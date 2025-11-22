@@ -29,7 +29,7 @@ All CI and CD integrations have been migrated away from [Microsoft Azure DevOps]
 
 All code quality analysis are done by [SonarCloud](https://sonarcloud.io/) and [CodeCov.io](https://codecov.io/).
 
-![License](https://img.shields.io/github/license/gimlichael/cuemon) ![Build Status](https://github.com/gimlichael/Cuemon/actions/workflows/pipelines.yml/badge.svg?branch=main) [![codecov](https://codecov.io/gh/gimlichael/Cuemon/branch/development/graph/badge.svg)](https://codecov.io/gh/gimlichael/Cuemon) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Cuemon&metric=coverage)](https://sonarcloud.io/dashboard?id=Cuemon) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.0-4baaaa.svg)](.github/CODE_OF_CONDUCT.md) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/gimlichael/Cuemon/badge)](https://scorecard.dev/viewer/?uri=github.com/gimlichael/Cuemon)
+![License](https://img.shields.io/github/license/codebeltnet/cuemon) ![Build Status](https://github.com/codebeltnet/cuemon/actions/workflows/pipelines.yml/badge.svg?branch=main) [![codecov](https://codecov.io/gh/codebeltnet/cuemon/branch/development/graph/badge.svg)](https://codecov.io/gh/codebeltnet/cuemon) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Cuemon&metric=coverage)](https://sonarcloud.io/dashboard?id=Cuemon) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.0-4baaaa.svg)](.github/CODE_OF_CONDUCT.md) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/codebeltnet/cuemon/badge)](https://scorecard.dev/viewer/?uri=github.com/codebeltnet/cuemon)
 
 ## Branching Strategy
 

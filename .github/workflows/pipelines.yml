@@ -165,24 +165,24 @@ jobs:
     needs: [build, test_linux, test_windows, integration_test]
     uses: codebeltnet/jobs-codecov/.github/workflows/default.yml@v1
     with:
-      repository: gimlichael/Cuemon
+      repository: codebeltnet/cuemon
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  # codeql:
-  #   name: call-codeql
-  #   needs: [build, test_linux, test_windows, integration_test]
-  #   uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
-  #   with:
-  #     timeout-minutes: 30
-  #   permissions:
-  #     security-events: write
+  codeql:
+    name: call-codeql
+    needs: [build, test_linux, test_windows, integration_test]
+    uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
+    with:
+      timeout-minutes: 30
+    permissions:
+      security-events: write
 
   deploy:
     if: github.event_name != 'pull_request'
     name: call-nuget
-    needs: [build, pack, test_linux, test_windows, integration_test, sonarcloud, codecov]
-    uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v1
+    needs: [build, pack, test_linux, test_windows, integration_test, sonarcloud, codecov, codeql]
+    uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v2
     with:
       version: ${{ needs.build.outputs.version }}
       environment: Production

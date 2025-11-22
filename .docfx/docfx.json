@@ -134,7 +134,7 @@
       "_enableSearch": true,
       "_disableContribution": false,
       "_gitContribute": {
-        "repo": "https://github.com/gimlichael/Cuemon",
+        "repo": "https://github.com/codebeltnet/cuemon",
         "branch": "development"
       },
       "_gitUrlPattern": "github",

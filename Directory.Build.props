@@ -24,7 +24,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://www.cuemon.net/</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/gimlichael/Cuemon</RepositoryUrl>
+    <RepositoryUrl>https://github.com/codebeltnet/cuemon</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -43,7 +43,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(NuGetPackageRoot)' != ''">
-    <SourceRoot Include="$(NuGetPackageRoot)" RepositoryUrl="https://github.com/gimlichael/Cuemon" />
+    <SourceRoot Include="$(NuGetPackageRoot)" RepositoryUrl="https://github.com/codebeltnet/cuemon" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(IsTestProject)' == 'false'">

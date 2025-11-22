@@ -181,7 +181,7 @@ jobs:
   deploy:
     if: github.event_name != 'pull_request'
     name: call-nuget
-    needs: [build, pack, test_linux, test_windows, integration_test, sonarcloud, codecov]
+    needs: [build, pack, test_linux, test_windows, integration_test, sonarcloud, codecov, codeql]
     uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v2
     with:
       version: ${{ needs.build.outputs.version }}

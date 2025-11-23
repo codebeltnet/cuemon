@@ -47,28 +47,207 @@ namespace Cuemon.Security
         /// <returns>A <see cref="HashResult" /> containing the computed hash code of the specified <paramref name="input" />.</returns>
         public override HashResult ComputeHash(byte[] input)
         {
-            var hash = OffsetBasis;
-            switch (Options.Algorithm)
+            Validator.ThrowIfNull(input);
+
+            if (Bits == 32) { return ComputeHash32(input, (uint)Prime, (uint)OffsetBasis, Options); }
+            if (Bits == 64) { return ComputeHash64(input, (ulong)Prime, (ulong)OffsetBasis, Options); }
+            if (Bits > 64 && (Bits % 32) == 0) { return ComputeHashMultiWord(input, Prime, OffsetBasis, Bits, Options); }
+            return ComputeHashFallback(input, Prime, OffsetBasis, Bits, Options);
+        }
+
+        private static HashResult ComputeHash32(byte[] input, uint prime, uint offsetBasis, FowlerNollVoOptions options)
+        {
+            unchecked
             {
-                case FowlerNollVoAlgorithm.Fnv1a:
-                    foreach (var b in input)
+                if (options.Algorithm == FowlerNollVoAlgorithm.Fnv1a)
+                {
+                    for (int i = 0; i < input.Length; i++)
                     {
-                        hash ^= b;
-                        hash *= Prime;
+                        offsetBasis ^= input[i];
+                        offsetBasis *= prime;
                     }
-                    break;
-                default:
-                    foreach (var b in input)
+                }
+                else
+                {
+                    for (int i = 0; i < input.Length; i++)
                     {
-                        hash *= Prime;
-                        hash ^= b;
+                        offsetBasis *= prime;
+                        offsetBasis ^= input[i];
                     }
-                    break;
+                }
+
+                var result = new byte[4];
+                if (options.ByteOrder == Endianness.LittleEndian)
+                {
+                    result[0] = (byte)offsetBasis;
+                    result[1] = (byte)(offsetBasis >> 8);
+                    result[2] = (byte)(offsetBasis >> 16);
+                    result[3] = (byte)(offsetBasis >> 24);
+                }
+                else
+                {
+                    result[3] = (byte)offsetBasis;
+                    result[2] = (byte)(offsetBasis >> 8);
+                    result[1] = (byte)(offsetBasis >> 16);
+                    result[0] = (byte)(offsetBasis >> 24);
+                }
+
+                return new HashResult(result);
             }
-            var result = hash.ToByteArray();
-            Array.Resize(ref result, Bits / Convertible.BitsPerByte);
-            result = Convertible.ReverseEndianness(result, o => o.ByteOrder = Options.ByteOrder);
-            return new HashResult(result);
+        }
+
+        private static HashResult ComputeHash64(byte[] input, ulong prime, ulong offsetBasis, FowlerNollVoOptions options)
+        {
+            unchecked
+            {
+                if (options.Algorithm == FowlerNollVoAlgorithm.Fnv1a)
+                {
+                    for (int i = 0; i < input.Length; i++)
+                    {
+                        offsetBasis ^= input[i];
+                        offsetBasis *= prime;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < input.Length; i++)
+                    {
+                        offsetBasis *= prime;
+                        offsetBasis ^= input[i];
+                    }
+                }
+
+                var result = new byte[8];
+                if (options.ByteOrder == Endianness.LittleEndian)
+                {
+                    result[0] = (byte)offsetBasis;
+                    result[1] = (byte)(offsetBasis >> 8);
+                    result[2] = (byte)(offsetBasis >> 16);
+                    result[3] = (byte)(offsetBasis >> 24);
+                    result[4] = (byte)(offsetBasis >> 32);
+                    result[5] = (byte)(offsetBasis >> 40);
+                    result[6] = (byte)(offsetBasis >> 48);
+                    result[7] = (byte)(offsetBasis >> 56);
+                }
+                else
+                {
+                    result[7] = (byte)offsetBasis;
+                    result[6] = (byte)(offsetBasis >> 8);
+                    result[5] = (byte)(offsetBasis >> 16);
+                    result[4] = (byte)(offsetBasis >> 24);
+                    result[3] = (byte)(offsetBasis >> 32);
+                    result[2] = (byte)(offsetBasis >> 40);
+                    result[1] = (byte)(offsetBasis >> 48);
+                    result[0] = (byte)(offsetBasis >> 56);
+                }
+
+                return new HashResult(result);
+            }
+        }
+
+        private static HashResult ComputeHashMultiWord(byte[] input, BigInteger prime, BigInteger offsetBasis, short bits, FowlerNollVoOptions options)
+        {
+            int unitCount = bits / 32;
+            var p = ToUInt32LittleEndian(prime, unitCount);
+            var a = ToUInt32LittleEndian(offsetBasis, unitCount);
+            var tmp = new uint[unitCount];
+
+            if (options.Algorithm == FowlerNollVoAlgorithm.Fnv1a)
+            {
+                for (int idx = 0; idx < input.Length; idx++)
+                {
+                    a[0] ^= input[idx];
+                    MultiplyMod32(a, p, tmp);
+                }
+            }
+            else
+            {
+                for (int idx = 0; idx < input.Length; idx++)
+                {
+                    MultiplyMod32(a, p, tmp);
+                    a[0] ^= input[idx];
+                }
+            }
+
+            var bytes = new byte[unitCount * 4];
+            for (int i = 0; i < unitCount; i++)
+            {
+                int j = i * 4;
+                var v = a[i];
+                bytes[j] = (byte)(v & 0xFF);
+                bytes[j + 1] = (byte)((v >> 8) & 0xFF);
+                bytes[j + 2] = (byte)((v >> 16) & 0xFF);
+                bytes[j + 3] = (byte)((v >> 24) & 0xFF);
+            }
+
+            var resultBytes = Convertible.ReverseEndianness(bytes, o => o.ByteOrder = options.ByteOrder);
+            return new HashResult(resultBytes);
+        }
+
+        private static HashResult ComputeHashFallback(byte[] input, BigInteger prime, BigInteger offsetBasis, short bits, FowlerNollVoOptions options)
+        {
+            if (options.Algorithm == FowlerNollVoAlgorithm.Fnv1a)
+            {
+                for (int i = 0; i < input.Length; i++)
+                {
+                    offsetBasis ^= input[i];
+                    offsetBasis *= prime;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < input.Length; i++)
+                {
+                    offsetBasis *= prime;
+                    offsetBasis ^= input[i];
+                }
+            }
+
+            var finalBytes = offsetBasis.ToByteArray();
+            Array.Resize(ref finalBytes, bits / Convertible.BitsPerByte);
+            finalBytes = Convertible.ReverseEndianness(finalBytes, o => o.ByteOrder = options.ByteOrder);
+            return new HashResult(finalBytes);
+        }
+
+        private static uint[] ToUInt32LittleEndian(BigInteger value, int unitCount)
+        {
+            var bytes = value.ToByteArray();
+            var needed = unitCount * 4;
+            if (bytes.Length < needed)
+            {
+                var extended = new byte[needed];
+                Array.Copy(bytes, extended, bytes.Length);
+                bytes = extended;
+            }
+            var res = new uint[unitCount];
+            for (int i = 0; i < unitCount; i++)
+            {
+                int j = i * 4;
+                res[i] = (uint)(bytes[j] | (bytes[j + 1] << 8) | (bytes[j + 2] << 16) | (bytes[j + 3] << 24));
+            }
+            return res;
+        }
+
+        private static void MultiplyMod32(uint[] a, uint[] p, uint[] tmp)
+        {
+            int L = a.Length;
+            for (int k = 0; k < L; k++) tmp[k] = 0u;
+
+            for (int i = 0; i < L; i++)
+            {
+                if (a[i] == 0) continue;
+                ulong carry = 0UL;
+                for (int j = 0; j < L - i; j++)
+                {
+                    int k = i + j;
+                    ulong acc = tmp[k];
+                    acc += (ulong)a[i] * p[j] + carry;
+                    tmp[k] = (uint)acc;
+                    carry = acc >> 32;
+                }
+            }
+
+            for (int i = 0; i < L; i++) a[i] = tmp[i];
         }
     }
 }

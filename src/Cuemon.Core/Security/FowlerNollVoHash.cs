@@ -8,6 +8,10 @@ namespace Cuemon.Security
     /// </summary>
     public abstract class FowlerNollVoHash : Hash<FowlerNollVoOptions>
     {
+        private readonly uint[] _primeWords;
+        private readonly uint[] _offsetBasisWords;
+        private readonly int _unitCount;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FowlerNollVoHash"/> class.
         /// </summary>
@@ -32,6 +36,13 @@ namespace Cuemon.Security
             Bits = bits;
             Prime = prime;
             OffsetBasis = offsetBasis;
+
+            if (bits > 64)
+            {
+                _unitCount = bits / 32;
+                _primeWords = ToUInt32LittleEndian(prime, _unitCount);
+                _offsetBasisWords = ToUInt32LittleEndian(offsetBasis, _unitCount);
+            }
         }
 
         /// <summary>
@@ -62,7 +73,7 @@ namespace Cuemon.Security
             Validator.ThrowIfNull(input);
             if (Bits == 32) { return ComputeHash32(input, (uint)Prime, (uint)OffsetBasis, Options); }
             if (Bits == 64) { return ComputeHash64(input, (ulong)Prime, (ulong)OffsetBasis, Options); }
-            if (Bits > 64 && (Bits % 32) == 0) { return ComputeHashMultiWord(input, Prime, OffsetBasis, Bits, Options); }
+            if (Bits > 64 && (Bits % 32) == 0) { return ComputeHashMultiWordInstance(input, _unitCount, _primeWords, _offsetBasisWords, Options); }
             throw new InvalidOperationException($"Unsupported Fowler–Noll–Vo hash size: {Bits}. Supported sizes are: 32, 64, 128, 256, 512, 1024 bits.");
         }
 
@@ -156,12 +167,12 @@ namespace Cuemon.Security
             }
         }
 
-        private static HashResult ComputeHashMultiWord(byte[] input, BigInteger prime, BigInteger offsetBasis, short bits, FowlerNollVoOptions options)
+        private static HashResult ComputeHashMultiWordInstance(byte[] input, int unitCount, uint[] primeWords, uint[] offsetBasisWords, FowlerNollVoOptions options)
         {
-            int unitCount = bits / 32;
-            var p = ToUInt32LittleEndian(prime, unitCount);
-            var a = ToUInt32LittleEndian(offsetBasis, unitCount);
+            var a = new uint[unitCount];
             var tmp = new uint[unitCount];
+            Array.Copy(offsetBasisWords, a, unitCount);
+            var p = primeWords;
 
             if (options.Algorithm == FowlerNollVoAlgorithm.Fnv1a)
             {
@@ -184,11 +195,11 @@ namespace Cuemon.Security
             for (int i = 0; i < unitCount; i++)
             {
                 int j = i * 4;
-                var v = a[i];
+                uint v = a[i];
                 bytes[j] = (byte)(v & 0xFF);
-                bytes[j + 1] = (byte)((v >> 8) & 0xFF);
-                bytes[j + 2] = (byte)((v >> 16) & 0xFF);
-                bytes[j + 3] = (byte)((v >> 24) & 0xFF);
+                bytes[j + 1] = (byte)(v >> 8);
+                bytes[j + 2] = (byte)(v >> 16);
+                bytes[j + 3] = (byte)(v >> 24);
             }
 
             var resultBytes = Convertible.ReverseEndianness(bytes, o => o.ByteOrder = options.ByteOrder);

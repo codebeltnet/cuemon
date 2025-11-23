@@ -46,10 +46,23 @@ namespace Cuemon
         }
 
         [Fact]
-        public void GetHashCode_TwoCalendars()
+        public void GetHashCode_TwoSameTypeCalendars_MustBeEqual()
         {
-            var a = new DateSpan(DateTime.UtcNow, DateTime.UtcNow.Add(TimeSpan.FromDays(1)), new ChineseLunisolarCalendar());
-            var b = new DateSpan(DateTime.UtcNow, DateTime.UtcNow.Add(TimeSpan.FromDays(1)), new ChineseLunisolarCalendar());
+            var utcNow = DateTime.UtcNow;
+
+            var a = new DateSpan(utcNow, utcNow.Add(TimeSpan.FromDays(1)), new GregorianCalendar());
+            var b = new DateSpan(utcNow, utcNow.Add(TimeSpan.FromDays(1)), new GregorianCalendar());
+
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
+        }
+
+        [Fact]
+        public void GetHashCode_TwoDifferentTypeCalendars_MustBeNotEqual()
+        {
+            var utcNow = DateTime.UtcNow;
+
+            var a = new DateSpan(utcNow, utcNow.Add(TimeSpan.FromDays(1)), new JulianCalendar());
+            var b = new DateSpan(utcNow, utcNow.Add(TimeSpan.FromDays(1)), new GregorianCalendar());
 
             Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
         }

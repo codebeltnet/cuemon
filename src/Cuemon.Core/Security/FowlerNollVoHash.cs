@@ -17,6 +17,18 @@ namespace Cuemon.Security
         /// <param name="setup">The <see cref="FowlerNollVoOptions"/> which need to be configured.</param>
         protected FowlerNollVoHash(short bits, BigInteger prime, BigInteger offsetBasis, Action<FowlerNollVoOptions> setup) : base(setup)
         {
+            switch (bits)
+            {
+                case 32:
+                case 64:
+                case 128:
+                case 256:
+                case 512:
+                case 1024:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(bits), bits, $"Unsupported Fowler–Noll–Vo hash size: {bits}. Supported sizes are: 32, 64, 128, 256, 512, 1024 bits.");
+            }
             Bits = bits;
             Prime = prime;
             OffsetBasis = offsetBasis;
@@ -48,11 +60,10 @@ namespace Cuemon.Security
         public override HashResult ComputeHash(byte[] input)
         {
             Validator.ThrowIfNull(input);
-
             if (Bits == 32) { return ComputeHash32(input, (uint)Prime, (uint)OffsetBasis, Options); }
             if (Bits == 64) { return ComputeHash64(input, (ulong)Prime, (ulong)OffsetBasis, Options); }
             if (Bits > 64 && (Bits % 32) == 0) { return ComputeHashMultiWord(input, Prime, OffsetBasis, Bits, Options); }
-            return ComputeHashFallback(input, Prime, OffsetBasis, Bits, Options);
+            throw new InvalidOperationException($"Unsupported Fowler–Noll–Vo hash size: {Bits}. Supported sizes are: 32, 64, 128, 256, 512, 1024 bits.");
         }
 
         private static HashResult ComputeHash32(byte[] input, uint prime, uint offsetBasis, FowlerNollVoOptions options)
@@ -182,31 +193,6 @@ namespace Cuemon.Security
 
             var resultBytes = Convertible.ReverseEndianness(bytes, o => o.ByteOrder = options.ByteOrder);
             return new HashResult(resultBytes);
-        }
-
-        private static HashResult ComputeHashFallback(byte[] input, BigInteger prime, BigInteger offsetBasis, short bits, FowlerNollVoOptions options)
-        {
-            if (options.Algorithm == FowlerNollVoAlgorithm.Fnv1a)
-            {
-                for (int i = 0; i < input.Length; i++)
-                {
-                    offsetBasis ^= input[i];
-                    offsetBasis *= prime;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < input.Length; i++)
-                {
-                    offsetBasis *= prime;
-                    offsetBasis ^= input[i];
-                }
-            }
-
-            var finalBytes = offsetBasis.ToByteArray();
-            Array.Resize(ref finalBytes, bits / Convertible.BitsPerByte);
-            finalBytes = Convertible.ReverseEndianness(finalBytes, o => o.ByteOrder = options.ByteOrder);
-            return new HashResult(finalBytes);
         }
 
         private static uint[] ToUInt32LittleEndian(BigInteger value, int unitCount)

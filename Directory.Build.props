@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
     <IsTestProject>$(MSBuildProjectName.EndsWith('Tests'))</IsTestProject>
+    <IsBenchmarkProject>$(MSBuildProjectName.EndsWith('Benchmarks'))</IsBenchmarkProject>
     <IsLinux>$([MSBuild]::IsOSPlatform('Linux'))</IsLinux>
     <IsWindows>$([MSBuild]::IsOSPlatform('Windows'))</IsWindows>
     <IsMainAuthor Condition="'$(EMAIL)' == 'michael@geekle.io'">true</IsMainAuthor>
@@ -13,7 +14,7 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IsTestProject)' == 'false'">
+  <PropertyGroup Condition="'$(IsTestProject)' == 'false' AND '$(IsBenchmarkProject)' == 'false'">
     <TargetFrameworks>net10.0;net9.0;netstandard2.0</TargetFrameworks>
     <Copyright>Copyright © Geekle 2009-2025. All rights reserved.</Copyright>
     <Authors>gimlichael</Authors>
@@ -46,7 +47,7 @@
     <SourceRoot Include="$(NuGetPackageRoot)" RepositoryUrl="https://github.com/codebeltnet/cuemon" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(IsTestProject)' == 'false'">
+  <ItemGroup Condition="'$(IsTestProject)' == 'false' AND '$(IsBenchmarkProject)' == 'false'">
     <PackageReference Include="MinVer" PrivateAssets="all" />
     <None Include="..\..\.nuget\icon.png" Pack="true" Visible="false" PackagePath="icon.png" />
     <None Include="..\..\.nuget\$(MSBuildProjectName)\README.md" Pack="true" PackagePath="\" />
@@ -60,7 +61,7 @@
     <TargetFrameworks>net10.0;net9.0;net48</TargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true' OR '$(IsBenchmarkProject)' == 'true'">
     <IsPackable>false</IsPackable>
     <OutputType>Exe</OutputType>
     <RunAnalyzers>false</RunAnalyzers>
@@ -95,6 +96,15 @@
 
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">
     <PackageReference Include="Codebelt.Extensions.Xunit" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(IsBenchmarkProject)' == 'true'">
+    <TargetFrameworks>net10.0;net9.0;net48</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsBenchmarkProject)' == 'true'">
+    <PackageReference Include="BenchmarkDotNet" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" />
   </ItemGroup>
 
 </Project>

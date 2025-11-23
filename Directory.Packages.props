@@ -4,6 +4,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="AutoFixture" Version="4.18.1" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.6" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.6" />
     <PackageVersion Include="Codebelt.Extensions.Xunit" Version="11.0.1" />
     <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting" Version="11.0.1" />
     <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting.AspNetCore" Version="11.0.1" />

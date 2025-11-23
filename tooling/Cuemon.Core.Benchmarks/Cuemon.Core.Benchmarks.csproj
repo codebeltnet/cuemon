@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Cuemon</RootNamespace>
+  </PropertyGroup>
+
+ 
+  <ItemGroup>
+    <Compile Include=".support\Program.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cuemon.Core\Cuemon.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="reports\results\" />
+  </ItemGroup>
+
+</Project>

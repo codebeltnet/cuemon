@@ -29,10 +29,8 @@ namespace Cuemon.Security.Cryptography
         public override HashResult ComputeHash(byte[] input)
         {
             Validator.ThrowIfNull(input);
-            using (var h = Initializer())
-            {
-                return new HashResult(h.ComputeHash(input));
-            }
+            using var h = Initializer();
+            return new HashResult(h.ComputeHash(input));
         }
     }
 }

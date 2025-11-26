@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -102,9 +102,10 @@ namespace Cuemon.Security.Cryptography
                             ms.Write(bytes, 0, bytes.Length);
                             ms.Position = 0;
                             cryptoStream = new CryptoStream(ms, rijndael.CreateDecryptor(), CryptoStreamMode.Read);
-                            var cryptoBytes = new byte[bytes.Length];
-                            cryptoStream.Read(cryptoBytes, 0, cryptoBytes.Length);
-                            return new MemoryStream(Eradicate.TrailingZeros(cryptoBytes));
+                            var outMs = new MemoryStream();
+                            cryptoStream.CopyTo(outMs);
+                            outMs.Position = 0;
+                            return outMs;
                         default:
                             cryptoStream = new CryptoStream(ms, rijndael.CreateEncryptor(), CryptoStreamMode.Write);
                             cryptoStream.Write(bytes, 0, bytes.Length);

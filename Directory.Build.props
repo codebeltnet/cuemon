@@ -2,6 +2,8 @@
   <PropertyGroup>
     <IsTestProject>$(MSBuildProjectName.EndsWith('Tests'))</IsTestProject>
     <IsBenchmarkProject>$(MSBuildProjectName.EndsWith('Benchmarks'))</IsBenchmarkProject>
+    <IsSourceProject>$(MSBuildProjectDirectory.ToLower().StartsWith('$(MSBuildThisFileDirectory.ToLower())src'))</IsSourceProject>
+    <IsToolingProject>$(MSBuildProjectDirectory.ToLower().StartsWith('$(MSBuildThisFileDirectory.ToLower())tooling'))</IsToolingProject>
     <IsLinux>$([MSBuild]::IsOSPlatform('Linux'))</IsLinux>
     <IsWindows>$([MSBuild]::IsOSPlatform('Windows'))</IsWindows>
     <IsMainAuthor Condition="'$(EMAIL)' == 'michael@geekle.io'">true</IsMainAuthor>
@@ -14,7 +16,7 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IsTestProject)' == 'false' AND '$(IsBenchmarkProject)' == 'false'">
+  <PropertyGroup Condition="'$(IsSourceProject)' == 'true'">
     <TargetFrameworks>net10.0;net9.0;netstandard2.0</TargetFrameworks>
     <Copyright>Copyright © Geekle 2009-2025. All rights reserved.</Copyright>
     <Authors>gimlichael</Authors>
@@ -47,7 +49,7 @@
     <SourceRoot Include="$(NuGetPackageRoot)" RepositoryUrl="https://github.com/codebeltnet/cuemon" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(IsTestProject)' == 'false' AND '$(IsBenchmarkProject)' == 'false'">
+  <ItemGroup Condition="'$(IsSourceProject)' == 'true'">
     <PackageReference Include="MinVer" PrivateAssets="all" />
     <None Include="..\..\.nuget\icon.png" Pack="true" Visible="false" PackagePath="icon.png" />
     <None Include="..\..\.nuget\$(MSBuildProjectName)\README.md" Pack="true" PackagePath="\" />
@@ -61,19 +63,28 @@
     <TargetFrameworks>net10.0;net9.0;net48</TargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IsTestProject)' == 'true' OR '$(IsBenchmarkProject)' == 'true'">
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
     <IsPackable>false</IsPackable>
     <OutputType>Exe</OutputType>
     <RunAnalyzers>false</RunAnalyzers>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
     <SonarQubeExclude>true</SonarQubeExclude>
-    <WarningLevel>0</WarningLevel>
     <AnalysisLevel>none</AnalysisLevel>
     <NoWarn>NU1701,NU1902,NU1903</NoWarn>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <NuGetAudit>false</NuGetAudit>
     <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true' AND '$(BuildingInsideVisualStudio)' != 'true'">
+    <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsToolingProject)' == 'true'">
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+    <SonarQubeExclude>true</SonarQubeExclude>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">
@@ -99,7 +110,7 @@
   </ItemGroup>
 
   <PropertyGroup Condition="'$(IsBenchmarkProject)' == 'true'">
-    <TargetFrameworks>net10.0;net9.0;net48</TargetFrameworks>
+    <TargetFrameworks>net10.0;net9.0;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(IsBenchmarkProject)' == 'true'">

@@ -1,5 +1,5 @@
 ---
-mode: Plan
+mode: agent
 description: 'Writing Performance Benchmarks in Cuemon'
 ---
 

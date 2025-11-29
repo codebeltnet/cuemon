@@ -102,7 +102,7 @@ namespace Cuemon
         /// <returns>A default constructed instance of <typeparamref name="T"/> initialized with <paramref name="factory"/>.</returns>
         public static T CreateInstance<T>(Action<T> factory) where T : class, new()
         {
-            var options = Activator.CreateInstance<T>();
+            var options = new T();
             factory?.Invoke(options);
             return options;
         }
@@ -118,7 +118,7 @@ namespace Cuemon
         /// <remarks>Often referred to as part the Options pattern: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options</remarks>
         public static TOptions Configure<TOptions>(Action<TOptions> setup, Action<TOptions> initializer = null, Action<TOptions> validator = null) where TOptions : class, IParameterObject, new()
         {
-            var options = Activator.CreateInstance<TOptions>();
+            var options = new TOptions();
             initializer?.Invoke(options);
             setup?.Invoke(options);
             validator?.Invoke(options);

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿    using System;
 using System.Security.Cryptography;
 using System.Text;
 using Cuemon.Text;
@@ -85,6 +84,7 @@ namespace Cuemon.Security.Cryptography
         private byte[] CryptoTransformCore(byte[] value, AesMode mode, Action<AesCryptorOptions> setup)
         {
             var options = Patterns.Configure(setup);
+
             using (var aes = Aes.Create())
             {
                 aes.BlockSize = BlockSize;
@@ -93,27 +93,11 @@ namespace Cuemon.Security.Cryptography
                 aes.Padding = options.Padding;
                 aes.Mode = options.Mode;
 
-                using (var sms = Patterns.SafeInvoke(() => new MemoryStream(), (ms, rijndael, bytes) =>
+                using (var transform = mode == AesMode.Encrypt
+                           ? aes.CreateEncryptor()
+                           : aes.CreateDecryptor())
                 {
-                    CryptoStream cryptoStream;
-                    switch (mode)
-                    {
-                        case AesMode.Decrypt:
-                            ms.Write(bytes, 0, bytes.Length);
-                            ms.Position = 0;
-                            cryptoStream = new CryptoStream(ms, rijndael.CreateDecryptor(), CryptoStreamMode.Read);
-                            var cryptoBytes = new byte[bytes.Length];
-                            cryptoStream.Read(cryptoBytes, 0, cryptoBytes.Length);
-                            return new MemoryStream(Eradicate.TrailingZeros(cryptoBytes));
-                        default:
-                            cryptoStream = new CryptoStream(ms, rijndael.CreateEncryptor(), CryptoStreamMode.Write);
-                            cryptoStream.Write(bytes, 0, bytes.Length);
-                            cryptoStream.FlushFinalBlock();
-                            return ms;
-                    }
-                }, aes, value))
-                {
-                    return sms.ToArray();
+                    return transform.TransformFinalBlock(value, 0, value.Length);
                 }
             }
         }

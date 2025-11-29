@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Codebelt.Extensions.Xunit;
+using System;
 using System.Globalization;
-using Codebelt.Extensions.Xunit;
 using Xunit;
 
 namespace Cuemon
@@ -9,6 +9,60 @@ namespace Cuemon
     {
         public DateSpanTest(ITestOutputHelper output) : base(output)
         {
+        }
+
+        [Fact]
+        public void GetHashCode_IsStableForSameInstance()
+        {
+            var span = new DateSpan();
+
+            var h1 = span.GetHashCode();
+            var h2 = span.GetHashCode();
+            var h3 = span.GetHashCode();
+
+            Assert.Equal(h1, h2);
+            Assert.Equal(h1, h3);
+        }
+
+        [Fact]
+        public void GetHashCode_EqualInstances_HaveSameHashCode()
+        {
+            var a = new DateSpan();
+            var b = new DateSpan();
+
+            Assert.True(a.Equals(b));
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
+        }
+
+        [Fact]
+        public void GetHashCode_ChangingUpperBoundary_UsuallyChangesHashCode()
+        {
+            var a = new DateSpan();
+            var b = new DateSpan(DateTime.UtcNow, DateTime.UtcNow.Add(TimeSpan.FromDays(1)), new ChineseLunisolarCalendar());
+
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
+        }
+
+        [Fact]
+        public void GetHashCode_TwoSameTypeCalendars_MustBeEqual()
+        {
+            var utcNow = DateTime.UtcNow;
+
+            var a = new DateSpan(utcNow, utcNow.Add(TimeSpan.FromDays(1)), new GregorianCalendar());
+            var b = new DateSpan(utcNow, utcNow.Add(TimeSpan.FromDays(1)), new GregorianCalendar());
+
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
+        }
+
+        [Fact]
+        public void GetHashCode_TwoDifferentTypeCalendars_MustBeNotEqual()
+        {
+            var utcNow = DateTime.UtcNow;
+
+            var a = new DateSpan(utcNow, utcNow.Add(TimeSpan.FromDays(1)), new JulianCalendar());
+            var b = new DateSpan(utcNow, utcNow.Add(TimeSpan.FromDays(1)), new GregorianCalendar());
+
+            Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
         }
 
         [Fact]
@@ -37,7 +91,6 @@ namespace Cuemon
             Assert.Equal(320699209256, span.TotalMilliseconds);
 
             Assert.Equal(531, span.GetWeeks());
-            Assert.Equal(174922196, span.GetHashCode());
 
             TestOutput.WriteLine(span.ToString());
         }
@@ -68,7 +121,6 @@ namespace Cuemon
             Assert.Equal(2678400000, span.TotalMilliseconds);
 
             Assert.Equal(6, span.GetWeeks());
-            Assert.Equal(-1566296493, span.GetHashCode());
 
             TestOutput.WriteLine(span.ToString());
         }
@@ -99,7 +151,6 @@ namespace Cuemon
             Assert.Equal(7948800000, span.TotalMilliseconds);
 
             Assert.Equal(14, span.GetWeeks());
-            Assert.Equal(-1442996082, span.GetHashCode());
 
             TestOutput.WriteLine(span.ToString());
         }
@@ -130,7 +181,6 @@ namespace Cuemon
             Assert.Equal(15897600000, span.TotalMilliseconds);
 
             Assert.Equal(27, span.GetWeeks());
-            Assert.Equal(-923802662, span.GetHashCode());
 
             TestOutput.WriteLine(span.ToString());
         }
@@ -161,7 +211,6 @@ namespace Cuemon
             Assert.Equal(23760000000, span.TotalMilliseconds);
 
             Assert.Equal(40, span.GetWeeks());
-            Assert.Equal(-2085201570, span.GetHashCode());
 
             TestOutput.WriteLine(span.ToString());
         }
@@ -203,7 +252,6 @@ namespace Cuemon
             Assert.Equal(22982400000, span.TotalMilliseconds);
 
             Assert.Equal(40, span.GetWeeks());
-            Assert.Equal(146233593, span.GetHashCode());
 
             TestOutput.WriteLine(span.ToString());
         }
@@ -234,7 +282,6 @@ namespace Cuemon
             Assert.Equal(31536000000, span.TotalMilliseconds);
 
             Assert.Equal(53, span.GetWeeks());
-            Assert.Equal(-252938415, span.GetHashCode());
 
             TestOutput.WriteLine(span.ToString());
         }
@@ -265,7 +312,6 @@ namespace Cuemon
             Assert.Equal(31536000000, span.TotalMilliseconds);
 
             Assert.Equal(53, span.GetWeeks());
-            Assert.Equal(1501380836, span.GetHashCode());
 
             TestOutput.WriteLine(span.ToString());
         }
@@ -296,7 +342,6 @@ namespace Cuemon
             Assert.Equal(31622400000, span.TotalMilliseconds);
 
             Assert.Equal(53, span.GetWeeks());
-            Assert.Equal(1113143048, span.GetHashCode());
 
             TestOutput.WriteLine(span.ToString());
         }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31919.166
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11217.181 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B59C8DF7-7DEC-46AF-A165-CC9E3AD01EA8}"
 EndProject
@@ -169,6 +169,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cuemon.AspNetCore.Mvc.FunctionalTests", "test\Cuemon.AspNetCore.Mvc.FunctionalTests\Cuemon.AspNetCore.Mvc.FunctionalTests.csproj", "{28AC63CA-9E57-4C36-81B4-C03DD0CFC0EA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cuemon.AspNetCore.FunctionalTests", "test\Cuemon.AspNetCore.FunctionalTests\Cuemon.AspNetCore.FunctionalTests.csproj", "{0618AFB5-D95A-48F9-A07A-B3A2DB876FC0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tooling", "tooling", "{11659885-1727-4DC8-809A-8FFCC6F53966}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cuemon.Core.Benchmarks", "tooling\Cuemon.Core.Benchmarks\Cuemon.Core.Benchmarks.csproj", "{6BC4C5DC-CECC-4E6C-8B95-673670A40BF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -492,6 +496,10 @@ Global
 		{0618AFB5-D95A-48F9-A07A-B3A2DB876FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0618AFB5-D95A-48F9-A07A-B3A2DB876FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0618AFB5-D95A-48F9-A07A-B3A2DB876FC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BC4C5DC-CECC-4E6C-8B95-673670A40BF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BC4C5DC-CECC-4E6C-8B95-673670A40BF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BC4C5DC-CECC-4E6C-8B95-673670A40BF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BC4C5DC-CECC-4E6C-8B95-673670A40BF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -576,6 +584,7 @@ Global
 		{AE0ADF91-E7C7-4CB4-A39D-E1A5374C5602} = {B59C8DF7-7DEC-46AF-A165-CC9E3AD01EA8}
 		{28AC63CA-9E57-4C36-81B4-C03DD0CFC0EA} = {31707D2B-843E-4D4F-B9C7-3E74EF8DA338}
 		{0618AFB5-D95A-48F9-A07A-B3A2DB876FC0} = {31707D2B-843E-4D4F-B9C7-3E74EF8DA338}
+		{6BC4C5DC-CECC-4E6C-8B95-673670A40BF8} = {11659885-1727-4DC8-809A-8FFCC6F53966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2A848386-B682-4F6D-8254-B5F6247C3054}

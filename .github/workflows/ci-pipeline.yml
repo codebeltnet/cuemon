@@ -2,11 +2,6 @@ name: Cuemon CI/CD Pipeline
 on:
   pull_request:
     branches: [main]
-    paths-ignore:
-      - .codecov/**
-      - .docfx/**
-      - .nuget/**
-      - '**/*.md'
   workflow_dispatch:
     inputs:
       configuration:
@@ -73,11 +68,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
         configuration: [Debug, Release]
         project: ${{ fromJson(needs.prepare_test.outputs.json) }}
     uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
     with:
-      runs-on: ubuntu-24.04
+      runs-on: ${{ matrix.os }}
       configuration: ${{ matrix.configuration }}
       projects: ${{ matrix.project }}
       build: true # we need to build due to xUnitv3
@@ -89,11 +85,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [windows-2025, windows-11-arm]
         configuration: [Debug, Release]
         project: ${{ fromJson(needs.prepare_test.outputs.json) }}
     uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
     with:
-      runs-on: windows-2022
+      runs-on: ${{ matrix.os }}
       configuration: ${{ matrix.configuration }}
       projects: ${{ matrix.project }}
       test-arguments: -- RunConfiguration.DisableAppDomain=true

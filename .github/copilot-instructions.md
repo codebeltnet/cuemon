@@ -172,7 +172,7 @@ This document provides guidance for writing performance tests (benchmarks) in th
       public class Sha512256Benchmark { /* ... */ }
   }
   ```
-The class name may end with `Benchmark`, but the namespace must match the assembly (no `.Benchmarks` suffix).
+The class name must end with `Benchmark`, but the namespace must match the assembly (no `.Benchmarks` suffix).
 - The benchmarks for the Cuemon.Bar assembly live in the Cuemon.Bar.Benchmarks assembly.
 - Benchmark class names end with Benchmark and live in the same namespace as the class being measured, e.g., the benchmarks for the Zoo class that resides in the Cuemon.Bar assembly would be named ZooBenchmark and placed in the Cuemon.Bar namespace in the Cuemon.Bar.Benchmarks assembly.
 - Modify the associated .csproj file to override the root namespace, e.g., <RootNamespace>Cuemon.Bar</RootNamespace>.

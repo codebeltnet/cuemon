@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Security.Cryptography;
 using System.Text;
 using Cuemon.Text;

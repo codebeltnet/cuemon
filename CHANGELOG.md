@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.1.0] - 2025-12-06
+
+This is a minor release that introduces support for post-configuration of parameter objects while delivering a significant series of performance improvements across various computations.
+
+These optimizations yielded a significant performance boost with impressive reductions in memory allocations, enhancing overall efficiency and responsiveness.
+
+### Added
+
+- `IPostConfigurableParameterObject` interface in the Cuemon.Configuration namespace that defines a contract for parameter objects that require post-configuration logic.
+
+### Changed
+
+- `Validator` class in the Cuemon namespace was extended to support invoking parameter objects implementing the `IPostConfigurableParameterObject` interface,
+- `FowlerNollVoHash` class in the Cuemon.Security namespace was optimized with specialized compute paths for 32-bit, 64-bit, and multi-word (≥128-bit) hashes,
+- `DateSpan` struct in the Cuemon namespace was optimized for better performance when computing hash codes and equality checks,
+- `RandomString` method on the `Generate` class in the Cuemon namespace with a sequential char-array builder and length guard, reducing overhead and allocations
+- `DelimitedString` class in the Cuemon namespace was optimized with a specialized fast-path for single-character delimiters and qualifiers, reducing overhead and allocations
+- `AesCryptor` class in the Cuemon.Security.Cryptography namespace was optimized to use `TransformFinalBlock` instead of stream-based transforms, reducing overhead and allocations
+- `CyclicRedundancyCheck` class in the Cuemon.Security namespace was optimized by switching CRC lookup tables to ulong[] and simplifying initialization/loop structure, increasing throughput and reducing unnecessary copying
+
+### Fixed
+
+- `Patterns` class in the Cuemon namespace had all `Activator.CreateInstance<T>()` calls replaced with direct `new T()` (generic object creation expressions), to eliminate reflection overhead
+- `SecureHashAlgorithm512` class in the Cuemon.Security.Cryptography namespace to allow optional setup delegate
+
 ## [10.0.0] - 2025-11-11
 
 This is a major release that focuses on adapting to the latest .NET 10 (LTS) release, while also removing support for .NET 8 (LTS).

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31919.166
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11217.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B59C8DF7-7DEC-46AF-A165-CC9E3AD01EA8}"
 EndProject
@@ -169,6 +169,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cuemon.AspNetCore.Mvc.FunctionalTests", "test\Cuemon.AspNetCore.Mvc.FunctionalTests\Cuemon.AspNetCore.Mvc.FunctionalTests.csproj", "{28AC63CA-9E57-4C36-81B4-C03DD0CFC0EA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cuemon.AspNetCore.FunctionalTests", "test\Cuemon.AspNetCore.FunctionalTests\Cuemon.AspNetCore.FunctionalTests.csproj", "{0618AFB5-D95A-48F9-A07A-B3A2DB876FC0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tuning", "tuning", "{ABBB70A4-D3C3-4B7C-8AF6-2DB8379E0BB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cuemon.Core.Benchmarks", "tuning\Cuemon.Core.Benchmarks\Cuemon.Core.Benchmarks.csproj", "{3F788B0A-3BFF-5F5D-BC90-F3DD5CE98CB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cuemon.Security.Cryptography.Benchmarks", "tuning\Cuemon.Security.Cryptography.Benchmarks\Cuemon.Security.Cryptography.Benchmarks.csproj", "{3DBF53D2-5E7F-497D-B279-90CAB8275B93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -492,6 +498,14 @@ Global
 		{0618AFB5-D95A-48F9-A07A-B3A2DB876FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0618AFB5-D95A-48F9-A07A-B3A2DB876FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0618AFB5-D95A-48F9-A07A-B3A2DB876FC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F788B0A-3BFF-5F5D-BC90-F3DD5CE98CB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F788B0A-3BFF-5F5D-BC90-F3DD5CE98CB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F788B0A-3BFF-5F5D-BC90-F3DD5CE98CB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F788B0A-3BFF-5F5D-BC90-F3DD5CE98CB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DBF53D2-5E7F-497D-B279-90CAB8275B93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DBF53D2-5E7F-497D-B279-90CAB8275B93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DBF53D2-5E7F-497D-B279-90CAB8275B93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DBF53D2-5E7F-497D-B279-90CAB8275B93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -576,6 +590,8 @@ Global
 		{AE0ADF91-E7C7-4CB4-A39D-E1A5374C5602} = {B59C8DF7-7DEC-46AF-A165-CC9E3AD01EA8}
 		{28AC63CA-9E57-4C36-81B4-C03DD0CFC0EA} = {31707D2B-843E-4D4F-B9C7-3E74EF8DA338}
 		{0618AFB5-D95A-48F9-A07A-B3A2DB876FC0} = {31707D2B-843E-4D4F-B9C7-3E74EF8DA338}
+		{3F788B0A-3BFF-5F5D-BC90-F3DD5CE98CB2} = {ABBB70A4-D3C3-4B7C-8AF6-2DB8379E0BB7}
+		{3DBF53D2-5E7F-497D-B279-90CAB8275B93} = {ABBB70A4-D3C3-4B7C-8AF6-2DB8379E0BB7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2A848386-B682-4F6D-8254-B5F6247C3054}

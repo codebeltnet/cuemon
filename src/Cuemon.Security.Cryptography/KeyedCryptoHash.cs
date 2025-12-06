@@ -28,10 +28,9 @@ namespace Cuemon.Security.Cryptography
         /// <returns>A <see cref="HashResult" /> containing the computed hash code of the specified <paramref name="input" />.</returns>
         public override HashResult ComputeHash(byte[] input)
         {
-            using (var h = Initializer())
-            {
-                return new HashResult(h.ComputeHash(input));
-            }
+            Validator.ThrowIfNull(input);
+            using var h = Initializer();
+            return new HashResult(h.ComputeHash(input));
         }
     }
 }

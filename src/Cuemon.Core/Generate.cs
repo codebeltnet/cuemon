@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Cuemon.Collections.Generic;
 using Cuemon.Reflection;
 using Cuemon.Security;
@@ -78,11 +76,15 @@ namespace Cuemon
         /// <param name="count">The number of <typeparamref name="T"/> to generate.</param>
         /// <param name="generator">The function delegate that will resolve the instance of <typeparamref name="T"/>; the parameter passed to the delegate represents the index (zero-based) of the element to return.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> that contains a range of <typeparamref name="T"/> elements.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="generator"/> is <c>null</c>.
+        /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="count"/> is less than 0.
         /// </exception>
         public static IEnumerable<T> RangeOf<T>(int count, Func<int, T> generator)
         {
+            Validator.ThrowIfNull(generator);
             Validator.ThrowIfLowerThan(count, 0, nameof(count));
             for (var i = 0; i < count; i++) { yield return generator(i); }
         }
@@ -157,14 +159,22 @@ namespace Cuemon
         public static string RandomString(int length, params string[] values)
         {
             Validator.ThrowIfSequenceNullOrEmpty(values, nameof(values));
-            var result = new ConcurrentBag<char>();
-            Parallel.For(0, length, _ =>
+            if (length <= 0) { return string.Empty; }
+
+            var random = LocalRandomizer.Value;
+            var buckets = values;
+            var bucketCount = buckets.Length;
+            var chars = new char[length];
+
+            for (var i = 0; i < length; i++)
             {
-                var index = RandomNumber(values.Length);
-                var indexLength = values[index].Length;
-                result.Add(values[index][RandomNumber(indexLength)]);
-            });
-            return Decorator.Enclose(result).ToStringEquivalent();
+                var bucketIndex = random.Next(bucketCount);
+                var bucket = buckets[bucketIndex];
+                var charIndex = random.Next(bucket.Length);
+                chars[i] = bucket[charIndex];
+            }
+
+            return new string(chars);
         }
 
         /// <summary>

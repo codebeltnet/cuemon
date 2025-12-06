@@ -56,8 +56,10 @@ namespace Cuemon.Security
         /// <remarks>Inspiration and praises goes to http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html</remarks>
         public override HashResult ComputeHash(byte[] input)
         {
+            Validator.ThrowIfNull(input);
+
             var crc = (uint)InitialValue;
-            for (var i = 0; i < input.LongLength; i++)
+            for (var i = 0; i < input.Length; i++)
             {
                 var cb = Options.ReflectInput ? Convertible.ReverseBits8(input[i]) : input[i];
                 crc ^= (uint)(cb << 24);

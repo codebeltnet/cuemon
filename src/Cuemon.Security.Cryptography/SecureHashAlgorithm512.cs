@@ -20,7 +20,7 @@ namespace Cuemon.Security.Cryptography
         /// Initializes a new instance of the <see cref="SecureHashAlgorithm512"/> class.
         /// </summary>
         /// <param name="setup">The <see cref="ConvertibleOptions" /> which may be configured.</param>
-        public SecureHashAlgorithm512(Action<ConvertibleOptions> setup) : base(SHA512.Create, setup)
+        public SecureHashAlgorithm512(Action<ConvertibleOptions> setup = null) : base(SHA512.Create, setup)
         {
         }
     }

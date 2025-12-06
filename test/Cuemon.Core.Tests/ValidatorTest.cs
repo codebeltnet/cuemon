@@ -184,6 +184,23 @@ namespace Cuemon
             });
         }
 
+        [Fact]
+        public void ThrowIfInvalidOptions_ShouldPassSincePostConfiguredAndValid()
+        {
+            var options = new PostConfigurableOptions();
+            Validator.ThrowIfInvalidOptions(options);
+        }
+
+        [Fact]
+        public void ThrowIfInvalidOptions_ShouldFailSincePostConfiguredAndInvalid()
+        {
+            var options = new FailPostConfigurableOptions();
+            Assert.Throws<ArgumentException>(() =>
+            {
+                Validator.ThrowIfInvalidOptions(options);
+            });
+        }
+
         [Theory]
         [MemberData(nameof(GetValidatableOptions))]
         public void ThrowIfInvalidOptions_ShouldThrowArgumentException_WithInnerNotImplementedException(ValidatableOptions paramName)

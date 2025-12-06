@@ -1,3 +1,23 @@
+Version 10.1.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+ 
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+ 
+# New Features
+- ADDED IPostConfigurableParameterObject interface in the Cuemon.Configuration namespace that defines a contract for parameter objects that require post-configuration logic
+ 
+# Improvements
+- EXTENDED Validator class in the Cuemon namespace to support invoking parameter objects implementing the IPostConfigurableParameterObject interface
+- OPTIMIZED FowlerNollVoHash class in the Cuemon.Security namespace for better performance when computing hash codes
+- OPTIMIZED DateSpan struct in the Cuemon namespace for better performance when computing hash codes and equality checks
+- OPTIMIZED RandomString method on the Generate class in the Cuemon namespace with a sequential char-array builder and length guard, reducing overhead and allocations
+- OPTIMIZED DelimitedString class in the Cuemon namespace with a specialized fast-path for single-character delimiters and qualifiers, reducing overhead and allocations
+- OPTIMIZED CyclicRedundancyCheck class in the Cuemon.Security namespace switching CRC lookup tables to ulong[] and simplified initialization/loop structure, increasing throughput and reducing unnecessary copying
+ 
+# Bug Fixes
+- FIXED Patterns class in the Cuemon namespace to use generic object creation expressions to eliminate reflection overhead
+ 
 Version 10.0.0
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
  

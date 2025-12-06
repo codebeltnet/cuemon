@@ -9,7 +9,7 @@ namespace Cuemon.Security
     /// <remarks>Help and inspiration was gathered @ http://www.ross.net/crc/download/crc_v3.txt</remarks>
     public abstract class CyclicRedundancyCheck : Hash<CyclicRedundancyCheckOptions>
     {
-        private readonly Lazy<List<ulong>> _lazyLookup;
+        private readonly Lazy<ulong[]> _lookupTable;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CyclicRedundancyCheck"/> class.
@@ -20,34 +20,31 @@ namespace Cuemon.Security
         /// <param name="setup">The <see cref="CyclicRedundancyCheckOptions"/> which need to be configured.</param>
         protected CyclicRedundancyCheck(ulong polynomial, ulong initialValue, ulong finalXor, Action<CyclicRedundancyCheckOptions> setup) : base(setup)
         {
-            _lazyLookup = new Lazy<List<ulong>>(() => PolynomialTableInitializerCore(polynomial));
+            _lookupTable = new Lazy<ulong[]>(() => PolynomialTableInitializerCore(polynomial));
             InitialValue = initialValue;
             FinalXor = finalXor;
         }
 
-        private List<ulong> PolynomialTableInitializerCore(ulong polynomial)
+        private ulong[] PolynomialTableInitializerCore(ulong polynomial)
         {
             var table = new ulong[256];
-            var index = byte.MinValue;
-            while (true)
+            for (var i = 0; i < 256; i++)
             {
-                var checksum = PolynomialIndexInitializer(index);
+                var checksum = PolynomialIndexInitializer((byte)i);
                 for (byte b = 0; b < 8; b++)
                 {
                     PolynomialSlotCalculator(ref checksum, polynomial);
                 }
-                table[index] = checksum;
-                if (index == byte.MaxValue) { break; }
-                index++;
+                table[i] = checksum;
             }
-            return new List<ulong>(table);
+            return table;
         }
 
         /// <summary>
         /// Gets the lookup table containing the pre-computed polynomial values.
         /// </summary>
         /// <value>The lookup table containing the pre-computed polynomial values.</value>
-        protected ulong[] LookupTable => _lazyLookup.Value.ToArray();
+        protected ulong[] LookupTable => _lookupTable.Value;
 
         /// <summary>
         /// Returns the initial value for the specified <paramref name="index"/> of the polynomial <see cref="LookupTable"/>.

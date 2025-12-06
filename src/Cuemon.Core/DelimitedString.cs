@@ -11,7 +11,7 @@ namespace Cuemon
     /// </summary>
     public static class DelimitedString
     {
-        private static readonly ConcurrentDictionary<string, Regex> CompiledSplitExpressions = new();
+        private static readonly ConcurrentDictionary<(string Delimiter, string Qualifier), Regex> CompiledSplitExpressions = new();
 
         /// <summary>
         /// Creates a delimited string representation from the specified <paramref name="source"/>.
@@ -27,14 +27,20 @@ namespace Cuemon
             Validator.ThrowIfNull(source);
             var options = Patterns.Configure(setup);
             var delimitedValues = new StringBuilder();
+
             using (var enumerator = source.GetEnumerator())
             {
+                if (!enumerator.MoveNext()) { return string.Empty; }
+
+                delimitedValues.Append(options.StringConverter(enumerator.Current));
                 while (enumerator.MoveNext())
                 {
-                    delimitedValues.Append(FormattableString.Invariant($"{options.StringConverter(enumerator.Current)}{options.Delimiter}"));
+                    delimitedValues.Append(options.Delimiter);
+                    delimitedValues.Append(options.StringConverter(enumerator.Current));
                 }
             }
-            return delimitedValues.Length > 0 ? delimitedValues.ToString(0, delimitedValues.Length - options.Delimiter.Length) : delimitedValues.ToString();
+
+            return delimitedValues.ToString();
         }
 
         /// <summary>
@@ -57,12 +63,13 @@ namespace Cuemon
             var options = Patterns.Configure(setup);
             var delimiter = options.Delimiter;
             var qualifier = options.Qualifier;
-            var key = string.Concat(delimiter, "<-dq->", qualifier);
-            if (!CompiledSplitExpressions.TryGetValue(key, out var compiledSplit))
-            {
-                compiledSplit = new Regex(string.Format(options.FormatProvider, "{0}(?=(?:[^{1}]*{1}[^{1}]*{1})*(?![^{1}]*{1}))", delimiter, qualifier), RegexOptions.IgnoreCase | RegexOptions.Compiled, TimeSpan.FromSeconds(2));
-                CompiledSplitExpressions.TryAdd(key, compiledSplit);
-            }
+
+            if (delimiter.Length == 1 && qualifier.Length == 1) { return SplitSingleCharCsv(value, delimiter[0], qualifier[0]); }
+
+            var key = (delimiter, qualifier);
+            var compiledSplit = CompiledSplitExpressions.GetOrAdd(
+                key,
+                k => new Regex(string.Format(options.FormatProvider, "{0}(?=(?:[^{1}]*{1}[^{1}]*{1})*(?![^{1}]*{1}))", Regex.Escape(k.Delimiter), Regex.Escape(k.Qualifier)), RegexOptions.IgnoreCase | RegexOptions.Compiled, TimeSpan.FromSeconds(2)));
 
             try
             {
@@ -72,6 +79,41 @@ namespace Cuemon
             {
                 throw new InvalidOperationException(FormattableString.Invariant($"An error occurred while splitting '{value}' into substrings separated by '{delimiter}' and quoted with '{qualifier}'. This is typically related to data corruption, eg. a field has not been properly closed with the {nameof(options.Qualifier)} specified."));
             }
+        }
+
+        private static string[] SplitSingleCharCsv(string value, char delimiter, char qualifier)
+        {
+            var result = new List<string>();
+            var field = new StringBuilder(value.Length); // upper bound heuristic
+            bool inQuotes = false;
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                var c = value[i];
+
+                if (c == delimiter && !inQuotes)
+                {
+                    result.Add(field.ToString());
+                    field.Length = 0; // reuse the builder
+                    continue;
+                }
+
+                field.Append(c);
+
+                if (c == qualifier)
+                {
+                    inQuotes = !inQuotes;
+                }
+            }
+
+            if (inQuotes)
+            {
+                throw new InvalidOperationException($"An error occurred while splitting '{value}' into substrings separated by '{delimiter}' and quoted with '{qualifier}'. This is typically related to data corruption, eg. a field has not been properly closed with the {nameof(DelimitedStringOptions.Qualifier)} specified.");
+            }
+
+            result.Add(field.ToString());
+
+            return result.ToArray();
         }
     }
 }

@@ -253,7 +253,53 @@ namespace Cuemon.Security
             Assert.Equal("199c0ace56c5c33d8bce6f7cf4bc4b555e0fc3ae8d37c4b7384678a34d96ae8192825ae6bcda63dbb9e3417d0980de290e79de582d88c97e17c9535950c35f4f16d311bc66d1ac2892d59f7b0697257eba9fc1e3accbc85729218306b34996eedf99292c814e8a75f41ddc5a5b5177b6e60c0211ad8d8f78395c7c2d2c483e7e", h.ComputeHash(Decorator.Enclose(Alphanumeric.LettersAndNumbers).ToStream()).ToHexadecimalString());
             Assert.Equal("c801f8e08ae91b180b98dd7d9f65ceb687ca86358c6905f60a7d1014c182b04ee2ab1bd0066e9857a7f7de000000000000000000000000000000000000000000000000000000000000000000000000000000018045149ade1c79abe3b709a406f7d9205169bec59b126140bcb96f9d5d3e2ea91dfc0f40af8e7e3f25d14c3186", h.ComputeHash(Alphanumeric.Numbers).ToHexadecimalString());
             Assert.Equal("000000000000000098d7c19fbce653df221b9f717d3490ff95ca87fdaef30d1b823372f85b24a372f50e380000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007685cd81a491dbccc21ad06648d09a5c8cf5a78482054e91470b33dde77252caef66597", h.ComputeHash(byte.MinValue).ToHexadecimalString());
+        }
 
+        // New tests to cover remaining factory overloads and switches
+        [Fact]
+        public void CreateFnv_Default_ShouldBeSameAsCreateFnv32()
+        {
+            var input = Alphanumeric.LettersAndNumbers;
+            var a = HashFactory.CreateFnv();
+            var b = HashFactory.CreateFnv32();
+            Assert.Equal(a.ComputeHash(input).ToHexadecimalString(), b.ComputeHash(input).ToHexadecimalString());
+        }
+
+        [Fact]
+        public void CreateFnv_Switch_ShouldReturnSpecificFactoryResults()
+        {
+            var input = Alphanumeric.Numbers;
+
+            var h32 = HashFactory.CreateFnv(NonCryptoAlgorithm.Fnv32);
+            Assert.Equal(HashFactory.CreateFnv32().ComputeHash(input).ToHexadecimalString(), h32.ComputeHash(input).ToHexadecimalString());
+
+            var h64 = HashFactory.CreateFnv(NonCryptoAlgorithm.Fnv64);
+            Assert.Equal(HashFactory.CreateFnv64().ComputeHash(input).ToHexadecimalString(), h64.ComputeHash(input).ToHexadecimalString());
+
+            var h128 = HashFactory.CreateFnv(NonCryptoAlgorithm.Fnv128);
+            Assert.Equal(HashFactory.CreateFnv128().ComputeHash(input).ToHexadecimalString(), h128.ComputeHash(input).ToHexadecimalString());
+
+            var h256 = HashFactory.CreateFnv(NonCryptoAlgorithm.Fnv256);
+            Assert.Equal(HashFactory.CreateFnv256().ComputeHash(input).ToHexadecimalString(), h256.ComputeHash(input).ToHexadecimalString());
+
+            var h512 = HashFactory.CreateFnv(NonCryptoAlgorithm.Fnv512);
+            Assert.Equal(HashFactory.CreateFnv512().ComputeHash(input).ToHexadecimalString(), h512.ComputeHash(input).ToHexadecimalString());
+
+            var h1024 = HashFactory.CreateFnv(NonCryptoAlgorithm.Fnv1024);
+            Assert.Equal(HashFactory.CreateFnv1024().ComputeHash(input).ToHexadecimalString(), h1024.ComputeHash(input).ToHexadecimalString());
+        }
+
+        [Fact]
+        public void CreateCrc64_WithParameters_ShouldMatchCreateCrc64GoIso()
+        {
+            var input = Alphanumeric.LettersAndNumbers;
+            var hParam = HashFactory.CreateCrc64(0x000000000000001B, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, o =>
+            {
+                o.ReflectInput = true;
+                o.ReflectOutput = true;
+            });
+            var hPreset = HashFactory.CreateCrc64GoIso();
+            Assert.Equal(hPreset.ComputeHash(input).ToHexadecimalString().ToUpper(), hParam.ComputeHash(input).ToHexadecimalString().ToUpper());
         }
     }
 }

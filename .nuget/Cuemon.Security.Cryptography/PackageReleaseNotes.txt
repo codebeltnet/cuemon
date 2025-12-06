@@ -1,3 +1,15 @@
+Version 10.1.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+ 
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+ 
+# Improvements
+- OPTIMIZED AesCryptor class in the Cuemon.Security.Cryptography namespace to use TransformFinalBlock instead of stream-based transforms, reducing overhead and allocations
+ 
+# Bug Fixes
+- FIXED SecureHashAlgorithm512 class in the Cuemon.Security.Cryptography namespace to allow optional setup delegate
+ 
 Version 10.0.0
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
  

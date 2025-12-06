@@ -92,6 +92,7 @@ namespace Cuemon
             ThrowIfNull(argument, paramName);
             try
             {
+                if (argument is IPostConfigurableParameterObject postConfigurable) { postConfigurable.PostConfigureOptions(); }
                 if (argument is IValidatableParameterObject validatableArgument) { validatableArgument.ValidateOptions(); }
             }
             catch (Exception e)

@@ -101,7 +101,7 @@ namespace Cuemon.Security
         public void Equals_Object_NotHashResult_ReturnsFalse()
         {
             var hr = new HashResult(new byte[] { 1 });
-            Assert.False(hr.Equals("not a hashresult"));
+            Assert.False(hr.Equals(new byte[] { 2 }));
         }
 
         [Fact]

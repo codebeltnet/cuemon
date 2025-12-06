@@ -30,7 +30,7 @@ Copilot must follow these guidelines when generating benchmark fixtures.
   {
       public class Sha512256Benchmark { … }
   }
-````
+  ```
 
 * **Benchmark class names must end with `Benchmark`.**
   Example: `DateSpanBenchmark`, `FowlerNollVoBenchmark`.

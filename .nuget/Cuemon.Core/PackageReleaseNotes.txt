@@ -13,7 +13,7 @@ Availability: .NET 10, .NET 9 and .NET Standard 2.0
 - OPTIMIZED DateSpan struct in the Cuemon namespace for better performance when computing hash codes and equality checks
 - OPTIMIZED RandomString method on the Generate class in the Cuemon namespace with a sequential char-array builder and length guard, reducing overhead and allocations
 - OPTIMIZED DelimitedString class in the Cuemon namespace with a specialized fast-path for single-character delimiters and qualifiers, reducing overhead and allocations
-- OPTMIZED CyclicRedundancyCheck class in the Cuemon.Security namespace switching CRC lookup tables to ulong[] and simplified initialization/loop structure, increasing throughput and reducing unnecessary copying
+- OPTIMIZED CyclicRedundancyCheck class in the Cuemon.Security namespace switching CRC lookup tables to ulong[] and simplified initialization/loop structure, increasing throughput and reducing unnecessary copying
  
 # Bug Fixes
 - FIXED Patterns class in the Cuemon namespace to use generic object creation expressions to eliminate reflection overhead

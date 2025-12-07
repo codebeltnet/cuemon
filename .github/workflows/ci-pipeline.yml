@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         configuration: [Debug, Release]
-    uses: codebeltnet/jobs-dotnet-build/.github/workflows/default.yml@v3
+    uses: codebeltnet/jobs-dotnet-build/.github/workflows/default.yml@v4
     with:
       configuration: ${{ matrix.configuration }}
       strong-name-key-filename: cuemon.snk

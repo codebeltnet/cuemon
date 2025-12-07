@@ -131,6 +131,17 @@ jobs:
           pattern: '*-${{ matrix.configuration }}'
           merge-multiple: true
 
+      - name: Fix Linux test apphost permissions
+        run: |
+          echo "Ensuring xUnit v3 test apphosts are executable on Linux..."
+          echo "Configuration: ${{ matrix.configuration }}"
+          # Dump a bit of info for debugging
+          find . -path "*/bin/${{ matrix.configuration }}/net*/*" -maxdepth 1 -type f -name "*Tests*" -print || true
+          # Actually fix permissions
+          find . -path "*/bin/${{ matrix.configuration }}/net*/*" -type f -name "*Tests*" -exec chmod +x {} +
+          echo "Permissions fixed."
+        shell: bash
+
       - name: Test with ${{ matrix.configuration }} build
         uses: codebeltnet/dotnet-test@v4
         with:

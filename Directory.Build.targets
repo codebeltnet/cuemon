@@ -1,8 +1,4 @@
 ﻿<Project>
-  <PropertyGroup>
-   <PackageReleaseNotesFile>..\..\.nuget\$(MSBuildProjectName)\PackageReleaseNotes.txt</PackageReleaseNotesFile>
-  </PropertyGroup>
-
   <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec" Condition="'$(IsTestProject)' == 'false' AND Exists('$(PackageReleaseNotesFile)')">
     <ReadLinesFromFile File="$(PackageReleaseNotesFile)">
       <Output TaskParameter="Lines" ItemName="PackageReleaseNotesLines"/>

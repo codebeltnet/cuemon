@@ -8,6 +8,7 @@
     <IsWindows>$([MSBuild]::IsOSPlatform('Windows'))</IsWindows>
     <IsMainAuthor Condition="'$(EMAIL)' == 'michael@geekle.io'">true</IsMainAuthor>
     <SkipSignAssembly>false</SkipSignAssembly>
+    <PackageReleaseNotesFile>..\..\.nuget\$(MSBuildProjectName)\PackageReleaseNotes.txt</PackageReleaseNotesFile>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -110,7 +111,6 @@
   </ItemGroup>
 
   <PropertyGroup Condition="'$(IsBenchmarkProject)' == 'true'">
-    <TargetFrameworks>net10.0;net9.0</TargetFrameworks>
     <TargetFrameworks>net10.0;net9.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <RunAnalyzers>false</RunAnalyzers>

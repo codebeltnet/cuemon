@@ -9,7 +9,7 @@
       <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Codebelt.Extensions.BenchmarkDotNet.Console" />
   </ItemGroup>

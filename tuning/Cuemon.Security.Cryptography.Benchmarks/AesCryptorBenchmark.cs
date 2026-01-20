@@ -1,12 +1,11 @@
 using System;
 using System.Security.Cryptography;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
 
 namespace Cuemon.Security.Cryptography
 {
     [MemoryDiagnoser]
-    public class AesCryptorBenchmarks
+    public class AesCryptorBenchmark
     {
         [Params(128, 1024, 65536)]
         public int Size { get; set; }

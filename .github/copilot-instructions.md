@@ -152,6 +152,37 @@ namespace Cuemon
 For further examples, refer to existing test files such as  
 [`test/Cuemon.Core.Tests/DisposableTest.cs`](test/Cuemon.Core.Tests/DisposableTest.cs) and  [`test/Cuemon.Core.Tests/Security/HashFactoryTest.cs`](test/Cuemon.Core.Tests/Security/HashFactoryTest.cs).
 
+## 9. Avoid `InternalsVisibleTo` in Tests
+
+- **Do not** use `InternalsVisibleTo` to access internal types or members from test projects.
+- Prefer **indirect testing via public APIs** that depend on the internal implementation (public facades, public extension methods, or other public entry points).
+
+### Preferred Pattern
+
+**Pattern name:** Public Facade Testing (also referred to as *Public API Proxy Testing*)
+
+**Description:**  
+Internal classes and methods must be validated by exercising the public API that consumes them. Tests should assert observable behavior exposed by the public surface rather than targeting internal implementation details directly.
+
+### Example Mapping
+
+- **Internal helper:** `DelimitedString` (internal static class)  
+- **Public API:** `TestOutputHelperExtensions.WriteLines()` (public extension method)  
+- **Test strategy:** Write tests for `WriteLines()` and verify its public behavior. The internal call to `DelimitedString.Create()` is exercised implicitly.
+
+### Benefits
+
+- Avoids exposing internal types to test assemblies.
+- Ensures tests reflect real-world usage patterns.
+- Maintains strong encapsulation and a clean public API.
+- Tests remain resilient to internal refactoring as long as public behavior is preserved.
+
+### When to Apply
+
+- Internal logic is fully exercised through existing public APIs.
+- Public entry points provide sufficient coverage of internal code paths.
+- The internal implementation exists solely as a helper or utility for public-facing functionality.
+
 ---
 description: 'Writing Performance Tests in Cuemon'
 applyTo: "tuning/**, **/*Benchmark*.cs"

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.1.2] - 2026-01-21
+
+This is a service update that focuses on package dependencies.
+
 ## [10.1.1] - 2025-12-12
 
 This is a service update that focuses on package dependencies while embracing the latest addition to Codebelt; [Codebelt.Extensions.BenchmarkDotNet](https://github.com/codebeltnet/benchmarkdotnet).

@@ -1,4 +1,4 @@
-﻿ARG NGINX_VERSION=1.29.3-alpine
+﻿ARG NGINX_VERSION=1.29.4-alpine
 
 FROM --platform=$BUILDPLATFORM nginx:${NGINX_VERSION} AS base
 RUN rm -rf /usr/share/nginx/html/*

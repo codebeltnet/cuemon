@@ -1,0 +1,279 @@
+Type,Code,Name,ParentCode,Kind,IsoAlpha2,IsoAlpha3,Ldc,Lldc,Sids
+Region,001,World,,World,,,,,
+Region,002,Africa,001,Region,,,,,
+Region,009,Oceania,001,Region,,,,,
+Region,010,Antarctica,001,Region,,,,,
+Region,019,Americas,001,Region,,,,,
+Region,142,Asia,001,Region,,,,,
+Region,150,Europe,001,Region,,,,,
+Region,005,South America,419,Subregion,,,,,
+Region,011,Western Africa,202,Subregion,,,,,
+Region,013,Central America,419,Subregion,,,,,
+Region,014,Eastern Africa,202,Subregion,,,,,
+Region,015,Northern Africa,002,Subregion,,,,,
+Region,017,Middle Africa,202,Subregion,,,,,
+Region,018,Southern Africa,202,Subregion,,,,,
+Region,021,Northern America,019,Subregion,,,,,
+Region,029,Caribbean,419,Subregion,,,,,
+Region,030,Eastern Asia,142,Subregion,,,,,
+Region,034,Southern Asia,142,Subregion,,,,,
+Region,035,South-eastern Asia,142,Subregion,,,,,
+Region,039,Southern Europe,150,Subregion,,,,,
+Region,053,Australia and New Zealand,009,Subregion,,,,,
+Region,054,Melanesia,009,Subregion,,,,,
+Region,057,Micronesia,009,Subregion,,,,,
+Region,061,Polynesia,009,Subregion,,,,,
+Region,143,Central Asia,142,Subregion,,,,,
+Region,145,Western Asia,142,Subregion,,,,,
+Region,151,Eastern Europe,150,Subregion,,,,,
+Region,154,Northern Europe,150,Subregion,,,,,
+Region,155,Western Europe,150,Subregion,,,,,
+Region,202,Sub-Saharan Africa,002,IntermediateRegion,,,,,
+Region,419,Latin America and the Caribbean,019,IntermediateRegion,,,,,
+Country,012,Algeria,015,CountryOrTerritory,DZ,DZA,false,false,false
+Country,818,Egypt,015,CountryOrTerritory,EG,EGY,false,false,false
+Country,434,Libya,015,CountryOrTerritory,LY,LBY,false,false,false
+Country,504,Morocco,015,CountryOrTerritory,MA,MAR,false,false,false
+Country,729,Sudan,015,CountryOrTerritory,SD,SDN,true,false,false
+Country,788,Tunisia,015,CountryOrTerritory,TN,TUN,false,false,false
+Country,732,Western Sahara,015,CountryOrTerritory,EH,ESH,false,false,false
+Country,086,British Indian Ocean Territory,014,CountryOrTerritory,IO,IOT,false,false,false
+Country,108,Burundi,014,CountryOrTerritory,BI,BDI,true,true,false
+Country,174,Comoros,014,CountryOrTerritory,KM,COM,true,false,true
+Country,262,Djibouti,014,CountryOrTerritory,DJ,DJI,true,false,false
+Country,232,Eritrea,014,CountryOrTerritory,ER,ERI,true,false,false
+Country,231,Ethiopia,014,CountryOrTerritory,ET,ETH,true,true,false
+Country,260,French Southern Territories,014,CountryOrTerritory,TF,ATF,false,false,false
+Country,404,Kenya,014,CountryOrTerritory,KE,KEN,false,false,false
+Country,450,Madagascar,014,CountryOrTerritory,MG,MDG,true,false,false
+Country,454,Malawi,014,CountryOrTerritory,MW,MWI,true,true,false
+Country,480,Mauritius,014,CountryOrTerritory,MU,MUS,false,false,true
+Country,175,Mayotte,014,CountryOrTerritory,YT,MYT,false,false,false
+Country,508,Mozambique,014,CountryOrTerritory,MZ,MOZ,true,false,false
+Country,638,Réunion,014,CountryOrTerritory,RE,REU,false,false,false
+Country,646,Rwanda,014,CountryOrTerritory,RW,RWA,true,true,false
+Country,690,Seychelles,014,CountryOrTerritory,SC,SYC,false,false,true
+Country,706,Somalia,014,CountryOrTerritory,SO,SOM,true,false,false
+Country,728,South Sudan,014,CountryOrTerritory,SS,SSD,true,true,false
+Country,800,Uganda,014,CountryOrTerritory,UG,UGA,true,true,false
+Country,834,United Republic of Tanzania,014,CountryOrTerritory,TZ,TZA,true,false,false
+Country,894,Zambia,014,CountryOrTerritory,ZM,ZMB,true,true,false
+Country,716,Zimbabwe,014,CountryOrTerritory,ZW,ZWE,false,true,false
+Country,024,Angola,017,CountryOrTerritory,AO,AGO,true,false,false
+Country,120,Cameroon,017,CountryOrTerritory,CM,CMR,false,false,false
+Country,140,Central African Republic,017,CountryOrTerritory,CF,CAF,true,true,false
+Country,148,Chad,017,CountryOrTerritory,TD,TCD,true,true,false
+Country,178,Congo,017,CountryOrTerritory,CG,COG,false,false,false
+Country,180,Democratic Republic of the Congo,017,CountryOrTerritory,CD,COD,true,false,false
+Country,226,Equatorial Guinea,017,CountryOrTerritory,GQ,GNQ,false,false,false
+Country,266,Gabon,017,CountryOrTerritory,GA,GAB,false,false,false
+Country,678,Sao Tome and Principe,017,CountryOrTerritory,ST,STP,false,false,true
+Country,072,Botswana,018,CountryOrTerritory,BW,BWA,false,true,false
+Country,748,Eswatini,018,CountryOrTerritory,SZ,SWZ,false,true,false
+Country,426,Lesotho,018,CountryOrTerritory,LS,LSO,true,true,false
+Country,516,Namibia,018,CountryOrTerritory,NA,NAM,false,false,false
+Country,710,South Africa,018,CountryOrTerritory,ZA,ZAF,false,false,false
+Country,204,Benin,011,CountryOrTerritory,BJ,BEN,true,false,false
+Country,854,Burkina Faso,011,CountryOrTerritory,BF,BFA,true,true,false
+Country,132,Cabo Verde,011,CountryOrTerritory,CV,CPV,false,false,true
+Country,384,Côte d'Ivoire,011,CountryOrTerritory,CI,CIV,false,false,false
+Country,270,Gambia,011,CountryOrTerritory,GM,GMB,true,false,false
+Country,288,Ghana,011,CountryOrTerritory,GH,GHA,false,false,false
+Country,324,Guinea,011,CountryOrTerritory,GN,GIN,true,false,false
+Country,624,Guinea-Bissau,011,CountryOrTerritory,GW,GNB,true,false,true
+Country,430,Liberia,011,CountryOrTerritory,LR,LBR,true,false,false
+Country,466,Mali,011,CountryOrTerritory,ML,MLI,true,true,false
+Country,478,Mauritania,011,CountryOrTerritory,MR,MRT,true,false,false
+Country,562,Niger,011,CountryOrTerritory,NE,NER,true,true,false
+Country,566,Nigeria,011,CountryOrTerritory,NG,NGA,false,false,false
+Country,654,Saint Helena,011,CountryOrTerritory,SH,SHN,false,false,false
+Country,686,Senegal,011,CountryOrTerritory,SN,SEN,true,false,false
+Country,694,Sierra Leone,011,CountryOrTerritory,SL,SLE,true,false,false
+Country,768,Togo,011,CountryOrTerritory,TG,TGO,true,false,false
+Country,660,Anguilla,029,CountryOrTerritory,AI,AIA,false,false,true
+Country,028,Antigua and Barbuda,029,CountryOrTerritory,AG,ATG,false,false,true
+Country,533,Aruba,029,CountryOrTerritory,AW,ABW,false,false,true
+Country,044,Bahamas,029,CountryOrTerritory,BS,BHS,false,false,true
+Country,052,Barbados,029,CountryOrTerritory,BB,BRB,false,false,true
+Country,535,"Bonaire, Sint Eustatius and Saba",029,CountryOrTerritory,BQ,BES,false,false,true
+Country,092,British Virgin Islands,029,CountryOrTerritory,VG,VGB,false,false,true
+Country,136,Cayman Islands,029,CountryOrTerritory,KY,CYM,false,false,false
+Country,192,Cuba,029,CountryOrTerritory,CU,CUB,false,false,true
+Country,531,Curaçao,029,CountryOrTerritory,CW,CUW,false,false,true
+Country,212,Dominica,029,CountryOrTerritory,DM,DMA,false,false,true
+Country,214,Dominican Republic,029,CountryOrTerritory,DO,DOM,false,false,true
+Country,308,Grenada,029,CountryOrTerritory,GD,GRD,false,false,true
+Country,312,Guadeloupe,029,CountryOrTerritory,GP,GLP,false,false,false
+Country,332,Haiti,029,CountryOrTerritory,HT,HTI,true,false,true
+Country,388,Jamaica,029,CountryOrTerritory,JM,JAM,false,false,true
+Country,474,Martinique,029,CountryOrTerritory,MQ,MTQ,false,false,false
+Country,500,Montserrat,029,CountryOrTerritory,MS,MSR,false,false,true
+Country,630,Puerto Rico,029,CountryOrTerritory,PR,PRI,false,false,true
+Country,652,Saint Barthélemy,029,CountryOrTerritory,BL,BLM,false,false,false
+Country,659,Saint Kitts and Nevis,029,CountryOrTerritory,KN,KNA,false,false,true
+Country,662,Saint Lucia,029,CountryOrTerritory,LC,LCA,false,false,true
+Country,663,Saint Martin (French Part),029,CountryOrTerritory,MF,MAF,false,false,false
+Country,670,Saint Vincent and the Grenadines,029,CountryOrTerritory,VC,VCT,false,false,true
+Country,534,Sint Maarten (Dutch part),029,CountryOrTerritory,SX,SXM,false,false,true
+Country,780,Trinidad and Tobago,029,CountryOrTerritory,TT,TTO,false,false,true
+Country,796,Turks and Caicos Islands,029,CountryOrTerritory,TC,TCA,false,false,false
+Country,850,United States Virgin Islands,029,CountryOrTerritory,VI,VIR,false,false,true
+Country,084,Belize,013,CountryOrTerritory,BZ,BLZ,false,false,true
+Country,188,Costa Rica,013,CountryOrTerritory,CR,CRI,false,false,false
+Country,222,El Salvador,013,CountryOrTerritory,SV,SLV,false,false,false
+Country,320,Guatemala,013,CountryOrTerritory,GT,GTM,false,false,false
+Country,340,Honduras,013,CountryOrTerritory,HN,HND,false,false,false
+Country,484,Mexico,013,CountryOrTerritory,MX,MEX,false,false,false
+Country,558,Nicaragua,013,CountryOrTerritory,NI,NIC,false,false,false
+Country,591,Panama,013,CountryOrTerritory,PA,PAN,false,false,false
+Country,032,Argentina,005,CountryOrTerritory,AR,ARG,false,false,false
+Country,068,Bolivia (Plurinational State of),005,CountryOrTerritory,BO,BOL,false,true,false
+Country,074,Bouvet Island,005,CountryOrTerritory,BV,BVT,false,false,false
+Country,076,Brazil,005,CountryOrTerritory,BR,BRA,false,false,false
+Country,152,Chile,005,CountryOrTerritory,CL,CHL,false,false,false
+Country,170,Colombia,005,CountryOrTerritory,CO,COL,false,false,false
+Country,218,Ecuador,005,CountryOrTerritory,EC,ECU,false,false,false
+Country,238,Falkland Islands (Malvinas),005,CountryOrTerritory,FK,FLK,false,false,false
+Country,254,French Guiana,005,CountryOrTerritory,GF,GUF,false,false,false
+Country,328,Guyana,005,CountryOrTerritory,GY,GUY,false,false,true
+Country,600,Paraguay,005,CountryOrTerritory,PY,PRY,false,true,false
+Country,604,Peru,005,CountryOrTerritory,PE,PER,false,false,false
+Country,239,South Georgia and the South Sandwich Islands,005,CountryOrTerritory,GS,SGS,false,false,false
+Country,740,Suriname,005,CountryOrTerritory,SR,SUR,false,false,true
+Country,858,Uruguay,005,CountryOrTerritory,UY,URY,false,false,false
+Country,862,Venezuela (Bolivarian Republic of),005,CountryOrTerritory,VE,VEN,false,false,false
+Country,060,Bermuda,021,CountryOrTerritory,BM,BMU,false,false,false
+Country,124,Canada,021,CountryOrTerritory,CA,CAN,false,false,false
+Country,304,Greenland,021,CountryOrTerritory,GL,GRL,false,false,false
+Country,666,Saint Pierre and Miquelon,021,CountryOrTerritory,PM,SPM,false,false,false
+Country,840,United States of America,021,CountryOrTerritory,US,USA,false,false,false
+Country,398,Kazakhstan,143,CountryOrTerritory,KZ,KAZ,false,true,false
+Country,417,Kyrgyzstan,143,CountryOrTerritory,KG,KGZ,false,true,false
+Country,762,Tajikistan,143,CountryOrTerritory,TJ,TJK,false,true,false
+Country,795,Turkmenistan,143,CountryOrTerritory,TM,TKM,false,true,false
+Country,860,Uzbekistan,143,CountryOrTerritory,UZ,UZB,false,true,false
+Country,156,China,030,CountryOrTerritory,CN,CHN,false,false,false
+Country,344,"China, Hong Kong Special Administrative Region",030,CountryOrTerritory,HK,HKG,false,false,false
+Country,446,"China, Macao Special Administrative Region",030,CountryOrTerritory,MO,MAC,false,false,false
+Country,408,Democratic People's Republic of Korea,030,CountryOrTerritory,KP,PRK,false,false,false
+Country,392,Japan,030,CountryOrTerritory,JP,JPN,false,false,false
+Country,496,Mongolia,030,CountryOrTerritory,MN,MNG,false,true,false
+Country,410,Republic of Korea,030,CountryOrTerritory,KR,KOR,false,false,false
+Country,096,Brunei Darussalam,035,CountryOrTerritory,BN,BRN,false,false,false
+Country,116,Cambodia,035,CountryOrTerritory,KH,KHM,true,false,false
+Country,360,Indonesia,035,CountryOrTerritory,ID,IDN,false,false,false
+Country,418,Lao People's Democratic Republic,035,CountryOrTerritory,LA,LAO,true,true,false
+Country,458,Malaysia,035,CountryOrTerritory,MY,MYS,false,false,false
+Country,104,Myanmar,035,CountryOrTerritory,MM,MMR,true,false,false
+Country,608,Philippines,035,CountryOrTerritory,PH,PHL,false,false,false
+Country,702,Singapore,035,CountryOrTerritory,SG,SGP,false,false,true
+Country,764,Thailand,035,CountryOrTerritory,TH,THA,false,false,false
+Country,626,Timor-Leste,035,CountryOrTerritory,TL,TLS,true,false,true
+Country,704,Viet Nam,035,CountryOrTerritory,VN,VNM,false,false,false
+Country,004,Afghanistan,034,CountryOrTerritory,AF,AFG,true,true,false
+Country,050,Bangladesh,034,CountryOrTerritory,BD,BGD,true,false,false
+Country,064,Bhutan,034,CountryOrTerritory,BT,BTN,false,true,false
+Country,356,India,034,CountryOrTerritory,IN,IND,false,false,false
+Country,364,Iran (Islamic Republic of),034,CountryOrTerritory,IR,IRN,false,false,false
+Country,462,Maldives,034,CountryOrTerritory,MV,MDV,false,false,true
+Country,524,Nepal,034,CountryOrTerritory,NP,NPL,true,true,false
+Country,586,Pakistan,034,CountryOrTerritory,PK,PAK,false,false,false
+Country,144,Sri Lanka,034,CountryOrTerritory,LK,LKA,false,false,false
+Country,051,Armenia,145,CountryOrTerritory,AM,ARM,false,true,false
+Country,031,Azerbaijan,145,CountryOrTerritory,AZ,AZE,false,true,false
+Country,048,Bahrain,145,CountryOrTerritory,BH,BHR,false,false,false
+Country,196,Cyprus,145,CountryOrTerritory,CY,CYP,false,false,false
+Country,268,Georgia,145,CountryOrTerritory,GE,GEO,false,true,false
+Country,368,Iraq,145,CountryOrTerritory,IQ,IRQ,false,false,false
+Country,376,Israel,145,CountryOrTerritory,IL,ISR,false,false,false
+Country,400,Jordan,145,CountryOrTerritory,JO,JOR,false,false,false
+Country,414,Kuwait,145,CountryOrTerritory,KW,KWT,false,false,false
+Country,422,Lebanon,145,CountryOrTerritory,LB,LBN,false,false,false
+Country,512,Oman,145,CountryOrTerritory,OM,OMN,false,false,false
+Country,634,Qatar,145,CountryOrTerritory,QA,QAT,false,false,false
+Country,682,Saudi Arabia,145,CountryOrTerritory,SA,SAU,false,false,false
+Country,275,State of Palestine,145,CountryOrTerritory,PS,PSE,false,false,false
+Country,760,Syrian Arab Republic,145,CountryOrTerritory,SY,SYR,false,false,false
+Country,792,Türkiye,145,CountryOrTerritory,TR,TUR,false,false,false
+Country,784,United Arab Emirates,145,CountryOrTerritory,AE,ARE,false,false,false
+Country,887,Yemen,145,CountryOrTerritory,YE,YEM,true,false,false
+Country,112,Belarus,151,CountryOrTerritory,BY,BLR,false,false,false
+Country,100,Bulgaria,151,CountryOrTerritory,BG,BGR,false,false,false
+Country,203,Czechia,151,CountryOrTerritory,CZ,CZE,false,false,false
+Country,348,Hungary,151,CountryOrTerritory,HU,HUN,false,false,false
+Country,616,Poland,151,CountryOrTerritory,PL,POL,false,false,false
+Country,498,Republic of Moldova,151,CountryOrTerritory,MD,MDA,false,true,false
+Country,642,Romania,151,CountryOrTerritory,RO,ROU,false,false,false
+Country,643,Russian Federation,151,CountryOrTerritory,RU,RUS,false,false,false
+Country,703,Slovakia,151,CountryOrTerritory,SK,SVK,false,false,false
+Country,804,Ukraine,151,CountryOrTerritory,UA,UKR,false,false,false
+Country,248,Åland Islands,154,CountryOrTerritory,AX,ALA,false,false,false
+Country,208,Denmark,154,CountryOrTerritory,DK,DNK,false,false,false
+Country,233,Estonia,154,CountryOrTerritory,EE,EST,false,false,false
+Country,234,Faroe Islands,154,CountryOrTerritory,FO,FRO,false,false,false
+Country,246,Finland,154,CountryOrTerritory,FI,FIN,false,false,false
+Country,831,Guernsey,154,CountryOrTerritory,GG,GGY,false,false,false
+Country,352,Iceland,154,CountryOrTerritory,IS,ISL,false,false,false
+Country,372,Ireland,154,CountryOrTerritory,IE,IRL,false,false,false
+Country,833,Isle of Man,154,CountryOrTerritory,IM,IMN,false,false,false
+Country,832,Jersey,154,CountryOrTerritory,JE,JEY,false,false,false
+Country,428,Latvia,154,CountryOrTerritory,LV,LVA,false,false,false
+Country,440,Lithuania,154,CountryOrTerritory,LT,LTU,false,false,false
+Country,578,Norway,154,CountryOrTerritory,NO,NOR,false,false,false
+Country,744,Svalbard and Jan Mayen Islands,154,CountryOrTerritory,SJ,SJM,false,false,false
+Country,752,Sweden,154,CountryOrTerritory,SE,SWE,false,false,false
+Country,826,United Kingdom of Great Britain and Northern Ireland,154,CountryOrTerritory,GB,GBR,false,false,false
+Country,008,Albania,039,CountryOrTerritory,AL,ALB,false,false,false
+Country,020,Andorra,039,CountryOrTerritory,AD,AND,false,true,false
+Country,070,Bosnia and Herzegovina,039,CountryOrTerritory,BA,BIH,false,false,false
+Country,191,Croatia,039,CountryOrTerritory,HR,HRV,false,false,false
+Country,292,Gibraltar,039,CountryOrTerritory,GI,GIB,false,false,false
+Country,300,Greece,039,CountryOrTerritory,GR,GRC,false,false,false
+Country,336,Holy See,039,CountryOrTerritory,VA,VAT,false,true,false
+Country,380,Italy,039,CountryOrTerritory,IT,ITA,false,false,false
+Country,470,Malta,039,CountryOrTerritory,MT,MLT,false,false,false
+Country,499,Montenegro,039,CountryOrTerritory,ME,MNE,false,false,false
+Country,807,North Macedonia,039,CountryOrTerritory,MK,MKD,false,true,false
+Country,620,Portugal,039,CountryOrTerritory,PT,PRT,false,false,false
+Country,674,San Marino,039,CountryOrTerritory,SM,SMR,false,true,false
+Country,688,Serbia,039,CountryOrTerritory,RS,SRB,false,false,false
+Country,705,Slovenia,039,CountryOrTerritory,SI,SVN,false,false,false
+Country,724,Spain,039,CountryOrTerritory,ES,ESP,false,false,false
+Country,040,Austria,155,CountryOrTerritory,AT,AUT,false,true,false
+Country,056,Belgium,155,CountryOrTerritory,BE,BEL,false,false,false
+Country,250,France,155,CountryOrTerritory,FR,FRA,false,false,false
+Country,276,Germany,155,CountryOrTerritory,DE,DEU,false,false,false
+Country,438,Liechtenstein,155,CountryOrTerritory,LI,LIE,false,true,false
+Country,442,Luxembourg,155,CountryOrTerritory,LU,LUX,false,true,false
+Country,492,Monaco,155,CountryOrTerritory,MC,MCO,false,false,false
+Country,528,Netherlands (Kingdom of the),155,CountryOrTerritory,NL,NLD,false,false,false
+Country,756,Switzerland,155,CountryOrTerritory,CH,CHE,false,true,false
+Country,036,Australia,053,CountryOrTerritory,AU,AUS,false,false,false
+Country,162,Christmas Island,053,CountryOrTerritory,CX,CXR,false,false,false
+Country,166,Cocos (Keeling) Islands,053,CountryOrTerritory,CC,CCK,false,false,false
+Country,334,Heard Island and McDonald Islands,053,CountryOrTerritory,HM,HMD,false,false,false
+Country,554,New Zealand,053,CountryOrTerritory,NZ,NZL,false,false,false
+Country,574,Norfolk Island,053,CountryOrTerritory,NF,NFK,false,false,false
+Country,242,Fiji,054,CountryOrTerritory,FJ,FJI,false,false,true
+Country,540,New Caledonia,054,CountryOrTerritory,NC,NCL,false,false,true
+Country,598,Papua New Guinea,054,CountryOrTerritory,PG,PNG,false,false,true
+Country,090,Solomon Islands,054,CountryOrTerritory,SB,SLB,true,false,true
+Country,548,Vanuatu,054,CountryOrTerritory,VU,VUT,false,false,true
+Country,316,Guam,057,CountryOrTerritory,GU,GUM,false,false,true
+Country,296,Kiribati,057,CountryOrTerritory,KI,KIR,true,false,true
+Country,584,Marshall Islands,057,CountryOrTerritory,MH,MHL,false,false,true
+Country,583,Micronesia (Federated States of),057,CountryOrTerritory,FM,FSM,false,false,true
+Country,520,Nauru,057,CountryOrTerritory,NR,NRU,false,false,true
+Country,580,Northern Mariana Islands,057,CountryOrTerritory,MP,MNP,false,false,true
+Country,585,Palau,057,CountryOrTerritory,PW,PLW,false,false,true
+Country,581,United States Minor Outlying Islands,057,CountryOrTerritory,UM,UMI,false,false,false
+Country,016,American Samoa,061,CountryOrTerritory,AS,ASM,false,false,true
+Country,184,Cook Islands,061,CountryOrTerritory,CK,COK,false,false,true
+Country,258,French Polynesia,061,CountryOrTerritory,PF,PYF,false,false,true
+Country,570,Niue,061,CountryOrTerritory,NU,NIU,false,false,true
+Country,612,Pitcairn,061,CountryOrTerritory,PN,PCN,false,false,false
+Country,882,Samoa,061,CountryOrTerritory,WS,WSM,false,false,true
+Country,772,Tokelau,061,CountryOrTerritory,TK,TKL,false,false,false
+Country,776,Tonga,061,CountryOrTerritory,TO,TON,false,false,true
+Country,798,Tuvalu,061,CountryOrTerritory,TV,TUV,true,false,true
+Country,876,Wallis and Futuna Islands,061,CountryOrTerritory,WF,WLF,false,false,false

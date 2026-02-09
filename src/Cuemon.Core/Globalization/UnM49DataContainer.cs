@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using Cuemon.Reflection;
 
 namespace Cuemon.Globalization;
@@ -12,8 +11,8 @@ internal sealed class UnM49DataContainer
 {
     internal UnM49DataContainer()
     {
-        var data = LoadUnM49Data();
-        BuildHierarchy(data);
+        var (regions, countries) = LoadUnM49Data();
+        BuildHierarchy(regions, countries);
     }
 
     internal List<StatisticalRegionInfo> Regions { get; } = new();
@@ -24,9 +23,11 @@ internal sealed class UnM49DataContainer
 
     internal Dictionary<string, StatisticalRegionInfo> CountriesByIsoAlpha2 { get; } = new(StringComparer.OrdinalIgnoreCase);
 
-    internal Unm49Data LoadUnM49Data()
+    private (List<Unm49RegionData> Regions, List<Unm49CountryData> Countries) LoadUnM49Data()
     {
-        var resourceName = $"{nameof(Cuemon)}.{nameof(Globalization)}.unm49-data.json";
+        var resourceName = $"{nameof(Cuemon)}.{nameof(Globalization)}.unm49-data.csv";
+        var regions = new List<Unm49RegionData>();
+        var countries = new List<Unm49CountryData>();
 
         using (var stream = Decorator.Enclose(typeof(StatisticalRegionInfo).Assembly).GetManifestResources(resourceName)
                    .Single().Value)
@@ -38,19 +39,95 @@ internal sealed class UnM49DataContainer
 
             using (var reader = new StreamReader(stream))
             {
-                var json = reader.ReadToEnd();
-                return JsonSerializer.Deserialize<Unm49Data>(json, new JsonSerializerOptions
+                // Skip header line
+                reader.ReadLine();
+
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    PropertyNameCaseInsensitive = true
-                });
+                    var parts = ParseCsvLine(line);
+                    if (parts.Length < 5) continue;
+
+                    var type = parts[0];
+                    var code = parts[1];
+                    var name = parts[2];
+                    var parentCode = parts[3];
+                    var kind = parts[4];
+
+                    if (type == "Region")
+                    {
+                        regions.Add(new Unm49RegionData
+                        {
+                            Code = code,
+                            Name = name,
+                            ParentCode = string.IsNullOrEmpty(parentCode) ? null : parentCode,
+                            Kind = kind
+                        });
+                    }
+                    else if (type == "Country" && parts.Length >= 10)
+                    {
+                        countries.Add(new Unm49CountryData
+                        {
+                            Code = code,
+                            Name = name,
+                            ParentCode = parentCode,
+                            Kind = kind,
+                            IsoAlpha2 = string.IsNullOrEmpty(parts[5]) ? null : parts[5],
+                            IsoAlpha3 = string.IsNullOrEmpty(parts[6]) ? null : parts[6],
+                            Ldc = parts[7] == "true",
+                            Lldc = parts[8] == "true",
+                            Sids = parts[9] == "true"
+                        });
+                    }
+                }
             }
         }
+
+        return (regions, countries);
     }
 
-    private void BuildHierarchy(Unm49Data data)
+    private static string[] ParseCsvLine(string line)
+    {
+        var parts = new List<string>();
+        var current = new System.Text.StringBuilder();
+        bool inQuotes = false;
+
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+
+            if (c == '"')
+            {
+                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                {
+                    // Escaped quote
+                    current.Append('"');
+                    i++;
+                }
+                else
+                {
+                    inQuotes = !inQuotes;
+                }
+            }
+            else if (c == ',' && !inQuotes)
+            {
+                parts.Add(current.ToString());
+                current.Clear();
+            }
+            else
+            {
+                current.Append(c);
+            }
+        }
+
+        parts.Add(current.ToString());
+        return parts.ToArray();
+    }
+
+    private void BuildHierarchy(List<Unm49RegionData> regions, List<Unm49CountryData> countries)
     {
         // First pass: Create all region objects
-        foreach (var regionData in data.Regions)
+        foreach (var regionData in regions)
         {
             var kind = ParseKind(regionData.Kind, regionData.Code, regionData.Name);
             var region = new StatisticalRegionInfo(regionData.Code, regionData.Name, kind, null);
@@ -59,7 +136,7 @@ internal sealed class UnM49DataContainer
         }
 
         // Second pass: Set up parent-child relationships for regions
-        foreach (var regionData in data.Regions)
+        foreach (var regionData in regions)
         {
             if (!string.IsNullOrEmpty(regionData.ParentCode) &&
                 RegionsByCode.TryGetValue(regionData.ParentCode, out var parent))
@@ -71,7 +148,7 @@ internal sealed class UnM49DataContainer
         }
 
         // Third pass: Create country objects as children of their parent regions
-        foreach (var countryData in data.Countries)
+        foreach (var countryData in countries)
         {
             if (RegionsByCode.TryGetValue(countryData.ParentCode, out var parent))
             {
@@ -202,5 +279,32 @@ internal sealed class UnM49DataContainer
             current = current.Parent;
         }
         return depth;
+    }
+
+    /// <summary>
+    /// Internal class for CSV deserialization of UN M.49 region data.
+    /// </summary>
+    private sealed class Unm49RegionData
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+        public string ParentCode { get; set; }
+        public string Kind { get; set; }
+    }
+
+    /// <summary>
+    /// Internal class for CSV deserialization of UN M.49 country data.
+    /// </summary>
+    private sealed class Unm49CountryData
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+        public string ParentCode { get; set; }
+        public string IsoAlpha2 { get; set; }
+        public string IsoAlpha3 { get; set; }
+        public bool Ldc { get; set; }
+        public bool Lldc { get; set; }
+        public bool Sids { get; set; }
+        public string Kind { get; set; }
     }
 }

@@ -14,11 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Globalization\unm49-data.json" />
-  </ItemGroup>
-
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard2'))">
-    <PackageReference Include="System.Text.Json" />
+    <EmbeddedResource Include="Globalization\unm49-data.csv" />
   </ItemGroup>
 
 </Project>

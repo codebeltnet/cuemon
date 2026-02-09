@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <ProjectGuid>000bdf91-e7c7-4cb4-a39d-e1a5374c5602</ProjectGuid>
@@ -10,7 +10,15 @@
     <AssemblyTitle>Cuemon</AssemblyTitle>
     <Title>Cuemon</Title>
     <Description>The Cuemon namespace contains fundamental types such as value and reference types, factories and utility classes, interfaces, attributes and feature rich delegates that support functional programming on a whole new level. The namespace is an addition to the System namespace.</Description>
-    <PackageTags>action-factory calculator configure configure-revert configure-exchange configurable condition options-pattern decorator delimited-string disposable finalize-disposable safe-invoke safe-invoke-async func-factory patterns reference-project clean-architecture clean-code task-action-factory task-func-factory template template-factory time-range time-unit validator guard text-encoding parser-factory security aes-cryptor cyclic-redundancy-check fowler-noll-vo-hash hash-factory hash-result keyed-crypto-hash keyed-crypto-algorithm message-digest non-crypto-algorithm unkeyed-crypto-hash</PackageTags>
+    <PackageTags>action-factory calculator configure configure-revert configure-exchange configurable condition options-pattern decorator delimited-string disposable finalize-disposable safe-invoke safe-invoke-async func-factory patterns reference-project clean-architecture clean-code task-action-factory task-func-factory template template-factory time-range time-unit validator guard text-encoding parser-factory security aes-cryptor cyclic-redundancy-check fowler-noll-vo-hash hash-factory hash-result keyed-crypto-hash keyed-crypto-algorithm message-digest non-crypto-algorithm unkeyed-crypto-hash globalization unm49 region countr m49</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Globalization\unm49-data.json" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard2'))">
+    <PackageReference Include="System.Text.Json" />
+  </ItemGroup>
 
 </Project>

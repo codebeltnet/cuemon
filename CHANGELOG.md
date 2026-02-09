@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.2.0] - 2026-02-09
+
+This is a minor release that introduces support for UN M.49 statistical regions and countries.
+
+### Added
+
+- `StatisticalRegionInfo` class in the Cuemon.Globalization namespace that provides information about a specific statistical region,
+- `StatisticalRegionKind` enum in the Cuemon.Globalization namespace that defines the kind of statistical region,
+- `StatisticalRegionExtensions` class in the Cuemon.Extensions.Globalization namespace that consist of extension methods for the `StatisticalRegionInfo` class: `IsWorld`, `IsRegion`, `IsSubregion`, `IsIntermediateRegion`, `IsCountryOrTerritory`, `IsArea`, `HasIsoCodes` and `HasRegionInfo`.
+
+### Changed
+
+- `World` class in the Cuemon.Globalization namespace with a new method: `GetStatisticalRegions`, which retrieves a list of statistical regions for a given UN M.49 country code,
+- `World` class in the Cuemon.Globalization namespace with a new method: `GetCountry`, which retrieves the country information for a given UN M.49 country code,
+- `World` class in the Cuemon.Globalization namespace with a new method: `GetCountry`, which retrieves the country information for a given `RegionInfo` object,
+- `World` class in the Cuemon.Globalization namespace with a new property: `StatisticalRegions`, which retrieves a list of all statistical regions.
+
 ## [10.1.2] - 2026-01-21
 
 This is a service update that focuses on package dependencies.

@@ -244,7 +244,7 @@ internal sealed class UnM49DataContainer
         // Validate countries have no children
         foreach (var country in CountriesByCode.Values)
         {
-            if (country.Children.Count > 0)
+            if (country.Children.Any())
             {
                 throw new InvalidOperationException(
                     $"Country {country.Name} ({country.Code}) cannot have children.");

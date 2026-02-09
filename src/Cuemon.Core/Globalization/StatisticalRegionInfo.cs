@@ -106,18 +106,18 @@ namespace Cuemon.Globalization
         /// <summary>
         /// Gets the direct child regions or countries of this region.
         /// </summary>
-        /// <value>A read-only list of children. Empty list if this is a leaf node (country).</value>
-        public IReadOnlyList<StatisticalRegionInfo> Children => _children;
+        /// <value>An enumerable list of children. Empty list if this is a leaf node (country).</value>
+        public IEnumerable<StatisticalRegionInfo> Children => _children;
 
         /// <summary>
         /// Gets all countries in this geographic region.
         /// </summary>
-        /// <value>A read-only list of child regions where <see cref="Kind"/> is <see cref="StatisticalRegionKind.CountryOrTerritory"/>.</value>
+        /// <value>An enumerable list of child regions where <see cref="Kind"/> is <see cref="StatisticalRegionKind.CountryOrTerritory"/>.</value>
         /// <remarks>
         /// This is a convenience property that filters <see cref="Children"/> to return only countries.
         /// It recursively includes all descendant countries, not just immediate children.
         /// </remarks>
-        public IReadOnlyList<StatisticalRegionInfo> Countries => GetAllDescendants()
+        public IEnumerable<StatisticalRegionInfo> Countries => GetAllDescendants()
             .Where(r => r.Kind == StatisticalRegionKind.CountryOrTerritory)
             .ToList();
 

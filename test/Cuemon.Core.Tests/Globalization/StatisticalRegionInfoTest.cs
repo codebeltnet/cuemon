@@ -173,7 +173,7 @@ namespace Cuemon.Globalization
             var world = World.GetStatisticalRegion("001");
 
             Assert.NotNull(world);
-            Assert.True(world.Children.Count >= 5, "World should have at least 5 continent children");
+            Assert.True(world.Children.Count() >= 5, "World should have at least 5 continent children");
 
             TestOutput.WriteLine($"Children of {world.Name}:");
             foreach (var child in world.Children)
@@ -188,9 +188,9 @@ namespace Cuemon.Globalization
             var world = World.GetStatisticalRegion("001");
 
             Assert.NotNull(world);
-            Assert.True(world.Countries.Count >= 200, $"Expected at least 200 countries, got {world.Countries.Count}");
+            Assert.True(world.Countries.Count() >= 200, $"Expected at least 200 countries, got {world.Countries.Count()}");
 
-            TestOutput.WriteLine($"Total countries: {world.Countries.Count}");
+            TestOutput.WriteLine($"Total countries: {world.Countries.Count()}");
         }
 
         [Fact]
@@ -304,7 +304,7 @@ namespace Cuemon.Globalization
             Assert.Equal("011", ghana.Parent.Code);
             Assert.Equal("011", senegal.Parent.Code);
 
-            TestOutput.WriteLine($"Western Africa has {westernAfrica.Countries.Count} countries");
+            TestOutput.WriteLine($"Western Africa has {westernAfrica.Countries.Count()} countries");
         }
 
         [Fact]

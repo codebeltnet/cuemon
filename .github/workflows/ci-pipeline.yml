@@ -137,7 +137,7 @@ jobs:
 
           echo "=== Context ==="
           echo "Runner: $RUNNER_OS / $RUNNER_ARCH"
-          echo "Configuration: ${{ inputs.configuration }}"
+          echo "Configuration: ${{ matrix.configuration }}"
           echo "Workspace: $GITHUB_WORKSPACE"
           echo "PWD: $(pwd)"
           echo "Event: $GITHUB_EVENT_NAME"
@@ -156,8 +156,8 @@ jobs:
           echo
 
           # Paths we care about
-          BIN_GLOB="*/bin/${{ inputs.configuration }}/net*/*"
-          OBJ_GLOB="*/obj/${{ inputs.configuration }}/net*/*"
+          BIN_GLOB="*/bin/*/net*/*"
+          OBJ_GLOB="*/obj/*/net*/*"
 
           echo "=== Brute-force chmod (bin + obj) ==="
           find . -type f \( -path "$BIN_GLOB" -o -path "$OBJ_GLOB" \) -exec chmod a+x {} + 2>/dev/null || true

@@ -19,7 +19,7 @@ Behavior (exact):
 
 Exact template to prepend (preserve whitespace and trailing NBSP U+00A0 on the blank lines):
 ```
-Version {{version}}
+Version: {{version}}
 Availability: {{previous-tfm}}
  
 # ALM

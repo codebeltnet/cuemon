@@ -137,62 +137,88 @@ jobs:
 
           echo "=== Context ==="
           echo "Runner: $RUNNER_OS / $RUNNER_ARCH"
+          echo "Configuration: ${{ matrix.configuration }}"
           echo "Workspace: $GITHUB_WORKSPACE"
           echo "PWD: $(pwd)"
+          echo "Event: $GITHUB_EVENT_NAME"
+          echo "Ref: $GITHUB_REF"
+          echo "SHA: $GITHUB_SHA"
           echo
 
-          echo "=== Brute-force chmod (all bin + obj) ==="
-          # Set execute permission on all files in any bin or obj directory
-          find . -type f \( -path "*/bin/*" -o -path "*/obj/*" \) -exec chmod a+x {} + 2>/dev/null || true
+          echo "=== .NET info ==="
+          dotnet --info || true
+          echo
+
+          echo "=== Git state ==="
+          git rev-parse HEAD || true
+          git status --porcelain || true
+          git rev-parse --is-shallow-repository || true
+          echo
+
+          # Paths we care about
+          BIN_GLOB="*/bin/*/net*/*"
+          OBJ_GLOB="*/obj/*/net*/*"
+
+          echo "=== Brute-force chmod (bin + obj) ==="
+          find . -type f \( -path "$BIN_GLOB" -o -path "$OBJ_GLOB" \) -exec chmod a+x {} + 2>/dev/null || true
           echo "chmod completed (errors ignored)."
           echo
 
           echo "=== Mount options (look for noexec) ==="
-          mount | head -n 50 || true
+          # If binaries live on a noexec mount, chmod won't help.
+          mount | sed -n '1,200p' || true
           echo
 
-          echo "=== Candidate executables (top 100) ==="
-          # Show potential executable files
-          find . -type f \( -path "*/bin/*" -o -path "*/obj/*" \) \
+          echo "=== Candidate executables (top 200) ==="
+          # Show what we might execute; exclude obvious managed files
+          find . -type f -path "$BIN_GLOB" \
             ! -name "*.dll" ! -name "*.pdb" ! -name "*.json" ! -name "*.xml" \
-            -printf "%m %u:%g %s %p\n" 2>/dev/null | head -n 100 || true
+            -printf "%m %u:%g %s %p\n" | head -n 200 || true
           echo
 
-          echo "=== Test hosts / apphosts ==="
-          find . -type f \( -path "*/bin/*" -o -path "*/obj/*" \) \( \
+          echo "=== Likely xUnit / test hosts (if present) ==="
+          # These names vary; do not rely on just *Tests*
+          find . -type f -path "$BIN_GLOB" \( \
               -name "testhost*" -o \
               -name "*xunit*" -o \
-              -name "*Tests" -o \
+              -name "*Tests*" -o \
               -name "*.runsettings" \
-            \) -printf "%m %u:%g %s %p\n" 2>/dev/null | head -n 50 || true
+            \) -printf "%m %u:%g %s %p\n" | head -n 200 || true
           echo
 
-          echo "=== Deep diagnostics for apphost candidates ==="
-          find . -type f \( -path "*/bin/*" -o -path "*/obj/*" \) \( \
-              -name "testhost*" -o \
-              -name "*xunit*" -o \
-              -name "*Tests" \
-            \) 2>/dev/null | head -n 20 | while IFS= read -r f; do
+          echo "=== Deep diagnostics for any 'testhost' or apphost candidates ==="
+          # For each likely executable, show the facts that explain 'permission denied' vs 'exec format error'
+          while IFS= read -r f; do
             echo "--- $f ---"
-            ls -la "$f" 2>/dev/null || true
-            file -L "$f" 2>/dev/null || true
-            
-            # Check ELF binaries
-            if file -L "$f" 2>/dev/null | grep -q "ELF"; then
-              echo "Interpreter & deps:"
-              readelf -l "$f" 2>/dev/null | grep -A 1 "program interpreter" || true
-              ldd "$f" 2>/dev/null | head -n 10 || true
+            ls -la "$f" || true
+
+            # Identify file type and architecture
+            file -L "$f" || true
+
+            # If it's an ELF binary, show its dynamic interpreter and linked libs (exec format errors often show up here)
+            if file -L "$f" | grep -q "ELF"; then
+              echo "readelf -l (interpreter):"
+              readelf -l "$f" 2>/dev/null | sed -n '1,80p' || true
+              echo "ldd (dependencies):"
+              ldd "$f" 2>/dev/null || true
             fi
-            
-            # Check shebangs for CRLF issues
+
+            # If it's a script, CRLF in the shebang can cause 'Exec format error'
             if head -c 2 "$f" 2>/dev/null | grep -q "#!"; then
-              echo "Shebang:"
+              echo "shebang:"
               head -n 1 "$f" | cat -A || true
             fi
+
             echo
-          done
-          
-          echo "=== Done ==="
+          done < <(
+            find . -type f -path "$BIN_GLOB" \( \
+              -name "testhost*" -o \
+              -name "*xunit*" -o \
+              -name "*Tests*" \
+            \) | head -n 50
+          ) || true
+
+          echo "=== Done diagnostics step ==="
         shell: bash
 
       - name: Test with ${{ matrix.configuration }} build

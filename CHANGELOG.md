@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.2.1] - TBD
+
+This is a service update that focuses on package dependencies.
+
 ## [10.2.0] - 2026-02-09
 
 This is a minor release that introduces support for UN M.49 statistical regions and countries.

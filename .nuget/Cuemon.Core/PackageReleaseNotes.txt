@@ -1,3 +1,14 @@
+Version: 10.2.1
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+ 
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+ 
+# Improvements
+- OPTIMIZED StreamDecoratorExtensions class in the Cuemon.IO namespace to reduce memory allocations and improve throughput of InvokeToByteArray by eliminating redundant buffer copies for non-MemoryStream inputs (allocation ratio reduced from ~2x to ~1x for typical payload sizes)
+- OPTIMIZED StreamDecoratorExtensions class in the Cuemon.IO namespace to cache Length access and avoid repeated virtual calls on seekable streams
+- OPTIMIZED StreamDecoratorExtensions class in the Cuemon.IO namespace to return Array.Empty<byte>() for zero-length seekable streams to avoid unnecessary MemoryStream allocation
+ 
 Version: 10.2.0
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
  

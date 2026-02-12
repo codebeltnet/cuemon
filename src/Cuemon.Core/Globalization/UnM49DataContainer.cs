@@ -29,14 +29,8 @@ internal sealed class UnM49DataContainer
         var regions = new List<Unm49RegionData>();
         var countries = new List<Unm49CountryData>();
 
-        using (var stream = Decorator.Enclose(typeof(StatisticalRegionInfo).Assembly).GetManifestResources(resourceName)
-                   .Single().Value)
+        using (var stream = Decorator.Enclose(typeof(StatisticalRegionInfo).Assembly).GetManifestResources(resourceName).Single().Value)
         {
-            if (stream == null)
-            {
-                throw new InvalidOperationException($"Embedded resource '{resourceName}' not found.");
-            }
-
             using (var reader = new StreamReader(stream))
             {
                 // Skip header line

@@ -26,16 +26,17 @@ namespace Cuemon.IO
             Validator.ThrowIfNull(decorator);
             var source = decorator.Inner;
             long lastPosition = 0;
-            if (changePosition && source.CanSeek)
+            var canSeekSource = source.CanSeek;
+            if (changePosition && canSeekSource)
             {
                 lastPosition = source.Position;
-                if (source.CanSeek) { source.Position = 0; }
+                source.Position = 0;
             }
 
             source.CopyTo(destination, bufferSize);
             destination.Flush();
 
-            if (changePosition && source.CanSeek) { source.Position = lastPosition; }
+            if (changePosition && canSeekSource) { source.Position = lastPosition; }
             if (changePosition && destination.CanSeek) { destination.Position = 0; }
         }
 
@@ -59,18 +60,41 @@ namespace Cuemon.IO
                     return s.ToArray();
                 }
 
-                using (var memoryStream = new MemoryStream(new byte[decorator.Inner.Length]))
+                var source = decorator.Inner;
+                var canSeek = source.CanSeek;
+                var oldPosition = 0L;
+
+                if (canSeek)
                 {
-                    var oldPosition = decorator.Inner.Position;
-                    if (decorator.Inner.CanSeek)
+                    oldPosition = source.Position;
+                    source.Position = 0;
+                }
+
+                var length = canSeek ? source.Length : 0L;
+
+                if (canSeek && length == 0)
+                {
+                    source.Position = oldPosition;
+                    return Array.Empty<byte>();
+                }
+
+                var memoryStream = length > 0 && length <= int.MaxValue
+                    ? new MemoryStream((int)length)
+                    : new MemoryStream();
+
+                using (memoryStream)
+                {
+                    source.CopyTo(memoryStream, bufferSize);
+                    if (canSeek)
                     {
-                        decorator.Inner.Position = 0;
+                        source.Position = oldPosition;
                     }
 
-                    decorator.Inner.CopyTo(memoryStream, bufferSize);
-                    if (decorator.Inner.CanSeek)
+                    if (memoryStream.TryGetBuffer(out var segment) &&
+                        segment.Offset == 0 &&
+                        segment.Count == segment.Array.Length)
                     {
-                        decorator.Inner.Position = oldPosition;
+                        return segment.Array;
                     }
 
                     return memoryStream.ToArray();

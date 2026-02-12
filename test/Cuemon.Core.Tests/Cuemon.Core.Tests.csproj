@@ -29,7 +29,6 @@
     <ProjectReference Include="..\..\src\Cuemon.Extensions.Core\Cuemon.Extensions.Core.csproj" />
     <ProjectReference Include="..\..\src\Cuemon.Extensions.IO\Cuemon.Extensions.IO.csproj" />
     <ProjectReference Include="..\..\src\Cuemon.Extensions.Text.Json\Cuemon.Extensions.Text.Json.csproj" />
-    <ProjectReference Include="..\..\src\Cuemon.IO\Cuemon.IO.csproj" />
     <ProjectReference Include="..\..\src\Cuemon.Extensions.Xml\Cuemon.Extensions.Xml.csproj" />
   </ItemGroup>
 

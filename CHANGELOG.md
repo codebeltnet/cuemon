@@ -6,9 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
-## [10.2.1] - TBD
+## [10.2.1] - 2026-02-12
 
-This is a service update that focuses on package dependencies.
+This is a service update that focuses on package dependencies; however, it also includes a small performance optimization to reduce allocations and improve throughput when working with streams.
+
+### Changed
+
+- `StreamDecoratorExtensions` class in the Cuemon.IO namespace to reduce memory allocations and improve throughput of InvokeToByteArray by eliminating redundant buffer copies for non-MemoryStream inputs (allocation ratio reduced from ~2x to ~1x for typical payload sizes)
+- `StreamDecoratorExtensions` class in the Cuemon.IO namespace to cache Length access and avoid repeated virtual calls on seekable streams
+- `StreamDecoratorExtensions` class in the Cuemon.IO namespace to return Array.Empty<byte>() for zero-length seekable streams to avoid unnecessary MemoryStream allocation
+
 
 ## [10.2.0] - 2026-02-09
 

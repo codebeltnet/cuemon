@@ -64,6 +64,8 @@ jobs:
     with:
       configuration: ${{ matrix.configuration }}
       version: ${{ needs.build.outputs.version }}
+      download-build-artifact-pattern: build-${{ matrix.configuration }}-X64
+
 
   test_linux:
     name: call-test-linux

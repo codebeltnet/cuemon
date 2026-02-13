@@ -42,11 +42,14 @@ jobs:
     name: call-build
     strategy:
       matrix:
+        arch: [X64, ARM64]
         configuration: [Debug, Release]
     uses: codebeltnet/jobs-dotnet-build/.github/workflows/default.yml@v3
     with:
       configuration: ${{ matrix.configuration }}
       strong-name-key-filename: cuemon.snk
+      runs-on: ${{ matrix.arch == 'ARM64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
+      upload-build-artifact-name: build-${{ matrix.configuration }}-${{ matrix.arch }}
     secrets:
       GCP_TOKEN: ${{ secrets.GCP_TOKEN }}
       GCP_BUCKETNAME: ${{ secrets.GCP_BUCKETNAME }}
@@ -68,16 +71,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
         configuration: [Debug, Release]
         project: ${{ fromJson(needs.prepare_test.outputs.json) }}
+        arch: [X64, ARM64]
     uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
     with:
-      runs-on: ${{ matrix.os }}
+      runs-on: ${{ matrix.arch == 'ARM64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
       configuration: ${{ matrix.configuration }}
       projects: ${{ matrix.project }}
       build: true # we need to build due to xUnitv3
       restore: true # we need to restore since we disabled caching
+      download-pattern: build-${{ matrix.configuration }}-${{ matrix.arch }}
 
   test_windows:
     name: call-test-windows
@@ -85,17 +89,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2025, windows-11-arm]
+        arch: [X64, ARM64]
         configuration: [Debug, Release]
         project: ${{ fromJson(needs.prepare_test.outputs.json) }}
     uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
     with:
-      runs-on: ${{ matrix.os }}
+      runs-on: ${{ matrix.arch == 'ARM64' && 'windows-11-arm' || 'windows-2025' }}
       configuration: ${{ matrix.configuration }}
       projects: ${{ matrix.project }}
       test-arguments: -- RunConfiguration.DisableAppDomain=true
       build: true # we need to build for .net48
       restore: true # apparently we need to restore for .net48
+      download-pattern: build-${{ matrix.configuration }}-${{ matrix.arch }}
 
   integration_test:
     name: ⚗️ Integration Test
@@ -128,7 +133,7 @@ jobs:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: '*-${{ matrix.configuration }}'
+          pattern: build-${{ matrix.configuration }}-X64
           merge-multiple: true
 
       - name: Fix Linux test apphost permissions

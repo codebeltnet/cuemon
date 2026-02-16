@@ -48,7 +48,7 @@ namespace Cuemon.Globalization
         /// The list includes the World region (code "001") and all geographic regions.
         /// The collection is immutable and cached for the lifetime of the application.
         /// </remarks>
-        public static IReadOnlyList<StatisticalRegionInfo> StatisticalRegions { get; } = UnM49Data.Value.Regions;
+        public static IEnumerable<StatisticalRegionInfo> StatisticalRegions { get; } = UnM49Data.Value.Regions;
 
         /// <summary>
         /// Gets a region or country by its UN M.49 code.

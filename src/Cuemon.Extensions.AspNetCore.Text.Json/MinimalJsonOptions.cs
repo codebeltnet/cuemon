@@ -13,8 +13,11 @@ namespace Cuemon.Extensions.AspNetCore.Text.Json
     public class MinimalJsonOptions : ConfigureOptions<JsonOptions>
     {
         /// <summary>
-        /// Creates a new <see cref="MinimalJsonOptions"/>.
+        /// Initializes a new instance of the <see cref="MinimalJsonOptions" /> class.
         /// </summary>
+        /// <param name="formatterOptions">
+        /// The formatter options.
+        /// </param>
         public MinimalJsonOptions(IOptions<JsonFormatterOptions> formatterOptions) : base(mo =>
         {
             var options = formatterOptions.Value;

@@ -2,6 +2,7 @@
 using System.Net.Http;
 using Cuemon.AspNetCore.Diagnostics;
 using Cuemon.Extensions.AspNetCore.Xml.Converters;
+using Cuemon.Extensions.DependencyInjection;
 using Cuemon.Net.Http;
 using Cuemon.Xml.Serialization.Formatters;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +37,7 @@ namespace Cuemon.Extensions.AspNetCore.Xml.Formatters
         {
             Validator.ThrowIfNull(services);
             Validator.ThrowIfInvalidConfigurator(setup, out var options);
-            services.Configure(setup ?? (o =>
+            services.TryConfigure(setup ?? (o =>
             {
                 o.Settings = options.Settings;
                 o.SensitivityDetails = options.SensitivityDetails;

@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text.Json;
 using Cuemon.AspNetCore.Diagnostics;
 using Cuemon.Extensions.AspNetCore.Text.Json.Converters;
+using Cuemon.Extensions.DependencyInjection;
 using Cuemon.Extensions.Text.Json.Formatters;
 using Cuemon.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +38,7 @@ namespace Cuemon.Extensions.AspNetCore.Text.Json.Formatters
         {
             Validator.ThrowIfNull(services);
             Validator.ThrowIfInvalidConfigurator(setup, out var options);
-            services.Configure(setup ?? (o =>
+            services.TryConfigure(setup ?? (o =>
             {
                 o.Settings = options.Settings;
                 o.SensitivityDetails = options.SensitivityDetails;

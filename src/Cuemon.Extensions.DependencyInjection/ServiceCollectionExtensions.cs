@@ -398,7 +398,7 @@ namespace Cuemon.Extensions.DependencyInjection
             Validator.ThrowIfNull(services);
             Validator.ThrowIfNull(setup);
             services.AddServices(service, implementation, lifetime, true);
-            services.Configure(setup);
+            services.TryConfigure(setup);
             return services;
         }
 
@@ -475,7 +475,7 @@ namespace Cuemon.Extensions.DependencyInjection
             Validator.ThrowIfNull(implementationFactory);
             Validator.ThrowIfNull(setup);
             services.AddServices(service, implementationFactory, lifetime, true);
-            services.Configure(setup);
+            services.TryConfigure(setup);
             return services;
         }
 

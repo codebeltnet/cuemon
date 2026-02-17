@@ -624,5 +624,56 @@ namespace Cuemon.Extensions.DependencyInjection
 
 #endif
 
+        [Fact]
+        public void Add_ShouldOnlyRegisterOptionsOnce_WhenCalledMultipleTimesWithSameOptionsType()
+        {
+            var sut = new ServiceCollection();
+
+            sut.Add<FakeOptions>(typeof(FakeService), typeof(FakeServiceScoped), ServiceLifetime.Scoped, (Action<FakeOptions>)(o => o.Greeting = "First"));
+            sut.Add<FakeOptions>(typeof(FakeService), typeof(FakeServiceSingleton), ServiceLifetime.Singleton, (Action<FakeOptions>)(o => o.Greeting = "Second"));
+            sut.Add<FakeOptions>(typeof(FakeService), typeof(FakeServiceTransient), ServiceLifetime.Transient, (Action<FakeOptions>)(o => o.Greeting = "Third"));
+
+            var configureOptionsCount = sut.Count(sd =>
+                sd.ServiceType == typeof(IConfigureOptions<FakeOptions>));
+
+            TestOutput.WriteLine($"IConfigureOptions<FakeOptions> registrations: {configureOptionsCount}");
+
+            Assert.Equal(1, configureOptionsCount);
+        }
+
+        [Fact]
+        public void TryAdd_ShouldOnlyRegisterOptionsOnce_WhenCalledMultipleTimesWithSameOptionsType()
+        {
+            var sut = new ServiceCollection();
+
+            sut.TryAdd<FakeOptions>(typeof(FakeService), typeof(FakeServiceScoped), ServiceLifetime.Scoped, (Action<FakeOptions>)(o => o.Greeting = "First"));
+            sut.TryAdd<FakeOptions>(typeof(FakeService), typeof(FakeServiceSingleton), ServiceLifetime.Singleton, (Action<FakeOptions>)(o => o.Greeting = "Second"));
+            sut.TryAdd<FakeOptions>(typeof(FakeService), typeof(FakeServiceTransient), ServiceLifetime.Transient, (Action<FakeOptions>)(o => o.Greeting = "Third"));
+
+            var configureOptionsCount = sut.Count(sd =>
+                sd.ServiceType == typeof(IConfigureOptions<FakeOptions>));
+
+            TestOutput.WriteLine($"IConfigureOptions<FakeOptions> registrations: {configureOptionsCount}");
+
+            Assert.Equal(1, configureOptionsCount);
+        }
+
+        [Fact]
+        public void TryAdd_WithFactory_ShouldOnlyRegisterOptionsOnce_WhenCalledMultipleTimesWithSameOptionsType()
+        {
+            var sut = new ServiceCollection();
+
+            sut.TryAdd<FakeOptions>(typeof(FakeService), _ => new FakeServiceScoped(default), ServiceLifetime.Scoped, (Action<FakeOptions>)(o => o.Greeting = "First"));
+            sut.TryAdd<FakeOptions>(typeof(FakeService), _ => new FakeServiceSingleton(default), ServiceLifetime.Singleton, (Action<FakeOptions>)(o => o.Greeting = "Second"));
+            sut.TryAdd<FakeOptions>(typeof(FakeService), _ => new FakeServiceTransient(default), ServiceLifetime.Transient, (Action<FakeOptions>)(o => o.Greeting = "Third"));
+
+            var configureOptionsCount = sut.Count(sd =>
+                sd.ServiceType == typeof(IConfigureOptions<FakeOptions>));
+
+            TestOutput.WriteLine($"IConfigureOptions<FakeOptions> registrations: {configureOptionsCount}");
+
+            Assert.Equal(1, configureOptionsCount);
+        }
+
     }
 }

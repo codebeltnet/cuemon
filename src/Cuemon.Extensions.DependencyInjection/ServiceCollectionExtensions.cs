@@ -76,7 +76,7 @@ namespace Cuemon.Extensions.DependencyInjection
             Validator.ThrowIfNull(services);
             Validator.ThrowIfNull(setup);
             services.AddServices(service, implementation, lifetime, false);
-            services.Configure(setup);
+            services.TryConfigure(setup);
             return services;
         }
 

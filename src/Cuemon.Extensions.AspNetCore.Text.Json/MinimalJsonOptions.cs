@@ -1,4 +1,5 @@
-﻿using Cuemon.Collections.Generic;
+﻿using System.Text.Json;
+using Cuemon.Collections.Generic;
 using Cuemon.Extensions.AspNetCore.Text.Json.Converters;
 using Cuemon.Extensions.Text.Json.Formatters;
 using Microsoft.AspNetCore.Http.Json;
@@ -18,39 +19,40 @@ namespace Cuemon.Extensions.AspNetCore.Text.Json
         {
             var options = formatterOptions.Value;
 
-            options.Settings.Converters.AddHttpExceptionDescriptorConverter(o => o.SensitivityDetails = options.SensitivityDetails);
+            var settings = new JsonSerializerOptions(options.Settings);
+            settings.Converters.AddHttpExceptionDescriptorConverter(o => o.SensitivityDetails = options.SensitivityDetails);
 
-            Decorator.Enclose(mo.SerializerOptions.Converters).AddRange(options.Settings.Converters);
-            mo.SerializerOptions.AllowOutOfOrderMetadataProperties = options.Settings.AllowOutOfOrderMetadataProperties;
-            mo.SerializerOptions.AllowTrailingCommas = options.Settings.AllowTrailingCommas;
-            mo.SerializerOptions.DefaultBufferSize = options.Settings.DefaultBufferSize;
-            mo.SerializerOptions.Encoder = options.Settings.Encoder;
-            mo.SerializerOptions.DictionaryKeyPolicy = options.Settings.DictionaryKeyPolicy;
-            mo.SerializerOptions.DefaultIgnoreCondition = options.Settings.DefaultIgnoreCondition;
-            mo.SerializerOptions.NumberHandling = options.Settings.NumberHandling;
-            mo.SerializerOptions.PreferredObjectCreationHandling = options.Settings.PreferredObjectCreationHandling;
-            mo.SerializerOptions.UnknownTypeHandling = options.Settings.UnknownTypeHandling;
-            mo.SerializerOptions.UnmappedMemberHandling = options.Settings.UnmappedMemberHandling;
-            mo.SerializerOptions.IgnoreReadOnlyProperties = options.Settings.IgnoreReadOnlyProperties;
-            mo.SerializerOptions.IgnoreReadOnlyFields = options.Settings.IgnoreReadOnlyFields;
-            mo.SerializerOptions.IncludeFields = options.Settings.IncludeFields;
-            mo.SerializerOptions.MaxDepth = options.Settings.MaxDepth;
-            mo.SerializerOptions.PropertyNamingPolicy = options.Settings.PropertyNamingPolicy;
-            mo.SerializerOptions.PropertyNameCaseInsensitive = options.Settings.PropertyNameCaseInsensitive;
-            mo.SerializerOptions.ReadCommentHandling = options.Settings.ReadCommentHandling;
-            mo.SerializerOptions.WriteIndented = options.Settings.WriteIndented;
-            mo.SerializerOptions.IndentCharacter = options.Settings.IndentCharacter;
-            mo.SerializerOptions.IndentSize = options.Settings.IndentSize;
-            mo.SerializerOptions.ReferenceHandler = options.Settings.ReferenceHandler;
-            mo.SerializerOptions.NewLine = options.Settings.NewLine;
-            mo.SerializerOptions.RespectNullableAnnotations = options.Settings.RespectNullableAnnotations;
-            mo.SerializerOptions.RespectRequiredConstructorParameters = options.Settings.RespectRequiredConstructorParameters;
+            Decorator.Enclose(mo.SerializerOptions.Converters).AddRange(settings.Converters);
+            mo.SerializerOptions.AllowOutOfOrderMetadataProperties = settings.AllowOutOfOrderMetadataProperties;
+            mo.SerializerOptions.AllowTrailingCommas = settings.AllowTrailingCommas;
+            mo.SerializerOptions.DefaultBufferSize = settings.DefaultBufferSize;
+            mo.SerializerOptions.Encoder = settings.Encoder;
+            mo.SerializerOptions.DictionaryKeyPolicy = settings.DictionaryKeyPolicy;
+            mo.SerializerOptions.DefaultIgnoreCondition = settings.DefaultIgnoreCondition;
+            mo.SerializerOptions.NumberHandling = settings.NumberHandling;
+            mo.SerializerOptions.PreferredObjectCreationHandling = settings.PreferredObjectCreationHandling;
+            mo.SerializerOptions.UnknownTypeHandling = settings.UnknownTypeHandling;
+            mo.SerializerOptions.UnmappedMemberHandling = settings.UnmappedMemberHandling;
+            mo.SerializerOptions.IgnoreReadOnlyProperties = settings.IgnoreReadOnlyProperties;
+            mo.SerializerOptions.IgnoreReadOnlyFields = settings.IgnoreReadOnlyFields;
+            mo.SerializerOptions.IncludeFields = settings.IncludeFields;
+            mo.SerializerOptions.MaxDepth = settings.MaxDepth;
+            mo.SerializerOptions.PropertyNamingPolicy = settings.PropertyNamingPolicy;
+            mo.SerializerOptions.PropertyNameCaseInsensitive = settings.PropertyNameCaseInsensitive;
+            mo.SerializerOptions.ReadCommentHandling = settings.ReadCommentHandling;
+            mo.SerializerOptions.WriteIndented = settings.WriteIndented;
+            mo.SerializerOptions.IndentCharacter = settings.IndentCharacter;
+            mo.SerializerOptions.IndentSize = settings.IndentSize;
+            mo.SerializerOptions.ReferenceHandler = settings.ReferenceHandler;
+            mo.SerializerOptions.NewLine = settings.NewLine;
+            mo.SerializerOptions.RespectNullableAnnotations = settings.RespectNullableAnnotations;
+            mo.SerializerOptions.RespectRequiredConstructorParameters = settings.RespectRequiredConstructorParameters;
 #if NET10_0_OR_GREATER
-            mo.SerializerOptions.AllowDuplicateProperties = options.Settings.AllowDuplicateProperties;
+            mo.SerializerOptions.AllowDuplicateProperties = settings.AllowDuplicateProperties;
 #endif
-            if (options.Settings.TypeInfoResolver is not null)
+            if (settings.TypeInfoResolver is not null)
             {
-                mo.SerializerOptions.TypeInfoResolver = options.Settings.TypeInfoResolver;
+                mo.SerializerOptions.TypeInfoResolver = settings.TypeInfoResolver;
             }
         })
         {

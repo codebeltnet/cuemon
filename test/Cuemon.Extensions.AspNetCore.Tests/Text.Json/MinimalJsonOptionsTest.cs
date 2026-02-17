@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Cuemon.Extensions.Text.Json.Formatters;
 using System.Text.Json.Serialization.Metadata;
 using Codebelt.Extensions.Xunit;
 using Microsoft.AspNetCore.Http.Json;
@@ -238,6 +239,26 @@ namespace Cuemon.Extensions.AspNetCore.Text.Json
             TestOutput.WriteLine($"Converter count: {jsonOptions.SerializerOptions.Converters.Count}");
 
             Assert.NotEmpty(jsonOptions.SerializerOptions.Converters);
+        }
+
+        [Fact]
+        public void MinimalJsonOptions_ShouldNotDuplicateConverters_WhenOptionsCreatedMultipleTimes()
+        {
+            var services = new ServiceCollection();
+            services.AddMinimalJsonOptions();
+
+            var provider = services.BuildServiceProvider();
+            var formatterOptions = provider.GetRequiredService<IOptions<JsonFormatterOptions>>().Value;
+            var optionsFactory = provider.GetRequiredService<IOptionsFactory<JsonOptions>>();
+
+            var before = formatterOptions.Settings.Converters.Count;
+
+            optionsFactory.Create(Options.DefaultName);
+            optionsFactory.Create(Options.DefaultName);
+
+            var after = formatterOptions.Settings.Converters.Count;
+
+            Assert.Equal(before, after);
         }
 
         [Fact]

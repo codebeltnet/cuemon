@@ -1,7 +1,8 @@
-using Cuemon.Configuration;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using Cuemon.Configuration;
 
 namespace Cuemon.Reflection;
 
@@ -13,6 +14,7 @@ public class AssemblyContextOptions : IValidatableParameterObject
 {
     private const string SystemPrefix = nameof(System);
     private const string MicrosoftPrefix = nameof(Microsoft);
+    private static readonly ConcurrentDictionary<string, bool> FrameworkNamespaceCache = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AssemblyContextOptions"/> class.
@@ -76,37 +78,43 @@ public class AssemblyContextOptions : IValidatableParameterObject
 
     private static bool HasFrameworkRootNamespace(Assembly assembly)
     {
-        try
+        var key = assembly.FullName;
+        if (string.IsNullOrEmpty(key)) { return false; }
+
+        return FrameworkNamespaceCache.GetOrAdd(key, _ =>
         {
-            foreach (var t in assembly.GetExportedTypes())
+            try
             {
-                var ns = t.Namespace;
-                if (string.IsNullOrEmpty(ns)) { continue; }
+                foreach (var t in assembly.GetExportedTypes())
+                {
+                    var ns = t.Namespace;
+                    if (string.IsNullOrEmpty(ns)) { continue; }
 
-                var dot = ns.IndexOf('.');
-                var root = dot < 0 ? ns : ns.Substring(0, dot);
+                    var dot = ns.IndexOf('.');
+                    var root = dot < 0 ? ns : ns.Substring(0, dot);
 
-                if (root == SystemPrefix || root == MicrosoftPrefix) { return true; }
+                    if (root == SystemPrefix || root == MicrosoftPrefix) { return true; }
+                }
             }
-        }
-        catch (ReflectionTypeLoadException ex)
-        {
-            foreach (var t in ex.Types)
+            catch (ReflectionTypeLoadException ex)
             {
-                var ns = t?.Namespace;
-                if (string.IsNullOrEmpty(ns)) { continue; }
+                foreach (var t in ex.Types)
+                {
+                    var ns = t?.Namespace;
+                    if (string.IsNullOrEmpty(ns)) { continue; }
 
-                var dot = ns.IndexOf('.');
-                var root = dot < 0 ? ns : ns.Substring(0, dot);
+                    var dot = ns.IndexOf('.');
+                    var root = dot < 0 ? ns : ns.Substring(0, dot);
 
-                if (root == SystemPrefix || root == MicrosoftPrefix) { return true; }
+                    if (root == SystemPrefix || root == MicrosoftPrefix) { return true; }
+                }
             }
-        }
-        catch
-        {
+            catch (Exception)
+            {
+                return false;
+            }
             return false;
-        }
-        return false;
+        });
     }
 
     /// <summary>
@@ -135,7 +143,8 @@ public class AssemblyContextOptions : IValidatableParameterObject
     /// This filter is applied to assemblies in the current application domain.
     /// The default predicate excludes any assembly whose <see cref="Assembly.FullName"/> starts with <c>System</c> or <c>Microsoft</c>,
     /// and additionally excludes any assembly whose exported types are rooted in the <c>System</c> or <c>Microsoft</c> namespace,
-    /// limiting resolution to application-level dependencies.
+    /// limiting resolution to application-level dependencies. Results of the type-scan are cached per assembly identity to avoid
+    /// repeated enumeration on subsequent calls.
     /// </remarks>
     public Func<Assembly, bool> AssemblyFilter { get; set; }
 
@@ -155,6 +164,7 @@ public class AssemblyContextOptions : IValidatableParameterObject
     /// </summary>
     /// <exception cref="InvalidOperationException">
     /// <see cref="AssemblyFilter"/> cannot be null - or -
+    /// <see cref="ExcludedAssemblies"/> cannot be null - or -
     /// <see cref="ReferencedAssemblyFilter"/> cannot be null.
     /// </exception>
     public void ValidateOptions()

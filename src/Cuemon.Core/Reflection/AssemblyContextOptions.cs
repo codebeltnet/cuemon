@@ -109,7 +109,7 @@ public class AssemblyContextOptions : IValidatableParameterObject
                     if (root == SystemPrefix || root == MicrosoftPrefix) { return true; }
                 }
             }
-            catch (Exception)
+            catch (Exception ex) when (Patterns.IsRecoverableException(ex))
             {
                 return false;
             }

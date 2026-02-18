@@ -1,5 +1,6 @@
 #if NETSTANDARD2_0_OR_GREATER
 using System.Collections.Generic;
+using Cuemon.Collections.Generic;
 
 namespace Cuemon.Extensions.Collections.Generic
 {
@@ -17,13 +18,7 @@ namespace Cuemon.Extensions.Collections.Generic
         /// <returns><c>true</c> if there is an object at the top of the <see cref="Stack{T}"/>; <c>false</c> if the <see cref="Stack{T}"/> is empty.</returns>
         public static bool TryPop<T>(this Stack<T> stack, out T result)
         {
-            if (stack.Count > 0)
-            {
-                result = stack.Pop();
-                return true;
-            }
-            result = default;
-            return false;
+            return Decorator.EncloseToExpose(stack).TryPop(out result);
         }
     }
 }

@@ -63,7 +63,7 @@ csharp_style_namespace_declarations = file_scoped:suggestion
 
 # Top-level statements: DO NOT USE
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0210-ide0211
-# No editorconfig option exists to prohibit top-level statements; this is enforced by convention.
+# This is enforced via a style preference set to error severity, not a language-level prohibition.
 # Always use explicit class declarations with a proper namespace and Main method where applicable.
 [*.cs]
 csharp_style_prefer_top_level_statements = false:error

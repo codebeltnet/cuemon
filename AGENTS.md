@@ -1,123 +1,216 @@
 # AGENTS.md
 
-Purpose
-- This file guides agentic coding tools working in this repo.
-- Follow the repo rules first; do not invent commands or conventions.
+This file guides agentic coding tools working in this repo.
+Follow the repo rules first; do not invent commands or conventions.
 
-Repository Basics
-- Workspace root: this file lives in repo root.
-- Solution lives at repo root (see `.docfx/index.md`).
-- Projects:
-  - `src/` = packages shipped to NuGet.
-  - `test/` = unit and functional tests.
-  - `tuning/` = BenchmarkDotNet benchmarks.
-  - `tooling/` = internal tools.
+## Repository Layout
 
-Toolchain
-- .NET targets: net10.0, net9.0, netstandard2.0 (source); tests also net48 on Windows.
-- Use `dotnet` CLI; CI runs on Linux and Windows.
+- Solution: `Cuemon.slnx` in repo root.
+- `src/` — NuGet packages (shipped to nuget.org).
+- `test/` — xUnit v3 unit and functional tests.
+- `tuning/` — BenchmarkDotNet benchmarks.
+- `tooling/` — internal CLI tools.
+- `.nuget/<PackageName>/` — per-package `README.md` and `PackageReleaseNotes.txt`.
 
-Build Commands
-- Build solution (all): `dotnet build -c Release`
-- Build a project: `dotnet build src/Cuemon.Core/Cuemon.Core.csproj -c Release`
-- Pack (if needed): `dotnet pack -c Release`
+## Toolchain
 
-Lint / Analyzers
-- No separate lint command is defined.
-- Code style is enforced during build (`EnforceCodeStyleInBuild=true`).
-- For tests and benchmarks, analyzers are disabled (see `Directory.Build.props`).
-- Prefer build to surface style issues: `dotnet build -c Release`.
+- .NET SDK with `LangVersion=latest`.
+- Source TFMs: `net10.0;net9.0;netstandard2.0`.
+- Test TFMs: `net10.0;net9.0` on Linux; adds `net48` on Windows.
+- Benchmark TFMs: `net10.0;net9.0`.
+- Central package management via `Directory.Packages.props` (`ManagePackageVersionsCentrally=true`).
+- CI runs on Linux (ubuntu-24.04) and Windows (windows-2025), both X64 and ARM64.
 
-Test Commands
-- Run all tests in a project:
-  - `dotnet test test/Cuemon.Core.Tests/Cuemon.Core.Tests.csproj -c Release`
-- Run a single test (recommended):
-  - `dotnet test test/Cuemon.Core.Tests/Cuemon.Core.Tests.csproj -c Release --filter "FullyQualifiedName~DateSpanTest.Parse_ShouldGetOneMonthOfDifference_UsingIso8601String"`
-- Run all tests under `test/`:
-  - `dotnet test -c Release test/`
+## Build Commands
 
-Integration Tests (SQL Server)
-- CI runs `test/Cuemon.Data.SqlClient.Tests.csproj` with a SQL Server container.
-- Expect a connection string env var:
-  - `CONNECTIONSTRINGS__ADVENTUREWORKS` (see CI workflow).
-- Use docker compose if you need local parity.
+```
+dotnet build -c Release                                           # entire solution
+dotnet build src/Cuemon.Core/Cuemon.Core.csproj -c Release        # single project
+dotnet pack -c Release                                            # pack all NuGet packages
+```
 
-Benchmarks (BenchmarkDotNet)
-- Benchmarks live under `tuning/` and are not unit tests.
-- Use `tooling/bdn-runner` to run benchmarks when needed.
+## Lint / Analyzers
 
-Cursor Rules
-- None found in `.cursor/rules/` or `.cursorrules`.
+- No separate lint step; code style is enforced during build (`EnforceCodeStyleInBuild=true` for source projects).
+- Analyzers are **disabled** for test and benchmark projects (`RunAnalyzers=false`, `AnalysisLevel=none`).
+- Run `dotnet build -c Release` on source projects to surface style violations.
 
-Copilot Rules (must follow)
-- Source: `.github/copilot-instructions.md`.
-- Tests must inherit `Codebelt.Extensions.Xunit.Test` and use `using Xunit;`.
-- Do NOT use `Xunit.Abstractions` or `using Xunit.Abstractions`.
-- Test namespaces MUST match the SUT namespace (no `.Tests` suffix).
-- Test class names end with `Test`.
-- Do not use `InternalsVisibleTo`; test through public APIs.
-- Benchmarks follow the benchmark prompt and naming rules.
-- XML doc comments should match existing style for public/protected APIs.
+## Test Commands
 
-Code Style and Conventions
+```
+# all tests in one project
+dotnet test test/Cuemon.Core.Tests/Cuemon.Core.Tests.csproj -c Release
 
-General Principles (from `.docfx/index.md`)
+# single test (recommended when iterating)
+dotnet test test/Cuemon.Core.Tests/Cuemon.Core.Tests.csproj -c Release \
+  --filter "FullyQualifiedName~DateSpanTest.Parse_ShouldGetOneMonthOfDifference_UsingIso8601String"
+
+# all tests
+dotnet test -c Release test/
+```
+
+### Integration Tests (SQL Server)
+
+- Project: `test/Cuemon.Data.SqlClient.Tests/Cuemon.Data.SqlClient.Tests.csproj`.
+- Requires env var `CONNECTIONSTRINGS__ADVENTUREWORKS`.
+- CI spins up SQL Server via `docker-compose.yml`; use the same locally.
+
+### Benchmarks
+
+- Live under `tuning/`; run with `tooling/bdn-runner`.
+- Not unit tests; do not include in test runs.
+
+## Cursor / Copilot Rules
+
+- No Cursor rules (`.cursor/rules/` and `.cursorrules` are absent).
+- Copilot rules live in `.github/copilot-instructions.md` — **must follow**.
+
+## Code Style and Conventions
+
+### General Principles
 - Follow Framework Design Guidelines and Microsoft Engineering Guidelines.
-- Prefer SOLID, DRY, and separation of concerns.
-- Do not duplicate code; apply the boy scout rule.
+- Adhere to SOLID, DRY, separation of concerns.
+- Apply the boy scout rule; do not duplicate code.
 
-Formatting
-- Indentation: 4 spaces for `.cs` and `.vb` (`.editorconfig`).
-- XML files: 2 spaces.
-- Many modern style analyzers are disabled; keep existing style in files.
+### Formatting
+- 4 spaces for `.cs` / `.vb`; 2 spaces for `.xml` (`.editorconfig`).
+- Keep existing style in files; many modern analyzers are explicitly disabled.
 
-Imports
+### Namespace Style
+- **Prefer file-scoped namespaces** (`namespace Cuemon.Foo;`) for new files.
+- The current majority of the codebase uses **block-scoped namespaces** — do not convert existing files unless explicitly asked.
+- When editing an existing file, follow whichever style that file already uses.
+- **Never use top-level statements.** Always use explicit class declarations with a proper namespace.
+
+### Disabled Analyzers (key rules — do NOT introduce these patterns)
+
+| Rule | What it forces | Why disabled |
+|------|---------------|--------------|
+| IDE0066 | switch expressions | style consistency |
+| IDE0063 | using declarations | style consistency |
+| IDE0290 | primary constructors | style consistency |
+| IDE0022 | expression-bodied methods | style consistency |
+| IDE0300/0301/0028/0305 | collection expressions | netstandard2.0 compat |
+| CA1846/1847/1865-1867 | Span/char overloads | netstandard2.0 compat |
+| IDE0330 | `System.Threading.Lock` | requires net9.0+ |
+| Performance category | various | netstandard2.0 compat |
+
+### Imports
 - Keep `using` directives explicit and minimal.
-- Follow existing ordering in the file; do not auto-reorder unless needed.
+- Follow existing ordering; do not auto-reorder.
 
-Types and Language Features
-- Avoid style rules that are explicitly disabled in `.editorconfig`:
-  - No forced switch expressions, using declarations, or primary constructors.
-  - Avoid forced collection expressions for arrays/empty/initializers.
-  - Avoid forced expression-bodied members.
-- Use explicit types when it improves clarity; do not blindly enforce `var`.
+### Types and `var`
+- Do not blindly enforce `var`; use explicit types when it improves clarity.
+- IDE0008 (use explicit type) is disabled — either form is acceptable.
 
-Naming
+### Naming
 - Public API naming follows .NET Framework Design Guidelines.
-- Test class names end with `Test`; benchmark class names end with `Benchmark`.
-- Namespaces for tests/benchmarks match the production namespace exactly.
+- Test classes end with `Test`; benchmark classes end with `Benchmark`.
+- Namespaces for tests and benchmarks **must match the production namespace exactly** (no `.Tests` / `.Benchmarks` suffix). Override `<RootNamespace>` in `.csproj`.
 
-Error Handling
-- Use guard clauses and `Validator.ThrowIfNull` style patterns where present.
-- Prefer deterministic, testable error paths; avoid swallowing exceptions.
+### Error Handling
+- Use guard clauses and `Validator.ThrowIfNull` patterns.
+- Prefer deterministic, testable error paths; never swallow exceptions.
 
-Extension Methods
-- Extension methods belong only in `Cuemon.Extensions.*` projects.
-- Non-extension assemblies must hide extension-like APIs via `IDecorator`.
+### Extension Methods
+- Extension methods belong **only** in `Cuemon.Extensions.*` projects.
+- Non-extension assemblies may expose similar APIs only behind the `IDecorator` interface.
 
-Tests (Unit / Functional)
+## Writing Tests
+
+- Test framework: **xUnit v3** (`xunit.v3` package).
 - Base class: `Test` from `Codebelt.Extensions.Xunit`.
-- Use `[Fact]` for unit tests, `[Theory]` for parameterized tests.
+- **Do NOT** use `Xunit.Abstractions` or `using Xunit.Abstractions` (removed in xUnit v3).
+- Constructor signature: `public FooTest(ITestOutputHelper output) : base(output) { }`.
+- Use `TestOutput.WriteLine(...)` for output, inherited from `Test`.
+- Use `[Fact]` for unit tests, `[Theory]` with `[InlineData]` for parameterized tests.
+- Assertions: xUnit `Assert.*` methods only.
 - Keep tests deterministic and isolated; prefer fakes/stubs/spies.
-- Avoid mocking unless necessary; Moq allowed in special cases.
-- Never mock `IMarshaller`; use `new JsonMarshaller()` instead.
+- Mocking (Moq) only under special circumstances; **never mock `IMarshaller`** — use `new JsonMarshaller()`.
+- Do NOT use `InternalsVisibleTo`; test through public APIs (Public Facade Testing pattern).
+- Assembly naming: `Cuemon.Foo.Tests` for unit tests, `Cuemon.Foo.FunctionalTests` for functional tests.
 
-Benchmarks
-- Namespace matches production namespace; no `.Benchmarks` suffix.
-- Place under `tuning/` in matching benchmark project.
-- Use `[MemoryDiagnoser]` and `[GroupBenchmarksBy]` where relevant.
-- Use deterministic data and `GlobalSetup` for expensive prep.
+### Test File Template
 
-Docs / XML Comments
-- Public and protected members should have XML doc comments.
-- Follow existing wording and style; see `.github/copilot-instructions.md`.
+```csharp
+using Codebelt.Extensions.Xunit;
+using Xunit;
 
-Release Notes
-- Package release notes live under `.nuget/<PackageName>/PackageReleaseNotes.txt`.
-- Keep notes updated for public API changes.
+namespace Cuemon.Foo // matches SUT namespace exactly
+{
+    public class BarTest : Test
+    {
+        public BarTest(ITestOutputHelper output) : base(output) { }
 
-Suggested Workflow for Agents
-- Identify correct project location (src/test/tuning/tooling).
-- Follow namespace and naming rules before writing code.
-- Build or run targeted tests when changing logic.
-- Keep changes minimal and consistent with local style.
+        [Fact]
+        public void Method_ShouldExpectedBehavior_WhenCondition()
+        {
+            // Arrange / Act / Assert
+        }
+    }
+}
+```
+
+## Writing Benchmarks
+
+- Place in `tuning/` in a `*.Benchmarks` project; namespace matches production (no `.Benchmarks` suffix).
+- Use `[MemoryDiagnoser]`, `[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]`.
+- Use `[GlobalSetup]` for expensive prep; keep measured methods focused.
+- Use `[Params]` for multiple input sizes; use deterministic data; avoid external systems.
+- Mark one method `Baseline = true`; use descriptive `Description` values.
+
+## XML Documentation
+
+- All public and protected members should have XML doc comments.
+- Follow existing wording and style in the codebase.
+- See `.github/copilot-instructions.md` for detailed examples.
+
+## Release Notes
+
+- Per-package notes in `.nuget/<PackageName>/PackageReleaseNotes.txt`.
+- Keep updated for public API changes.
+
+## Commit Style (Gitmoji)
+
+This repo uses **gitmoji** commit messages — do **not** use Conventional Commits (`feat:`, `fix:`, etc.).
+
+Format: `<emoji> <subject>`
+
+**Always use the actual Unicode emoji character**, not the GitHub shortcode (e.g., use `✨` not `:sparkles:`).
+
+Example: `✨ Add DateSpan.TryParse overload`
+
+### Common Gitmojis
+
+| Emoji | Use for |
+|-------|---------|
+| ✨ | New feature |
+| 🐛 | Bug fix |
+| ♻️ | Refactoring |
+| ✅ | Adding / updating tests |
+| 📝 | Documentation |
+| ⚡ | Performance improvement |
+| 🎨 | Code style / formatting |
+| 🔥 | Removing code or files |
+| 🚧 | Work in progress |
+| 📦 | Package / dependency update |
+| 🔧 | Configuration / tooling |
+| 🚚 | Moving / renaming files |
+| 💥 | Breaking change |
+| 🩹 | Non-critical fix |
+
+### Rules
+
+1. **One emoji per commit** — each commit has exactly one primary gitmoji.
+2. **Be specific** — choose the most appropriate emoji, not a generic one.
+3. **Consistent scope** — use consistent scope names across commits.
+4. **Clear messages** — the subject line should be understandable without a body.
+5. **Atomic commits** — each commit should be independently buildable and testable.
+
+## Agent Workflow
+
+1. Identify the correct project area (`src/`, `test/`, `tuning/`, `tooling/`).
+2. Follow namespace and naming rules **before** writing any code.
+3. Build the affected source project to check for style violations.
+4. Run targeted tests when changing logic.
+5. Keep changes minimal and consistent with existing local style.

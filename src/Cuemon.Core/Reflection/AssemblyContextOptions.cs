@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using Cuemon.Configuration;
 
 namespace Cuemon.Reflection;
@@ -76,6 +77,21 @@ public class AssemblyContextOptions : IValidatableParameterObject
                !fullName.StartsWith(MicrosoftPrefix, StringComparison.Ordinal);
     };
 
+    private static bool HasFrameworkRootNamespace(IEnumerable<Type> types)
+    {
+        if (types == null) { return false; }
+
+        return types
+            .Select(t => t?.Namespace)
+            .Where(ns => !string.IsNullOrEmpty(ns))
+            .Select(ns =>
+            {
+                var dot = ns.IndexOf('.');
+                return dot < 0 ? ns : ns.Substring(0, dot);
+            })
+            .Any(root => root == SystemPrefix || root == MicrosoftPrefix);
+    }
+
     private static bool HasFrameworkRootNamespace(Assembly assembly)
     {
         var key = assembly.FullName;
@@ -85,28 +101,16 @@ public class AssemblyContextOptions : IValidatableParameterObject
         {
             try
             {
-                foreach (var t in assembly.GetExportedTypes())
+                if (HasFrameworkRootNamespace(assembly.GetExportedTypes()))
                 {
-                    var ns = t.Namespace;
-                    if (string.IsNullOrEmpty(ns)) { continue; }
-
-                    var dot = ns.IndexOf('.');
-                    var root = dot < 0 ? ns : ns.Substring(0, dot);
-
-                    if (root == SystemPrefix || root == MicrosoftPrefix) { return true; }
+                    return true;
                 }
             }
             catch (ReflectionTypeLoadException ex)
             {
-                foreach (var t in ex.Types)
+                if (HasFrameworkRootNamespace(ex.Types))
                 {
-                    var ns = t?.Namespace;
-                    if (string.IsNullOrEmpty(ns)) { continue; }
-
-                    var dot = ns.IndexOf('.');
-                    var root = dot < 0 ? ns : ns.Substring(0, dot);
-
-                    if (root == SystemPrefix || root == MicrosoftPrefix) { return true; }
+                    return true;
                 }
             }
             catch (Exception ex) when (Patterns.IsRecoverableException(ex))

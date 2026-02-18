@@ -20,6 +20,8 @@ namespace Cuemon.Reflection
             Assert.True(sut.IncludeReferencedAssemblies);
             Assert.NotNull(sut.AssemblyFilter);
             Assert.NotNull(sut.ReferencedAssemblyFilter);
+            Assert.NotNull(sut.ExcludedAssemblies);
+            Assert.Contains(typeof(AssemblyContextOptions).Assembly, sut.ExcludedAssemblies);
         }
 
         [Fact]
@@ -34,6 +36,23 @@ namespace Cuemon.Reflection
             var sut3 = Assert.Throws<ArgumentException>(() => Validator.ThrowIfInvalidOptions(sut1));
 
             Assert.Equal("Operation is not valid due to the current state of the object. (Expression 'AssemblyFilter is null')", sut2.Message);
+            Assert.StartsWith("AssemblyContextOptions are not in a valid state.", sut3.Message);
+            Assert.Contains("sut1", sut3.Message);
+            Assert.IsType<InvalidOperationException>(sut3.InnerException);
+        }
+
+        [Fact]
+        public void ValidateOptions_ShouldThrowInvalidOperationException_WhenExcludedAssembliesIsNull()
+        {
+            var sut1 = new AssemblyContextOptions()
+            {
+                ExcludedAssemblies = null
+            };
+
+            var sut2 = Assert.Throws<InvalidOperationException>(() => sut1.ValidateOptions());
+            var sut3 = Assert.Throws<ArgumentException>(() => Validator.ThrowIfInvalidOptions(sut1));
+
+            Assert.Equal("Operation is not valid due to the current state of the object. (Expression 'ExcludedAssemblies is null')", sut2.Message);
             Assert.StartsWith("AssemblyContextOptions are not in a valid state.", sut3.Message);
             Assert.Contains("sut1", sut3.Message);
             Assert.IsType<InvalidOperationException>(sut3.InnerException);
@@ -80,6 +99,22 @@ namespace Cuemon.Reflection
             Assert.False(sut.AssemblyFilter(microsoftAssembly));
 
             TestOutput.WriteLine(microsoftAssembly.FullName);
+        }
+
+        [Fact]
+        public void DefaultAssemblyFilter_ShouldReturnSameResult_WhenCalledMultipleTimes()
+        {
+            var sut = new AssemblyContextOptions();
+            var assembly = typeof(AssemblyContextOptions).Assembly;
+
+            var first = sut.AssemblyFilter(assembly);
+            var second = sut.AssemblyFilter(assembly);
+            var third = sut.AssemblyFilter(assembly);
+
+            TestOutput.WriteLine($"Results: {first}, {second}, {third}");
+
+            Assert.Equal(first, second);
+            Assert.Equal(second, third);
         }
 
 #if NET9_0_OR_GREATER

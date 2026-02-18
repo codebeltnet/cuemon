@@ -187,7 +187,7 @@ Example: `✨ Add DateSpan.TryParse overload`
 | ✨ | New feature |
 | 🐛 | Bug fix |
 | ♻️ | Refactoring |
-| ✅ | Adding / updating tests |
+| ✅ | Adding / updating unit test / functional test |
 | 📝 | Documentation |
 | ⚡ | Performance improvement |
 | 🎨 | Code style / formatting |

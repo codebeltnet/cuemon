@@ -212,6 +212,7 @@ Example: `✨ Add DateSpan.TryParse overload`
 
 1. Identify the correct project area (`src/`, `test/`, `tuning/`, `tooling/`).
 2. Follow namespace and naming rules **before** writing any code.
-3. Build the affected source project to check for style violations.
-4. Run targeted tests when changing logic.
-5. Keep changes minimal and consistent with existing local style.
+3. Before potentially refactoring any code, verify the code in question is well tested; if coverage is missing, add or update tests first to reduce regression risk.
+4. Build the affected source project to check for style violations.
+5. Run targeted tests when changing logic.
+6. Keep changes minimal and consistent with existing local style.

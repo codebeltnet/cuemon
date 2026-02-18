@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Cuemon.Configuration;
 
 namespace Cuemon
@@ -19,6 +20,36 @@ namespace Cuemon
         public static Patterns Use { get; } = ExtendedPatterns;
 
         /// <summary>
+        /// Determines whether the specified <paramref name="exception"/> is considered fatal and should not be swallowed.
+        /// </summary>
+        /// <param name="exception">The exception to evaluate.</param>
+        /// <returns><c>true</c> if <paramref name="exception"/> is a fatal runtime exception such as <see cref="OutOfMemoryException"/>, <see cref="StackOverflowException"/>, <see cref="SEHException"/>, <see cref="AccessViolationException"/>, <see cref="ThreadAbortException"/> or <see cref="ThreadInterruptedException"/>; otherwise, <c>false</c>.</returns>
+        /// <remarks>Designed for use as an exception filter: <c>catch (Exception ex) when (!Patterns.IsFatalException(ex))</c> to prevent accidentally swallowing critical runtime exceptions.</remarks>
+        public static bool IsFatalException(Exception exception)
+        {
+#pragma warning disable CS0618 // ExecutionEngineException is obsolete
+            return exception is OutOfMemoryException
+                || exception is StackOverflowException
+                || exception is SEHException
+                || exception is AccessViolationException
+                || exception is ThreadAbortException
+                || exception is ThreadInterruptedException
+                || exception is ExecutionEngineException;
+#pragma warning restore CS0618
+        }
+
+        /// <summary>
+        /// Determines whether the specified <paramref name="exception"/> is considered recoverable and can be safely caught.
+        /// </summary>
+        /// <param name="exception">The exception to evaluate.</param>
+        /// <returns><c>true</c> if <paramref name="exception"/> is not considered fatal; otherwise, <c>false</c>.</returns>
+        /// <remarks>Designed for use as an exception filter: <c>catch (Exception ex) when (Patterns.IsRecoverableException(ex))</c> to avoid double-negation.</remarks>
+        public static bool IsRecoverableException(Exception exception)
+        {
+            return !IsFatalException(exception);
+        }
+
+        /// <summary>
         /// Returns a value that indicates whether the specified <paramref name="method"/> can be invoked without an exception.
         /// </summary>
         /// <param name="method">The delegate that to invoke.</param>
@@ -32,18 +63,8 @@ namespace Cuemon
                 method();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (IsRecoverableException(ex))
             {
-                if (ex is OutOfMemoryException ||
-                    ex is StackOverflowException ||
-                    ex is SEHException ||
-                    ex is AccessViolationException ||
-#pragma warning disable CS0618 // Type or member is obsolete
-                    ex is ExecutionEngineException) // fatal exceptions; re-throw for .NET "legacy" (.NET Core will handle these by a high-level catch-all handler)
-#pragma warning restore CS0618 // Type or member is obsolete
-                {
-                    throw;
-                }
                 return false;
             }
         }
@@ -64,18 +85,8 @@ namespace Cuemon
                 result = method();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!IsFatalException(ex))
             {
-                if (ex is OutOfMemoryException ||
-                    ex is StackOverflowException ||
-                    ex is SEHException ||
-                    ex is AccessViolationException ||
-#pragma warning disable CS0618 // Type or member is obsolete
-                    ex is ExecutionEngineException) // fatal exceptions; re-throw for .NET "legacy" (.NET Core will handle these by a high-level catch-all handler)
-#pragma warning restore CS0618 // Type or member is obsolete
-                {
-                    throw;
-                }
                 result = default;
                 return false;
             }

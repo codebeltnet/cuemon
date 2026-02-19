@@ -1,0 +1,78 @@
+name: Trigger Downstream Service Updates
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  dispatch:
+    if: github.event.release.prerelease == false
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (to read dispatch-targets.json)
+        uses: actions/checkout@v4
+
+      - name: Check for dispatch targets
+        id: check
+        run: |
+          if [ ! -f .github/dispatch-targets.json ]; then
+            echo "No dispatch-targets.json found, skipping."
+            echo "has_targets=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          COUNT=$(python3 -c "import json; print(len(json.load(open('.github/dispatch-targets.json'))))")
+          echo "has_targets=$([ $COUNT -gt 0 ] && echo true || echo false)" >> $GITHUB_OUTPUT
+
+      - name: Extract version from release tag
+        if: steps.check.outputs.has_targets == 'true'
+        id: version
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate codebelt-aicia token
+        if: steps.check.outputs.has_targets == 'true'
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.CODEBELT_AICIA_APP_ID }}
+          private-key: ${{ secrets.CODEBELT_AICIA_PRIVATE_KEY }}
+          owner: codebeltnet
+
+      - name: Dispatch to downstream repos
+        if: steps.check.outputs.has_targets == 'true'
+        run: |
+          python3 - <<'EOF'
+          import json, urllib.request, os, sys
+
+          targets = json.load(open('.github/dispatch-targets.json'))
+          token   = os.environ['GH_TOKEN']
+          version = os.environ['VERSION']
+          source  = os.environ['SOURCE_REPO']
+
+          for repo in targets:
+              url     = f'https://api.github.com/repos/codebeltnet/{repo}/dispatches'
+              payload = json.dumps({
+                  'event_type': 'codebelt-service-update',
+                  'client_payload': {
+                      'source_repo':    source,
+                      'source_version': version
+                  }
+              }).encode()
+              req = urllib.request.Request(url, data=payload, method='POST', headers={
+                  'Authorization':  f'Bearer {token}',
+                  'Accept':         'application/vnd.github+json',
+                  'Content-Type':   'application/json',
+                  'X-GitHub-Api-Version': '2022-11-28'
+              })
+              with urllib.request.urlopen(req) as r:
+                  print(f'✓ Dispatched to {repo}: HTTP {r.status}')
+          EOF
+        env:
+          GH_TOKEN:    ${{ steps.app-token.outputs.token }}
+          VERSION:     ${{ steps.version.outputs.version }}
+          SOURCE_REPO: ${{ github.event.repository.name }}

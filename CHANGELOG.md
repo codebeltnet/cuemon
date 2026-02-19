@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.3.0] - 2026-02-19
+
+This is a minor release that introduces assembly discovery utilities and improved minimal API formatter integration, while also tightening option registration behavior across ASP.NET Core formatter setup.
+
+### Added
+
+- `AssemblyContext` class in the Cuemon.Reflection namespace that provides filtered discovery of assemblies in the current application domain, with optional traversal of referenced assemblies,
+- `AssemblyContextOptions` class in the Cuemon.Reflection namespace that configures inclusion/exclusion filters and referenced-assembly traversal for `AssemblyContext`,
+- `Patterns` class in the Cuemon namespace was extended with two new methods: `IsFatalException` and `IsRecoverableException`,
+- `MinimalJsonOptions` class in the Cuemon.Extensions.AspNetCore.Text.Json namespace was added to map `JsonFormatterOptions` into ASP.NET Core `JsonOptions` for minimal APIs,
+- `ServiceCollectionExtensions` class in the Cuemon.Extensions.AspNetCore.Text.Json namespace was extended with a new method: `AddMinimalJsonOptions`,
+- `StackDecoratorExtensions` class in the Cuemon.Collections.Generic namespace was extended with a new `TryPop` extension method for `IDecorator<Stack<T>>`,
+- `StackExtensions` class in the Cuemon.Extensions.Collections.Generic namespace was extended with a new `TryPop` extension method for `Stack<T>` (for compatible target frameworks without native `Stack<T>.TryPop`).
+
+### Changed
+
+- `ServiceCollectionExtensions` class in the Cuemon.Extensions.DependencyInjection namespace to use `TryConfigure` in option-registration overloads to avoid duplicate configuration registration,
+- `ServiceCollectionExtensions` class in the Cuemon.Extensions.AspNetCore.Text.Json.Formatters namespace to use `TryConfigure` in `AddJsonFormatterOptions`,
+- `ServiceCollectionExtensions` class in the Cuemon.Extensions.AspNetCore.Xml.Formatters namespace to use `TryConfigure` in `AddXmlFormatterOptions`,
+- `Patterns` class in the Cuemon namespace to apply exception filters via `IsFatalException` / `IsRecoverableException` in `TryInvoke` overloads,
+- `World` class in the Cuemon.Globalization namespace where `StatisticalRegions` now returns `IEnumerable<StatisticalRegionInfo>`.
+
+### Fixed
+
+- Prevented repeated `IConfigureOptions<TOptions>` registrations when formatter/options extension methods are called multiple times.
+
 ## [10.2.1] - 2026-02-12
 
 This is a service update that focuses on package dependencies; however, it also includes a small performance optimization to reduce allocations and improve throughput when working with streams.

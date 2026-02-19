@@ -1,3 +1,15 @@
+Version: 10.3.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+ 
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+ 
+# Improvements
+- CHANGED ServiceCollectionExtensions class in the Cuemon.Extensions.DependencyInjection namespace to use TryConfigure in Add/TryAdd overloads that accept Action<TOptions> to avoid duplicate option registrations
+ 
+# Bug Fixes
+- FIXED duplicate IConfigureOptions<TOptions> registrations when using Add/TryAdd overloads repeatedly with configuration delegates
+ 
 Version: 10.2.1
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
  

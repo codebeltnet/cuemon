@@ -1,0 +1,139 @@
+name: Service Update
+
+on:
+  repository_dispatch:
+    types: [codebelt-service-update]
+  workflow_dispatch:
+    inputs:
+      source_repo:
+        description: 'Triggering source repo name (e.g. cuemon)'
+        required: false
+        default: ''
+      source_version:
+        description: 'Version released by source (e.g. 10.3.0)'
+        required: false
+        default: ''
+      dry_run:
+        type: boolean
+        description: 'Dry run — show changes but do not commit or open PR'
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  service-update:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve trigger inputs
+        id: trigger
+        run: |
+          SOURCE="${{ github.event.client_payload.source_repo || github.event.inputs.source_repo }}"
+          VERSION="${{ github.event.client_payload.source_version || github.event.inputs.source_version }}"
+          echo "source=$SOURCE"   >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Determine new version for this repo
+        id: newver
+        run: |
+          CURRENT=$(grep -oP '(?<=## \[)[\d.]+(?=\])' CHANGELOG.md | head -1)
+          NEW=$(echo "$CURRENT" | awk -F. '{printf "%s.%s.%d", $1, $2, $3+1}')
+          BRANCH="v${NEW}/service-update"
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "new=$NEW"         >> $GITHUB_OUTPUT
+          echo "branch=$BRANCH"   >> $GITHUB_OUTPUT
+
+      - name: Generate codebelt-aicia token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.CODEBELT_AICIA_APP_ID }}
+          private-key: ${{ secrets.CODEBELT_AICIA_PRIVATE_KEY }}
+          owner: codebeltnet
+
+      - name: Bump NuGet packages
+        run: python3 .github/scripts/bump-nuget.py
+        env:
+          TRIGGER_SOURCE:  ${{ steps.trigger.outputs.source }}
+          TRIGGER_VERSION: ${{ steps.trigger.outputs.version }}
+
+      - name: Update PackageReleaseNotes.txt
+        run: |
+          NEW="${{ steps.newver.outputs.new }}"
+          for f in .nuget/*/PackageReleaseNotes.txt; do
+            [ -f "$f" ] || continue
+            TFM=$(grep -m1 "^Availability:" "$f" | sed 's/Availability: //' || echo ".NET 10, .NET 9 and .NET Standard 2.0")
+            ENTRY="Version ${NEW}\nAvailability: ${TFM}\n \n# ALM\n- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)\n \n"
+            { printf "$ENTRY"; cat "$f"; } > "$f.tmp" && mv "$f.tmp" "$f"
+          done
+
+      - name: Update CHANGELOG.md
+        run: |
+          python3 - <<'EOF'
+          import os, re
+          from datetime import date
+          new_ver = os.environ['NEW_VERSION']
+          today   = date.today().isoformat()
+          entry   = f"## [{new_ver}] - {today}\n\nThis is a service update that focuses on package dependencies.\n\n"
+          with open("CHANGELOG.md") as f:
+              content = f.read()
+          idx = content.find("## [")
+          content = (content[:idx] + entry + content[idx:]) if idx != -1 else (content + entry)
+          with open("CHANGELOG.md", "w") as f:
+              f.write(content)
+          print(f"CHANGELOG updated for v{new_ver}")
+          EOF
+        env:
+          NEW_VERSION: ${{ steps.newver.outputs.new }}
+
+      # Note: Docker image bumps removed in favor of manual updates
+      # The automated selection was picking wrong variants (e.g., mono-* instead of standard)
+      # TODO: Move to hosted service for smarter image selection
+
+      - name: Show diff (dry run)
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        run: git diff
+
+      - name: Create branch and open PR
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          NEW="${{ steps.newver.outputs.new }}"
+          BRANCH="${{ steps.newver.outputs.branch }}"
+          SOURCE="${{ steps.trigger.outputs.source }}"
+          SRC_VER="${{ steps.trigger.outputs.version }}"
+
+          git config user.name  "codebelt-aicia[bot]"
+          git config user.email "codebelt-aicia[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add -A
+          git diff --cached --quiet && echo "Nothing changed - skipping PR." && exit 0
+          git commit -m "V${NEW}/service update"
+          git push origin "$BRANCH"
+
+          echo "This is a service update that focuses on package dependencies." > pr_body.txt
+          echo "" >> pr_body.txt
+          echo "Automated changes:" >> pr_body.txt
+          echo "- Codebelt/Cuemon package versions bumped to latest compatible" >> pr_body.txt
+          echo "- PackageReleaseNotes.txt updated for v${NEW}" >> pr_body.txt
+          echo "- CHANGELOG.md entry added for v${NEW}" >> pr_body.txt
+          echo "" >> pr_body.txt
+          echo "Note: Third-party packages (Microsoft.Extensions.*, BenchmarkDotNet, etc.) are not auto-updated." >> pr_body.txt
+          echo "Use Dependabot or manual updates for those." >> pr_body.txt
+          echo "" >> pr_body.txt
+          echo "Generated by codebelt-aicia" >> pr_body.txt
+          if [ -n "$SOURCE" ] && [ -n "$SRC_VER" ]; then
+            echo "Triggered by: ${SOURCE} @ ${SRC_VER}" >> pr_body.txt
+          else
+            echo "Triggered by: manual workflow dispatch" >> pr_body.txt
+          fi
+
+          gh pr create --title "V${NEW}/service update" --body-file pr_body.txt --base main --head "$BRANCH" --assignee gimlichael

@@ -29,9 +29,9 @@ namespace Cuemon.Globalization
             {
                 var region = new RegionInfo(c.Name);
                 if (int.TryParse(region.Name, out _)) { continue; } // Skip statistical regions (why would Microsoft even consider having these as part of RegionInfo? No valid ISO 3166-1 alpha-2/3 code can be all digits, so these are not actual regions or countries.)
-                Decorator.Enclose(regions).TryAdd(c.Name, region);
+                Decorator.Enclose(regions).TryAdd($"{region.Name}:{region.NativeName}", region);
             }
-            return regions.Values.OrderBy(info => info.Name);
+            return regions.Values.OrderBy(info => info.Name).ThenBy(info => info.NativeName);
         });
 
         private static readonly Lazy<UnM49DataContainer> UnM49Data = new(() => new UnM49DataContainer());

@@ -142,6 +142,15 @@ internal sealed class UnM49DataContainer
         }
 
         // Third pass: Create country objects as children of their parent regions
+        var regionsByIsoAlpha2 = new Dictionary<string, RegionInfo>(StringComparer.OrdinalIgnoreCase);
+        foreach (var r in World.Regions)
+        {
+            if (!regionsByIsoAlpha2.ContainsKey(r.TwoLetterISORegionName))
+            {
+                regionsByIsoAlpha2[r.TwoLetterISORegionName] = r;
+            }
+        }
+
         foreach (var countryData in countries)
         {
             if (RegionsByCode.TryGetValue(countryData.ParentCode, out var parent))
@@ -154,15 +163,10 @@ internal sealed class UnM49DataContainer
                         $"Country {countryData.Name} ({countryData.Code}) must have kind 'CountryOrTerritory', but was '{countryData.Kind}'.");
                 }
 
-                // Try to find matching RegionInfo
                 RegionInfo regionInfo = null;
-                try
+                if (!string.IsNullOrEmpty(countryData.IsoAlpha2))
                 {
-                    regionInfo = World.Regions.FirstOrDefault(r => string.Equals(r.TwoLetterISORegionName, countryData.IsoAlpha2, StringComparison.OrdinalIgnoreCase));
-                }
-                catch
-                {
-                    // Some territories may not be supported by the OS
+                    regionsByIsoAlpha2.TryGetValue(countryData.IsoAlpha2, out regionInfo);
                 }
 
                 var country = new StatisticalRegionInfo(

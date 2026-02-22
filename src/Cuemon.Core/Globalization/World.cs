@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Cuemon.Collections.Generic;
 
 namespace Cuemon.Globalization
 {
@@ -14,9 +15,9 @@ namespace Cuemon.Globalization
         {
             var cultures = new SortedList<string, CultureInfo>();
             var specificCultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
-            foreach (var c in specificCultures.Where(ci => ci.LCID != 127))
+            foreach (var c in specificCultures.Where(ci => ci.LCID != 127)) // *should* not happen for specific cultures, but on some linux based systems there are some cultures with LCID 127 (invariant culture) that are incorrectly categorized as specific cultures, so we need to filter those out.
             {
-                if (!cultures.ContainsKey(c.DisplayName)) { cultures.Add(c.DisplayName, c); }
+                Decorator.Enclose(cultures).TryAdd(c.Name, c);
             }
             return cultures.Values;
         });
@@ -27,9 +28,10 @@ namespace Cuemon.Globalization
             foreach (var c in SpecificCultures.Value)
             {
                 var region = new RegionInfo(c.Name);
-                if (!regions.ContainsKey(region.EnglishName)) { regions.Add(region.EnglishName, region); }
+                if (int.TryParse(region.Name, out _)) { continue; } // Skip statistical regions (why would Microsoft even consider having these as part of RegionInfo? No valid ISO 3166-1 alpha-2/3 code can be all digits, so these are not actual regions or countries.)
+                Decorator.Enclose(regions).TryAdd(c.Name, region);
             }
-            return regions.Values;
+            return regions.Values.OrderBy(info => info.Name);
         });
 
         private static readonly Lazy<UnM49DataContainer> UnM49Data = new(() => new UnM49DataContainer());

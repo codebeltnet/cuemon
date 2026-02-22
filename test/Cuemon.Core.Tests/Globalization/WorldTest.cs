@@ -69,17 +69,40 @@ namespace Cuemon.Globalization
         }
 
         [Fact]
-        public void Regions_ShouldReturnAllRegions()
+        public void Regions_ShouldPrintAllRegionsAndHighlightIsoCodeFrequency()
         {
             var sut1 = World.Regions.ToList();
 
-            TestOutput.WriteLine(sut1.Count.ToString());
+            foreach (var r in sut1)
+            {
+                TestOutput.WriteLine($"{r.Name,-5} {r.EnglishName}");
+            }
 
-            Assert.NotNull(sut1);
+            var grouped = sut1.GroupBy(r => r.Name).OrderBy(g => g.Key).ToList();
+            var multiEntry = grouped.Where(g => g.Count() > 1).OrderByDescending(g => g.Count()).ThenBy(g => g.Key).ToList();
+
+            TestOutput.WriteLine($"Total: {sut1.Count}, Unique ISO codes: {grouped.Count}, ISO codes with multiple entries: {multiEntry.Count}");
+
+            foreach (var g in multiEntry)
+            {
+                var first = g.First();
+                var allEqual = g.All(r => r.Equals(first));
+                var distinctNativeNames = g.Select(r => r.NativeName).Distinct().ToList();
+                TestOutput.WriteLine($"  {g.Key} ({first.EnglishName}): {g.Count()} entries | all Equals: {allEqual} | distinct NativeNames: {distinctNativeNames.Count}");
+                if (distinctNativeNames.Count > 1)
+                {
+                    foreach (var name in distinctNativeNames)
+                    {
+                        TestOutput.WriteLine($"    NativeName: {name}");
+                    }
+                }
+            }
+
+            Assert.NotEmpty(sut1);
 #if NET48_OR_GREATER
             Assert.True(sut1.Count > 100, "sut1.Count > 100");
 #else
-            Assert.True(sut1.Count > 220, "sut1.Count > 220");
+            Assert.True(sut1.Count > 400, "sut1.Count > 400");
 #endif
         }
 

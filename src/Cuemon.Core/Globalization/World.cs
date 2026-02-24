@@ -58,9 +58,10 @@ namespace Cuemon.Globalization
         /// <returns>A <see cref="StatisticalRegionInfo"/> instance, or <c>null</c> if the code is not found.</returns>
         public static StatisticalRegionInfo GetStatisticalRegion(string code)
         {
-            if (string.IsNullOrEmpty(code)) return null;
-            UnM49Data.Value.RegionsByCode.TryGetValue(code, out var region);
-            return region;
+            if (string.IsNullOrEmpty(code)) { return null; }
+            if (UnM49Data.Value.RegionsByCode.TryGetValue(code, out var region)) { return region; }
+            UnM49Data.Value.CountriesByCode.TryGetValue(code, out var country);
+            return country;
         }
 
         /// <summary>

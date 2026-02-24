@@ -143,12 +143,10 @@ internal sealed class UnM49DataContainer
 
         // Third pass: Create country objects as children of their parent regions
         var regionsByIsoAlpha2 = new Dictionary<string, RegionInfo>(StringComparer.OrdinalIgnoreCase);
-        foreach (var r in World.Regions)
+        var seenIsoAlpha2 = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var r in World.Regions.Where(r => seenIsoAlpha2.Add(r.TwoLetterISORegionName)))
         {
-            if (!regionsByIsoAlpha2.ContainsKey(r.TwoLetterISORegionName))
-            {
-                regionsByIsoAlpha2[r.TwoLetterISORegionName] = r;
-            }
+            regionsByIsoAlpha2[r.TwoLetterISORegionName] = r;
         }
 
         foreach (var countryData in countries)

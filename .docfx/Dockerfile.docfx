@@ -3,7 +3,7 @@
 FROM --platform=$BUILDPLATFORM nginx:${NGINX_VERSION} AS base
 RUN rm -rf /usr/share/nginx/html/*
 
-FROM --platform=$BUILDPLATFORM codebeltnet/docfx:2.78.4 AS build
+FROM --platform=$BUILDPLATFORM codebeltnet/docfx:2.78.5 AS build
 
 ADD [".", "docfx"]
 

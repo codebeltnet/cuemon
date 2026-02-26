@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
@@ -86,14 +86,15 @@ namespace Cuemon.Extensions.Xml.Serialization.Converters
         /// Adds an <see cref="IEnumerable"/> XML converter to the list.
         /// </summary>
         /// <param name="converters">The <see cref="T:IList{XmlConverter}" /> to extend.</param>
+        /// <param name="flattenItems">When <c>true</c> and a qualified element name is available, each collection item is serialized as a repeated element using that name instead of being wrapped in a generic <c>Item</c> element. The default is <c>false</c>.</param>
         /// <returns>A reference to <paramref name="converters"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="converters"/> cannot be null.
         /// </exception>
-        public static IList<XmlConverter> AddEnumerableConverter(this IList<XmlConverter> converters)
+        public static IList<XmlConverter> AddEnumerableConverter(this IList<XmlConverter> converters, bool flattenItems = false)
         {
             Validator.ThrowIfNull(converters);
-            return Decorator.Enclose(converters).AddEnumerableConverter().Inner;
+            return Decorator.Enclose(converters).AddEnumerableConverter(flattenItems).Inner;
         }
 
         /// <summary>

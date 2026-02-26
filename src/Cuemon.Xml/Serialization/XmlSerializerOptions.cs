@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Xml;
 using Cuemon.Xml.Serialization.Converters;
 
@@ -67,5 +67,11 @@ namespace Cuemon.Xml.Serialization
         /// </summary>
         /// <value>The name of the XML root element.</value>
         public XmlQualifiedEntity RootName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether collection items should be serialized as repeated elements using the property name instead of being wrapped in a generic <c>Item</c> element.
+        /// </summary>
+        /// <value><c>true</c> to emit one repeated element per item named after the enclosing property; <c>false</c> to use the default <c>Item</c> wrapper. The default is <c>false</c>.</value>
+        public bool FlattenCollectionItems { get; set; }
     }
 }

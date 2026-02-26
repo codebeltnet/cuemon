@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -345,9 +345,15 @@ namespace Cuemon.Xml.Serialization.Converters
 
         private void WriteXmlChildrenEncapsulated(XmlWriter writer, IHierarchy<object> childNode, XmlQualifiedEntity qualifiedEntity)
         {
-            var encapsulate = childNode.HasChildren && Decorator.Enclose(childNode.InstanceType).IsComplex();
-            if (encapsulate) { Decorator.Enclose(writer).WriteStartElement(qualifiedEntity); }
+            // Determine if there is a specific converter for this child node type
             var converter = Decorator.Enclose(Converters).FirstOrDefaultWriterConverter(childNode.InstanceType);
+
+            // Only encapsulate (write a surrounding start/end element) when there is no dedicated converter
+            // for the child node. If a converter exists it is responsible for writing the proper elements
+            // (to avoid duplicate wrapping such as <Children><Children>...)
+            var encapsulate = childNode.HasChildren && Decorator.Enclose(childNode.InstanceType).IsComplex() && converter == null;
+            if (encapsulate) { Decorator.Enclose(writer).WriteStartElement(qualifiedEntity); }
+
             if (converter != null && !qualifiedEntity.HasXmlAttributeDecoration)
             {
                 converter.WriteXml(writer, childNode.Instance, qualifiedEntity);
@@ -356,6 +362,7 @@ namespace Cuemon.Xml.Serialization.Converters
             {
                 WriteXmlNodes(writer, childNode);
             }
+
             if (encapsulate) { writer.WriteEndElement(); }
         }
     }

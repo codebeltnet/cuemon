@@ -112,7 +112,7 @@ namespace Cuemon.Xml.Serialization.Converters
                 {
                     if (isDictionaryLike)
                     {
-                        w.WriteStartElement(q.LocalName);
+                        w.WriteStartElement(q.Prefix, q.LocalName, q.Namespace);
                         foreach (var element in o)
                         {
                             var elementType = element.GetType();
@@ -125,31 +125,38 @@ namespace Cuemon.Xml.Serialization.Converters
                             var keyName = Decorator.Enclose(keyValue.ToString()).SanitizeXmlElementName();
                             if (Decorator.Enclose(valuePropertyType).IsComplex())
                             {
-                                Decorator.Enclose(w).WriteObject(valueValue, valuePropertyType, opts => opts.Settings.RootName = new XmlQualifiedEntity(keyName));
+                                Decorator.Enclose(w).WriteObject(valueValue, valuePropertyType, opts => opts.Settings.RootName = new XmlQualifiedEntity(keyName, q.Namespace));
                             }
                             else
                             {
-                                w.WriteElementString(keyName, Convert.ToString(valueValue, CultureInfo.InvariantCulture));
+                                w.WriteStartElement(keyName, q.Namespace);
+                                w.WriteValue(valueValue);
+                                w.WriteEndElement();
                             }
                         }
                         w.WriteEndElement();
                     }
                     else
                     {
+                        var isDocumentRoot = w.WriteState == WriteState.Start;
+                        if (isDocumentRoot) { w.WriteStartElement(q.Prefix, q.LocalName, q.Namespace); }
+                        var qe = new XmlQualifiedEntity(q.Prefix, q.LocalName, q.Namespace);
                         foreach (var item in o)
                         {
                             if (item == null) { continue; }
                             var itemType = item.GetType();
                             if (Decorator.Enclose(itemType).IsComplex())
                             {
-                                var localName = q.LocalName;
-                                Decorator.Enclose(w).WriteObject(item, itemType, opts => opts.Settings.RootName = new XmlQualifiedEntity(localName));
+                                Decorator.Enclose(w).WriteObject(item, itemType, opts => opts.Settings.RootName = qe);
                             }
                             else
                             {
-                                w.WriteElementString(q.LocalName, Convert.ToString(item, CultureInfo.InvariantCulture));
+                                w.WriteStartElement(q.Prefix, q.LocalName, q.Namespace);
+                                w.WriteValue(item);
+                                w.WriteEndElement();
                             }
                         }
+                        if (isDocumentRoot) { w.WriteEndElement(); }
                     }
                 }
                 else

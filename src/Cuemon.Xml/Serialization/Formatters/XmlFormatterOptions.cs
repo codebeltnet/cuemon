@@ -129,9 +129,14 @@ namespace Cuemon.Xml.Serialization.Formatters
                     _refreshed = true;
                     if (Settings.FlattenCollectionItems)
                     {
-                        var existing = Decorator.Enclose(Settings.Converters).FirstOrDefaultWriterConverter(typeof(IEnumerable));
-                        if (existing != null) { Settings.Converters.Remove(existing); }
-                        Decorator.Enclose(Settings.Converters).AddEnumerableConverter(flattenItems: true);
+                        var converters = Decorator.Enclose(Settings.Converters);
+                        while (true)
+                        {
+                            var existing = converters.FirstOrDefaultWriterConverter(typeof(IEnumerable));
+                            if (existing == null) { break; }
+                            Settings.Converters.Remove(existing);
+                        }
+                        converters.AddEnumerableConverter(flattenItems: true);
                     }
                     Decorator.Enclose(Settings.Converters)
                         .AddExceptionConverter(SensitivityDetails.HasFlag(FaultSensitivityDetails.StackTrace), SensitivityDetails.HasFlag(FaultSensitivityDetails.Data))

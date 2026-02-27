@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -92,24 +92,28 @@ namespace Cuemon.Xml.Serialization.Converters
         /// Adds an <see cref="IEnumerable"/> XML converter to the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
         /// </summary>
         /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="flattenItems">When <c>true</c> and a qualified element name is available, each collection item is serialized as a repeated element using that name instead of being wrapped in a generic <c>Item</c> element. The default is <c>false</c>.</param>
         /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
-        public static IDecorator<IList<XmlConverter>> AddEnumerableConverter(this IDecorator<IList<XmlConverter>> decorator)
+        public static IDecorator<IList<XmlConverter>> AddEnumerableConverter(this IDecorator<IList<XmlConverter>> decorator, bool flattenItems = false)
         {
             Validator.ThrowIfNull(decorator);
             decorator.AddXmlConverter<IEnumerable>((w, o, q) =>
             {
                 if (w.WriteState == WriteState.Start && q == null && !(o is IDictionary || o is IList)) { q = new XmlQualifiedEntity("Enumerable"); }
-                Decorator.Enclose(w).WriteXmlRootElement(o, (writer, sequence, _) =>
-                {
-                    var type = sequence.GetType();
-                    var hasKeyValuePairType = type.GetGenericArguments().Any(gt => Decorator.Enclose(gt).HasKeyValuePairImplementation());
 
-                    if (Decorator.Enclose(type).HasDictionaryImplementation() || hasKeyValuePairType)
+                var seqType = o.GetType();
+                var hasKeyValuePairType = seqType.GetGenericArguments().Any(gt => Decorator.Enclose(gt).HasKeyValuePairImplementation());
+                var isDictionaryLike = Decorator.Enclose(seqType).HasDictionaryImplementation() || hasKeyValuePairType;
+
+                if (flattenItems && q != null)
+                {
+                    if (isDictionaryLike)
                     {
-                        foreach (var element in sequence)
+                        w.WriteStartElement(q.LocalName);
+                        foreach (var element in o)
                         {
                             var elementType = element.GetType();
                             var keyProperty = elementType.GetProperty("Key");
@@ -118,38 +122,84 @@ namespace Cuemon.Xml.Serialization.Converters
                             var valueValue = valueProperty.GetValue(element, null);
                             var valuePropertyType = valueProperty.PropertyType;
                             if (valuePropertyType == typeof(object) && valueValue != null) { valuePropertyType = valueValue.GetType(); }
-                            writer.WriteStartElement("Item");
-                            writer.WriteAttributeString("name", keyValue.ToString());
+                            var keyName = Decorator.Enclose(keyValue.ToString()).SanitizeXmlElementName();
                             if (Decorator.Enclose(valuePropertyType).IsComplex())
                             {
-                                Decorator.Enclose(writer).WriteObject(valueValue, valuePropertyType);
+                                Decorator.Enclose(w).WriteObject(valueValue, valuePropertyType, opts => opts.Settings.RootName = new XmlQualifiedEntity(keyName));
                             }
                             else
                             {
-                                writer.WriteValue(valueValue);
+                                w.WriteElementString(keyName, Convert.ToString(valueValue, CultureInfo.InvariantCulture));
                             }
-                            writer.WriteEndElement();
                         }
+                        w.WriteEndElement();
                     }
                     else
                     {
-                        foreach (var item in sequence)
+                        foreach (var item in o)
                         {
                             if (item == null) { continue; }
                             var itemType = item.GetType();
-                            writer.WriteStartElement("Item");
                             if (Decorator.Enclose(itemType).IsComplex())
                             {
-                                Decorator.Enclose(writer).WriteObject(item, itemType);
+                                var localName = q.LocalName;
+                                Decorator.Enclose(w).WriteObject(item, itemType, opts => opts.Settings.RootName = new XmlQualifiedEntity(localName));
                             }
                             else
                             {
-                                writer.WriteValue(item);
+                                w.WriteElementString(q.LocalName, Convert.ToString(item, CultureInfo.InvariantCulture));
                             }
-                            writer.WriteEndElement();
                         }
                     }
-                }, q);
+                }
+                else
+                {
+                    Decorator.Enclose(w).WriteXmlRootElement(o, (writer, sequence, _) =>
+                    {
+                        if (isDictionaryLike)
+                        {
+                            foreach (var element in sequence)
+                            {
+                                var elementType = element.GetType();
+                                var keyProperty = elementType.GetProperty("Key");
+                                var valueProperty = elementType.GetProperty("Value");
+                                var keyValue = keyProperty.GetValue(element, null);
+                                var valueValue = valueProperty.GetValue(element, null);
+                                var valuePropertyType = valueProperty.PropertyType;
+                                if (valuePropertyType == typeof(object) && valueValue != null) { valuePropertyType = valueValue.GetType(); }
+                                writer.WriteStartElement("Item");
+                                writer.WriteAttributeString("name", keyValue.ToString());
+                                if (Decorator.Enclose(valuePropertyType).IsComplex())
+                                {
+                                    Decorator.Enclose(writer).WriteObject(valueValue, valuePropertyType);
+                                }
+                                else
+                                {
+                                    writer.WriteValue(valueValue);
+                                }
+                                writer.WriteEndElement();
+                            }
+                        }
+                        else
+                        {
+                            foreach (var item in sequence)
+                            {
+                                if (item == null) { continue; }
+                                var itemType = item.GetType();
+                                writer.WriteStartElement("Item");
+                                if (Decorator.Enclose(itemType).IsComplex())
+                                {
+                                    Decorator.Enclose(writer).WriteObject(item, itemType);
+                                }
+                                else
+                                {
+                                    writer.WriteValue(item);
+                                }
+                                writer.WriteEndElement();
+                            }
+                        }
+                    }, q);
+                }
             }, (reader, type) => Decorator.Enclose(type).HasDictionaryImplementation() ? Decorator.Enclose(Decorator.Enclose(reader).ToHierarchy()).UseDictionary(type.GetGenericArguments()) : Decorator.Enclose(Decorator.Enclose(reader).ToHierarchy()).UseCollection(type.GetGenericArguments().First()), type => type != typeof(string));
             return decorator;
         }

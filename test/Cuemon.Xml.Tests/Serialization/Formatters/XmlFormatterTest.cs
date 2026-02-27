@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Xml;
 using Cuemon.Diagnostics;
-using Cuemon.Extensions;
 using Cuemon.Extensions.IO;
 using Codebelt.Extensions.Xunit;
 using Cuemon.IO;
@@ -102,6 +101,161 @@ namespace Cuemon.Xml.Serialization.Formatters
 
             Assert.Equal("<?xml version=\"1.0\" encoding=\"utf-8\"?>", x.FirstChild.OuterXml);
             Assert.Contains("<String><![CDATA[<html><title>Cuemon for .NET</title></html>]]></String>", x.OuterXml);
+
+            result.Dispose();
+        }
+
+        [Fact]
+        public void Serialize_ShouldSerializeWorldNodeHierarchy()
+        {
+            var world = new WorldNode
+            {
+                Code = "001",
+                Name = "World",
+                Kind = "World",
+                Links = new WorldLinks
+                {
+                    Self = new Link { Href = "/", Title = "World" },
+                    Children = new List<Link>
+                    {
+                        new Link { Href = "/regions/002", Title = "Africa" },
+                        new Link { Href = "/regions/009", Title = "Oceania" },
+                        new Link { Href = "/regions/010", Title = "Antarctica" },
+                        new Link { Href = "/regions/019", Title = "Americas" },
+                        new Link { Href = "/regions/142", Title = "Asia" },
+                        new Link { Href = "/regions/150", Title = "Europe" }
+                    }
+                }
+            };
+
+            var sut = new XmlFormatter(o => o.Settings.Writer.Indent = true);
+            var result = sut.Serialize(world);
+            var x = new XmlDocument();
+            x.Load(result);
+
+            TestOutput.WriteLine(Decorator.Enclose(result).ToEncodedString());
+
+            Assert.Contains("<Code>001</Code>", x.OuterXml);
+            Assert.Contains("<Name>World</Name>", x.OuterXml);
+            Assert.Contains("<Kind>World</Kind>", x.OuterXml);
+            Assert.Contains("<Href>/</Href>", x.OuterXml);
+            Assert.Contains("<Title>World</Title>", x.OuterXml);
+            Assert.Contains("<Href>/regions/002</Href>", x.OuterXml);
+            Assert.Contains("<Title>Africa</Title>", x.OuterXml);
+            Assert.Contains("<Href>/regions/150</Href>", x.OuterXml);
+
+            result.Dispose();
+        }
+
+        [Fact]
+        public void Serialize_ShouldProduce_PascalCase_Structure_ForWorldNode()
+        {
+            var world = new WorldNode
+            {
+                Code = "001",
+                Name = "World",
+                Kind = "World",
+                Links = new WorldLinks
+                {
+                    Self = new Link { Href = "/", Title = "World" },
+                    Children = new List<Link>
+                    {
+                        new Link { Href = "/regions/002", Title = "Africa" },
+                        new Link { Href = "/regions/009", Title = "Oceania" },
+                        new Link { Href = "/regions/010", Title = "Antarctica" },
+                        new Link { Href = "/regions/019", Title = "Americas" },
+                        new Link { Href = "/regions/142", Title = "Asia" },
+                        new Link { Href = "/regions/150", Title = "Europe" }
+                    }
+                }
+            };
+
+            var sut = new XmlFormatter(o =>
+            {
+                o.Settings.Writer.Indent = true;
+                o.Settings.FlattenCollectionItems = true;
+            });
+            var result = sut.Serialize(world);
+            var x = new XmlDocument();
+            x.Load(result);
+
+            TestOutput.WriteLine(Decorator.Enclose(result).ToEncodedString());
+
+            Assert.Equal("WorldNode", x.DocumentElement.Name);
+            Assert.Contains("<Code>001</Code>", x.OuterXml);
+            Assert.Contains("<Name>World</Name>", x.OuterXml);
+            Assert.Contains("<Kind>World</Kind>", x.OuterXml);
+            Assert.Contains("<Links>", x.OuterXml);
+            Assert.Contains("<Self>", x.OuterXml);
+            Assert.Contains("<Href>/</Href>", x.OuterXml);
+            Assert.Contains("<Title>World</Title>", x.OuterXml);
+            Assert.DoesNotContain("<Item>", x.OuterXml);
+            Assert.Contains("<Href>/regions/002</Href>", x.OuterXml);
+            Assert.Contains("<Title>Africa</Title>", x.OuterXml);
+            Assert.Contains("<Href>/regions/150</Href>", x.OuterXml);
+
+            result.Dispose();
+        }
+
+        [Fact]
+        public void Serialize_ShouldSerializeUsingEnumerableConverter_DictionaryProperty()
+        {
+            var sut1 = new RegionStats
+            {
+                Name = "Africa",
+                Indicators = new Dictionary<string, int>
+                {
+                    { "Population", 1400000000 },
+                    { "Countries", 54 }
+                }
+            };
+
+            var sut = new XmlFormatter(o => o.Settings.Writer.Indent = true);
+            var result = sut.Serialize(sut1);
+            var x = new XmlDocument();
+            x.Load(result);
+
+            TestOutput.WriteLine(Decorator.Enclose(result).ToEncodedString());
+
+            Assert.Equal("RegionStats", x.DocumentElement.Name);
+            Assert.Contains("<Name>Africa</Name>", x.OuterXml);
+            Assert.Contains("<Indicators>", x.OuterXml);
+            Assert.Contains("<Item name=\"Population\">1400000000</Item>", x.OuterXml);
+            Assert.Contains("<Item name=\"Countries\">54</Item>", x.OuterXml);
+
+            result.Dispose();
+        }
+
+        [Fact]
+        public void Serialize_ShouldSerializeUsingFlattenedConverter_DictionaryProperty()
+        {
+            var sut1 = new RegionStats
+            {
+                Name = "Africa",
+                Indicators = new Dictionary<string, int>
+                {
+                    { "Population", 1400000000 },
+                    { "Countries", 54 }
+                }
+            };
+
+            var sut = new XmlFormatter(o =>
+            {
+                o.Settings.Writer.Indent = true;
+                o.Settings.FlattenCollectionItems = true;
+            });
+            var result = sut.Serialize(sut1);
+            var x = new XmlDocument();
+            x.Load(result);
+
+            TestOutput.WriteLine(Decorator.Enclose(result).ToEncodedString());
+
+            Assert.Equal("RegionStats", x.DocumentElement.Name);
+            Assert.Contains("<Name>Africa</Name>", x.OuterXml);
+            Assert.DoesNotContain("<Item", x.OuterXml);
+            Assert.Contains("<Indicators>", x.OuterXml);
+            Assert.Contains("<Population>1400000000</Population>", x.OuterXml);
+            Assert.Contains("<Countries>54</Countries>", x.OuterXml);
 
             result.Dispose();
         }

@@ -1,3 +1,9 @@
+﻿Version: 10.4.0
+Availability: .NET 10 and .NET 9
+ 
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+ 
 Version: 10.3.0
 Availability: .NET 10 and .NET 9
  

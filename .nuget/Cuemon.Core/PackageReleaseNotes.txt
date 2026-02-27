@@ -4,6 +4,12 @@ Availability: .NET 10, .NET 9 and .NET Standard 2.0
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
  
+# Improvements
+- CHANGED World class in the Cuemon.Globalization namespace to exclude redundancies in region handling
+ 
+# Bug Fixes
+- FIXED World class in the Cuemon.Globalization namespace where retrieving countries by code in GetStatisticalRegion was not included
+ 
 Version: 10.3.0
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
  

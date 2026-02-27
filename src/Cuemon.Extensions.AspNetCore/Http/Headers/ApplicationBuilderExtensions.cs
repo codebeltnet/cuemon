@@ -67,5 +67,15 @@ namespace Cuemon.Extensions.AspNetCore.Http.Headers
         {
             return MiddlewareBuilderFactory.UseConfigurableMiddleware<CacheableMiddleware, CacheableOptions>(builder, setup);
         }
+
+        /// <summary>
+        /// Adds an HTTP Vary: Accept header to the <see cref="IApplicationBuilder"/> request execution pipeline.
+        /// </summary>
+        /// <param name="builder">The type that provides the mechanisms to configure an application's request pipeline.</param>
+        /// <returns>An <see cref="IApplicationBuilder"/> that can be used to further configure the request pipeline.</returns>
+        public static IApplicationBuilder UseVaryAccept(this IApplicationBuilder builder)
+        {
+            return MiddlewareBuilderFactory.UseMiddleware<VaryAcceptMiddleware>(builder);
+        }
     }
 }

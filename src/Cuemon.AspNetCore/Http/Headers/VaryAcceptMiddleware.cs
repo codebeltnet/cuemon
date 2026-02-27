@@ -1,6 +1,7 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
-using System.Threading.Tasks;
 
 namespace Cuemon.AspNetCore.Http.Headers
 {
@@ -41,7 +42,21 @@ namespace Cuemon.AspNetCore.Http.Headers
         {
             context.Response.OnStarting(() =>
             {
-                context.Response.Headers.Vary = HeaderNames.Accept;
+                var headers = context.Response.Headers;
+                var existing = headers[HeaderNames.Vary].ToString();
+                if (string.IsNullOrEmpty(existing))
+                {
+                    headers[HeaderNames.Vary] = HeaderNames.Accept;
+                    return Task.CompletedTask;
+                }
+                foreach (var segment in existing.Split(','))
+                {
+                    if (segment.Trim().Equals(HeaderNames.Accept, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return Task.CompletedTask;
+                    }
+                }
+                headers[HeaderNames.Vary] = existing + ", " + HeaderNames.Accept;
                 return Task.CompletedTask;
             });
 

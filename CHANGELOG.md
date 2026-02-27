@@ -13,7 +13,8 @@ This is a minor release that introduces support for flattening items in enumerab
 ### Added
 
 - `ServiceCollectionExtensions` class in the Cuemon.Extensions.AspNetCore.Xml namespace with `AddMinimalXmlOptions` extension method,
-- `VaryAcceptMiddleware` class in the Cuemon.AspNetCore.Http.Headers namespace that adds the Vary header with the value of Accept to the HTTP response.
+- `VaryAcceptMiddleware` class in the Cuemon.AspNetCore.Http.Headers namespace that adds the Vary header with the value of Accept to the HTTP response,
+- `ApplicationBuilderExtensions` class in the Cuemon.Extensions.AspNetCore.Http.Headers namespace was extended with the UseVaryAccept extension method that adds the Vary header with the value of Accept to the HTTP response.
 
 ### Fixed
 

@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.4.0] - 2026-02-27
+
+This is a minor release that introduces support for flattening items in enumerable XML serialization, while also improving the behavior of the default XML converter to prevent duplicate element wrapping. A few bug fixes and improvements were also included in this release.
+
+### Added
+
+- `ServiceCollectionExtensions` class in the Cuemon.Extensions.AspNetCore.Xml namespace with `AddMinimalXmlOptions` extension method.
+
+### Fixed
+
+- `DefaultXmlConverter` class in the `Cuemon.Xml.Serialization.Converters` namespace to prevent duplicate element wrapping,
+- `World` class in the Cuemon.Globalization namespace to include countries not previously included in the `GetStatisticalRegion` method.
+
+### Changed
+
+- `World` class in the Cuemon.Globalization namespace to exclude redundancies in `RegionInfo` handling,
+- `XmlConverterExtensions` class in the Cuemon.Extensions.Xml.Serialization.Converters namespace to support flattening items when serializing in the `AddEnumerableConverter` method,
+- `XmlSerializerOptions` class in the `Cuemon.Xml.Serialization` namespace was extended with `FlattenCollectionItems` property to control item flattening during enumerable XML serialization,
+- 
+
 ## [10.3.0] - 2026-02-19
 
 This is a minor release that introduces assembly discovery utilities and improved minimal API formatter integration, while also tightening option registration behavior across ASP.NET Core formatter setup.

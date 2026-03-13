@@ -206,6 +206,8 @@ namespace Cuemon
                 Validator.ThrowIfInvalidOptions(paramName);
             });
 
+            TestOutput.WriteLine(result.Message);
+
             Assert.StartsWith($"{nameof(ValidatableOptions)} are not in a valid state.", result.Message);
             Assert.Contains(nameof(paramName), result.Message);
             Assert.IsType<NotImplementedException>(result.InnerException);

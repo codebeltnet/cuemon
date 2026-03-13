@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -28,7 +28,7 @@ namespace Cuemon.Reflection
         [Fact]
         public void GetTypes_ShouldReturnAllTypesFromCuemonCore()
         {
-            var a = typeof(Disposable).Assembly;
+            var a = typeof(SystemSnapshots).Assembly;
 
             var allTypes = Decorator.Enclose(a).GetTypes();
             var disposableTypes = Decorator.Enclose(a).GetTypes(typeFilter: typeof(Disposable));
@@ -39,10 +39,11 @@ namespace Cuemon.Reflection
             var configurationTypesCount = Decorator.Enclose(configurationTypes).Inner.Count();
 
             TestOutput.WriteLine(disposableTypes.ToDelimitedString());
+            TestOutput.WriteLine(configurationTypes.ToDelimitedString());
 
-            Assert.InRange(allTypesCount, 325, 375); // range because of tooling on CI adding dynamic types and high range of refactoring
-            Assert.Equal(5, disposableTypesCount);
-            Assert.Equal(5, configurationTypesCount);
+            Assert.InRange(allTypesCount, 250, 300); // range because of tooling on CI adding dynamic types and high range of refactoring
+            Assert.Equal(3, disposableTypesCount);
+            Assert.Equal(2, configurationTypesCount);
         }
 
         [Fact]

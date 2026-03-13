@@ -9,13 +9,13 @@ Your versatile companion for:
 
 It is (by heart) free, flexible and built to extend and boost your agile codebelt.
 
-## **Cuemon.Data.Integrity** for .NET
+## **Cuemon (Kernel)** for .NET
 
-The `Cuemon.Data.Integrity` namespace contains types that provide ways for developers to determine and maintain integrity of data that is normally associated with an entity/resource.
+Cuemon.Kernel provides the essential Cuemon programming substrate, including validators, conditions, decorators, configuration abstractions, asynchronous option types, disposable patterns, and core text encoding helpers. It is the minimal foundational layer for the Cuemon ecosystem and an addition to the System namespace.
 
 More documentation available at our documentation site:
 
-- [Cuemon.Data.Integrity](https://docs.cuemon.net/api/dotnet/Cuemon.Data.Integrity.html) 🔗
+- [Cuemon](https://docs.cuemon.net/api/dotnet/Cuemon.html) 🔗
 
 ## Related Packages
 

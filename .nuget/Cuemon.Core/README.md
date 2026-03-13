@@ -9,9 +9,9 @@ Your versatile companion for:
 
 It is (by heart) free, flexible and built to extend and boost your agile codebelt.
 
-## **Cuemon** for .NET
+## **Cuemon (Core)** for .NET
 
-The `Cuemon` namespace contains fundamental types such as value and reference types, factories and utility classes, interfaces, attributes and feature rich delegates that support functional programming on a whole new level. The namespace is an addition to the `System` namespace.
+Cuemon.Core provides higher-level building blocks on top of Cuemon.Kernel, including factories, formatting and parsing helpers, collections, reflection, runtime and messaging abstractions, time and range types, globalization data, and non-cryptographic hashing utilities. It serves as the broader compatibility-oriented core of the Cuemon ecosystem and is an addition to the System namespace.
 
 More documentation available at our documentation site:
 
@@ -67,6 +67,7 @@ More documentation available at our documentation site:
 * [Cuemon.Extensions.Threading](https://www.nuget.org/packages/Cuemon.Extensions.Threading/) 📦
 * [Cuemon.Extensions.Xml](https://www.nuget.org/packages/Cuemon.Extensions.Xml/) 📦
 * [Cuemon.IO](https://www.nuget.org/packages/Cuemon.IO/) 📦
+* [Cuemon.Kernel](https://www.nuget.org/packages/Cuemon.Kernel/) ⚙️
 * [Cuemon.Net](https://www.nuget.org/packages/Cuemon.Net/) 📦
 * [Cuemon.Resilience](https://www.nuget.org/packages/Cuemon.Resilience/) 📦
 * [Cuemon.Runtime.Caching](https://www.nuget.org/packages/Cuemon.Runtime.Caching/) 📦

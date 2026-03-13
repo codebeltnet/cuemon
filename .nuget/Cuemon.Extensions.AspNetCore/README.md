@@ -61,6 +61,7 @@ More documentation available at our documentation site:
 * [Cuemon.Extensions.Threading](https://www.nuget.org/packages/Cuemon.Extensions.Threading/) 📦
 * [Cuemon.Extensions.Xml](https://www.nuget.org/packages/Cuemon.Extensions.Xml/) 📦
 * [Cuemon.IO](https://www.nuget.org/packages/Cuemon.IO/) 📦
+* [Cuemon.Kernel](https://www.nuget.org/packages/Cuemon.Kernel/) ⚙️
 * [Cuemon.Net](https://www.nuget.org/packages/Cuemon.Net/) 📦
 * [Cuemon.Resilience](https://www.nuget.org/packages/Cuemon.Resilience/) 📦
 * [Cuemon.Runtime.Caching](https://www.nuget.org/packages/Cuemon.Runtime.Caching/) 📦

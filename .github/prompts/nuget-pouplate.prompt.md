@@ -30,8 +30,6 @@ Transformation rules (strict):
 - Keep one bullet per logical change; deduplicate repeated commit messages.
 - Prefer imperative, product-facing summaries over raw commit text.
 - Mention concrete type/member names and namespace when identifiable, matching existing tone.
-- Preserve NBSP-only spacer lines (`U+00A0`) between sections.
-- Alaways end with a newline followed by spacer lines (`U+00A0`) between sections.
 - Do not reorder historical sections and do not rewrite previous version blocks.
 
 Tag and range rules:
@@ -43,7 +41,6 @@ Tag and range rules:
 Notes:
 - Do not infer target versions from changelog text; parse only explicit `Version: x.y.z` lines.
 - Keep edits minimal and strictly inside the current version block.
-- DO NOT REMOVE THE ASCII 0xA0 NBSP CHARACTERS OR RUN ANY SORT OF TRIM on spacer lines.
 - Do not open PRs or create branches.
 
 Example run command (agent):

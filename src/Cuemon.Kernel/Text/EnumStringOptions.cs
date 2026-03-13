@@ -1,9 +1,10 @@
-﻿using Cuemon.Configuration;
+using System;
+using Cuemon.Configuration;
 
 namespace Cuemon.Text
 {
     /// <summary>
-    /// Configuration options for <see cref="ParserFactory.FromEnum"/>.
+    /// Configuration options for concrete implementations of <see cref="IConfigurableParser{TOptions}"/> that is related to parsing an <see cref="Enum"/> from a <see cref="string"/>.
     /// </summary>
     /// <seealso cref="IParameterObject"/>
     public class EnumStringOptions : IParameterObject

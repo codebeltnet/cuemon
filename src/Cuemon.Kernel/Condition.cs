@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -278,7 +279,7 @@ namespace Cuemon
         public static bool IsBase64(string value)
         {
             if (string.IsNullOrEmpty(value)) { return false; }
-            return ParserFactory.FromBase64().TryParse(value, out _);
+            return Patterns.TryInvoke(() => Convert.FromBase64String(value), out _);
         }
 
         /// <summary>
@@ -383,7 +384,20 @@ namespace Cuemon
         public static bool IsEnum<T>(string value, Action<EnumStringOptions> setup = null) where T : struct, IConvertible
         {
             if (string.IsNullOrWhiteSpace(value)) { return false; }
-            return typeof(T).GetTypeInfo().IsEnum && ParserFactory.FromEnum().TryParse<T>(value, out _, setup);
+            var enumType = typeof(T);
+            if (!enumType.GetTypeInfo().IsEnum) { return false; }
+            try
+            {
+                var options = Patterns.Configure(setup);
+                var hasFlags = enumType.GetTypeInfo().IsDefined(typeof(FlagsAttribute), false);
+                var result = Enum.Parse(enumType, value, options.IgnoreCase);
+                if (hasFlags && value.IndexOf(',') != -1) { return true; }
+                return Enum.IsDefined(enumType, result);
+            }
+            catch (Exception e) when (Patterns.IsRecoverableException(e))
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -464,7 +478,7 @@ namespace Cuemon
         public static bool IsGuid(string value, GuidFormats format)
         {
             if (string.IsNullOrWhiteSpace(value)) { return false; }
-            return ParserFactory.FromGuid().TryParse(value, out _, o => o.Formats = format);
+            return TryParseGuid(value, format);
         }
 
         /// <summary>
@@ -622,7 +636,21 @@ namespace Cuemon
         /// <returns><c>true</c> if the specified <paramref name="value"/> is a protocol relative URI; otherwise, <c>false</c>.</returns>
         public static bool IsProtocolRelativeUrl(string value, Action<ProtocolRelativeUriStringOptions> setup = null)
         {
-            return ParserFactory.FromProtocolRelativeUri().TryParse(value, out _, setup);
+            if (string.IsNullOrWhiteSpace(value)) { return false; }
+            try
+            {
+                var options = Patterns.Configure(setup, validator: o =>
+                {
+                    Validator.ThrowIfFalse(value.StartsWith(o.RelativeReference, StringComparison.OrdinalIgnoreCase), nameof(value), FormattableString.Invariant($"The specified input did not start with the expected input of: {o.RelativeReference}."));
+                });
+                var relativeReferenceLength = options.RelativeReference.Length;
+                var candidate = value.Remove(0, relativeReferenceLength).Insert(0, FormattableString.Invariant($"{CreateUriScheme(options.Protocol)}://"));
+                return Uri.TryCreate(candidate, UriKind.Absolute, out _);
+            }
+            catch (Exception e) when (Patterns.IsRecoverableException(e))
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -654,8 +682,46 @@ namespace Cuemon
         /// <returns><c>true</c> if the specified <paramref name="value"/> is a valid URI; otherwise, <c>false</c>.</returns>
         public static bool IsUri(string value, Action<UriStringOptions> setup = null)
         {
-            return ParserFactory.FromUri().TryParse(value, out _, setup);
+            if (string.IsNullOrWhiteSpace(value)) { return false; }
+            try
+            {
+                Validator.ThrowIfInvalidConfigurator(setup, out UriStringOptions options);
+                var isValid = options.Kind == UriKind.Relative;
+                if (!isValid)
+                {
+                    foreach (var scheme in options.Schemes)
+                    {
+                        switch (scheme)
+                        {
+                            case UriScheme.Undefined:
+                                break;
+                            case UriScheme.File:
+                            case UriScheme.Ftp:
+                            case UriScheme.Sftp:
+                            case UriScheme.Gopher:
+                            case UriScheme.Http:
+                            case UriScheme.Https:
+                            case UriScheme.Mailto:
+                            case UriScheme.NetPipe:
+                            case UriScheme.NetTcp:
+                            case UriScheme.News:
+                            case UriScheme.Nntp:
+                                isValid = value.StartsWith(CreateUriScheme(scheme), StringComparison.OrdinalIgnoreCase);
+                                break;
+                            default:
+                                throw new InvalidEnumArgumentException(nameof(setup), (int)scheme, typeof(UriScheme));
+                        }
+                        if (isValid) { break; }
+                    }
+                }
+                return isValid && Uri.TryCreate(value, options.Kind, out _);
+            }
+            catch (Exception e) when (Patterns.IsRecoverableException(e))
+            {
+                return false;
+            }
         }
+
         /// <summary>
         /// Determines whether the specified <paramref name="value"/> consist only of white-space characters.
         /// </summary>
@@ -666,6 +732,7 @@ namespace Cuemon
             if (value is null) { return false; }
             return value.All(char.IsWhiteSpace);
         }
+
         /// <summary>
         /// Determines whether the specified <paramref name="x"/> is within range of <paramref name="min"/> and <paramref name="max"/>.
         /// </summary>
@@ -810,7 +877,9 @@ namespace Cuemon
         /// </returns>
         public static bool HasDifference(string first, string second, out string difference)
         {
-            difference = Decorator.Enclose(first, false).Difference(second);
+            first ??= string.Empty;
+            second ??= string.Empty;
+            difference = string.Concat(second.Except(first));
             return difference.Length != 0;
         }
 
@@ -821,6 +890,41 @@ namespace Cuemon
             if (character >= 97)
                 return character <= 102;
             return false;
+        }
+
+        private static string CreateUriScheme(UriScheme scheme)
+        {
+            return scheme switch
+            {
+                UriScheme.File => "file",
+                UriScheme.Ftp => "ftp",
+                UriScheme.Gopher => "gopher",
+                UriScheme.Http => "http",
+                UriScheme.Https => "https",
+                UriScheme.Mailto => "mailto",
+                UriScheme.NetPipe => "net.pipe",
+                UriScheme.NetTcp => "net.tcp",
+                UriScheme.News => "news",
+                UriScheme.Nntp => "nntp",
+                UriScheme.Sftp => "sftp",
+                _ => UriScheme.Undefined.ToString()
+            };
+        }
+
+        private static bool TryParseGuid(string value, GuidFormats format)
+        {
+            if (format.HasFlag(GuidFormats.Any)) { return Guid.TryParse(value, out _); }
+
+            var hasHyphens = value.IndexOf('-') != -1;
+            var hasBraces = value.StartsWith("{", StringComparison.OrdinalIgnoreCase) && value.EndsWith("}", StringComparison.OrdinalIgnoreCase);
+            var hasParentheses = value.StartsWith("(", StringComparison.OrdinalIgnoreCase) && value.EndsWith(")", StringComparison.OrdinalIgnoreCase);
+            var hasHexadecimalStructure = hasBraces && value.Split(',').Length == 11;
+
+            return (!hasHyphens && format.HasFlag(GuidFormats.N) && Guid.TryParseExact(value, "N", out _))
+                   || (hasHyphens && format.HasFlag(GuidFormats.D) && Guid.TryParseExact(value, "D", out _))
+                   || (hasBraces && hasHyphens && format.HasFlag(GuidFormats.B) && Guid.TryParseExact(value, "B", out _))
+                   || (hasParentheses && hasHyphens && format.HasFlag(GuidFormats.P) && Guid.TryParseExact(value, "P", out _))
+                   || (hasHexadecimalStructure && format.HasFlag(GuidFormats.X) && Guid.TryParseExact(value, "X", out _));
         }
     }
 }

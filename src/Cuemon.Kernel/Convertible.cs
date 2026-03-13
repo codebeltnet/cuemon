@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -9,7 +9,7 @@ using Cuemon.Text;
 namespace Cuemon
 {
     /// <summary>
-    /// Provides a set of static methods, suitable for verifying integrity of data, that convert <see cref="IConvertible"/> implementations to and from a sequence of bytes.
+    /// Provides static helper methods for converting <see cref="IConvertible"/> values to and from byte arrays, including support for configurable encoding, byte order, and custom converters.
     /// </summary>
     public static class Convertible
     {
@@ -39,27 +39,27 @@ namespace Cuemon
         };
 
         /// <summary>
-        /// A representation for a null value when converting to a <see cref="T:byte[]"/>.
+        /// Represents a null value when converting to a byte array.
         /// </summary>
         public const int NullValue = 0;
 
         /// <summary>
-        /// Defines how many bits is needed for one byte.
+        /// Represents the number of bits in a byte.
         /// </summary>
         public const int BitsPerByte = 8;
 
         /// <summary>
-        /// Defines how many bits is needed for one nibble (one hexadecimal digit).
+        /// Represents the number of bits in a nibble.
         /// </summary>
         public const int BitsPerNibble = BitsPerByte / 2;
 
         /// <summary>
-        /// Registers the specified <see cref="IConvertible"/> implementation of <typeparamref name="T"/> to make it globally known.
+        /// Registers a custom converter for the specified <see cref="IConvertible"/> implementation.
         /// </summary>
-        /// <typeparam name="T">The type of the <see cref="IConvertible"/> implementation to use.</typeparam>
-        /// <param name="converter">The function delegate that converts an <see cref="IConvertible"/> implementation to its equivalent <see cref="T:byte[]"/>.</param>
+        /// <typeparam name="T">The type of the <see cref="IConvertible"/> implementation to register.</typeparam>
+        /// <param name="converter">The delegate that converts an instance of <typeparamref name="T"/> to a byte array.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="converter"/> cannot be null.
+        /// <paramref name="converter"/> is <see langword="null"/>.
         /// </exception>
         public static void RegisterConvertible<T>(Func<T, byte[]> converter) where T : IConvertible
         {
@@ -68,40 +68,40 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Reverse the bits of the specified <paramref name="input"/>.
+        /// Reverses the bit order of the specified 8-bit unsigned integer.
         /// </summary>
-        /// <param name="input">The unsigned 8-bit integer to reverse bits on.</param>
-        /// <returns>A <see cref="byte"/> with the bits reversed.</returns>
+        /// <param name="input">The value whose bits to reverse.</param>
+        /// <returns>A <see cref="byte"/> whose bits are reversed.</returns>
         public static byte ReverseBits8(byte input)
         {
             return (byte)ReverseBits(input, sizeof(byte));
         }
 
         /// <summary>
-        /// Reverse the bits of the specified <paramref name="input"/>.
+        /// Reverses the bit order of the specified 16-bit unsigned integer.
         /// </summary>
-        /// <param name="input">The unsigned 16-bit integer to reverse bits on.</param>
-        /// <returns>A <see cref="ushort"/> with the bits reversed.</returns>
+        /// <param name="input">The value whose bits to reverse.</param>
+        /// <returns>A <see cref="ushort"/> whose bits are reversed.</returns>
         public static ushort ReverseBits16(ushort input)
         {
             return (ushort)ReverseBits(input, sizeof(ushort));
         }
 
         /// <summary>
-        /// Reverse the bits of the specified <paramref name="input"/>.
+        /// Reverses the bit order of the specified 32-bit unsigned integer.
         /// </summary>
-        /// <param name="input">The unsigned 32-bit integer to reverse bits on.</param>
-        /// <returns>A <see cref="uint"/> with the bits reversed.</returns>
+        /// <param name="input">The value whose bits to reverse.</param>
+        /// <returns>A <see cref="uint"/> whose bits are reversed.</returns>
         public static uint ReverseBits32(uint input)
         {
             return (uint)ReverseBits(input, sizeof(uint));
         }
 
         /// <summary>
-        /// Reverse the bits of the specified <paramref name="input"/>.
+        /// Reverses the bit order of the specified 64-bit unsigned integer.
         /// </summary>
-        /// <param name="input">The unsigned 64-bit integer to reverse bits on.</param>
-        /// <returns>A <see cref="ulong"/> with the bits reversed.</returns>
+        /// <param name="input">The value whose bits to reverse.</param>
+        /// <returns>A <see cref="ulong"/> whose bits are reversed.</returns>
         public static ulong ReverseBits64(ulong input)
         {
             return ReverseBits(input, sizeof(ulong));
@@ -119,14 +119,19 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Returns the specified <see cref="IConvertible"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="IConvertible"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="IConvertible"/> implementation to convert.</param>
-        /// <param name="setup">The <see cref="ConvertibleOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the conversion options.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="input"/> is an unknown implementation of <see cref="IConvertible"/>; please use RegisterConvertible to make a custom implementation globally known -or- use setup to add a custom implementation using ConvertibleOptions.Converters..Add.
+        /// <paramref name="input"/> is of a type for which no converter has been registered or configured.
         /// </exception>
+        /// <remarks>
+        /// Returns the byte representation of <see cref="NullValue"/> when <paramref name="input"/> is <see langword="null"/>.
+        /// Custom converters may be registered globally with <see cref="RegisterConvertible{T}(Func{T, byte[]})"/> or supplied
+        /// locally through <see cref="ConvertibleOptions.Converters"/>.
+        /// </remarks>
         public static byte[] GetBytes(IConvertible input, Action<ConvertibleOptions> setup = null)
         {
             if (input == null) { return BitConverter.GetBytes(NullValue); }
@@ -157,11 +162,13 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Returns the specified sequence of <see cref="IConvertible"/> as an aggregated <see cref="T:byte[]"/>.
+        /// Converts the specified sequence of <see cref="IConvertible"/> values to a single aggregated byte array.
         /// </summary>
-        /// <param name="input">The <see cref="IEnumerable{IConvertible}"/> sequence to convert.</param>
-        /// <param name="setup">The <see cref="ConvertibleOptions"/> which may be configured.</param>
-        /// <returns>An aggregated <see cref="T:byte[]"/> that is otherwise equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The sequence of values to convert.</param>
+        /// <param name="setup">The delegate that configures the conversion options.</param>
+        /// <returns>
+        /// A byte array containing the concatenated byte representations of the elements in <paramref name="input"/>.
+        /// </returns>
         public static byte[] GetBytes(IEnumerable<IConvertible> input, Action<ConvertibleOptions> setup = null)
         {
             var result = new List<byte>();
@@ -174,118 +181,124 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Returns the specified <see cref="bool"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="bool"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="bool"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(bool input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, BitConverter.GetBytes, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="byte"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="byte"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="byte"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(byte input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, x => new[] { x }, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="char"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="char"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="char"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(char input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, BitConverter.GetBytes, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="DateTime"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="DateTime"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="DateTime"/> to convert.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
+        /// <remarks>
+        /// The value is formatted using the universal sortable date and time pattern and encoded with ASCII.
+        /// </remarks>
         public static byte[] GetBytes(DateTime input)
         {
             return GetBytes(input.ToString("u", CultureInfo.InvariantCulture), o => o.Encoding = Encoding.ASCII);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="DBNull"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="DBNull"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="DBNull"/> to convert.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <returns>A byte array representing <see cref="NullValue"/>.</returns>
         public static byte[] GetBytes(DBNull input)
         {
-            return GetBytesCore(input, x => BitConverter.GetBytes(NullValue), null);
+            return GetBytesCore(input, _ => BitConverter.GetBytes(NullValue), null);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="decimal"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="decimal"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="decimal"/> to convert.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
+        /// <remarks>
+        /// The value is formatted using the invariant culture and encoded with ASCII.
+        /// </remarks>
         public static byte[] GetBytes(decimal input)
         {
             return GetBytes(input.ToString(CultureInfo.InvariantCulture), o => o.Encoding = Encoding.ASCII);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="double"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="double"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="double"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(double input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, BitConverter.GetBytes, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="short"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="short"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="short"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(short input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, BitConverter.GetBytes, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="int"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="int"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="int"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(int input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, BitConverter.GetBytes, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="long"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="long"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="long"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(long input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, BitConverter.GetBytes, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="sbyte"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="sbyte"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="sbyte"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(sbyte input, Action<EndianOptions> setup = null)
         {
 #if NET9_0_OR_GREATER
@@ -296,62 +309,65 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Returns the specified <see cref="float"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="float"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="float"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(float input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, BitConverter.GetBytes, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="ushort"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="ushort"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="ushort"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(ushort input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, BitConverter.GetBytes, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="uint"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="uint"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="uint"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(uint input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, BitConverter.GetBytes, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="ulong"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="ulong"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="ulong"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         public static byte[] GetBytes(ulong input, Action<EndianOptions> setup = null)
         {
             return GetBytesCore(input, BitConverter.GetBytes, setup);
         }
 
         /// <summary>
-        /// Returns the specified <see cref="string"/> as its equivalent <see cref="T:byte[]"/> representation.
+        /// Converts the specified <see cref="string"/> value to its byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="string"/> to convert.</param>
-        /// <param name="setup">The <see cref="EncodingOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the encoding behavior.</param>
+        /// <returns>A byte array that represents <paramref name="input"/>.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="input"/> cannot be null.
+        /// <paramref name="input"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="InvalidEnumArgumentException">
-        /// <paramref name="setup"/> was initialized with an invalid <see cref="EncodingOptions.Preamble"/>.
+        /// <paramref name="setup"/> configures an invalid value for <see cref="EncodingOptions.Preamble"/>.
         /// </exception>
-        /// <remarks><see cref="IEncodingOptions"/> will be initialized with <see cref="EncodingOptions.DefaultPreambleSequence"/> and <see cref="EncodingOptions.DefaultEncoding"/>.</remarks>
+        /// <remarks>
+        /// <see cref="EncodingOptions"/> is initialized with <see cref="EncodingOptions.DefaultPreambleSequence"/> and
+        /// <see cref="EncodingOptions.DefaultEncoding"/>.
+        /// </remarks>
         public static byte[] GetBytes(string input, Action<EncodingOptions> setup = null)
         {
             Validator.ThrowIfNull(input);
@@ -372,11 +388,11 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Returns the specified <see cref="Enum"/> as a <see cref="T:byte[]"/>.
+        /// Converts the specified <see cref="Enum"/> value to its underlying byte array representation.
         /// </summary>
-        /// <param name="input">The <see cref="Enum"/> to convert.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The value to convert.</param>
+        /// <param name="setup">The delegate that configures the byte order.</param>
+        /// <returns>A byte array that represents the underlying numeric value of <paramref name="input"/>.</returns>
         public static byte[] GetBytes(Enum input, Action<EndianOptions> setup = null)
         {
             var tc = input.GetTypeCode();
@@ -417,18 +433,22 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Returns the specified <see cref="T:byte[]"/> as its equivalent <see cref="string"/> representation.
+        /// Converts the specified byte array to its string representation.
         /// </summary>
-        /// <param name="input">The <see cref="T:byte[]"/> to convert.</param>
-        /// <param name="setup">The <see cref="EncodingOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="string"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <param name="input">The byte array to convert.</param>
+        /// <param name="setup">The delegate that configures the encoding behavior.</param>
+        /// <returns>A string that represents <paramref name="input"/>.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="input"/> cannot be null.
+        /// <paramref name="input"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="InvalidEnumArgumentException">
-        /// <paramref name="setup"/> was initialized with an invalid <see cref="EncodingOptions.Preamble"/>.
+        /// <paramref name="setup"/> configures an invalid value for <see cref="EncodingOptions.Preamble"/>.
         /// </exception>
-        /// <remarks><see cref="IEncodingOptions"/> will be initialized with <see cref="EncodingOptions.DefaultPreambleSequence"/> and <see cref="EncodingOptions.DefaultEncoding"/>.</remarks>
+        /// <remarks>
+        /// <see cref="EncodingOptions"/> is initialized with <see cref="EncodingOptions.DefaultPreambleSequence"/> and
+        /// <see cref="EncodingOptions.DefaultEncoding"/>.
+        /// If the configured encoding is the default encoding, the encoding is detected from the byte order mark when possible.
+        /// </remarks>
         public static string ToString(byte[] input, Action<EncodingOptions> setup = null)
         {
             Validator.ThrowIfNull(input);
@@ -448,11 +468,13 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Reverse the endianness of the specified <paramref name="input"/>.
+        /// Reverses the byte order of the specified byte array when required by the configured endianness.
         /// </summary>
-        /// <param name="input">The <see cref="T:byte[]"/> to reverse.</param>
-        /// <param name="setup">The <see cref="EndianOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that, depending on the <paramref name="setup"/>, is either equal or a reversed value of <paramref name="input"/>.</returns>
+        /// <param name="input">The byte array whose byte order to reverse.</param>
+        /// <param name="setup">The delegate that configures the desired byte order.</param>
+        /// <returns>
+        /// <paramref name="input"/>, either unchanged or reversed to match the configured byte order.
+        /// </returns>
         public static byte[] ReverseEndianness(byte[] input, Action<EndianOptions> setup = null)
         {
             var options = Patterns.Configure(setup);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Cuemon.Collections.Generic;
 using Cuemon.Configuration;
@@ -6,8 +6,9 @@ using Cuemon.Configuration;
 namespace Cuemon.Text
 {
     /// <summary>
-    /// Configuration options for <see cref="ParserFactory.FromUri"/>.
+    /// Configuration options for concrete implementations of <see cref="IConfigurableParser{TOptions}"/> that is related to parsing a <see cref="Uri"/> from a <see cref="string"/>.
     /// </summary>
+    /// <seealso cref="IValidatableParameterObject"/>.
     public class UriStringOptions : IValidatableParameterObject
     {
         /// <summary>

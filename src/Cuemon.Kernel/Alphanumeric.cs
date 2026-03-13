@@ -1,4 +1,4 @@
-﻿namespace Cuemon
+namespace Cuemon
 {
     /// <summary>
     /// Provides a set of alphanumeric constant and static fields that consists of both letters, numbers and other symbols (such as punctuation marks and mathematical symbols).

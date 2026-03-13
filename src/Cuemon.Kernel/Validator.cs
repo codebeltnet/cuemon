@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
@@ -97,7 +97,7 @@ namespace Cuemon
             }
             catch (Exception e)
             {
-                if (message?.Equals("{0} are not in a valid state.", StringComparison.Ordinal) ?? false) { message = string.Format(CultureInfo.InvariantCulture, message, Patterns.InvokeOrDefault(() => Decorator.Enclose(typeof(TOptions)).ToFriendlyName(), "Options")); }
+                if (message?.Equals("{0} are not in a valid state.", StringComparison.Ordinal) ?? false) { message = string.Format(CultureInfo.InvariantCulture, message, Patterns.InvokeOrDefault(() => ToFriendlyTypeName(typeof(TOptions)), "Options")); }
                 throw new ArgumentException(message, paramName, e);
             }
         }
@@ -144,20 +144,7 @@ namespace Cuemon
         /// <remarks>This guard should be called when performing an operation on a disposed object - not when validating arguments passed to a member.</remarks>
         public static void ThrowIfDisposed(bool condition, Type type, string message = "Cannot access a disposed object.")
         {
-            if (condition) { throw new ObjectDisposedException(type == null ? null : Decorator.Enclose(type, false).ToFriendlyName(o => o.FullName = true), message); }
-        }
-
-        /// <summary>
-        /// Validates and throws an <see cref="ArgumentException"/> (or a derived counterpart) from the specified delegate <paramref name="condition"/>.
-        /// </summary>
-        /// <param name="condition">The delegate that evaluates, creates and ultimately throws an <see cref="ArgumentException"/> (or a derived counterpart) from within a given scenario.</param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="condition"/> is null.
-        /// </exception>
-        public static void ThrowWhen(Action<ExceptionCondition<ArgumentException>> condition)
-        {
-            ThrowIfNull(condition);
-            Patterns.CreateInstance(condition);
+            if (condition) { throw new ObjectDisposedException(type == null ? null : ToFriendlyTypeName(type, true), message); }
         }
 
         /// <summary>
@@ -202,7 +189,7 @@ namespace Cuemon
         /// <param name="paramName">The name of the parameter that caused the exception.</param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="argument"/> cannot be null - or -
-        /// <see cref="P:IDecorator.Inner"/> property of <paramref name="argument"/> cannot be null.
+        /// <see cref="IDecorator{T}.Inner"/> property of <paramref name="argument"/> cannot be null.
         /// </exception>
         public static void ThrowIfNull<T>(IDecorator<T> argument, out T inner, string message = "Value cannot be null.", [CallerArgumentExpression(nameof(argument))] string paramName = null)
         {
@@ -688,7 +675,7 @@ namespace Cuemon
         {
             ThrowIfNull(types);
             ThrowIfFalse(types.All(type => type.IsInterface), nameof(types), $"At least one of the specified {nameof(types)} is not an interface.");
-            if (Decorator.Enclose(typeof(T)).HasInterfaces(types)) { throw new TypeArgumentOutOfRangeException(typeParamName, DelimitedString.Create(types), message); }
+            if (HasInterfaces(typeof(T), types)) { throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message); }
         }
 
         /// <summary>
@@ -713,7 +700,7 @@ namespace Cuemon
             ThrowIfNull(argument);
             ThrowIfNull(types);
             ThrowIfFalse(types.All(type => type.IsInterface), nameof(types), $"At least one of the specified {nameof(types)} is not an interface.");
-            if (Decorator.Enclose(argument).HasInterfaces(types)) { throw new ArgumentOutOfRangeException(paramName, DelimitedString.Create(types), message); }
+            if (HasInterfaces(argument, types)) { throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message); }
         }
 
         /// <summary>
@@ -754,7 +741,7 @@ namespace Cuemon
         {
             ThrowIfNull(types);
             ThrowIfFalse(types.All(type => type.IsInterface), nameof(types), $"At least one of the specified {nameof(types)} is not an interface.");
-            if (!Decorator.Enclose(typeof(T)).HasInterfaces(types)) { throw new TypeArgumentOutOfRangeException(typeParamName, DelimitedString.Create(types), message); }
+            if (!HasInterfaces(typeof(T), types)) { throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message); }
         }
 
         /// <summary>
@@ -779,7 +766,7 @@ namespace Cuemon
             ThrowIfNull(argument);
             ThrowIfNull(types);
             ThrowIfFalse(types.All(type => type.IsInterface), nameof(types), $"At least one of the specified {nameof(types)} is not an interface.");
-            if (!Decorator.Enclose(argument).HasInterfaces(types)) { throw new ArgumentOutOfRangeException(paramName, DelimitedString.Create(types), message); }
+            if (!HasInterfaces(argument, types)) { throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message); }
         }
 
         /// <summary>
@@ -819,7 +806,7 @@ namespace Cuemon
         {
             ThrowIfNull(argument);
             ThrowIfNull(types);
-            if (Decorator.Enclose(argument).HasTypes(types)) { throw new ArgumentOutOfRangeException(paramName, DelimitedString.Create(types), message); }
+            if (HasTypes(argument, types)) { throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message); }
         }
 
         /// <summary>
@@ -853,7 +840,7 @@ namespace Cuemon
         public static void ThrowIfContainsType<T>(string typeParamName, string message, params Type[] types)
         {
             ThrowIfNull(types);
-            if (Decorator.Enclose(typeof(T)).HasTypes(types)) { throw new TypeArgumentOutOfRangeException(typeParamName, DelimitedString.Create(types), message); }
+            if (HasTypes(typeof(T), types)) { throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message); }
         }
 
         /// <summary>
@@ -874,7 +861,7 @@ namespace Cuemon
         {
             ThrowIfNull(argument);
             ThrowIfNull(types);
-            if (!Decorator.Enclose(argument).HasTypes(types)) { throw new ArgumentOutOfRangeException(paramName, DelimitedString.Create(types), message); }
+            if (!HasTypes(argument, types)) { throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message); }
         }
 
         /// <summary>
@@ -927,7 +914,7 @@ namespace Cuemon
         public static void ThrowIfNotContainsType<T>(string typeParamName, string message, params Type[] types)
         {
             ThrowIfNull(types);
-            if (!Decorator.Enclose(typeof(T)).HasTypes(types)) { throw new TypeArgumentOutOfRangeException(typeParamName, DelimitedString.Create(types), message); }
+            if (!HasTypes(typeof(T), types)) { throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message); }
         }
 
         /// <summary>
@@ -1124,9 +1111,10 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfContainsAny(string argument, char[] characters, StringComparison comparison = StringComparison.OrdinalIgnoreCase, string message = "One or more character matches were found.", [CallerArgumentExpression(nameof(argument))] string paramName = null)
         {
-            if (Decorator.Enclose(argument, false)?.ContainsAny(comparison, characters) ?? false)
+            ThrowIfNull(characters);
+            if (ContainsAny(argument, characters, comparison))
             {
-                throw new ArgumentOutOfRangeException(paramName, DelimitedString.Create(argument.Where(characters.Contains).Distinct(), o => o.StringConverter = c => $"'{c}'"), message);
+                throw new ArgumentOutOfRangeException(paramName, CreateCharacterList(argument.Where(c => characters.Any(find => string.Equals(c.ToString(), find.ToString(), comparison))).Distinct()), message);
             }
         }
 
@@ -1143,10 +1131,88 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfNotContainsAny(string argument, char[] characters, StringComparison comparison = StringComparison.OrdinalIgnoreCase, string message = "No matching characters were found.", [CallerArgumentExpression(nameof(argument))] string paramName = null)
         {
-            if (!Decorator.Enclose(argument, false)?.ContainsAny(comparison, characters) ?? true)
+            ThrowIfNull(characters);
+            if (!ContainsAny(argument, characters, comparison))
             {
-                throw new ArgumentOutOfRangeException(paramName, DelimitedString.Create(characters.Distinct(), o => o.StringConverter = c => $"'{c}'"), message);
+                throw new ArgumentOutOfRangeException(paramName, CreateCharacterList(characters.Distinct()), message);
             }
+        }
+
+        /// <summary>
+        /// Validates and throws an <see cref="ArgumentException"/> (or a derived counterpart) from the specified delegate <paramref name="condition"/>.
+        /// </summary>
+        /// <param name="condition">The delegate that evaluates, creates and ultimately throws an <see cref="ArgumentException"/> (or a derived counterpart) from within a given scenario.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="condition"/> is null.
+        /// </exception>
+        public static void ThrowWhen(Action<ExceptionCondition<ArgumentException>> condition)
+        {
+            ThrowIfNull(condition);
+            Patterns.CreateInstance(condition);
+        }
+
+        private static bool ContainsAny(string argument, IEnumerable<char> characters, StringComparison comparison)
+        {
+            if (argument == null) { return false; }
+            foreach (var character in characters)
+            {
+                if (argument.IndexOf(character.ToString(), comparison) >= 0) { return true; }
+            }
+            return false;
+        }
+
+        private static string CreateCharacterList(IEnumerable<char> characters)
+        {
+            return string.Join(",", characters.Select(c => $"'{c}'"));
+        }
+
+        private static string CreateTypeList(IEnumerable<Type> types)
+        {
+            return string.Join(", ", types.Select(type => ToFriendlyTypeName(type, true)));
+        }
+
+        private static bool HasInterfaces(Type source, IEnumerable<Type> interfaceTypes)
+        {
+            var implementedInterfaces = source.IsInterface ? Enumerable.Repeat(source, 1).Concat(source.GetInterfaces()).ToList() : source.GetInterfaces().ToList();
+            foreach (var interfaceType in interfaceTypes.Where(type => type.IsInterface))
+            {
+                foreach (var implementedInterface in implementedInterfaces)
+                {
+                    if (implementedInterface.IsGenericType && interfaceType == implementedInterface.GetGenericTypeDefinition()) { return true; }
+                    if (interfaceType == implementedInterface) { return true; }
+                }
+            }
+            return false;
+        }
+
+        private static bool HasTypes(Type source, IEnumerable<Type> types)
+        {
+            foreach (var type in types)
+            {
+                var current = source;
+                while (current != null)
+                {
+                    if (current.IsGenericType && type == current.GetGenericTypeDefinition()) { return true; }
+                    if (current == type) { return true; }
+                    current = current.BaseType;
+                }
+            }
+            return false;
+        }
+
+        private static string ToFriendlyTypeName(Type type, bool fullName = false)
+        {
+            if (type.IsByRef) { return $"{ToFriendlyTypeName(type.GetElementType()!, fullName)}&"; }
+            if (type.IsPointer) { return $"{ToFriendlyTypeName(type.GetElementType()!, fullName)}*"; }
+            if (type.IsArray) { return $"{ToFriendlyTypeName(type.GetElementType()!, fullName)}[]"; }
+            if (!type.GetTypeInfo().IsGenericType) { return fullName ? type.FullName ?? type.Name : type.Name; }
+
+            var genericType = type.IsGenericTypeDefinition ? type : type.GetGenericTypeDefinition();
+            var genericTypeName = fullName ? genericType.FullName ?? genericType.Name : genericType.Name;
+            var arityIndex = genericTypeName.IndexOf('`');
+            if (arityIndex > -1) { genericTypeName = genericTypeName.Substring(0, arityIndex); }
+
+            return FormattableString.Invariant($"{genericTypeName}<{string.Join(",", type.GetGenericArguments().Select(argument => ToFriendlyTypeName(argument, fullName)))}>");
         }
     }
 }

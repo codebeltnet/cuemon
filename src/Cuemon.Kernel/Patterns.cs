@@ -149,28 +149,31 @@ namespace Cuemon
             where TResult : class, new()
         {
             var io = Configure(setup);
-            initializer ??= (i, o) =>
+            if (initializer == null)
             {
-                var match = false;
-                var typeOfInput = typeof(TSource);
-                var typeOfOutput = typeof(TResult);
-                var ips = typeOfInput.GetProperties().Where(pi => pi.CanRead && pi.CanWrite).ToList();
-                var ops = typeOfOutput.GetProperties().Where(pi => pi.CanRead && pi.CanWrite).ToList();
-                foreach (var ip in ips)
+                initializer = (i, o) =>
                 {
-                    var op = ops.SingleOrDefault(opi => opi.Name == ip.Name && opi.PropertyType == ip.PropertyType);
-                    if (op != null)
+                    var match = false;
+                    var typeOfInput = typeof(TSource);
+                    var typeOfOutput = typeof(TResult);
+                    var ips = typeOfInput.GetProperties().Where(pi => pi.CanRead && pi.CanWrite).ToList();
+                    var ops = typeOfOutput.GetProperties().Where(pi => pi.CanRead && pi.CanWrite).ToList();
+                    foreach (var ip in ips)
                     {
-                        op.SetValue(o, ip.GetValue(i));
-                        match = true;
+                        var op = ops.SingleOrDefault(opi => opi.Name == ip.Name && opi.PropertyType == ip.PropertyType);
+                        if (op != null)
+                        {
+                            op.SetValue(o, ip.GetValue(i));
+                            match = true;
+                        }
                     }
-                }
 
-                if (!match)
-                {
-                    throw new InvalidOperationException(FormattableString.Invariant($"Unable to use default converter for exchange of {nameof(TSource)} ({DelimitedString.Create(ips)}) with {nameof(TResult)} ({DelimitedString.Create(ops)}); no match on public read-write properties."));
-                }
-            };
+                    if (!match)
+                    {
+                        throw new InvalidOperationException(FormattableString.Invariant($"Unable to use default converter for exchange of {nameof(TSource)} ({string.Join(", ", ips.Select(pi => pi.Name))}) with {nameof(TResult)} ({string.Join(", ", ops.Select(pi => pi.Name))}); no match on public read-write properties."));
+                    }
+                };
+            }
             return oo => initializer(io, oo);
         }
 
@@ -225,9 +228,7 @@ namespace Cuemon
         {
             Validator.ThrowIfNull(initializer);
             Validator.ThrowIfNull(tester);
-            var f1 = new FuncFactory<MutableTuple<TResult>, TResult>(tuple => tester(tuple.Arg1), new MutableTuple<TResult>(default), tester);
-            var f2 = new ActionFactory<MutableTuple<Exception>>(tuple => catcher?.Invoke(tuple.Arg1), new MutableTuple<Exception>(default), catcher);
-            return SafeInvokeCore(f1, initializer, f2);
+            return SafeInvokeCore(initializer, tester, catcher);
         }
 
         /// <summary>
@@ -244,9 +245,7 @@ namespace Cuemon
         {
             Validator.ThrowIfNull(initializer);
             Validator.ThrowIfNull(tester);
-            var f1 = new FuncFactory<MutableTuple<TResult, T>, TResult>(tuple => tester(tuple.Arg1, tuple.Arg2), new MutableTuple<TResult, T>(default, arg), tester);
-            var f2 = new ActionFactory<MutableTuple<Exception, T>>(tuple => catcher?.Invoke(tuple.Arg1, tuple.Arg2), new MutableTuple<Exception, T>(default, arg), catcher);
-            return SafeInvokeCore(f1, initializer, f2);
+            return SafeInvokeCore(initializer, result => tester(result, arg), catcher == null ? null : e => catcher(e, arg));
         }
 
         /// <summary>
@@ -265,9 +264,7 @@ namespace Cuemon
         {
             Validator.ThrowIfNull(initializer);
             Validator.ThrowIfNull(tester);
-            var f1 = new FuncFactory<MutableTuple<TResult, T1, T2>, TResult>(tuple => tester(tuple.Arg1, tuple.Arg2, tuple.Arg3), new MutableTuple<TResult, T1, T2>(default, arg1, arg2), tester);
-            var f2 = new ActionFactory<MutableTuple<Exception, T1, T2>>(tuple => catcher?.Invoke(tuple.Arg1, tuple.Arg2, tuple.Arg3), new MutableTuple<Exception, T1, T2>(default, arg1, arg2), catcher);
-            return SafeInvokeCore(f1, initializer, f2);
+            return SafeInvokeCore(initializer, result => tester(result, arg1, arg2), catcher == null ? null : e => catcher(e, arg1, arg2));
         }
 
         /// <summary>
@@ -288,9 +285,7 @@ namespace Cuemon
         {
             Validator.ThrowIfNull(initializer);
             Validator.ThrowIfNull(tester);
-            var f1 = new FuncFactory<MutableTuple<TResult, T1, T2, T3>, TResult>(tuple => tester(tuple.Arg1, tuple.Arg2, tuple.Arg3, tuple.Arg4), new MutableTuple<TResult, T1, T2, T3>(default, arg1, arg2, arg3), tester);
-            var f2 = new ActionFactory<MutableTuple<Exception, T1, T2, T3>>(tuple => catcher?.Invoke(tuple.Arg1, tuple.Arg2, tuple.Arg3, tuple.Arg4), new MutableTuple<Exception, T1, T2, T3>(default, arg1, arg2, arg3), catcher);
-            return SafeInvokeCore(f1, initializer, f2);
+            return SafeInvokeCore(initializer, result => tester(result, arg1, arg2, arg3), catcher == null ? null : e => catcher(e, arg1, arg2, arg3));
         }
 
         /// <summary>
@@ -313,9 +308,7 @@ namespace Cuemon
         {
             Validator.ThrowIfNull(initializer);
             Validator.ThrowIfNull(tester);
-            var f1 = new FuncFactory<MutableTuple<TResult, T1, T2, T3, T4>, TResult>(tuple => tester(tuple.Arg1, tuple.Arg2, tuple.Arg3, tuple.Arg4, tuple.Arg5), new MutableTuple<TResult, T1, T2, T3, T4>(default, arg1, arg2, arg3, arg4), tester);
-            var f2 = new ActionFactory<MutableTuple<Exception, T1, T2, T3, T4>>(tuple => catcher?.Invoke(tuple.Arg1, tuple.Arg2, tuple.Arg3, tuple.Arg4, tuple.Arg5), new MutableTuple<Exception, T1, T2, T3, T4>(default, arg1, arg2, arg3, arg4), catcher);
-            return SafeInvokeCore(f1, initializer, f2);
+            return SafeInvokeCore(initializer, result => tester(result, arg1, arg2, arg3, arg4), catcher == null ? null : e => catcher(e, arg1, arg2, arg3, arg4));
         }
 
         /// <summary>
@@ -340,39 +333,32 @@ namespace Cuemon
         {
             Validator.ThrowIfNull(initializer);
             Validator.ThrowIfNull(tester);
-            var f1 = new FuncFactory<MutableTuple<TResult, T1, T2, T3, T4, T5>, TResult>(tuple => tester(tuple.Arg1, tuple.Arg2, tuple.Arg3, tuple.Arg4, tuple.Arg5, tuple.Arg6), new MutableTuple<TResult, T1, T2, T3, T4, T5>(default, arg1, arg2, arg3, arg4, arg5), tester);
-            var f2 = new ActionFactory<MutableTuple<Exception, T1, T2, T3, T4, T5>>(tuple => catcher?.Invoke(tuple.Arg1, tuple.Arg2, tuple.Arg3, tuple.Arg4, tuple.Arg5, tuple.Arg6), new MutableTuple<Exception, T1, T2, T3, T4, T5>(default, arg1, arg2, arg3, arg4, arg5), catcher);
-            return SafeInvokeCore(f1, initializer, f2);
+            return SafeInvokeCore(initializer, result => tester(result, arg1, arg2, arg3, arg4, arg5), catcher == null ? null : e => catcher(e, arg1, arg2, arg3, arg4, arg5));
         }
 
-        private static TResult SafeInvokeCore<TTester, TResult, TCatcher>(FuncFactory<TTester, TResult> testerFactory, Func<TResult> initializer, ActionFactory<TCatcher> catcherFactory)
+        private static TResult SafeInvokeCore<TResult>(Func<TResult> initializer, Func<TResult, TResult> tester, Action<Exception> catcher)
             where TResult : class, IDisposable
-            where TTester : MutableTuple<TResult>
-            where TCatcher : MutableTuple<Exception>
         {
             TResult result = null;
+            TResult initialized = null;
             try
             {
-                testerFactory.GenericArguments.Arg1 = initializer();
-                testerFactory.GenericArguments.Arg1 = testerFactory.ExecuteMethod();
-                result = testerFactory.GenericArguments.Arg1;
-                testerFactory.GenericArguments.Arg1 = null;
+                initialized = initializer();
+                result = tester(initialized);
+                initialized = null;
             }
             catch (Exception e)
             {
-                if (!catcherFactory.HasDelegate)
+                if (catcher == null)
                 {
                     throw;
                 }
-                else
-                {
-                    catcherFactory.GenericArguments.Arg1 = e;
-                    catcherFactory.ExecuteMethod();
-                }
+
+                catcher(e);
             }
             finally
             {
-                testerFactory.GenericArguments.Arg1?.Dispose();
+                initialized?.Dispose();
             }
             return result;
         }

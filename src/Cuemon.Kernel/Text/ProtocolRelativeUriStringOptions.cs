@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using Cuemon.Configuration;
 
 namespace Cuemon.Text
 {
     /// <summary>
-    /// Configuration options for <see cref="ParserFactory.FromProtocolRelativeUri"/>.
+    /// Configuration options for concrete implementations of <see cref="IConfigurableParser{TOptions}"/> that is related to parsing a protocol relative URI from a <see cref="string"/>.
     /// </summary>
     /// <seealso cref="IParameterObject"/>
     public class ProtocolRelativeUriStringOptions : IParameterObject

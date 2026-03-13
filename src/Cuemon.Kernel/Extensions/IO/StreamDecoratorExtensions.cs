@@ -1,25 +1,28 @@
-﻿using System;
+using System;
 using System.IO;
 
 namespace Cuemon.IO
 {
     /// <summary>
     /// Extension methods for the <see cref="Stream"/> class hidden behind the <see cref="IDecorator{T}"/> interface.
-    /// This API supports the product infrastructure and is not intended to be used directly from your code.
+    /// This API supports the product infrastructure and is not intended to be used directly from application code.
     /// </summary>
     /// <seealso cref="IDecorator{T}"/>
     /// <seealso cref="Decorator{T}"/>
     public static class StreamDecoratorExtensions
     {
         /// <summary>
-        /// Reads the bytes from the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/> and writes them to the <paramref name="destination"/>.
+        /// Copies the contents of the enclosed <see cref="Stream"/> to the specified <paramref name="destination"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="IDecorator{Stream}"/> to extend.</param>
-        /// <param name="destination">The <see cref="Stream"/> to which the contents of the current stream will be copied.</param>
-        /// <param name="bufferSize">The size of the buffer. This value must be greater than zero. The default size is 81920.</param>
-        /// <param name="changePosition">if <c>true</c>, the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/> will temporarily have its position changed to 0; otherwise the position is left untouched.</param>
+        /// <param name="decorator">The <see cref="IDecorator{Stream}"/> that wraps the source stream.</param>
+        /// <param name="destination">The destination stream to which the contents of the source stream are copied.</param>
+        /// <param name="bufferSize">The size of the buffer, in bytes. The value must be greater than zero. The default is 81920.</param>
+        /// <param name="changePosition">
+        /// <see langword="true"/> to temporarily reset the position of the enclosed stream to the beginning before copying;
+        /// otherwise, <see langword="false"/> to preserve the current position.
+        /// </param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="decorator"/> cannot be null.
+        /// <paramref name="decorator"/> is <see langword="null"/>.
         /// </exception>
         public static void CopyStream(this IDecorator<Stream> decorator, Stream destination, int bufferSize = 81920, bool changePosition = true)
         {
@@ -41,14 +44,21 @@ namespace Cuemon.IO
         }
 
         /// <summary>
-        /// Converts the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/> to its equivalent <see cref="T:byte[]"/> representation. Not intended to be used directly from your code.
+        /// Converts the enclosed <see cref="Stream"/> to its byte array representation.
         /// </summary>
-        /// <param name="decorator">The <see cref="IDecorator{Stream}"/> to extend.</param>
-        /// <param name="bufferSize">The size of the buffer. This value must be greater than zero. The default size is 81920.</param>
-        /// <param name="leaveOpen">if <c>true</c>, the <see cref="Stream"/> object is being left open; otherwise it is being closed and disposed.</param>
+        /// <param name="decorator">The <see cref="IDecorator{Stream}"/> that wraps the source stream.</param>
+        /// <param name="bufferSize">The size of the buffer, in bytes. The value must be greater than zero. The default is 81920.</param>
+        /// <param name="leaveOpen"><see langword="true"/> to leave the enclosed stream open; otherwise, <see langword="false"/>.</param>
+        /// <returns>A byte array containing the contents of the enclosed <see cref="Stream"/>.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="decorator"/> cannot be null.
+        /// <paramref name="decorator"/> is <see langword="null"/>.
         /// </exception>
+        /// <exception cref="ArgumentException">
+        /// The enclosed <see cref="Stream"/> does not support reading.
+        /// </exception>
+        /// <remarks>
+        /// This API supports the product infrastructure and is not intended to be used directly from application code.
+        /// </remarks>
         public static byte[] InvokeToByteArray(this IDecorator<Stream> decorator, int bufferSize = 81920, bool leaveOpen = false)
         {
             Validator.ThrowIfNull(decorator);

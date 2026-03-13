@@ -1,4 +1,4 @@
-﻿namespace Cuemon
+namespace Cuemon
 {
     /// <summary>
     /// Specifies ways that a string must be converted in terms of casing.

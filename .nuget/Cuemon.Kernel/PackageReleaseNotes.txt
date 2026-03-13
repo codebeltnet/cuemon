@@ -4,8 +4,10 @@ Availability: .NET 10, .NET 9 and .NET Standard 2.0
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
 
-# Improvements
-- CHANGED World class in the Cuemon.Globalization namespace to exclude redundancies in region handling
+# New Features
+- ADDED the initial Kernel surface that provides the essential Cuemon.Core substrate, including foundational types such as Validator, Patterns, Condition, Decorator, and related supporting abstractions
 
 # Bug Fixes
-- FIXED World class in the Cuemon.Globalization namespace where retrieving countries by code in GetStatisticalRegion was not included
+
+- FIXED Arguments class in the Cuemon.Collections.Generic namespace so Concat<T> appends the second array at the correct offset when the input arrays have different lengths
+- FIXED ByteOrderMark class in the Cuemon.Text namespace to correctly detect UTF-8 and UTF-16 BOMs from short byte buffers and short streams, while only removing a preamble when the byte sequence matches the full encoding preamble exactly

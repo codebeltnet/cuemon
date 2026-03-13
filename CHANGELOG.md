@@ -6,6 +6,54 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.5.0] - 2026-03-13
+
+Okay, so this might look like a major release — and effort-wise it certainly felt like one — but it's actually a fully backward-compatible minor bump. Thanks to a helping hand from AI and a long-standing wish to carve out a small, lean core from Cuemon, we've introduced a brand-new assembly: **Cuemon.Kernel**. Think of it as the nano (or at least noticeably smaller) sibling of `Cuemon.Core`, shipping only the most essential and much-loved types — validators, conditions, decorators, disposable patterns, the options/parameter-object infrastructure, text encoding helpers and async primitives.
+
+If you've ever wondered about Microsoft's own split between `mscorlib.dll`, `System.dll`, `System.Core.dll` and `System.Private.CoreLib.dll` — well, `Cuemon.Kernel` is probably our equivalent of `mscorlib.dll` and `System.dll`. Not quite as dramatic, but you get the idea.
+
+The key detail: every public API stays exactly where it was. `Cuemon.Core` now references `Cuemon.Kernel` and uses `TypeForwardedTo` attributes for every type that moved, so existing consumers won't notice a thing. No breaking changes, no missing types, just a cleaner layering underneath.
+
+> [!NOTE]
+> To be clear, this is not a refactoring release. The code in `Cuemon.Core` that moved to `Cuemon.Kernel` is still exactly the same (only exception being the bug fixes), just compiled into a different assembly. The only "refactoring" aspect is the introduction of `TypeForwardedTo` attributes in `Cuemon.Core` to maintain backward compatibility.
+
+This release also bumps all package dependencies to their latest compatible versions and includes minor XML documentation improvements in `DelimitedString` and `StringFactory` as well as bug fixing.
+
+### Added
+
+- **`Cuemon.Kernel`** assembly (new) — a lightweight, foundational subset of `Cuemon.Core` containing the most essential primitives:
+  - `Alphanumeric`, `CasingMethod`, `GuidFormats`, `Endianness`, `UriScheme` enums and constants,
+  - `Condition`, `ConditionalValue`, `ExceptionCondition` guard and condition utilities,
+  - `Validator` with the full suite of `ThrowIf*` guard-clause methods,
+  - `Patterns` with safe-invoke, configure, and exception-filter helpers,
+  - `Decorator` / `IDecorator<T>` decoration infrastructure,
+  - `Disposable`, `FinalizeDisposable`, `DisposableOptions` lifecycle types,
+  - `Convertible`, `ConvertibleConverterDictionary`, `ConvertibleOptions` conversion primitives,
+  - `IParameterObject`, `IValidatableParameterObject`, `IPostConfigurableParameterObject` configuration contracts,
+  - `TesterFunc` delegate family and `SuccessfulValue` / `UnsuccessfulValue` result types,
+  - `Arguments` collection helper,
+  - `StreamDecoratorExtensions` stream utilities,
+  - `AsyncOptions`, `AsyncRunOptions`, `IAsyncOptions`, `Awaiter` async primitives,
+  - `ByteOrderMark`, `EncodingOptions`, `FallbackEncodingOptions`, `IEncodingOptions`, `PreambleSequence`, `EnumStringOptions` text encoding helpers,
+  - `IParser`, `IConfigurableParser`, `UriStringOptions`, `ProtocolRelativeUriStringOptions` parser contracts,
+  - `EndianOptions` byte-order configuration,
+  - `TypeArgumentException`, `TypeArgumentOutOfRangeException`, `ArgumentReservedKeywordException` custom exception types,
+  - `CallerArgumentExpressionAttribute` polyfill (for `netstandard2.0` and pre-.NET Core 3.0 targets),
+- **`Cuemon.Kernel.Tests`** test project with comprehensive unit tests; a few migrated from `Cuemon.Core.Tests`, but the majority written beforehand creation of `Cuemon.Kernel`.
+
+### Changed
+
+- `Cuemon.Core` assembly now depends on `Cuemon.Kernel` and uses `[TypeForwardedTo]` attributes for all types that moved, preserving full backward compatibility,
+- `Cuemon.Core` package description updated to reflect its role as higher-level building blocks on top of `Cuemon.Kernel`,
+- `DelimitedString` class in the `Cuemon` namespace received improved XML documentation for the `Split` method,
+- `StringFactory` class in the `Cuemon` namespace received improved XML documentation across factory methods,
+- `Directory.Build.targets` simplified the `PreparePackageReleaseNotesFromFile` target to use `System.IO.File.ReadAllText` instead of `ReadLinesFromFile`.
+
+### Fixed
+
+- `Arguments` class in the `Cuemon.Collections.Generic` namespace so `Concat<T>` appends the second array at the correct offset when the input arrays have different lengths,
+- `ByteOrderMark` class in the `Cuemon.Text` namespace to correctly detect UTF-8 and UTF-16 BOMs from short byte buffers and short streams, while only removing a preamble when the byte sequence matches the full encoding preamble exactly.
+
 ## [10.4.0] - 2026-02-27
 
 This is a minor release that introduces support for flattening items in enumerable XML serialization, while also improving the behavior of the default XML converter to prevent duplicate element wrapping. A few bug fixes and improvements were also included in this release.
@@ -515,7 +563,6 @@ This release was primarily focused on adapting a more modern way of performing C
 - YamlFormatterOptions class in the Cuemon.Text.Yaml.Formatters to include the ObsoleteAttribute with this message: All YAML marshalling has been moved to its own assembly; Cuemon.Extensions.YamlDotNet. This member will be removed with next major version
 - YamlConverterFactory class in the Cuemon.Text.Yaml to include the ObsoleteAttribute with this message: All YAML marshalling has been moved to its own assembly; Cuemon.Extensions.YamlDotNet. This member will be removed with next major version
 - YamlNamingPolicy class in the Cuemon.Text.Yaml to include the ObsoleteAttribute with this message: All YAML marshalling has been moved to its own assembly; Cuemon.Extensions.YamlDotNet. This member will be removed with next major version
- 
 
 ### Fixed
 

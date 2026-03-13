@@ -7,9 +7,14 @@
             "wslDistribution": "Ubuntu-24.04"
         },
         {
-            "name": "Docker-Ubuntu",
+            "name": "Docker-Ubuntu (net9)",
             "type": "docker",
-            "dockerImage": "codebeltnet/ubuntu-testrunner:net8.0.418-9.0.311-10.0.103"
+            "dockerImage": "codebeltnet/ubuntu-testrunner:9"
+        },
+        {
+            "name": "Docker-Ubuntu (net10)",
+            "type": "docker",
+            "dockerImage": "codebeltnet/ubuntu-testrunner:10"
         }
     ]
 }

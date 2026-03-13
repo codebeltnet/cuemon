@@ -1,30 +1,36 @@
-﻿Version: 10.4.0
+﻿Version: 10.5.0
 Availability: .NET 10 and .NET 9
- 
+
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
- 
+
+Version: 10.4.0
+Availability: .NET 10 and .NET 9
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
 # New Features
 - ADDED VaryAcceptMiddleware class in the Cuemon.AspNetCore.Http.Headers namespace that adds the Vary header with the value of Accept to the HTTP response
- 
+
 Version: 10.3.0
 Availability: .NET 10 and .NET 9
- 
+
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
- 
+
 Version: 10.2.1
 Availability: .NET 10 and .NET 9
- 
+
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
- 
+
 Version: 10.2.0
 Availability: .NET 10 and .NET 9
- 
+
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
- 
+
 Version 10.1.2
 Availability: .NET 10 and .NET 9
  
@@ -33,98 +39,98 @@ Availability: .NET 10 and .NET 9
  
 Version 10.1.1
 Availability: .NET 10 and .NET 9
- 
+
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
- 
+
 Version 10.1.0
 Availability: .NET 10 and .NET 9
- 
+
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
- 
+
 Version 10.0.0
 Availability: .NET 10 and .NET 9
- 
+
 # ALM
 - ADDED Support for TFM .NET 10 (LTS)
 - REMOVED Support for TFM .NET 8 (LTS)
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
- 
+
 Version 9.0.10
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
- 
+
 Version 9.0.9
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
- 
+
 Version 9.0.8
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
- 
+
 Version 9.0.7
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
- 
+
 Version 9.0.6
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
- 
+
 Version 9.0.5
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
- 
+
 Version 9.0.4
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
- 
+
 Version 9.0.3
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
- 
+
 Version 9.0.2
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
- 
+
 Version 9.0.1
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
- 
+
 Version 9.0.0
 Availability: .NET 9 and .NET 8
- 
+
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
 - REMOVED Support for TFM .NET 6 (LTS)
- 
+
 # Breaking Changes
 - REMOVED BadRequestMessage property from the class from the ApiKeySentinelOptions class in the Cuemon.AspNetCore.Http.Headers namespace
- 
+
 # New Features
 - ADDED PreferredFaultDescriptor enum in the Cuemon.AspNetCore.Diagnostics namespace that specifies the preferred output format of an Exception raised in the context of either vanilla ASP.NET or ASP.NET MVC
- 
+
 # Improvements
 - EXTENDED FaultDescriptorOptions class in the Cuemon.AspNetCore.Diagnostics namespace to include a property named FaultDescriptor (PreferredFaultDescriptor); default is PreferredFaultDescriptor.FaultDetails
 - EXTENDED HttpExceptionDescriptor class in the Cuemon.AspNetCore.Diagnostics namespace to include two new properties; Instance (Uri) and TraceId (string)
- 
+

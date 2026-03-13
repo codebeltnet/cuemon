@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -7,19 +7,19 @@ using Cuemon.Text;
 namespace Cuemon
 {
     /// <summary>
-    /// Provides access to factory methods for creating and configuring encoded <see cref="string"/> instances.
+    /// Provides access to factory methods for creating encoded string representations.
     /// </summary>
     public static class StringFactory
     {
         private static readonly IDictionary<UriScheme, string> UriSchemeToStringLookupTable = ParserFactory.StringToUriSchemeLookupTable.ToDictionary(pair => pair.Value, pair => pair.Key);
 
         /// <summary>
-        /// Creates a hexadecimal string representation from the specified <paramref name="value"/>.
+        /// Creates a hexadecimal string representation of the specified byte array.
         /// </summary>
-        /// <param name="value">The <see cref="T:byte[]"/> to convert.</param>
-        /// <returns>A hexadecimal string representation that is equivalent to <paramref name="value"/>.</returns>
+        /// <param name="value">The byte array to convert.</param>
+        /// <returns>A hexadecimal string representation of <paramref name="value"/>.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> cannot be null.
+        /// <paramref name="value"/> is <see langword="null"/>.
         /// </exception>
         public static string CreateHexadecimal(byte[] value)
         {
@@ -32,16 +32,16 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Creates a hexadecimal string representation from the specified <paramref name="value"/>.
+        /// Creates a hexadecimal string representation of the specified string.
         /// </summary>
-        /// <param name="value">The <see cref="string"/> to convert.</param>
-        /// <param name="setup">The <see cref="EncodingOptions"/> which may be configured.</param>
-        /// <returns>A hexadecimal string representation that is equivalent to <paramref name="value"/>.</returns>
+        /// <param name="value">The string to convert.</param>
+        /// <param name="setup">The delegate that configures the encoding behavior.</param>
+        /// <returns>A hexadecimal string representation of <paramref name="value"/>.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> cannot be null.
+        /// <paramref name="value"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="InvalidEnumArgumentException">
-        /// <paramref name="setup"/> was initialized with an invalid <see cref="PreambleSequence"/>.
+        /// <paramref name="setup"/> configures an invalid value for <see cref="EncodingOptions.Preamble"/>.
         /// </exception>
         public static string CreateHexadecimal(string value, Action<EncodingOptions> setup = null)
         {
@@ -51,12 +51,12 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Creates a binary digits string representation from the specified <paramref name="value"/>.
+        /// Creates a binary digit string representation of the specified byte array.
         /// </summary>
-        /// <param name="value">The <see cref="T:byte[]"/> to convert.</param>
-        /// <returns>A binary digits string representation that is equivalent to <paramref name="value"/>.</returns>
+        /// <param name="value">The byte array to convert.</param>
+        /// <returns>A binary digit string representation of <paramref name="value"/>.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> cannot be null.
+        /// <paramref name="value"/> is <see langword="null"/>.
         /// </exception>
         public static string CreateBinaryDigits(byte[] value)
         {
@@ -65,14 +65,20 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Creates a base64 string representation, in URL-safe characters, from the specified <paramref name="value"/>.
+        /// Creates a URL-safe Base64 string representation of the specified byte array.
         /// </summary>
-        /// <param name="value">The <see cref="T:byte[]"/> to convert.</param>
-        /// <returns>A base64 string representation, in URL-safe characters, that is equivalent to <paramref name="value"/>.</returns>
+        /// <param name="value">The byte array to convert.</param>
+        /// <returns>A URL-safe Base64 string representation of <paramref name="value"/>.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> cannot be null.
+        /// <paramref name="value"/> is <see langword="null"/>.
         /// </exception>
-        /// <remarks>Source: http://tools.ietf.org/html/draft-ietf-jose-json-web-signature-08#appendix-C</remarks>
+        /// <remarks>
+        /// This method uses the Base64 URL encoding convention by removing padding characters and replacing
+        /// <c>+</c> with <c>-</c> and <c>/</c> with <c>_</c>.
+        /// <para>
+        /// The implementation was inspired by Appendix C of the JSON Web Signature (JWS) draft specification.
+        /// </para>
+        /// </remarks>
         public static string CreateUrlEncodedBase64(byte[] value)
         {
             Validator.ThrowIfNull(value);
@@ -84,16 +90,16 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Creates a protocol-relative URL string representation from the specified <paramref name="value"/>.
+        /// Creates a protocol-relative URL string representation of the specified <see cref="Uri"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Uri"/> to convert.</param>
-        /// <param name="setup">The <see cref="ProtocolRelativeUriStringOptions"/> which may be configured.</param>
-        /// <returns>A protocol-relative URL string representation that is equivalent to <paramref name="value"/>.</returns>
+        /// <param name="value">The URI to convert.</param>
+        /// <param name="setup">The delegate that configures the protocol-relative URL format.</param>
+        /// <returns>A protocol-relative URL string representation of <paramref name="value"/>.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="value"/> cannot be null.
+        /// <paramref name="value"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// <paramref name="value"/> must be an absolute URI.
+        /// <paramref name="value"/> is not an absolute URI.
         /// </exception>
         public static string CreateProtocolRelativeUrl(Uri value, Action<ProtocolRelativeUriStringOptions> setup = null)
         {
@@ -105,10 +111,14 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Creates an URI scheme string representation from the specified <paramref name="value"/>.
+        /// Creates the string representation of the specified <see cref="UriScheme"/>.
         /// </summary>
-        /// <param name="value">The <see cref="UriScheme"/> to convert.</param>
-        /// <returns>An URI scheme string representation that is equivalent to <paramref name="value"/>.</returns>
+        /// <param name="value">The URI scheme to convert.</param>
+        /// <returns>The string representation of <paramref name="value"/>.</returns>
+        /// <remarks>
+        /// Returns the string representation of <see cref="UriScheme.Undefined"/> when <paramref name="value"/>
+        /// is not found in the lookup table.
+        /// </remarks>
         public static string CreateUriScheme(UriScheme value)
         {
             if (!UriSchemeToStringLookupTable.TryGetValue(value, out var result))

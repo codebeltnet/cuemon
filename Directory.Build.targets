@@ -1,10 +1,7 @@
 ﻿<Project>
   <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec" Condition="'$(IsTestProject)' == 'false' AND Exists('$(PackageReleaseNotesFile)')">
-    <ReadLinesFromFile File="$(PackageReleaseNotesFile)">
-      <Output TaskParameter="Lines" ItemName="PackageReleaseNotesLines"/>
-    </ReadLinesFromFile>
     <PropertyGroup>
-      <PackageReleaseNotes>@(PackageReleaseNotesLines, '%0A')</PackageReleaseNotes>
+      <PackageReleaseNotes>$([System.IO.File]::ReadAllText('$(PackageReleaseNotesFile)'))</PackageReleaseNotes>
     </PropertyGroup>
   </Target>
 

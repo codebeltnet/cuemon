@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
@@ -44,19 +44,37 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Returns a <see cref="T:string[]"/> that contain the substrings of <paramref name="value"/> delimited by a <see cref="DelimitedStringOptions.Delimiter"/> that may be quoted by <see cref="DelimitedStringOptions.Qualifier"/>.
+        /// Splits the specified <paramref name="value"/> into substrings by using the configured <see cref="DelimitedStringOptions.Delimiter"/> and <see cref="DelimitedStringOptions.Qualifier"/>.
         /// </summary>
-        /// <param name="value">The value containing substrings and delimiters.</param>
+        /// <param name="value">The delimited string to split.</param>
         /// <param name="setup">The <see cref="DelimitedStringOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:string[]"/> that contain the substrings of <paramref name="value"/> delimited by a <see cref="DelimitedStringOptions.Delimiter"/> and optionally surrounded within <see cref="DelimitedStringOptions.Qualifier"/>.</returns>
-        /// <remarks>
-        /// This method was inspired by two articles on StackOverflow @ http://stackoverflow.com/questions/2807536/split-string-in-c-sharp, https://stackoverflow.com/questions/3776458/split-a-comma-separated-string-with-both-quoted-and-unquoted-strings and https://stackoverflow.com/questions/6542996/how-to-split-csv-whose-columns-may-contain.
-        /// The default implementation conforms with the RFC-4180 standard.
-        /// </remarks>
-        /// <exception cref="InvalidOperationException">
-        /// An error occurred while splitting <paramref name="value"/> into substrings separated by <see cref="DelimitedStringOptions.Delimiter"/> and quoted with <see cref="DelimitedStringOptions.Qualifier"/>.
-        /// This is typically related to data corruption, eg. a field has not been properly closed with the <see cref="DelimitedStringOptions.Qualifier"/> specified.
+        /// <returns>
+        /// An array of <see cref="string"/> values that contains the substrings extracted from <paramref name="value"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="value"/> is <see langword="null"/>, empty, or consists only of white-space characters.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when <paramref name="value"/> cannot be split using the configured <see cref="DelimitedStringOptions.Delimiter"/> and <see cref="DelimitedStringOptions.Qualifier"/>.
+        /// This typically indicates malformed input, such as an unclosed qualified field.
+        /// </exception>
+        /// <remarks>
+        /// The default implementation conforms to RFC 4180.
+        /// <para>
+        /// This implementation was inspired by the following Stack Overflow discussions:
+        /// </para>
+        /// <list type="bullet">
+        /// <item>
+        /// <description>https://stackoverflow.com/questions/2807536/split-string-in-c-sharp</description>
+        /// </item>
+        /// <item>
+        /// <description>https://stackoverflow.com/questions/3776458/split-a-comma-separated-string-with-both-quoted-and-unquoted-strings</description>
+        /// </item>
+        /// <item>
+        /// <description>https://stackoverflow.com/questions/6542996/how-to-split-csv-whose-columns-may-contain</description>
+        /// </item>
+        /// </list>
+        /// </remarks>
         public static string[] Split(string value, Action<DelimitedStringOptions> setup = null)
         {
             Validator.ThrowIfNullOrWhitespace(value);

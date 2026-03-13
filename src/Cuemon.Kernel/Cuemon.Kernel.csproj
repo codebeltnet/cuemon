@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Cuemon</RootNamespace>
+    <AssemblyName>Cuemon.Kernel</AssemblyName>
+    <AssemblyTitle>Cuemon.Kernel</AssemblyTitle>
+    <Title>Cuemon.Kernel</Title>
+    <Description>Cuemon.Kernel provides the essential Cuemon programming substrate, including validators, conditions, decorators, configuration abstractions, asynchronous option types, disposable patterns, and core text encoding helpers. It is the minimal foundational layer for the Cuemon ecosystem and an addition to the System namespace.</Description>
+    <PackageTags>arguments async-options awaiter bom byte-order-mark condition conditional-value configurable configure configure-exchange configure-revert decorator disposable encoding-options endianness enum-string fallback-encoding finalize-disposable guard options-pattern parameter-object parser patterns preamble-sequence protocol-relative-uri safe-invoke safe-invoke-async text-encoding uri-string validator</PackageTags>
+    <PackageId>Cuemon.Kernel</PackageId>
+  </PropertyGroup>
+
+</Project>

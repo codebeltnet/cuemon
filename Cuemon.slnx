@@ -39,6 +39,7 @@
     <Project Path="src/Cuemon.Extensions.Threading/Cuemon.Extensions.Threading.csproj" />
     <Project Path="src/Cuemon.Extensions.Xml/Cuemon.Extensions.Xml.csproj" />
     <Project Path="src/Cuemon.IO/Cuemon.IO.csproj" />
+    <Project Path="src/Cuemon.Kernel/Cuemon.Kernel.csproj" Id="e8705265-1862-4d38-a41a-c94b3fcbc3f7" />
     <Project Path="src/Cuemon.Net/Cuemon.Net.csproj" />
     <Project Path="src/Cuemon.Resilience/Cuemon.Resilience.csproj" />
     <Project Path="src/Cuemon.Runtime.Caching/Cuemon.Runtime.Caching.csproj" />
@@ -78,6 +79,7 @@
     <Project Path="test/Cuemon.Extensions.Threading.Tests/Cuemon.Extensions.Threading.Tests.csproj" />
     <Project Path="test/Cuemon.Extensions.Xml.Tests/Cuemon.Extensions.Xml.Tests.csproj" />
     <Project Path="test/Cuemon.IO.Tests/Cuemon.IO.Tests.csproj" />
+    <Project Path="test/Cuemon.Kernel.Tests/Cuemon.Kernel.Tests.csproj" Id="7dab1139-ec80-4bf8-84fa-108c89af89fc" />
     <Project Path="test/Cuemon.Net.Tests/Cuemon.Net.Tests.csproj" />
     <Project Path="test/Cuemon.Resilience.Tests/Cuemon.Resilience.Tests.csproj" />
     <Project Path="test/Cuemon.Runtime.Caching.Tests/Cuemon.Runtime.Caching.Tests.csproj" />

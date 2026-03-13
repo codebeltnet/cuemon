@@ -4,6 +4,7 @@
       "src": [
         {
           "files": [
+            "Cuemon.Kernel/**.csproj",
             "Cuemon.Core/**.csproj",
             "Cuemon.Data/**.csproj",
             "Cuemon.Data.Integrity/**.csproj",

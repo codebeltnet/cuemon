@@ -1,14 +1,10 @@
-﻿using System;
+using Codebelt.Extensions.Xunit;
+using Cuemon.Assets;
+using Cuemon.Collections.Generic;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Cuemon.Assets;
-using Cuemon.Extensions.Collections.Generic;
-#if NET48_OR_GREATER
-using Cuemon.Extensions;
-#endif
-using Codebelt.Extensions.Xunit;
-using Cuemon.Extensions;
 using Xunit;
 
 namespace Cuemon
@@ -246,18 +242,120 @@ namespace Cuemon
         }
 
         [Fact]
+        public void CheckParameter_FuncShouldThrowArgumentNullExceptionOrReturnComputedResult()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+            {
+                Validator.CheckParameter<string>((Func<string>)null);
+            });
+
+            Assert.Equal("validator", ex.ParamName);
+            Assert.Equal("cuemon:7", Validator.CheckParameter(() => "cuemon:7"));
+        }
+
+        [Fact]
+        public void ThrowIfSingleton_ShouldReturnSameInstance()
+        {
+            Assert.Same(Validator.ThrowIf, Validator.ThrowIf);
+        }
+
+        [Fact]
+        public void ThrowWhen_ShouldSupportNullGuardAndBothExceptionConditionStyles()
+        {
+            var nullEx = Assert.Throws<ArgumentNullException>(() =>
+            {
+                Validator.ThrowWhen((Action<ExceptionCondition<ArgumentException>>)null);
+            });
+
+            Assert.Equal("condition", nullEx.ParamName);
+
+            ArgumentException trueEx = Assert.Throws<ArgumentException>(() =>
+            {
+                Validator.ThrowWhen(condition => condition
+                    .IsTrue(() => true)
+                    .Create(() => new ArgumentException("custom", "paramName"))
+                    .TryThrow());
+            });
+
+            Assert.Equal("paramName", trueEx.ParamName);
+            Assert.StartsWith("custom", trueEx.Message);
+
+            ArgumentException falseEx = Assert.Throws<ArgumentException>(() =>
+            {
+                Validator.ThrowWhen(condition => condition
+                    .IsFalse<string>((out string result) =>
+                    {
+                        result = "typed";
+                        return false;
+                    })
+                    .Create(result => new ArgumentException(result, "typedParam"))
+                    .TryThrow());
+            });
+
+            Assert.Equal("typedParam", falseEx.ParamName);
+            Assert.StartsWith("typed", falseEx.Message);
+
+            Validator.ThrowWhen(condition => condition
+                .IsTrue(() => false)
+                .Create(() => new ArgumentException("unused", "unused"))
+                .TryThrow());
+        }
+
+        [Fact]
+        public void ThrowIfInvalidState_ShouldSupportCustomMessageAndFalseCondition()
+        {
+            Validator.ThrowIfInvalidState(false, "custom message");
+
+            var ex = Assert.Throws<InvalidOperationException>(() =>
+            {
+                Validator.ThrowIfInvalidState(true, "custom message");
+            });
+
+            Assert.Equal("custom message (Expression 'true')", ex.Message);
+        }
+
+        [Fact]
+        public void ThrowIfInvalidOptions_ShouldUseCustomMessageWhenValidationFails()
+        {
+            var ex = Assert.Throws<ArgumentException>(() =>
+            {
+                Validator.ThrowIfInvalidOptions(new ValidatableOptions(), "custom options message", "optionsParam");
+            });
+
+            Assert.Equal("optionsParam", ex.ParamName);
+            Assert.StartsWith("custom options message", ex.Message);
+        }
+
+        [Fact]
+        public void ThrowIfContainsType_ShouldHandleNullAndNonMatchingTypes()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                Validator.ThrowIfContainsType((Type)null, new[] { typeof(Exception) });
+            });
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                Validator.ThrowIfContainsType(typeof(string), null);
+            });
+
+            Validator.ThrowIfContainsType(typeof(string), new[] { typeof(Stream) });
+            Validator.ThrowIfContainsType<string>("typeParamName", typeof(Stream));
+        }
+
+        [Fact]
         public void ThrowIfContainsType_ShouldThrowArgumentOutOfRangeException()
         {
             var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                Validator.ThrowIfContainsType(typeof(ArgumentNullException), typeof(ArgumentException).Yield().ToArray());
+                Validator.ThrowIfContainsType(typeof(ArgumentNullException), Arguments.Yield(typeof(ArgumentException)).ToArray());
             });
 
             Assert.Equal(ex.ParamName, "typeof(ArgumentNullException)");
 
             ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                Validator.ThrowIfContainsType(new ArgumentNullException(), typeof(ArgumentException).Yield().ToArray());
+                Validator.ThrowIfContainsType(new ArgumentNullException(), Arguments.Yield(typeof(ArgumentException)).ToArray());
             });
 
             Assert.Equal(ex.ParamName, "new ArgumentNullException()");
@@ -277,12 +375,12 @@ namespace Cuemon
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                Validator.ThrowIfNotContainsType(typeof(ArgumentNullException), typeof(OutOfMemoryException).Yield().ToArray());
+                Validator.ThrowIfNotContainsType(typeof(ArgumentNullException), Arguments.Yield(typeof(OutOfMemoryException)).ToArray());
             });
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                Validator.ThrowIfNotContainsType(new ArgumentNullException(), typeof(OutOfMemoryException).Yield().ToArray());
+                Validator.ThrowIfNotContainsType(new ArgumentNullException(), Arguments.Yield(typeof(OutOfMemoryException)).ToArray());
             });
         }
 
@@ -291,7 +389,7 @@ namespace Cuemon
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                Validator.ThrowIfNotContainsInterface(typeof(Stream), typeof(IConvertible).Yield().ToArray());
+                Validator.ThrowIfNotContainsInterface(typeof(Stream), Arguments.Yield(typeof(IConvertible)).ToArray());
             });
         }
 
@@ -309,7 +407,7 @@ namespace Cuemon
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                Validator.ThrowIfContainsInterface(typeof(string), typeof(IConvertible).Yield().ToArray());
+                Validator.ThrowIfContainsInterface(typeof(string), Arguments.Yield(typeof(IConvertible)).ToArray());
             });
         }
 
@@ -322,6 +420,23 @@ namespace Cuemon
                 Validator.ThrowIfContainsInterface<TBool>(nameof(TBool), typeof(IConvertible));
             });
             Assert.Equal(nameof(TBool), ex.ParamName);
+        }
+
+        [Fact]
+        public void ThrowIfNotContainsType_ShouldHandleNullAndMatchingTypes()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                Validator.ThrowIfNotContainsType((Type)null, new[] { typeof(Exception) });
+            });
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                Validator.ThrowIfNotContainsType(typeof(string), null);
+            });
+
+            Validator.ThrowIfNotContainsType(typeof(ArgumentNullException), new[] { typeof(Exception) });
+            Validator.ThrowIfNotContainsType<ArgumentNullException>("typeParamName", typeof(Exception));
         }
 
         [Fact]
@@ -1066,6 +1181,166 @@ namespace Cuemon
             var argument = "dj bobo\tis the best 90ies artist!";
             var characters = new[] { Alphanumeric.TabChar, ' ' };
             Validator.ThrowIfNotContainsAny(argument, characters);
+        }
+
+        [Fact]
+        public void ThrowIfContainsInterfaceOverloads_ShouldCoverThrowAndNoThrowPaths()
+        {
+            Validator.ThrowIfContainsInterface<MemoryStream>("typeParamName", typeof(IConvertible));
+            Validator.ThrowIfContainsInterface<MemoryStream>("typeParamName", "custom", typeof(IConvertible));
+            Validator.ThrowIfContainsInterface(typeof(Stream), new[] { typeof(IConvertible) }, "custom", "typeParamName");
+
+            var generic = Assert.Throws<TypeArgumentOutOfRangeException>(() =>
+            {
+                Validator.ThrowIfContainsInterface<int>("typeParamName", "custom", typeof(IConvertible));
+            });
+
+            Assert.Equal("typeParamName", generic.ParamName);
+            Assert.StartsWith("custom", generic.Message);
+
+            var nongeneric = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                Validator.ThrowIfContainsInterface(typeof(string), new[] { typeof(IConvertible) }, "custom", "typeParamName");
+            });
+
+            Assert.Equal("typeParamName", nongeneric.ParamName);
+            Assert.StartsWith("custom", nongeneric.Message);
+        }
+
+        [Fact]
+        public void ThrowIfNotContainsInterfaceOverloads_ShouldCoverThrowAndNoThrowPaths()
+        {
+            Validator.ThrowIfNotContainsInterface<int>("typeParamName", typeof(IConvertible));
+            Validator.ThrowIfNotContainsInterface<int>("typeParamName", "custom", typeof(IConvertible));
+            Validator.ThrowIfNotContainsInterface(typeof(string), new[] { typeof(IConvertible) }, "custom", "typeParamName");
+
+            var generic = Assert.Throws<TypeArgumentOutOfRangeException>(() =>
+            {
+                Validator.ThrowIfNotContainsInterface<MemoryStream>("typeParamName", "custom", typeof(IConvertible));
+            });
+
+            Assert.Equal("typeParamName", generic.ParamName);
+            Assert.StartsWith("custom", generic.Message);
+
+            var nongeneric = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                Validator.ThrowIfNotContainsInterface(typeof(Stream), new[] { typeof(IConvertible) }, "custom", "typeParamName");
+            });
+
+            Assert.Equal("typeParamName", nongeneric.ParamName);
+            Assert.StartsWith("custom", nongeneric.Message);
+        }
+
+        [Fact]
+        public void ThrowIfContainsTypeOverloads_ShouldCoverObjectGenericAndTypeBranches()
+        {
+            Validator.ThrowIfContainsType(new MemoryStream(), new[] { typeof(string) }, "custom", "objectParam");
+            Validator.ThrowIfContainsType<MemoryStream>("typeParamName", typeof(string));
+            Validator.ThrowIfContainsType<MemoryStream>("typeParamName", "custom", typeof(string));
+            Validator.ThrowIfNotContainsType(new MemoryStream(), new[] { typeof(Stream) }, "custom", "objectParam");
+            Validator.ThrowIfNotContainsType<MemoryStream>("typeParamName", typeof(Stream));
+            Validator.ThrowIfNotContainsType<MemoryStream>("typeParamName", "custom", typeof(Stream));
+
+            var containsObject = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                Validator.ThrowIfContainsType((object)"text", new[] { typeof(string) }, "custom", "objectParam");
+            });
+
+            Assert.Equal("objectParam", containsObject.ParamName);
+            Assert.StartsWith("custom", containsObject.Message);
+
+            var containsGeneric = Assert.Throws<TypeArgumentOutOfRangeException>(() =>
+            {
+                Validator.ThrowIfContainsType<MemoryStream>("typeParamName", "custom", typeof(Stream));
+            });
+
+            Assert.Equal("typeParamName", containsGeneric.ParamName);
+            Assert.StartsWith("custom", containsGeneric.Message);
+
+            var notContainsObject = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                Validator.ThrowIfNotContainsType((object)"text", new[] { typeof(Stream) }, "custom", "objectParam");
+            });
+
+            Assert.Equal("objectParam", notContainsObject.ParamName);
+            Assert.StartsWith("custom", notContainsObject.Message);
+
+            var notContainsGeneric = Assert.Throws<TypeArgumentOutOfRangeException>(() =>
+            {
+                Validator.ThrowIfNotContainsType<MemoryStream>("typeParamName", "custom", typeof(string));
+            });
+
+            Assert.Equal("typeParamName", notContainsGeneric.ParamName);
+            Assert.StartsWith("custom", notContainsGeneric.Message);
+        }
+
+        [Fact]
+        public void ThrowIfScalarGuardOverloads_ShouldCoverExplicitOptionalParameterPaths()
+        {
+            var culture = new System.Globalization.CultureInfo("da-DK");
+            var guid = Guid.NewGuid();
+            var sameReference = TimeZoneInfo.Utc;
+
+            Validator.ThrowIfNumber("abc", System.Globalization.NumberStyles.Number, culture, "custom", "numberParam");
+            Validator.ThrowIfNotNumber("12,50", System.Globalization.NumberStyles.Number, culture, "custom", "numberParam");
+            Validator.ThrowIfFalse(() => true, "paramName", "custom");
+            Validator.ThrowIfTrue(false, "paramName", "custom");
+            Validator.ThrowIfTrue(() => false, "paramName", "custom");
+            Validator.ThrowIfSame(TimeZoneInfo.Utc, TimeZoneInfo.Local, "paramName", "custom");
+            Validator.ThrowIfNotSame(sameReference, sameReference, "paramName", "custom");
+            Validator.ThrowIfEqual("alpha", "ALPHA", "paramName", StringComparer.Ordinal, "custom");
+            Validator.ThrowIfNotEqual("alpha", "ALPHA", "paramName", StringComparer.OrdinalIgnoreCase, "custom");
+            Validator.ThrowIfGreaterThanOrEqual(1, 2, "paramName", "custom");
+            Validator.ThrowIfLowerThan(2, 1, "paramName", "custom");
+            Validator.ThrowIfLowerThanOrEqual(2, 1, "paramName", "custom");
+            Validator.ThrowIfHex("not-hex", "custom", "paramName");
+            Validator.ThrowIfNotHex("AAB0F3C1", "custom", "paramName");
+            Validator.ThrowIfEmailAddress("not-an-email", "custom", "paramName");
+            Validator.ThrowIfNotEmailAddress("user@example.com", "custom", "paramName");
+            Validator.ThrowIfGuid("not-a-guid", GuidFormats.N, "custom", "paramName");
+            Validator.ThrowIfNotGuid(guid.ToString("N"), GuidFormats.N, "custom", "paramName");
+            Validator.ThrowIfEnumType((Type)null, "custom", "paramName");
+            Validator.ThrowIfNotEnumType<VerticalDirection>("typeParamName", "custom");
+            Validator.ThrowIfNotBinaryDigits("101010", "custom", "paramName");
+            Validator.ThrowIfNotBase64String("QQ==", "custom", "paramName");
+            Validator.ThrowIfEnum<VerticalDirection>("sideways", ignoreCase: false, message: "custom", paramName: "paramName");
+            Validator.ThrowIfNotEnum<VerticalDirection>("Up", ignoreCase: false, message: "custom", paramName: "paramName");
+
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfNumber("12,50", System.Globalization.NumberStyles.Number, culture, "custom", "numberParam")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfNotNumber("abc", System.Globalization.NumberStyles.Number, culture, "custom", "numberParam")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfTrue(true, "paramName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfTrue(() => true, "paramName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfSame(sameReference, sameReference, "paramName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfNotSame(TimeZoneInfo.Utc, TimeZoneInfo.Local, "paramName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfGreaterThanOrEqual(2, 2, "paramName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfLowerThan(1, 2, "paramName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfLowerThanOrEqual(2, 2, "paramName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfHex("AAB0F3C1", "custom", "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfNotHex("olkiujhy", "custom", "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfEmailAddress("user@example.com", "custom", "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfNotEmailAddress("invalid", "custom", "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfGuid(guid.ToString("N"), GuidFormats.N, "custom", "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfNotGuid("not-a-guid", GuidFormats.N, "custom", "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfEnumType(typeof(VerticalDirection), "custom", "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<TypeArgumentException>(() => Validator.ThrowIfEnumType<VerticalDirection>("typeParamName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<TypeArgumentException>(() => Validator.ThrowIfNotEnumType<DateTime>("typeParamName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfNotBinaryDigits("1201", "custom", "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfNotBase64String("invalid", "custom", "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfEnum<VerticalDirection>("Up", ignoreCase: false, message: "custom", paramName: "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfNotEnum<VerticalDirection>("up", ignoreCase: false, message: "custom", paramName: "paramName")).Message);
+        }
+
+        [Fact]
+        public void ThrowIfDifferenceAndUriOverloads_ShouldCoverCustomMessageBranches()
+        {
+            Validator.ThrowIfDifferent("abc", "cba", "paramName", "custom");
+            Validator.ThrowIfUri("not a valid uri", UriKind.Absolute, "custom", "paramName");
+            Validator.ThrowIfNotUri("https://www.cuemon.net/", UriKind.Absolute, "custom", "paramName");
+
+            Assert.StartsWith("custom", Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfNotDifferent("abc", "cba", "paramName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfDifferent("abc", "abcd", "paramName", "custom")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfUri("https://www.cuemon.net/", UriKind.Absolute, "custom", "paramName")).Message);
+            Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfNotUri("www.cuemon.net", UriKind.Absolute, "custom", "paramName")).Message);
         }
     }
 }

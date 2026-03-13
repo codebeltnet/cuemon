@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Codebelt.Extensions.Xunit;
 using Xunit;
 
@@ -14,7 +14,9 @@ namespace Cuemon
         public void Ctor_SucceededShouldBeTrue()
         {
             var sut = new SuccessfulValue();
+
             Assert.True(sut.Succeeded);
+            Assert.Null(sut.Failure);
         }
 
         [Fact]
@@ -25,6 +27,7 @@ namespace Cuemon
 
             Assert.True(sut.Succeeded);
             Assert.Equal(value, sut.Result);
+            Assert.Null(sut.Failure);
         }
     }
 }

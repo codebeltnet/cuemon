@@ -54,7 +54,7 @@ namespace Cuemon.Reflection
 
             TestOutput.WriteLine(v.ToString());
 
-            Assert.Equal("10.0.0.0", v.ToString());
+            Assert.Equal("11.0.0.0", v.ToString());
             Assert.False(v.HasAlphanumericVersion);
             Assert.False(v.IsSemanticVersion());
         }

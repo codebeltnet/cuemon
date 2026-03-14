@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [11.0.0] - 2026-03-14
+
+This is a major release centered on two deliberate changes: moving the Cuemon build and test matrix forward to .NET 11, and removing the temporary compatibility bridge that kept `Cuemon.Core` forwarding foundational APIs from `Cuemon.Kernel`.
+
+The .NET update is straightforward: `net11.0` is now part of the target matrix and `net9.0` is no longer supported. The more important part is the assembly boundary change. Version 10.5.0 introduced `Cuemon.Kernel` while keeping `Cuemon.Core` backward compatible through `[TypeForwardedTo]`. Starting with 11.0.0, that forwarding layer is removed.
+
+> [!WARNING]
+> Breaking change from 11.0.0 and forward: applications using foundational APIs that were previously reachable through `Cuemon.Core` must now reference `Cuemon.Kernel` directly. This includes guard/configuration/async/text primitives such as `Validator`, `Arguments`, `Patterns`, `Disposable`, `Convertible`, `Awaiter`, parser and encoding option types, as well as date and range primitives such as `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, and `TimeUnit`.
+
+### Changed
+
+- Solution, source, test, and benchmark target frameworks now include `net11.0`; `net9.0` has been removed from the supported matrix.
+- Central package management was updated to align `net11.0` and `netstandard2.0` builds with .NET 11 preview package versions, while `net10.0` remains on the .NET 10 package line where applicable.
+- `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, and `TimeUnit` source files now live in `Cuemon.Kernel` as part of the completed kernel split.
+- `BufferWriterOptions` was updated to follow the new `NET10_0_OR_GREATER` conditional path.
+- Solution organization now groups `Cuemon.Core` and `Cuemon.Kernel` under a dedicated `/src/corelibs/` folder.
+- Test environment definitions now target Docker images for `net10` and `net11`.
+
+### Removed
+
+- `Cuemon.Core` no longer uses `[TypeForwardedTo]` to forward foundational `Cuemon.Kernel` types, making the kernel split a true assembly boundary instead of a compatibility shim.
+
+
 ## [10.5.0] - 2026-03-13
 
 Okay, so this might look like a major release — and effort-wise it certainly felt like one — but it's actually a fully backward-compatible minor bump. Thanks to a helping hand from AI and a long-standing wish to carve out a small, lean core from Cuemon, we've introduced a brand-new assembly: **Cuemon.Kernel**. Think of it as the nano (or at least noticeably smaller) sibling of `Cuemon.Core`, shipping only the most essential and much-loved types — validators, conditions, decorators, disposable patterns, the options/parameter-object infrastructure, text encoding helpers and async primitives.

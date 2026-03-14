@@ -28,7 +28,7 @@ namespace Cuemon.Assets
 
         public UnmanagedDisposable()
         {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
                 if (NativeLibrary.TryLoad("kernel32.dll", GetType().Assembly, DllImportSearchPath.System32, out _libHandle))
@@ -84,7 +84,7 @@ namespace Cuemon.Assets
 
         protected override void OnDisposeUnmanagedResources()
         {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
                 if (_handle != IntPtr.Zero)

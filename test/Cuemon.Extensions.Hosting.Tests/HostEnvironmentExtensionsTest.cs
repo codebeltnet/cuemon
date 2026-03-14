@@ -23,7 +23,7 @@ namespace Cuemon.Extensions.Hosting
         [Fact]
         public void IsLocalDevelopment_VerifyEnvironmentEqualsLocalDevelopment()
         {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
             Assert.True(Environment.IsLocalDevelopment());
             Assert.False(Environment.IsProduction());
             Assert.False(Environment.IsStaging());
@@ -40,7 +40,7 @@ namespace Cuemon.Extensions.Hosting
         [Fact]
         public void IsLocalDevelopment_VerifyEnvironmentIsNonProduction()
         {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
             Assert.True(Environment.IsNonProduction());
             Assert.False(Environment.IsProduction());
 #else

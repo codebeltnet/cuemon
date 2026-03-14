@@ -1,5 +1,5 @@
 ﻿using System;
-#if NETSTANDARD2_1_OR_GREATER || NET9_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET10_0_OR_GREATER
 using System.Buffers;
 #endif
 using System.Collections.Generic;
@@ -115,7 +115,7 @@ namespace Cuemon.IO
             return CreateStreamCore(factory, setup);
         }
 
-#if NETSTANDARD2_1_OR_GREATER || NET9_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET10_0_OR_GREATER
 
         /// <summary>
         /// Creates and returns a <see cref="Stream"/> by the specified delegate <paramref name="writer"/>.

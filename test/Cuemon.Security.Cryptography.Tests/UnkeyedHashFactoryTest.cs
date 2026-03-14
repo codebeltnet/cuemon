@@ -45,7 +45,7 @@ namespace Cuemon.Security.Cryptography
             Assert.Equal("db4bfcbd4da0cd85a60c3c37d3fbd8805c77f15fc6b1fdfe614ee0a7c8fdb4c0", h.ComputeHash(Alphanumeric.LettersAndNumbers).ToHexadecimalString());
             Assert.Equal("db4bfcbd4da0cd85a60c3c37d3fbd8805c77f15fc6b1fdfe614ee0a7c8fdb4c0", h.ComputeHash(Decorator.Enclose(Alphanumeric.LettersAndNumbers).ToStream()).ToHexadecimalString());
             Assert.Equal("84d89877f0d4041efb6bf91a16f0248f2fd573e6af05c19f96bedb9f882f7882", h.ComputeHash(Alphanumeric.Numbers).ToHexadecimalString());
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
             Assert.Equal("53ab3a50f51855beeae9721ab68656312c7f105b9b34bbfa97875dbfda72dbc6", h.ComputeHash(DateTime.UnixEpoch).ToHexadecimalString());
 #endif
             Assert.Equal("1f1a24c833be74a0f4f99007aa70a51e2456e41f745a5628721ea2b8e1c07641", h.ComputeHash(213, "fdfsfsf", 9999).ToHexadecimalString());

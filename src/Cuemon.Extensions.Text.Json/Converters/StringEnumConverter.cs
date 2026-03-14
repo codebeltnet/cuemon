@@ -43,7 +43,7 @@ namespace Cuemon.Extensions.Text.Json.Converters
             var enumConverterFactory = typeof(JsonConverterFactory).Assembly.GetType("System.Text.Json.Serialization.Converters.EnumConverterFactory");
             if (enumConverterOptions != null && enumConverterFactory != null)
             {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
                 var createMethod = enumConverterFactory.GetMethod("Create", MemberReflection.Everything, new[] { typeof(Type), enumConverterOptions, typeof(JsonNamingPolicy), typeof(JsonSerializerOptions) });
                 if (createMethod != null)
                 {

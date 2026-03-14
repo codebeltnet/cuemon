@@ -165,7 +165,7 @@ namespace Cuemon.Extensions.Reflection
             expected = 21;
             actualValueName = "m_actualValue";
 #endif
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
             expected = 16;
 #endif
 

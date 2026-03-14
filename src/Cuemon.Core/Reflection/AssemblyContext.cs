@@ -67,7 +67,7 @@ public static class AssemblyContext
 
     private static bool TryPop(Stack<Assembly> stack, out Assembly assembly)
     {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         return stack.TryPop(out assembly);
 #else
         return Decorator.RawEnclose(stack).TryPop(out assembly);

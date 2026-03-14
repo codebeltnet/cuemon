@@ -7,7 +7,7 @@ using Cuemon.Threading;
 
 namespace Cuemon.Extensions.Net.Http
 {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
     /// <summary>
     /// Provides a simple and lightweight implementation of the <see cref="IHttpClientFactory"/> interface.
     /// </summary>
@@ -22,14 +22,14 @@ namespace Cuemon.Extensions.Net.Http
     /// <remarks>Inspiration taken from https://github.com/dotnet/runtime/blob/master/src/libraries/Microsoft.Extensions.Http/src/DefaultHttpClientFactory.cs</remarks>
 #endif
     public class SlimHttpClientFactory : IHttpClientFactory
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         , IHttpMessageHandlerFactory
 #endif
     {
         private readonly ConcurrentDictionary<string, Lazy<ActiveHandler>> _activeHandlers = new();
         private readonly ConcurrentQueue<ExpiredHandler> _expiredHandlers = new();
         private readonly Func<HttpClientHandler> _handlerFactory;
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         private readonly Lock _lock = new();
 #else
         private readonly object _lock = new();

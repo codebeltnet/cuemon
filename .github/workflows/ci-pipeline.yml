@@ -269,19 +269,20 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  codeql:
-    name: call-codeql
-    needs: [build, test_linux, test_windows, integration_test]
-    uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
-    with:
-      timeout-minutes: 30
-    permissions:
-      security-events: write
+  # It is really a joke that a Microsoft backed tool does not support latest-and-greatest .NET versions
+  # codeql:
+  #   name: call-codeql
+  #   needs: [build, test_linux, test_windows, integration_test]
+  #   uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
+  #   with:
+  #     timeout-minutes: 30
+  #   permissions:
+  #     security-events: write
 
   deploy:
     if: github.event_name != 'pull_request'
     name: call-nuget
-    needs: [build, pack, test_linux, test_windows, integration_test, sonarcloud, codecov, codeql]
+    needs: [build, pack, test_linux, test_windows, integration_test, sonarcloud, codecov]
     uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v2
     with:
       version: ${{ needs.build.outputs.version }}

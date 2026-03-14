@@ -136,8 +136,11 @@ namespace Cuemon.Extensions.Reflection
             expected = 49;
 #endif
 
-#if NET11_0_OR_GREATER // apparently ms decided to remove GetHelpContext
-            expected = 39;
+#if NET11_0_OR_GREATER
+            if (OperatingSystem.IsLinux()) // apparently ms decided to remove GetHelpContext on linux
+            {
+                expected = 39;
+            }
 #endif
 
             TestOutput.WriteLines(methods);

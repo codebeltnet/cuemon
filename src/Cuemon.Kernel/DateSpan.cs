@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using Cuemon.Collections.Generic;
-using Cuemon.Security;
 
 namespace Cuemon
 {
@@ -15,8 +14,8 @@ namespace Cuemon
         private readonly DateTime _upper;
         private readonly Calendar _calendar;
         private readonly ulong _calendarId;
-        private static readonly ulong Hash = (ulong)new FowlerNollVo64().OffsetBasis;
-        private static readonly ulong Prime = (ulong)new FowlerNollVo64().Prime;
+        private const ulong Hash = 14695981039346656037;
+        private const ulong Prime = 1099511628211;
 
         /// <summary>
 		/// Initializes a new instance of the <see cref="DateSpan"/> structure with a default <see cref="DateTime"/> value set to <see cref="DateTime.Today"/>.

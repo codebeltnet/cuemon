@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 
 namespace Cuemon
@@ -13,11 +13,8 @@ namespace Cuemon
         /// </summary>
         /// <param name="start">The start of a time range.</param>
         /// <param name="end">The end of a time range.</param>
-        public TimeRange(TimeSpan start, TimeSpan end) : this(start, end, () => end.Subtract(start))
-        {
-        }
-
-        internal TimeRange(TimeSpan start, TimeSpan end, Func<TimeSpan> duration) : base(start, end, duration)
+        /// <param name="duration">A function delegate that returns the duration of the time range. If not provided, the duration is calculated as the difference between <paramref name="end"/> and <paramref name="start"/>.</param>
+        public TimeRange(TimeSpan start, TimeSpan end, Func<TimeSpan> duration = null) : base(start, end, duration ?? (() => end.Subtract(start)))
         {
         }
 

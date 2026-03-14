@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -78,8 +78,8 @@ namespace Cuemon.Data.Assets
                                                             ,[ModifiedDate])
                                                             VALUES
                                                             ({{reader.GetInt32(0)}},
-                                                            "{{reader.GetString(1)}}",
-                                                            "{{reader.GetString(2)}}",
+                                                            {{SqlString(reader.GetString(1))}},
+                                                            {{SqlString(reader.GetString(2))}},
                                                             {{reader.GetInt32(3)}},
                                                             {{reader.GetInt32(4)}},
                                                             {{StringOrNull(reader.GetString(5))}},
@@ -97,11 +97,11 @@ namespace Cuemon.Data.Assets
                                                             {{StringOrNull(reader.GetString(17))}},
                                                             {{(reader.GetString(18) == "NULL" ? "NULL" : reader.GetInt32(18))}},
                                                             {{(reader.GetString(19) == "NULL" ? "NULL" : reader.GetInt32(19))}},
-                                                            "{{reader.GetDateTime(20):O}}",
-                                                            {{(reader.GetString(21) == "NULL" ? "NULL" : string.Concat("\"", reader.GetDateTime(21).ToString("O"), "\""))}},
-                                                            {{(reader.GetString(22) == "NULL" ? "NULL" : string.Concat("\"", reader.GetDateTime(22).ToString("O"), "\""))}},
-                                                            "{{reader.GetString(23)}}",
-                                                            "{{reader.GetDateTime(24):O}}")
+                                                            {{SqlString(reader.GetDateTime(20).ToString("O"))}},
+                                                            {{(reader.GetString(21) == "NULL" ? "NULL" : SqlString(reader.GetDateTime(21).ToString("O")))}},
+                                                            {{(reader.GetString(22) == "NULL" ? "NULL" : SqlString(reader.GetDateTime(22).ToString("O")))}},
+                                                            {{SqlString(reader.GetString(23))}},
+                                                            {{SqlString(reader.GetDateTime(24).ToString("O"))}})
                                                             """);
 
                 try
@@ -119,7 +119,12 @@ namespace Cuemon.Data.Assets
         private static string StringOrNull(string value)
         {
             if (value == "NULL") { return "NULL"; }
-            return (value.StartsWith("\"") && value.EndsWith("\"")) ? $"{value}" : $"\"{value}\"";
+            return (value.StartsWith("\"") && value.EndsWith("\"")) ? SqlString(value.Substring(1, value.Length - 2)) : SqlString(value);
+        }
+
+        private static string SqlString(string value)
+        {
+            return $"'{value.Replace("'", "''")}'";
         }
     }
 }

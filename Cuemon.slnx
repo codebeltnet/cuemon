@@ -9,7 +9,6 @@
     <Project Path="src/Cuemon.AspNetCore.Razor.TagHelpers/Cuemon.AspNetCore.Razor.TagHelpers.csproj" />
     <Project Path="src/Cuemon.AspNetCore/Cuemon.AspNetCore.csproj" />
     <Project Path="src/Cuemon.Core.App/Cuemon.Core.App.csproj" />
-    <Project Path="src/Cuemon.Core/Cuemon.Core.csproj" />
     <Project Path="src/Cuemon.Data.Integrity/Cuemon.Data.Integrity.csproj" />
     <Project Path="src/Cuemon.Data.SqlClient/Cuemon.Data.SqlClient.csproj" />
     <Project Path="src/Cuemon.Data/Cuemon.Data.csproj" />
@@ -39,13 +38,16 @@
     <Project Path="src/Cuemon.Extensions.Threading/Cuemon.Extensions.Threading.csproj" />
     <Project Path="src/Cuemon.Extensions.Xml/Cuemon.Extensions.Xml.csproj" />
     <Project Path="src/Cuemon.IO/Cuemon.IO.csproj" />
-    <Project Path="src/Cuemon.Kernel/Cuemon.Kernel.csproj" Id="e8705265-1862-4d38-a41a-c94b3fcbc3f7" />
     <Project Path="src/Cuemon.Net/Cuemon.Net.csproj" />
     <Project Path="src/Cuemon.Resilience/Cuemon.Resilience.csproj" />
     <Project Path="src/Cuemon.Runtime.Caching/Cuemon.Runtime.Caching.csproj" />
     <Project Path="src/Cuemon.Security.Cryptography/Cuemon.Security.Cryptography.csproj" />
     <Project Path="src/Cuemon.Threading/Cuemon.Threading.csproj" />
     <Project Path="src/Cuemon.Xml/Cuemon.Xml.csproj" />
+  </Folder>
+  <Folder Name="/src/corelibs/">
+    <Project Path="src/Cuemon.Core/Cuemon.Core.csproj" />
+    <Project Path="src/Cuemon.Kernel/Cuemon.Kernel.csproj" Id="e8705265-1862-4d38-a41a-c94b3fcbc3f7" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/Cuemon.AspNetCore.Authentication.Tests/Cuemon.AspNetCore.Authentication.Tests.csproj" />

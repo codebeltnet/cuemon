@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -134,6 +134,10 @@ namespace Cuemon.Extensions.Reflection
 
 #if NET48_OR_GREATER
             expected = 49;
+#endif
+
+#if NET11_0_OR_GREATER // apparently ms decided to remove GetHelpContext
+            expected = 39;
 #endif
 
             TestOutput.WriteLines(methods);

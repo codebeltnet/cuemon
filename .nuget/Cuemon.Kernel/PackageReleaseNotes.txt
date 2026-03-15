@@ -2,7 +2,61 @@ Version: 11.0.0
 Availability: .NET 11, .NET 10 and .NET Standard 2.0
 
 # ALM
+- ADDED Support for TFM .NET 11 (LTS)
+- REMOVED Support for TFM .NET 9 (STS)
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+# Moved from Cuemon.Core
+- ADDED Arguments class to the Cuemon.Collections.Generic namespace
+- ADDED IParameterObject interface to the Cuemon.Configuration namespace
+- ADDED IPostConfigurableParameterObject interface to the Cuemon.Configuration namespace
+- ADDED IValidatableParameterObject interface to the Cuemon.Configuration namespace
+- ADDED StreamDecoratorExtensions class to the Cuemon.IO namespace
+- ADDED CallerArgumentExpressionAttribute class to the Cuemon.Runtime.CompilerServices namespace
+- ADDED ByteOrderMark class to the Cuemon.Text namespace
+- ADDED EncodingOptions class to the Cuemon.Text namespace
+- ADDED EnumStringOptions class to the Cuemon.Text namespace
+- ADDED FallbackEncodingOptions class to the Cuemon.Text namespace
+- ADDED IConfigurableParser interface to the Cuemon.Text namespace
+- ADDED IEncodingOptions interface to the Cuemon.Text namespace
+- ADDED IParser interface to the Cuemon.Text namespace
+- ADDED PreambleSequence class to the Cuemon.Text namespace
+- ADDED ProtocolRelativeUriStringOptions class to the Cuemon.Text namespace
+- ADDED UriStringOptions class to the Cuemon.Text namespace
+- ADDED AsyncOptions class to the Cuemon.Threading namespace
+- ADDED AsyncRunOptions class to the Cuemon.Threading namespace
+- ADDED Awaiter class to the Cuemon.Threading namespace
+- ADDED IAsyncOptions interface to the Cuemon.Threading namespace
+- ADDED Alphanumeric class to the Cuemon namespace
+- ADDED ArgumentReservedKeywordException class to the Cuemon namespace
+- ADDED CasingMethod enum to the Cuemon namespace
+- ADDED Condition class to the Cuemon namespace
+- ADDED ConditionalValue class to the Cuemon namespace
+- ADDED Convertible class to the Cuemon namespace
+- ADDED ConvertibleConverterDictionary class to the Cuemon namespace
+- ADDED ConvertibleOptions class to the Cuemon namespace
+- ADDED DateSpan struct to the Cuemon namespace
+- ADDED DateTimeRange class to the Cuemon namespace
+- ADDED Decorator class to the Cuemon namespace
+- ADDED Disposable class to the Cuemon namespace
+- ADDED DisposableOptions class to the Cuemon namespace
+- ADDED Endianness enum to the Cuemon namespace
+- ADDED EndianOptions class to the Cuemon namespace
+- ADDED ExceptionCondition class to the Cuemon namespace
+- ADDED FinalizeDisposable class to the Cuemon namespace
+- ADDED GuidFormats enum to the Cuemon namespace
+- ADDED IDecorator interface to the Cuemon namespace
+- ADDED Patterns class to the Cuemon namespace
+- ADDED Range class to the Cuemon namespace
+- ADDED SuccessfulValue class to the Cuemon namespace
+- ADDED TesterFunc delegate to the Cuemon namespace
+- ADDED TimeRange class to the Cuemon namespace
+- ADDED TimeUnit enum to the Cuemon namespace
+- ADDED TypeArgumentException class to the Cuemon namespace
+- ADDED TypeArgumentOutOfRangeException class to the Cuemon namespace
+- ADDED UnsuccessfulValue class to the Cuemon namespace
+- ADDED UriScheme enum to the Cuemon namespace
+- ADDED Validator class to the Cuemon namespace
 
 Version: 10.5.0
 Availability: .NET 10, .NET 9 and .NET Standard 2.0

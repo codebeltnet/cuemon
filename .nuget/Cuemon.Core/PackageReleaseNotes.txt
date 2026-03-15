@@ -2,7 +2,61 @@ Version: 11.0.0
 Availability: .NET 11, .NET 10 and .NET Standard 2.0
 
 # ALM
+- ADDED Support for TFM .NET 11 (LTS)
+- REMOVED Support for TFM .NET 9 (LTS)
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+# Breaking Changes
+- REMOVED Arguments class from the Cuemon.Collections.Generic namespace
+- REMOVED IParameterObject interface from the Cuemon.Configuration namespace
+- REMOVED IPostConfigurableParameterObject interface from the Cuemon.Configuration namespace
+- REMOVED IValidatableParameterObject interface from the Cuemon.Configuration namespace
+- REMOVED StreamDecoratorExtensions class from the Cuemon.IO namespace
+- REMOVED CallerArgumentExpressionAttribute class from the Cuemon.Runtime.CompilerServices namespace
+- REMOVED ByteOrderMark class from the Cuemon.Text namespace
+- REMOVED EncodingOptions class from the Cuemon.Text namespace
+- REMOVED EnumStringOptions class from the Cuemon.Text namespace
+- REMOVED FallbackEncodingOptions class from the Cuemon.Text namespace
+- REMOVED IConfigurableParser interface from the Cuemon.Text namespace
+- REMOVED IEncodingOptions interface from the Cuemon.Text namespace
+- REMOVED IParser interface from the Cuemon.Text namespace
+- REMOVED PreambleSequence class from the Cuemon.Text namespace
+- REMOVED ProtocolRelativeUriStringOptions class from the Cuemon.Text namespace
+- REMOVED UriStringOptions class from the Cuemon.Text namespace
+- REMOVED AsyncOptions class from the Cuemon.Threading namespace
+- REMOVED AsyncRunOptions class from the Cuemon.Threading namespace
+- REMOVED Awaiter class from the Cuemon.Threading namespace
+- REMOVED IAsyncOptions interface from the Cuemon.Threading namespace
+- REMOVED Alphanumeric class from the Cuemon namespace
+- REMOVED ArgumentReservedKeywordException class from the Cuemon namespace
+- REMOVED CasingMethod enum from the Cuemon namespace
+- REMOVED Condition class from the Cuemon namespace
+- REMOVED ConditionalValue class from the Cuemon namespace
+- REMOVED Convertible class from the Cuemon namespace
+- REMOVED ConvertibleConverterDictionary class from the Cuemon namespace
+- REMOVED ConvertibleOptions class from the Cuemon namespace
+- REMOVED DateSpan struct from the Cuemon namespace
+- REMOVED DateTimeRange class from the Cuemon namespace
+- REMOVED Decorator class from the Cuemon namespace
+- REMOVED Disposable class from the Cuemon namespace
+- REMOVED DisposableOptions class from the Cuemon namespace
+- REMOVED Endianness enum from the Cuemon namespace
+- REMOVED EndianOptions class from the Cuemon namespace
+- REMOVED ExceptionCondition class from the Cuemon namespace
+- REMOVED FinalizeDisposable class from the Cuemon namespace
+- REMOVED GuidFormats enum from the Cuemon namespace
+- REMOVED IDecorator interface from the Cuemon namespace
+- REMOVED Patterns class from the Cuemon namespace
+- REMOVED Range class from the Cuemon namespace
+- REMOVED SuccessfulValue class from the Cuemon namespace
+- REMOVED TesterFunc delegate from the Cuemon namespace
+- REMOVED TimeRange class from the Cuemon namespace
+- REMOVED TimeUnit enum from the Cuemon namespace
+- REMOVED TypeArgumentException class from the Cuemon namespace
+- REMOVED TypeArgumentOutOfRangeException class from the Cuemon namespace
+- REMOVED UnsuccessfulValue class from the Cuemon namespace
+- REMOVED UriScheme enum from the Cuemon namespace
+- REMOVED Validator class from the Cuemon namespace
 
 Version: 10.5.0
 Availability: .NET 10, .NET 9 and .NET Standard 2.0

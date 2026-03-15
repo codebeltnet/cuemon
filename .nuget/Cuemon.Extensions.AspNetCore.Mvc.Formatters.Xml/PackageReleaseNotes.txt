@@ -2,6 +2,8 @@ Version: 11.0.0
 Availability: .NET 11 and .NET 10
 
 # ALM
+- ADDED Support for TFM .NET 11 (LTS)
+- REMOVED Support for TFM .NET 9 (STS)
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
 
 Version: 10.5.0

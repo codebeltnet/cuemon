@@ -8,6 +8,8 @@ Availability: .NET 11, .NET 10 and .NET Standard 2.0
 
 # Moved from Cuemon.Core
 - ADDED Arguments class to the Cuemon.Collections.Generic namespace
+- ADDED Configurable class to the Cuemon.Configuration namespace
+- ADDED IConfigurable interface to the Cuemon.Configuration namespace
 - ADDED IParameterObject interface to the Cuemon.Configuration namespace
 - ADDED IPostConfigurableParameterObject interface to the Cuemon.Configuration namespace
 - ADDED IValidatableParameterObject interface to the Cuemon.Configuration namespace

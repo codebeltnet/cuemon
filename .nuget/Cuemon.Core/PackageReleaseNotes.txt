@@ -58,6 +58,12 @@ Availability: .NET 11, .NET 10 and .NET Standard 2.0
 - REMOVED UriScheme enum from the Cuemon namespace
 - REMOVED Validator class from the Cuemon namespace
 
+Version: 10.5.1
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
 Version: 10.5.0
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

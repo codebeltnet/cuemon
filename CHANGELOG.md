@@ -8,21 +8,28 @@ For more details, please refer to `PackageReleaseNotes.txt` on a per assembly ba
 
 ## [11.0.0] - 2026-03-14
 
-This is a major release centered on two deliberate changes: moving the Cuemon build and test matrix forward to .NET 11, and removing the temporary compatibility bridge that kept `Cuemon.Core` forwarding foundational APIs from `Cuemon.Kernel`.
+This is a major release centered on three deliberate changes: moving the Cuemon build and test matrix forward to .NET 11, completing the assembly boundary split by removing the compatibility bridge from `Cuemon.Core` to `Cuemon.Kernel`, and relocating configuration primitives (`Configurable` and `IConfigurable`) into the kernel layer. Additionally, comprehensive unit test coverage was added for XML serialization converters.
 
-The .NET update is straightforward: `net11.0` is now part of the target matrix and `net9.0` is no longer supported. The more important part is the assembly boundary change. Version 10.5.0 introduced `Cuemon.Kernel` while keeping `Cuemon.Core` backward compatible through `[TypeForwardedTo]`. Starting with 11.0.0, that forwarding layer is removed.
+The .NET update is straightforward: `net11.0` is now part of the target matrix and `net9.0` is no longer supported. The more important part is the assembly boundary change. Version 10.5.0 introduced `Cuemon.Kernel` while keeping `Cuemon.Core` backward compatible through `[TypeForwardedTo]`. Starting with 11.0.0, that forwarding layer is removed and configuration types join the kernel layer.
 
 > [!WARNING]
-> Breaking change from 11.0.0 and forward: applications using foundational APIs that were previously reachable through `Cuemon.Core` must now reference `Cuemon.Kernel` directly. This includes guard/configuration/async/text primitives such as `Validator`, `Arguments`, `Patterns`, `Disposable`, `Convertible`, `Awaiter`, parser and encoding option types, as well as date and range primitives such as `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, and `TimeUnit`.
+> Breaking change from 11.0.0 and forward: applications using foundational APIs that were previously reachable through `Cuemon.Core` must now reference `Cuemon.Kernel` directly. This includes guard, configuration, async, and text primitives such as `Validator`, `Arguments`, `Patterns`, `Disposable`, `Convertible`, `Configurable`, `IConfigurable`, `Awaiter`, and parser/encoding option types, as well as date and range primitives such as `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, and `TimeUnit`.
 
 ### Changed
 
 - Solution, source, test, and benchmark target frameworks now include `net11.0`; `net9.0` has been removed from the supported matrix.
 - Central package management was updated to align `net11.0` and `netstandard2.0` builds with .NET 11 preview package versions, while `net10.0` remains on the .NET 10 package line where applicable.
 - `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, and `TimeUnit` source files now live in `Cuemon.Kernel` as part of the completed kernel split.
+- `Configurable` and `IConfigurable` types now reside in `Cuemon.Kernel`; `Cuemon.Core` maintains backward compatibility through type forwarding.
 - `BufferWriterOptions` was updated to follow the new `NET10_0_OR_GREATER` conditional path.
 - Solution organization now groups `Cuemon.Core` and `Cuemon.Kernel` under a dedicated `/src/corelibs/` folder.
 - Test environment definitions now target Docker images for `net10` and `net11`.
+- `XmlConverterDecoratorExtensions` class in the Cuemon.Extensions.Xml.Serialization.Converters namespace was simplified for improved maintainability.
+
+### Added
+
+- Comprehensive unit test suite for XML serialization in `Cuemon.Xml.Tests` covering `XmlConverter`, `DefaultXmlConverter`, `ExceptionConverter`, `FailureConverter`, `DynamicXmlConverter`, and related serializer functionality,
+- Test assets `LinkResponse` and `WrapperResponse` in `Cuemon.Xml.Tests` for XML serialization validation.
 
 ### Removed
 
@@ -1753,6 +1760,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[11.0.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.1...v11.0.0
 [10.5.1]: https://github.com/codebeltnet/cuemon/compare/v10.5.0...v10.5.1
 [10.5.0]: https://github.com/codebeltnet/cuemon/compare/v10.4.0...v10.5.0
 [10.4.0]: https://github.com/codebeltnet/cuemon/compare/v10.3.0...v10.4.0

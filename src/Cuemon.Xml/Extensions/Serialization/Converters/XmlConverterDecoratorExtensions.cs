@@ -138,16 +138,14 @@ namespace Cuemon.Xml.Serialization.Converters
                     }
                     else
                     {
-                        var isDocumentRoot = w.WriteState == WriteState.Start;
-                        if (isDocumentRoot) { w.WriteStartElement(q.Prefix, q.LocalName, q.Namespace); }
-                        var qe = new XmlQualifiedEntity(q.Prefix, q.LocalName, q.Namespace);
+                        w.WriteStartElement(q.Prefix, q.LocalName, q.Namespace);
                         foreach (var item in o)
                         {
                             if (item == null) { continue; }
                             var itemType = item.GetType();
                             if (Decorator.Enclose(itemType).IsComplex())
                             {
-                                Decorator.Enclose(w).WriteObject(item, itemType, opts => opts.Settings.RootName = qe);
+                                Decorator.Enclose(w).WriteObject(item, itemType);
                             }
                             else
                             {
@@ -156,7 +154,7 @@ namespace Cuemon.Xml.Serialization.Converters
                                 w.WriteEndElement();
                             }
                         }
-                        if (isDocumentRoot) { w.WriteEndElement(); }
+                        w.WriteEndElement();
                     }
                 }
                 else

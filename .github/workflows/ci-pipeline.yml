@@ -17,6 +17,28 @@ permissions:
   contents: read
 
 jobs:
+  init:
+    name: initialize
+    runs-on: ubuntu-24.04
+    outputs:
+      run-privileged-jobs: ${{ steps.vars.outputs.run-privileged-jobs }}
+      strong-name-key-filename: ${{ steps.vars.outputs.strong-name-key-filename }}
+      build-switches: ${{ steps.vars.outputs.build-switches }}
+    steps:
+      - id: vars
+        name: calculate workflow variables
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
+            echo "run-privileged-jobs=false" >> "$GITHUB_OUTPUT"
+            echo "strong-name-key-filename=" >> "$GITHUB_OUTPUT"
+            echo "build-switches=-p:SkipSignAssembly=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run-privileged-jobs=true" >> "$GITHUB_OUTPUT"
+            echo "strong-name-key-filename=cuemon.snk" >> "$GITHUB_OUTPUT"
+            echo "build-switches=" >> "$GITHUB_OUTPUT"
+          fi
+
   prepare_test:
     name: 📜 Prepare Test
     runs-on: ubuntu-24.04
@@ -40,6 +62,7 @@ jobs:
 
   build:
     name: call-build
+    needs: [init]
     strategy:
       matrix:
         arch: [X64, ARM64]
@@ -47,7 +70,8 @@ jobs:
     uses: codebeltnet/jobs-dotnet-build/.github/workflows/default.yml@v3
     with:
       configuration: ${{ matrix.configuration }}
-      strong-name-key-filename: cuemon.snk
+      strong-name-key-filename: ${{ needs.init.outputs.strong-name-key-filename }}
+      build-switches: ${{ needs.init.outputs.build-switches }}
       runs-on: ${{ matrix.arch == 'ARM64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
       upload-build-artifact-name: build-${{ matrix.configuration }}-${{ matrix.arch }}
     secrets:
@@ -80,6 +104,7 @@ jobs:
     with:
       runs-on: ${{ matrix.arch == 'ARM64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
       configuration: ${{ matrix.configuration }}
+      build-switches: -p:SkipSignAssembly=true
       projects: ${{ matrix.project }}
       build: true # we need to build due to xUnitv3
       restore: true # we need to restore since we disabled caching
@@ -98,6 +123,7 @@ jobs:
     with:
       runs-on: ${{ matrix.arch == 'ARM64' && 'windows-11-arm' || 'windows-2025' }}
       configuration: ${{ matrix.configuration }}
+      build-switches: -p:SkipSignAssembly=true
       projects: ${{ matrix.project }}
       test-arguments: -- RunConfiguration.DisableAppDomain=true
       build: true # we need to build for .net48
@@ -105,8 +131,9 @@ jobs:
       download-pattern: build-${{ matrix.configuration }}-${{ matrix.arch }}
 
   integration_test:
+    if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
     name: ⚗️ Integration Test
-    needs: [build]
+    needs: [init, build]
     strategy:
       fail-fast: false
       matrix:
@@ -244,8 +271,9 @@ jobs:
           command: down
 
   sonarcloud:
+    if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
     name: call-sonarcloud
-    needs: [build, test_linux, test_windows, integration_test]
+    needs: [init, build, test_linux, test_windows, integration_test]
     uses: codebeltnet/jobs-sonarcloud/.github/workflows/default.yml@v3
     with:
       organization: geekle
@@ -255,8 +283,9 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   codecov:
+    if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
     name: call-codecov
-    needs: [build, test_linux, test_windows, integration_test]
+    needs: [init, build, test_linux, test_windows, integration_test]
     uses: codebeltnet/jobs-codecov/.github/workflows/default.yml@v1
     with:
       repository: codebeltnet/cuemon
@@ -264,8 +293,9 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   codeql:
+    if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
     name: call-codeql
-    needs: [build, test_linux, test_windows, integration_test]
+    needs: [init, build, test_linux, test_windows, integration_test]
     uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
     with:
       timeout-minutes: 30

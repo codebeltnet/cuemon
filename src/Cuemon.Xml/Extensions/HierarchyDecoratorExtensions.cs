@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -124,7 +124,9 @@ namespace Cuemon.Xml
         /// <returns><c>true</c> if underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/> contains an <see cref="XmlRootAttribute"/>, <c>false</c> otherwise.</returns>
         public static bool TryGetXmlRootAttribute(this IDecorator<IHierarchy<object>> decorator, out XmlRootAttribute xmlAttribute)
         {
-            xmlAttribute = decorator.Inner.HasMemberReference ? decorator.Inner.MemberReference.GetCustomAttribute<XmlRootAttribute>(true) : null;
+            xmlAttribute = decorator.Inner.HasMemberReference
+                ? decorator.Inner.MemberReference.GetCustomAttribute<XmlRootAttribute>(true)
+                : decorator.Inner.InstanceType.GetCustomAttribute<XmlRootAttribute>(true);
             return xmlAttribute != null;
         }
 

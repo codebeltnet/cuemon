@@ -198,6 +198,33 @@ namespace Cuemon.Xml.Serialization.Formatters
         }
 
         [Fact]
+        public void Serialize_ShouldProduce_PascalCase_Structure_ForWrapperResponse()
+        {
+            var wrapper = new WrapperResponse();
+
+            var sut = new XmlFormatter(o =>
+            {
+                o.Settings.Writer.Indent = true;
+                o.Settings.FlattenCollectionItems = true;
+            });
+            var result = sut.Serialize(wrapper);
+            var x = new XmlDocument();
+            x.Load(result);
+
+            TestOutput.WriteLine(Decorator.Enclose(result).ToEncodedString());
+
+            Assert.Equal("WrapperResponse", x.DocumentElement.Name);
+            Assert.Contains("<Links>", x.OuterXml);
+            Assert.Contains("<Link>", x.OuterXml);
+            Assert.Contains("<Href>https://example.com</Href>", x.OuterXml);
+            Assert.Contains("<Rel>self</Rel>", x.OuterXml);
+            Assert.Contains("<Href>https://example.com/other</Href>", x.OuterXml);
+            Assert.Contains("<Rel>related</Rel>", x.OuterXml);
+
+            result.Dispose();
+        }
+
+        [Fact]
         public void Serialize_ShouldSerializeUsingEnumerableConverter_DictionaryProperty()
         {
             var sut1 = new RegionStats

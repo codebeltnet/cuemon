@@ -32,18 +32,18 @@ namespace Cuemon.Reflection
 
             var allTypes = Decorator.Enclose(a).GetTypes();
             var disposableTypes = Decorator.Enclose(a).GetTypes(typeFilter: typeof(Disposable));
-            var configurationTypes = Decorator.Enclose(a).GetTypes($"{nameof(Cuemon)}.{nameof(Configuration)}");
+            var threadingTypes = Decorator.Enclose(a).GetTypes($"{nameof(Cuemon)}.{nameof(Threading)}");
 
             var allTypesCount = Decorator.Enclose(allTypes).Inner.Count();
             var disposableTypesCount = Decorator.Enclose(disposableTypes).Inner.Count();
-            var configurationTypesCount = Decorator.Enclose(configurationTypes).Inner.Count();
+            var configurationTypesCount = Decorator.Enclose(threadingTypes).Inner.Count();
 
             TestOutput.WriteLine(disposableTypes.ToDelimitedString());
-            TestOutput.WriteLine(configurationTypes.ToDelimitedString());
+            TestOutput.WriteLine(threadingTypes.ToDelimitedString());
 
             Assert.InRange(allTypesCount, 250, 300); // range because of tooling on CI adding dynamic types and high range of refactoring
             Assert.Equal(3, disposableTypesCount);
-            Assert.Equal(2, configurationTypesCount);
+            Assert.Equal(4, configurationTypesCount);
         }
 
         [Fact]

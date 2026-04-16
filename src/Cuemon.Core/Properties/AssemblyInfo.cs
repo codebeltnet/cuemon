@@ -79,6 +79,8 @@ using Cuemon.Threading;
 [assembly: TypeForwardedTo(typeof(UriScheme))]
 [assembly: TypeForwardedTo(typeof(UriStringOptions))]
 [assembly: TypeForwardedTo(typeof(Validator))]
+[assembly: TypeForwardedTo(typeof(IConfigurable<>))]
+[assembly: TypeForwardedTo(typeof(Configurable<>))]
 #if !NETCOREAPP3_0_OR_GREATER
 [assembly: TypeForwardedTo(typeof(CallerArgumentExpressionAttribute))]
 #endif

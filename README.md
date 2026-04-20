@@ -11,6 +11,10 @@ Your versatile companion for:
 
 It is (by heart) free, flexible and built to extend and boost your agile codebelt.
 
+> [!IMPORTANT]
+> **Cuemon is the core foundation of the Codebelt ecosystem.**  
+> It provides the fundamental abstractions, utilities, and patterns upon which the entire Codebelt stack is built.
+
 ## State of the Union
 
 Cuemon for .NET (formerly Cuemon .NET Standard) has been completely refactored and updated to support .NET 10 (LTS) and .NET 9 (STS).

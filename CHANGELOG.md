@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.5.2] - 2026-05-18
+
+This is a service update that focuses on package dependencies.
+
+### Changed
+
+- Codebelt.Extensions.BenchmarkDotNet.Console updated from 1.2.5 to 1.2.6,
+- Codebelt.Extensions.Xunit and related testing packages (Xunit, Xunit.Hosting, Xunit.Hosting.AspNetCore) updated from 11.0.8 to 11.0.9,
+- Microsoft.NET.Test.Sdk updated from 18.4.0 to 18.5.1,
+- coverlet test instrumentation packages (collector and msbuild) updated from 8.0.1 to 10.0.1,
+- Microsoft.Data.Sqlite updated to latest compatible versions (10.0.6 → 10.0.8 for .NET Standard 2.0 and .NET 10, 9.0.15 → 9.0.16 for .NET 9),
+- Microsoft.Extensions packages (Configuration, DependencyInjection, Hosting, Http, Options.ConfigurationExtensions) updated to latest compatible versions (10.0.6 → 10.0.8 for .NET Standard 2.0 and .NET 10, 9.0.15 → 9.0.16 for .NET 9),
+- Microsoft.Data.SqlClient updated from 7.0.0 to 7.0.1 for .NET 9 and .NET 10,
+- System.Text.Json updated from 10.0.6 to 10.0.8 for .NET Standard 2.0,
+- Microsoft.Bcl.AsyncInterfaces updated from 10.0.6 to 10.0.8 for .NET Standard 2.0,
+- jobs-nuget-push GitHub Actions workflow updated from v2 to v3,
+- NGINX container base image updated from 1.30.0-alpine to 1.31.0-alpine in DocFX Dockerfile,
+- Ubuntu test runner Docker images pinned to specific patch versions (9 → 9.0.314, 10 → 10.0.300) for reproducible test environments.
+
 ## [10.5.1] - 2026-04-16
 
 This is a patch release focused on kernel assembly refinement, XML serialization reliability, and comprehensive test coverage expansion. The release relocates foundational configuration types into the kernel layer while maintaining full backward compatibility through type forwarding.
@@ -1730,6 +1749,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.5.2]: https://github.com/codebeltnet/cuemon/compare/v10.5.1...v10.5.2
 [10.5.1]: https://github.com/codebeltnet/cuemon/compare/v10.5.0...v10.5.1
 [10.5.0]: https://github.com/codebeltnet/cuemon/compare/v10.4.0...v10.5.0
 [10.4.0]: https://github.com/codebeltnet/cuemon/compare/v10.3.0...v10.4.0

@@ -9,12 +9,12 @@
         {
             "name": "Docker-Ubuntu (net9)",
             "type": "docker",
-            "dockerImage": "codebeltnet/ubuntu-testrunner:9"
+            "dockerImage": "codebeltnet/ubuntu-testrunner:9.0.314"
         },
         {
             "name": "Docker-Ubuntu (net10)",
             "type": "docker",
-            "dockerImage": "codebeltnet/ubuntu-testrunner:10"
+            "dockerImage": "codebeltnet/ubuntu-testrunner:10.0.300"
         }
     ]
 }

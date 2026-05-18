@@ -55,6 +55,44 @@ This is a patch release focused on kernel assembly refinement, XML serialization
 
 - `DefaultXmlConverter` class in the `Cuemon.Xml.Serialization.Converters` namespace to add `XmlRootAttribute` fallback when `MemberReference` is null, improving robustness in edge-case serialization scenarios.
 
+## [10.5.2] - 2026-05-18
+
+This is a service update that focuses on package dependencies.
+
+### Changed
+
+- Codebelt.Extensions.BenchmarkDotNet.Console updated from 1.2.5 to 1.2.6,
+- Codebelt.Extensions.Xunit and related testing packages (Xunit, Xunit.Hosting, Xunit.Hosting.AspNetCore) updated from 11.0.8 to 11.0.9,
+- Microsoft.NET.Test.Sdk updated from 18.4.0 to 18.5.1,
+- coverlet test instrumentation packages (collector and msbuild) updated from 8.0.1 to 10.0.1,
+- Microsoft.Data.Sqlite updated to latest compatible versions (10.0.6 → 10.0.8 for .NET Standard 2.0 and .NET 10, 9.0.15 → 9.0.16 for .NET 9),
+- Microsoft.Extensions packages (Configuration, DependencyInjection, Hosting, Http, Options.ConfigurationExtensions) updated to latest compatible versions (10.0.6 → 10.0.8 for .NET Standard 2.0 and .NET 10, 9.0.15 → 9.0.16 for .NET 9),
+- Microsoft.Data.SqlClient updated from 7.0.0 to 7.0.1 for .NET 9 and .NET 10,
+- System.Text.Json updated from 10.0.6 to 10.0.8 for .NET Standard 2.0,
+- Microsoft.Bcl.AsyncInterfaces updated from 10.0.6 to 10.0.8 for .NET Standard 2.0,
+- jobs-nuget-push GitHub Actions workflow updated from v2 to v3,
+- NGINX container base image updated from 1.30.0-alpine to 1.31.0-alpine in DocFX Dockerfile,
+- Ubuntu test runner Docker images pinned to specific patch versions (9 → 9.0.314, 10 → 10.0.300) for reproducible test environments.
+
+## [10.5.1] - 2026-04-16
+
+This is a patch release focused on kernel assembly refinement, XML serialization reliability, and comprehensive test coverage expansion. The release relocates foundational configuration types into the kernel layer while maintaining full backward compatibility through type forwarding.
+
+### Changed
+
+- `IConfigurable` and `Configurable` types relocated from `Cuemon.Core` to `Cuemon.Kernel` for improved architectural layering; `Cuemon.Core` maintains backward compatibility through `[TypeForwardedTo]` attributes,
+- `XmlConverterDecoratorExtensions` class in the Cuemon.Extensions.Xml.Serialization.Converters namespace with simplified collection writing logic for improved maintainability,
+- All package dependencies updated to latest compatible versions.
+
+### Added
+
+- Comprehensive unit tests for XML serialization converters in `Cuemon.Xml.Tests` covering `XmlConverter`, `DefaultXmlConverter`, `ExceptionConverter`, `FailureConverter`, `DynamicXmlConverter`, and related functionality,
+- Test assets `LinkResponse` and `WrapperResponse` in `Cuemon.Xml.Tests` for XML serialization validation.
+
+### Fixed
+
+- `DefaultXmlConverter` class in the `Cuemon.Xml.Serialization.Converters` namespace to add `XmlRootAttribute` fallback when `MemberReference` is null, improving robustness in edge-case serialization scenarios.
+
 ## [10.5.0] - 2026-03-13
 
 Okay, so this might look like a major release — and effort-wise it certainly felt like one — but it's actually a fully backward-compatible minor bump. Thanks to a helping hand from AI and a long-standing wish to carve out a small, lean core from Cuemon, we've introduced a brand-new assembly: **Cuemon.Kernel**. Think of it as the nano (or at least noticeably smaller) sibling of `Cuemon.Core`, shipping only the most essential and much-loved types — validators, conditions, decorators, disposable patterns, the options/parameter-object infrastructure, text encoding helpers and async primitives.
@@ -1761,6 +1799,18 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
 [11.0.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.1...v11.0.0
+[10.5.1]: https://github.com/codebeltnet/cuemon/compare/v10.5.0...v10.5.1
+[10.5.0]: https://github.com/codebeltnet/cuemon/compare/v10.4.0...v10.5.0
+[10.4.0]: https://github.com/codebeltnet/cuemon/compare/v10.3.0...v10.4.0
+[10.3.0]: https://github.com/codebeltnet/cuemon/compare/v10.2.1...v10.3.0
+[10.2.1]: https://github.com/codebeltnet/cuemon/compare/v10.2.0...v10.2.1
+[10.2.0]: https://github.com/codebeltnet/cuemon/compare/v10.1.2...v10.2.0
+[10.1.2]: https://github.com/codebeltnet/cuemon/compare/v10.1.1...v10.1.2
+[10.1.1]: https://github.com/codebeltnet/cuemon/compare/v10.1.0...v10.1.1
+[10.1.0]: https://github.com/codebeltnet/cuemon/compare/v10.0.0...v10.1.0
+[10.0.0]: https://github.com/codebeltnet/cuemon/releases/tag/v10.0.0
+
+[10.5.2]: https://github.com/codebeltnet/cuemon/compare/v10.5.1...v10.5.2
 [10.5.1]: https://github.com/codebeltnet/cuemon/compare/v10.5.0...v10.5.1
 [10.5.0]: https://github.com/codebeltnet/cuemon/compare/v10.4.0...v10.5.0
 [10.4.0]: https://github.com/codebeltnet/cuemon/compare/v10.3.0...v10.4.0

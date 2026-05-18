@@ -7,6 +7,15 @@ Availability: .NET 11, .NET 10, .NET Standard 2.1 and .NET Standard 2.0
 Version: 10.5.1
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 
+Version: 10.5.2
+Availability: .NET 10, .NET 9, .NET Standard 2.1 and .NET Standard 2.0
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+Version: 10.5.1
+Availability: .NET 10, .NET 9, .NET Standard 2.1 and .NET Standard 2.0
+
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
 

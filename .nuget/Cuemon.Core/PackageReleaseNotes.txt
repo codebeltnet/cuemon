@@ -60,7 +60,6 @@ Availability: .NET 11, .NET 10 and .NET Standard 2.0
 - REMOVED UriScheme enum from the Cuemon namespace
 - REMOVED Validator class from the Cuemon namespace
 
-
 Version: 10.5.2
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

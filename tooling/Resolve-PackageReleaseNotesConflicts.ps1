@@ -26,7 +26,7 @@ foreach ($file in $files) {
     $content = Get-Content $file -Raw
     $resolved = $content `
         -replace '(?m)^<<<<<<< .+\r?\n', '' `
-        -replace '(?m)^=======\r?\n', '' `
+        -replace '(?m)^=======\r?\n', "`n" `
         -replace '(?m)^>>>>>>> .+\r?\n', ''
     [System.IO.File]::WriteAllText((Resolve-Path $file), $resolved)
     git add $file

@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
-## [11.0.0] - 2026-04-17 (11.0.0-preview.3)
+## [11.0.0] - 2026-05-18 (11.0.0-preview.4)
 
 This is a major release centered on three deliberate changes: moving the Cuemon build and test matrix forward to .NET 11, completing the assembly boundary split by removing the compatibility bridge from `Cuemon.Core` to `Cuemon.Kernel`, and relocating configuration primitives (`Configurable` and `IConfigurable`) into the kernel layer. Additionally, comprehensive unit test coverage was added for XML serialization converters.
 
@@ -35,25 +35,10 @@ The .NET update is straightforward: `net11.0` is now part of the target matrix a
 
 - `Cuemon.Core` no longer uses `[TypeForwardedTo]` to forward foundational `Cuemon.Kernel` types, making the kernel split a true assembly boundary instead of a compatibility shim.
 
-
-## [10.5.1] - 2026-04-16
-
-This is a patch release focused on kernel assembly refinement, XML serialization reliability, and comprehensive test coverage expansion. The release relocates foundational configuration types into the kernel layer while maintaining full backward compatibility through type forwarding.
-
-### Changed
-
-- `IConfigurable` and `Configurable` types relocated from `Cuemon.Core` to `Cuemon.Kernel` for improved architectural layering; `Cuemon.Core` maintains backward compatibility through `[TypeForwardedTo]` attributes,
-- `XmlConverterDecoratorExtensions` class in the Cuemon.Extensions.Xml.Serialization.Converters namespace with simplified collection writing logic for improved maintainability,
-- All package dependencies updated to latest compatible versions.
-
-### Added
-
-- Comprehensive unit tests for XML serialization converters in `Cuemon.Xml.Tests` covering `XmlConverter`, `DefaultXmlConverter`, `ExceptionConverter`, `FailureConverter`, `DynamicXmlConverter`, and related functionality,
-- Test assets `LinkResponse` and `WrapperResponse` in `Cuemon.Xml.Tests` for XML serialization validation.
-
 ### Fixed
 
-- `DefaultXmlConverter` class in the `Cuemon.Xml.Serialization.Converters` namespace to add `XmlRootAttribute` fallback when `MemberReference` is null, improving robustness in edge-case serialization scenarios.
+- `Resolve-PackageReleaseNotesConflicts.ps1` script improved to correctly handle and resolve merge conflict markers in all PackageReleaseNotes.txt files with more robust regex pattern matching,
+- Merge conflict resolution output cleaned up to remove spurious double line breaks and duplicate version entries.
 
 ## [10.5.2] - 2026-05-18
 
@@ -1798,18 +1783,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
-[11.0.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.1...v11.0.0
-[10.5.1]: https://github.com/codebeltnet/cuemon/compare/v10.5.0...v10.5.1
-[10.5.0]: https://github.com/codebeltnet/cuemon/compare/v10.4.0...v10.5.0
-[10.4.0]: https://github.com/codebeltnet/cuemon/compare/v10.3.0...v10.4.0
-[10.3.0]: https://github.com/codebeltnet/cuemon/compare/v10.2.1...v10.3.0
-[10.2.1]: https://github.com/codebeltnet/cuemon/compare/v10.2.0...v10.2.1
-[10.2.0]: https://github.com/codebeltnet/cuemon/compare/v10.1.2...v10.2.0
-[10.1.2]: https://github.com/codebeltnet/cuemon/compare/v10.1.1...v10.1.2
-[10.1.1]: https://github.com/codebeltnet/cuemon/compare/v10.1.0...v10.1.1
-[10.1.0]: https://github.com/codebeltnet/cuemon/compare/v10.0.0...v10.1.0
-[10.0.0]: https://github.com/codebeltnet/cuemon/releases/tag/v10.0.0
-
+[11.0.0-preview.4]: https://github.com/codebeltnet/cuemon/compare/v10.5.2...v11.0.0
 [10.5.2]: https://github.com/codebeltnet/cuemon/compare/v10.5.1...v10.5.2
 [10.5.1]: https://github.com/codebeltnet/cuemon/compare/v10.5.0...v10.5.1
 [10.5.0]: https://github.com/codebeltnet/cuemon/compare/v10.4.0...v10.5.0

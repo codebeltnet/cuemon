@@ -317,7 +317,7 @@ jobs:
           echo "Quality gate PASSED."
 
   sonarcloud:
-    if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
+    if: ${{ always() && needs.quality-gate.result == 'success' && needs.init.outputs.run-privileged-jobs == 'true' }}
     name: call-sonarcloud
     needs: [init, build, quality-gate]
     uses: codebeltnet/jobs-sonarcloud/.github/workflows/default.yml@v3
@@ -330,7 +330,7 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   codecov:
-    if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
+    if: ${{ always() && needs.quality-gate.result == 'success' && needs.init.outputs.run-privileged-jobs == 'true' }}
     name: call-codecov
     needs: [init, build, quality-gate]
     uses: codebeltnet/jobs-codecov/.github/workflows/default.yml@v1
@@ -351,7 +351,7 @@ jobs:
   #     security-events: write
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: ${{ always() && github.event_name != 'pull_request' && needs.quality-gate.result == 'success' && (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') && (needs.codecov.result == 'success' || needs.codecov.result == 'skipped') }}
     name: call-nuget
     needs: [build, pack, quality-gate, sonarcloud, codecov]
     uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3

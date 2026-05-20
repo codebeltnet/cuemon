@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
-## [11.0.0] - 2026-05-18 (11.0.0-preview.4)
+## [11.0.0] - 2026-05-20 (11.0.0-preview.4)
 
 This is a major release centered on three deliberate changes: moving the Cuemon build and test matrix forward to .NET 11, completing the assembly boundary split by removing the compatibility bridge from `Cuemon.Core` to `Cuemon.Kernel`, and relocating configuration primitives (`Configurable` and `IConfigurable`) into the kernel layer. Additionally, comprehensive unit test coverage was added for XML serialization converters.
 
@@ -25,6 +25,7 @@ The .NET update is straightforward: `net11.0` is now part of the target matrix a
 - Solution organization now groups `Cuemon.Core` and `Cuemon.Kernel` under a dedicated `/src/corelibs/` folder.
 - Test environment definitions now target Docker images for `net10` and `net11`.
 - `XmlConverterDecoratorExtensions` class in the Cuemon.Extensions.Xml.Serialization.Converters namespace was simplified for improved maintainability.
+- CI/CD pipeline refactored with a dedicated quality-gate job that consolidates test result evaluation and enables bypassing the gate via `skip-quality-gate` workflow input as a [temporary workaround for known infrastructure bugs](https://github.com/dotnet/aspnetcore/issues/66760).
 
 ### Added
 

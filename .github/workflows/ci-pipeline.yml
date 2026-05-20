@@ -12,6 +12,11 @@ on:
         options:
           - Debug
           - Release
+      skip-quality-gate:
+        type: boolean
+        description: "Skip quality gate — allow test failures to be non-blocking. Use only when a known infrastructure bug (e.g. dotnet/aspnetcore#66760) causes false failures."
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -275,10 +280,46 @@ jobs:
         with:
           command: down
 
+  quality-gate:
+    name: 🚦 Quality Gate
+    runs-on: ubuntu-24.04
+    if: always()
+    needs: [test_linux, test_windows, integration_test]
+    steps:
+      - name: Evaluate test results
+        shell: bash
+        run: |
+          linux="${{ needs.test_linux.result }}"
+          windows="${{ needs.test_windows.result }}"
+          integration="${{ needs.integration_test.result }}"
+          skip="${{ inputs.skip-quality-gate }}"
+
+          echo "test_linux:        $linux"
+          echo "test_windows:      $windows"
+          echo "integration_test:  $integration"
+          echo "skip-quality-gate: $skip"
+
+          if [[ "$skip" == "true" ]]; then
+            echo "Quality gate skipped per workflow input (workaround for known dotnet/aspnetcore#66760 bug)."
+            exit 0
+          fi
+
+          failed=false
+          [[ "$linux" != "success" ]] && echo "FAIL: test_linux" && failed=true
+          [[ "$windows" != "success" ]] && echo "FAIL: test_windows" && failed=true
+          [[ "$integration" != "success" && "$integration" != "skipped" ]] && echo "FAIL: integration_test" && failed=true
+
+          if [[ "$failed" == "true" ]]; then
+            echo "Quality gate FAILED."
+            exit 1
+          fi
+
+          echo "Quality gate PASSED."
+
   sonarcloud:
     if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
     name: call-sonarcloud
-    needs: [init, build, test_linux, test_windows, integration_test]
+    needs: [init, build, quality-gate]
     uses: codebeltnet/jobs-sonarcloud/.github/workflows/default.yml@v3
     with:
       organization: geekle
@@ -291,7 +332,7 @@ jobs:
   codecov:
     if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
     name: call-codecov
-    needs: [init, build, test_linux, test_windows, integration_test]
+    needs: [init, build, quality-gate]
     uses: codebeltnet/jobs-codecov/.github/workflows/default.yml@v1
     with:
       repository: codebeltnet/cuemon
@@ -312,7 +353,7 @@ jobs:
   deploy:
     if: github.event_name != 'pull_request'
     name: call-nuget
-    needs: [build, pack, test_linux, test_windows, integration_test, sonarcloud, codecov]
+    needs: [build, pack, quality-gate, sonarcloud, codecov]
     uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3
     with:
       version: ${{ needs.build.outputs.version }}

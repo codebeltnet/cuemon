@@ -21,6 +21,9 @@ on:
 permissions:
   contents: read
 
+env:
+  DOTNET_ReadyToRun: 0
+
 jobs:
   init:
     name: initialize

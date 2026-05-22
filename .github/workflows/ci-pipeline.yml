@@ -21,9 +21,6 @@ on:
 permissions:
   contents: read
 
-env:
-  DOTNET_ReadyToRun: 0
-
 jobs:
   init:
     name: initialize
@@ -119,6 +116,12 @@ jobs:
       restore: true # we need to restore since we disabled caching
       download-pattern: build-${{ matrix.configuration }}-${{ matrix.arch }}
       include-preview: true
+      # Temporary diagnostic workaround for:
+      # https://github.com/dotnet/runtime/issues/128490
+      #
+      # .NET 11 Preview 4 hangs in selected ASP.NET Core-related tests on linux-arm64.
+      # Disabling ReadyToRun helps verify whether the failure is related to precompiled runtime images / JIT interaction.
+      test-arguments: ${{ matrix.arch == 'ARM64' && '--environment DOTNET_ReadyToRun=0' || '' }}
 
   test_windows:
     name: call-test-windows

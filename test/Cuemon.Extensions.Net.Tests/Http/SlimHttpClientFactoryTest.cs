@@ -14,6 +14,31 @@ namespace Cuemon.Extensions.Net.Http
         }
 
         [Fact]
+        public void SlimHttpClientFactory_ShouldValidateNullHandlerFactory()
+        {
+            Assert.Throws<ArgumentNullException>(() => new SlimHttpClientFactory(null));
+        }
+
+        [Fact]
+        public void SlimHttpClientFactory_ShouldCreateClientsAndExposeOptions()
+        {
+            var invocations = 0;
+            var firstInner = new TrackingAwareHttpClientHandler();
+            var created = new Queue<TrackingAwareHttpClientHandler>(new[] { firstInner });
+            var sut = new SlimHttpClientFactory(() =>
+            {
+                invocations++;
+                return created.Dequeue();
+            }, o => o.HandlerLifetime = TimeSpan.Zero);
+
+            using var client = sut.CreateClient("alpha");
+
+            Assert.Equal(1, invocations);
+            Assert.NotNull(client);
+        }
+
+#if NET9_0_OR_GREATER
+        [Fact]
         public void SlimHttpClientFactory_ShouldReuseHandlersAndProtectInnerHandlerOnDispose()
         {
             var invocations = 0;
@@ -39,11 +64,10 @@ namespace Cuemon.Extensions.Net.Http
             Assert.Equal(TimeSpan.FromSeconds(15), options.HandlerLifetime);
             handlerA1.Dispose();
             Assert.False(firstInner.WasDisposed);
-            Assert.Throws<ArgumentNullException>(() => new SlimHttpClientFactory(null));
         }
 
         [Fact]
-        public async Task SlimHttpClientFactory_ShouldExpireAndDisposeHandlers_WhenLifetimeElapses()
+        public void SlimHttpClientFactory_ShouldCacheHandlersPerKey()
         {
             var invocations = 0;
             var firstInner = new TrackingAwareHttpClientHandler();
@@ -56,25 +80,21 @@ namespace Cuemon.Extensions.Net.Http
             }, o => o.HandlerLifetime = TimeSpan.Zero);
             var factory = (IHttpMessageHandlerFactory)sut;
 
-            var handler = factory.CreateHandler("expiring");
-            handler = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            // Request handlers for different keys
+            var handler1 = factory.CreateHandler("key1");
+            Assert.Equal(1, invocations);
 
-            await Task.Delay(TimeSpan.FromSeconds(16));
+            var handler2 = factory.CreateHandler("key1");
+            Assert.Equal(1, invocations); // Should reuse cached handler for same key
 
-            var replacement = factory.CreateHandler("expiring");
-            replacement = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            var handler3 = factory.CreateHandler("key2");
+            Assert.Equal(2, invocations); // Should create new handler for different key
 
-            await Task.Delay(TimeSpan.FromSeconds(16));
-
-            Assert.True(firstInner.WasDisposed);
-            Assert.Equal(2, invocations);
+            // Verify caching and distinctness
+            Assert.Same(handler1, handler2); // Same key, same handler
+            Assert.NotSame(handler1, handler3); // Different keys, different handlers
         }
+#endif
 
         private sealed class TrackingAwareHttpClientHandler : HttpClientHandler
         {

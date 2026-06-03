@@ -1,3 +1,9 @@
+Version: 10.5.3
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# Bug Fixes
+- FIXED ServiceProviderExtensions.GetServiceDescriptors() method to properly traverse and handle wrapped service providers with cycle detection; now correctly resolves descriptors when the provider is wrapped by third-party components
+
 Version: 10.5.2
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

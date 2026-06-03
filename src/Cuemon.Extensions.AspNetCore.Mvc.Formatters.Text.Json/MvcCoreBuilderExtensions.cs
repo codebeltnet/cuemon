@@ -23,7 +23,7 @@ namespace Cuemon.Extensions.AspNetCore.Mvc.Formatters.Text.Json
         /// <paramref name="builder"/> cannot be null -or-
         /// <paramref name="setup"/> cannot be null.
         /// </exception>
-        public static IMvcCoreBuilder AddJsonFormatters(this IMvcCoreBuilder builder, Action<JsonFormatterOptions> setup)
+        public static IMvcCoreBuilder AddJsonFormatters(this IMvcCoreBuilder builder, Action<JsonFormatterOptions> setup = null)
         {
             Validator.ThrowIfNull(builder);
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, JsonSerializationMvcOptionsSetup>());

@@ -98,6 +98,7 @@ namespace Cuemon.Extensions
         /// <param name="memberReference">The member from where <paramref name="instance"/> was referenced.</param>
         public Wrapper(T instance, MemberInfo memberReference = null)
         {
+            Validator.ThrowIfNull(instance);
             _instance = instance;
             _instanceType = instance.GetType();
             _memberReference = memberReference;

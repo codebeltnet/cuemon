@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 using System.Xml.Serialization;
 using Codebelt.Extensions.Xunit;
 using Cuemon.Extensions.Runtime.Serialization;

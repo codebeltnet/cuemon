@@ -8,7 +8,7 @@ For more details, please refer to `PackageReleaseNotes.txt` on a per assembly ba
 
 ## [10.5.3] - 2026-06-03
 
-This is a patch release focused on fixing request service provider resolution for wrapped providers, expanding test coverage across the library, and clarifying unit test best practices. The release significantly improves code coverage with 36 new unit test classes covering core utilities, extension methods, serialization, resilience, and threading components.
+This is a patch release focused on fixing request service provider resolution for wrapped providers and significantly expanding test coverage across the library. The release improves code coverage with 36 focused, System-Under-Test (SUT)-specific unit test classes covering core utilities, extension methods, serialization, resilience, threading, and infrastructure components.
 
 ### Fixed
 
@@ -19,15 +19,14 @@ This is a patch release focused on fixing request service provider resolution fo
 
 - `ServiceProviderExtensionsTest` unit test class with comprehensive test coverage for `GetServiceDescriptors()` method, including scenarios for delegating providers, ambiguous multi-provider cases, and cyclic provider graph detection,
 - Functional test in `ApplicationBuilderExtensionsTest` to verify fault descriptor exception handling works correctly with wrapped request services,
-- Comprehensive unit test classes for core utilities: `ActionFactoryTest`, `FuncFactoryTest`, `TesterFuncFactoryTest`, `WrapperTest`, and `VerticalDirectionTest`,
-- Unit test classes for extension methods: `RegionInfoExtensionsTest`, `MethodDescriptorExtensionsTest`, `CacheValidatorTest`, `ChecksumBuilderTest`, `ChecksumBuilderExtensionsTest`, `FileInfoExtensionsTest`, `HostBuilderExtensionsTest`, and `UriExtensionsTest`,
-- Unit test classes for Hierarchy-related functionality: `HierarchyTest`, `HierarchyOptionsTest`, `HierarchyDecoratorExtensionsTest`, and `HierarchySerializerTest`,
-- Test coverage for ASP.NET Core MVC formatters: `MvcBuilderExtensionsTest` and `MvcCoreBuilderExtensionsTest` for both Text.Json and Xml formatters,
-- Test coverage for XML serialization converters in `Cuemon.Extensions.Xml.Tests` across Linq and Serialization namespaces,
-- Test coverage for resilience and threading: `LatencyExceptionTest`, `TransientOperationOverloadTest`, `AdvancedParallelFactoryTest`, `AsyncPatternsTest`, and `ParallelFactoryOverloadTest`,
-- Additional coverage tests for `Cuemon.Data`, `Cuemon.Extensions.Net`, `Cuemon.Net`, and `Cuemon.Resilience` namespaces with CoverageTest classes,
-- `MailDistributorTest` unit test class for mail distribution functionality,
-- Enhanced unit test guidelines in `.github/copilot-instructions.md` with clarifications on namespace conventions, base class usage, and best practices for test organization.
+- Focused unit test classes for core utilities (replacing generic CoverageTest approach): `ActionFactoryTest`, `FuncFactoryTest`, `TesterFuncFactoryTest`, `WrapperTest`, and `VerticalDirectionTest`,
+- Focused unit test classes for extension methods: `RegionInfoExtensionsTest`, `MethodDescriptorExtensionsTest`, `CacheValidatorTest`, `ChecksumBuilderTest`, `ChecksumBuilderExtensionsTest`, `FileInfoExtensionsTest`, `HostBuilderExtensionsTest`, and `UriExtensionsTest`,
+- Focused unit test classes for Hierarchy-related functionality: `HierarchyTest`, `HierarchyOptionsTest`, `HierarchyDecoratorExtensionsTest`, and `HierarchySerializerTest`,
+- Focused unit test classes for ASP.NET Core MVC formatters: `MvcBuilderExtensionsTest` and `MvcCoreBuilderExtensionsTest` for both Text.Json and Xml formatters,
+- Focused unit test classes for XML serialization converters: `ExceptionConverterTest`, `DefaultXmlConverterTest`, `DynamicXmlConverterTest`, and related converter functionality across the Cuemon.Extensions.Xml namespace,
+- Focused unit test classes for resilience and threading: `LatencyExceptionTest`, `TransientOperationOverloadTest`, `AdvancedParallelFactoryTest`, `AsyncPatternsTest`, and `ParallelFactoryOverloadTest`,
+- Focused unit test classes for mail and data infrastructure: `MailDistributorTest` and focused coverage for `Cuemon.Data`, `Cuemon.Extensions.Net`, `Cuemon.Net`, and `Cuemon.Resilience` namespaces,
+- Enhanced unit test guidelines in `.github/copilot-instructions.md` with clarifications on namespace conventions, base class usage, public facade testing patterns, and best practices for test organization.
 
 ## [10.5.2] - 2026-05-18
 

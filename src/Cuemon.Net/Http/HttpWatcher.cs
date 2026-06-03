@@ -22,6 +22,7 @@ namespace Cuemon.Net.Http
         /// <param name="setup">The <see cref="HttpWatcherOptions" /> which may be configured.</param>
         public HttpWatcher(Uri location, Action<HttpWatcherOptions> setup = null) : base(Patterns.ConfigureExchange<HttpWatcherOptions, WatcherOptions>(setup))
         {
+            Validator.ThrowIfNull(location);
             var options = Patterns.Configure(setup);
             Location = location;
             ClientFactory = options.ClientFactory;

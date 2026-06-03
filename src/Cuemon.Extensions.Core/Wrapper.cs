@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
@@ -96,8 +96,12 @@ namespace Cuemon.Extensions
         /// </summary>
         /// <param name="instance">The instance that this wrapper object represents.</param>
         /// <param name="memberReference">The member from where <paramref name="instance"/> was referenced.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="instance"/> is null.
+        /// </exception>
         public Wrapper(T instance, MemberInfo memberReference = null)
         {
+            Validator.ThrowIfNull(instance);
             _instance = instance;
             _instanceType = instance.GetType();
             _memberReference = memberReference;

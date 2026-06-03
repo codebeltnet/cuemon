@@ -34,6 +34,16 @@ namespace Cuemon
             Assert.Equal(sut1.ActualValue!.ToString(), original.ActualValue!.ToString());
             Assert.Equal(sut1.Message, original.Message);
             Assert.Equal(sut1.ToString(), original.ToString());
+#if NET48_OR_GREATER
+            Assert.Equal($$"""
+                         {
+                           "type": "Cuemon.TypeArgumentOutOfRangeException",
+                           "message": "{{randomMessage}}\r\nParameter name: {{randomParamName}}\r\nActual value was {{actualValue}}.",
+                           "actualValue": {{actualValue}},
+                           "paramName": "{{randomParamName}}"
+                         }
+                         """, sut4);
+#else
             var newline = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"\r\n" : @"\n";
             Assert.Equal($$"""
                          {
@@ -43,6 +53,7 @@ namespace Cuemon
                            "paramName": "{{randomParamName}}"
                          }
                          """.ReplaceLineEndings(), sut4);
+#endif
         }
     }
 }

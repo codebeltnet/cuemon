@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Codebelt.Extensions.Xunit;
@@ -100,6 +101,39 @@ namespace Cuemon.Extensions.Collections.Generic
                 i => Assert.Equal(7, i),
                 i => Assert.Equal(8, i),
                 i => Assert.Equal(9, i));
+        }
+        [Fact]
+        public void ToPartitioner_ShouldThrowArgumentNullException_WhenCollectionIsNull()
+        {
+            ICollection<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.ToPartitioner());
+        }
+
+        [Fact]
+        public void AddRange_ShouldThrowArgumentNullException_WhenCollectionIsNull()
+        {
+            ICollection<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.AddRange(1, 2, 3));
+        }
+
+        [Fact]
+        public void AddRange_ShouldThrowArgumentNullException_WhenSourceArrayIsNull()
+        {
+            var sut = new List<int>();
+            int[] source = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.AddRange(source));
+        }
+
+        [Fact]
+        public void AddRange_ShouldThrowArgumentNullException_WhenSourceSequenceIsNull()
+        {
+            var sut = new Collection<int>();
+            IEnumerable<int> source = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.AddRange(source));
         }
     }
 }

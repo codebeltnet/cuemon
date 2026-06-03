@@ -208,6 +208,15 @@ Example: `✨ Add DateSpan.TryParse overload`
 4. **Clear messages** — the subject line should be understandable without a body.
 5. **Atomic commits** — each commit should be independently buildable and testable.
 
+## Git Operations Safeguards
+
+Agents must never automatically commit code changes or push to remote repositories. Both actions require explicit user approval:
+
+- **Commits**: Always request confirmation from the user before staging and committing code. Present a clear summary of the changes and wait for approval before executing the commit.
+- **Remote Operations**: Do not push, pull, fetch, or interact with `origin` or any remote repository without explicit user instruction. These operations modify repository history and can cause data loss if performed unexpectedly.
+
+**Rationale:** Automatic commits can clutter history with incomplete work, temporary debugging code, or unintended changes. Unexpected remote operations risk overwriting or losing commits on shared branches. Always require explicit user approval before performing these actions.
+
 ## Agent Workflow
 
 1. Identify the correct project area (`src/`, `test/`, `tuning/`, `tooling/`).

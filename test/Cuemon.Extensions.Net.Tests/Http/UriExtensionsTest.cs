@@ -23,9 +23,11 @@ namespace Cuemon.Extensions.Net.Http
         [Fact]
         public async Task HttpGetAsync_ShouldGetResponseFromUri()
         {
-            var uri = new Uri("https://www.cuemon.net/");
+            // Test SlimHttpClientFactory robustness under parallel load using a reliable external server
+            var uri = new Uri("https://httpbin.org/status/200");
             var expected = 125;
             var atomicCount = 0;
+
             await ParallelFactory.ForAsync(0, expected, async (i, ct) =>
             {
                 using (var response = await uri.HttpGetAsync(ct))
@@ -34,6 +36,27 @@ namespace Cuemon.Extensions.Net.Http
                     Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 }
             });
+
+            Assert.Equal(expected, atomicCount);
+        }
+
+        [Fact]
+        public async Task HttpGetAsync_ShouldHandleHttpStatusCodes()
+        {
+            // Test that the extension method properly returns non-OK status codes under parallel load
+            var uri = new Uri("https://httpbin.org/status/404");
+            var expected = 50;
+            var atomicCount = 0;
+
+            await ParallelFactory.ForAsync(0, expected, async (i, ct) =>
+            {
+                using (var response = await uri.HttpGetAsync(ct))
+                {
+                    Interlocked.Increment(ref atomicCount);
+                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                }
+            });
+
             Assert.Equal(expected, atomicCount);
         }
     }

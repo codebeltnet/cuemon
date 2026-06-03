@@ -5,9 +5,9 @@ using Xunit;
 
 namespace Cuemon.Extensions.Xml.Serialization
 {
-    public class CoverageTest : Test
+    public class XmlSerializerOptionsExtensionsTest : Test
     {
-        public CoverageTest(ITestOutputHelper output) : base(output)
+        public XmlSerializerOptionsExtensionsTest(ITestOutputHelper output) : base(output)
         {
         }
 

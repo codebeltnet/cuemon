@@ -9,9 +9,9 @@ using Xunit;
 
 namespace Cuemon.Extensions.Xml.Serialization.Converters
 {
-    public class CoverageTest : Test
+    public class XmlConverterExtensionsTest : Test
     {
-        public CoverageTest(ITestOutputHelper output) : base(output)
+        public XmlConverterExtensionsTest(ITestOutputHelper output) : base(output)
         {
         }
 

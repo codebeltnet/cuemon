@@ -4,9 +4,9 @@ using Xunit;
 
 namespace Cuemon.Extensions.Xml.Linq
 {
-    public class CoverageTest : Test
+    public class XElementExtensionsTest : Test
     {
-        public CoverageTest(ITestOutputHelper output) : base(output)
+        public XElementExtensionsTest(ITestOutputHelper output) : base(output)
         {
         }
 

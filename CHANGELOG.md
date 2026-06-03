@@ -8,25 +8,36 @@ For more details, please refer to `PackageReleaseNotes.txt` on a per assembly ba
 
 ## [10.5.3] - 2026-06-03
 
-This is a patch release focused on fixing request service provider resolution for wrapped providers and significantly expanding test coverage across the library. The release improves code coverage with 36 focused, System-Under-Test (SUT)-specific unit test classes covering core utilities, extension methods, serialization, resilience, threading, and infrastructure components.
+This is a patch release focused on fixing request service provider resolution for wrapped providers and significantly expanding test coverage across 15 assemblies to achieve >=95% coverage. The release consolidates ad-hoc coverage tests into integrated, maintainable test suites.
 
 ### Fixed
 
 - `ServiceProviderExtensions.GetServiceDescriptors()` method to properly traverse and handle wrapped service providers, including detection and rejection of cyclic provider graphs; the method now correctly resolves descriptors when the provider is wrapped by third-party components such as AspVersioning's InjectApiVersion and throws `NotSupportedException` with descriptive messages when ambiguous or cyclic provider structures are encountered,
-- `UseFaultDescriptorExceptionHandler()` middleware to work correctly when request services are wrapped by external decorators or proxies.
+- `UseFaultDescriptorExceptionHandler()` middleware to work correctly when request services are wrapped by external decorators or proxies,
+- `CollectionExtensions` class in the Cuemon.Extensions.Collections.Generic namespace to add null guard validation in the `Concat<T>` method.
 
 ### Added
 
-- `ServiceProviderExtensionsTest` unit test class with comprehensive test coverage for `GetServiceDescriptors()` method, including scenarios for delegating providers, ambiguous multi-provider cases, and cyclic provider graph detection,
-- Functional test in `ApplicationBuilderExtensionsTest` to verify fault descriptor exception handling works correctly with wrapped request services,
-- Focused unit test classes for core utilities (replacing generic CoverageTest approach): `ActionFactoryTest`, `FuncFactoryTest`, `TesterFuncFactoryTest`, `WrapperTest`, and `VerticalDirectionTest`,
-- Focused unit test classes for extension methods: `RegionInfoExtensionsTest`, `MethodDescriptorExtensionsTest`, `CacheValidatorTest`, `ChecksumBuilderTest`, `ChecksumBuilderExtensionsTest`, `FileInfoExtensionsTest`, `HostBuilderExtensionsTest`, and `UriExtensionsTest`,
-- Focused unit test classes for Hierarchy-related functionality: `HierarchyTest`, `HierarchyOptionsTest`, `HierarchyDecoratorExtensionsTest`, and `HierarchySerializerTest`,
-- Focused unit test classes for ASP.NET Core MVC formatters: `MvcBuilderExtensionsTest` and `MvcCoreBuilderExtensionsTest` for both Text.Json and Xml formatters,
-- Focused unit test classes for XML serialization converters: `ExceptionConverterTest`, `DefaultXmlConverterTest`, `DynamicXmlConverterTest`, and related converter functionality across the Cuemon.Extensions.Xml namespace,
-- Focused unit test classes for resilience and threading: `LatencyExceptionTest`, `TransientOperationOverloadTest`, `AdvancedParallelFactoryTest`, `AsyncPatternsTest`, and `ParallelFactoryOverloadTest`,
-- Focused unit test classes for mail and data infrastructure: `MailDistributorTest` and focused coverage for `Cuemon.Data`, `Cuemon.Extensions.Net`, `Cuemon.Net`, and `Cuemon.Resilience` namespaces,
-- Enhanced unit test guidelines in `.github/copilot-instructions.md` with clarifications on namespace conventions, base class usage, public facade testing patterns, and best practices for test organization.
+- Comprehensive unit test coverage for Cuemon.Core: `EradicateTest`, `ExceptionInsightsTest`, `MutableTupleFactoryTest`, `StringFactoryTest`, `WatcherTest`, `GenerateTest`, `StringReplacePairTest`,
+- Comprehensive unit test coverage for Cuemon.IO: `StreamFactoryTest`, `StreamOptionsTest`, `TextReaderDecoratorExtensionsTest`,
+- Comprehensive unit test coverage for Cuemon.Xml: `XmlDocumentFactoryTest`, `XPathDocumentFactoryTest`, and extension tests for Stream, String, XmlReader, XmlWriter, Linq.String decorators,
+- Comprehensive unit test coverage for Cuemon.Diagnostics: `FaultResolverTest`, `TimeMeasureTest`,
+- Comprehensive unit test coverage for Cuemon.Runtime.Caching: `CacheEntryTest`, `CacheEntryEventArgsTest`, `CacheInvalidationTest`, `SlimMemoryCacheTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.Collections.Generic: `QueueExtensionsTest` and collection extension test updates,
+- Comprehensive unit test coverage for Cuemon.Extensions.Runtime.Caching: `CacheEnumerableExtensionsTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.Text.Json: `StringEnumConverterTest`, `StringFlagsEnumConverterTest`, `DynamicJsonConverterTest`, `JsonNamingPolicyExtensionsTest`, `JsonSerializerOptionsExtensionsTest`, and net48 TFM support,
+- Comprehensive unit test coverage for Cuemon.AspNetCore: `MiddlewareTest`, `HttpStatusCodeExceptionTest`, `InternalServerErrorExceptionTest`, `HttpRequestDecoratorExtensionsTest`, `HttpResponseDecoratorExtensionsTest`, `HeaderDictionaryDecoratorExtensionsTest`, `Int32DecoratorExtensionsTest`, `HttpRequestEvidenceTest`, `HttpExceptionDescriptorDecoratorExtensionsTest`, `HttpExceptionDescriptorResponseFormatterTest`, `DynamicCacheBustingTest`,
+- Comprehensive unit test coverage for Cuemon.AspNetCore.Mvc: `BreadcrumbTest`, `ResultClassesTest`, `ConfigurableFilterBaseTest`, `MvcFaultDescriptorOptionsTest`, `HttpCacheHeaderOptionsTest`, `HttpEntityTagHeaderFilterTest`, `DisableModelBindingAttributeTest`, `FormatterBaseTest`,
+- Comprehensive unit test coverage for Cuemon.AspNetCore.Authentication: `AuthenticatorTest`, `AuthenticationHandlerFeatureTest`, `MemoryNonceTrackerTest`, `NonceTrackerEntryTest`, `DigestHashFactoryTest`, `MiddlewareConstructorTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.AspNetCore: `ApplicationBuilderExtensionsTest`, `ServiceCollectionExtensionsCoverageTest`, Headers and Throttling integration tests, `HttpExceptionDescriptorResponseFormatterExtensionsTest`, `XmlConverterExtensionsTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.AspNetCore.Mvc: `FilterCollectionExtensionsTest`, `MvcBuilderExtensionsTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.AspNetCore.Authentication: `AuthorizationResponseHandlerOptionsTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.Xml: `HierarchyExtensionsTest`, `XElementExtensionsTest`, `XmlConverterExtensionsTest`, `XmlSerializerOptionsExtensionsTest`, `XmlExtensionsTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.Net: `HttpMethodExtensionsTest`, `SlimHttpClientFactoryTest`, `HttpStatusCodeExtensionsTest`, `StringExtensionsTest`, `ByteArrayDecoratorExtensionsTest`.
+
+### Changed
+
+- Enhanced code documentation and test guidelines in `AGENTS.md` with clarifications on testing best practices.
 
 ## [10.5.2] - 2026-05-18
 

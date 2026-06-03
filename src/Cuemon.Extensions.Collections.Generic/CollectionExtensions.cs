@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Cuemon.Collections.Generic;
 
 namespace Cuemon.Extensions.Collections.Generic
@@ -17,6 +17,7 @@ namespace Cuemon.Extensions.Collections.Generic
         /// <returns>An instance of <see cref="PartitionerCollection{T}"/>.</returns>
         public static PartitionerCollection<T> ToPartitioner<T>(this ICollection<T> collection, int partitionSize = 128)
         {
+            Validator.ThrowIfNull(collection);
             return new PartitionerCollection<T>(collection, partitionSize);
         }
 
@@ -39,6 +40,8 @@ namespace Cuemon.Extensions.Collections.Generic
         /// <param name="source">The sequence of elements that should be added to <paramref name="collection"/>.</param>
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> source)
         {
+            Validator.ThrowIfNull(collection);
+            Validator.ThrowIfNull(source);
             if (collection is List<T> list)
             {
                 list.AddRange(source);

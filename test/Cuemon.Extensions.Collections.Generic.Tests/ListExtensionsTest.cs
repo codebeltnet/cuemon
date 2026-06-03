@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Codebelt.Extensions.Xunit;
 using Xunit;
@@ -109,6 +110,75 @@ namespace Cuemon.Extensions.Collections.Generic
                 i => Assert.Equal(null, i),
                 i => Assert.Equal(null, i),
                 i => Assert.Equal(null, i));
+        }
+        [Fact]
+        public void HasIndex_ShouldThrowArgumentNullException_WhenListIsNull()
+        {
+            IList<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.HasIndex(0));
+        }
+
+        [Fact]
+        public void Next_ShouldThrowArgumentNullException_WhenListIsNull()
+        {
+            IList<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.Next(0));
+        }
+
+        [Fact]
+        public void Next_ShouldThrowArgumentOutOfRangeException_WhenIndexIsNegative()
+        {
+            var sut = new List<int> { 1, 2, 3 };
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => sut.Next(-1));
+        }
+
+        [Fact]
+        public void Previous_ShouldThrowArgumentNullException_WhenListIsNull()
+        {
+            IList<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.Previous(0));
+        }
+
+        [Fact]
+        public void Previous_ShouldThrowArgumentOutOfRangeException_WhenIndexIsNegative()
+        {
+            var sut = new List<int> { 1, 2, 3 };
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => sut.Previous(-1));
+        }
+
+        [Fact]
+        public void TryAdd_ShouldAddItem_WhenMissing()
+        {
+            var sut = new List<int> { 1, 2, 3 };
+
+            var result = sut.TryAdd(4);
+
+            Assert.True(result);
+            Assert.Equal(new[] { 1, 2, 3, 4 }, sut);
+        }
+
+        [Fact]
+        public void TryAdd_ShouldReturnFalse_WhenItemAlreadyExists()
+        {
+            var sut = new List<int> { 1, 2, 3 };
+
+            var result = sut.TryAdd(3);
+
+            Assert.False(result);
+            Assert.Equal(new[] { 1, 2, 3 }, sut);
+        }
+
+        [Fact]
+        public void TryAdd_ShouldThrowArgumentNullException_WhenListIsNull()
+        {
+            IList<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.TryAdd(1));
         }
     }
 }

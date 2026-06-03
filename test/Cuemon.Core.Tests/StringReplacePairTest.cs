@@ -114,5 +114,45 @@ namespace Cuemon
 
             TestOutput.WriteLine(sut);
         }
+
+        [Fact]
+        public void ReplaceAll_WithNullValue_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => StringReplacePair.ReplaceAll(null, "old", "new"));
+        }
+
+        [Fact]
+        public void ReplaceAll_WithNullOldValue_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => StringReplacePair.ReplaceAll("value", null, "new"));
+        }
+
+        [Fact]
+        public void ReplaceAll_WithNullReplacePairs_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => StringReplacePair.ReplaceAll("value", (System.Collections.Generic.IEnumerable<StringReplacePair>)null));
+        }
+
+        [Fact]
+        public void ReplaceAll_WithNoMatches_ReturnsOriginalValue()
+        {
+            var value = "Alpha Beta Gamma";
+
+            var sut = StringReplacePair.ReplaceAll(value, "Delta", "Omega", StringComparison.Ordinal);
+
+            Assert.Same(value, sut);
+        }
+
+        [Fact]
+        public void ReplaceAll_WithMultiplePairs_UsesCurrentCultureIgnoreCaseComparison()
+        {
+            var sut = StringReplacePair.ReplaceAll("Foo and BAR and baz", new[]
+            {
+                new StringReplacePair("foo", "1"),
+                new StringReplacePair("bar", "2")
+            }, StringComparison.CurrentCultureIgnoreCase);
+
+            Assert.Equal("1 and 2 and baz", sut);
+        }
     }
 }

@@ -278,6 +278,36 @@ namespace Cuemon
             public int WriteOnly { set { _write = value; } }
         }
 
+        [Fact]
+        public void RangeOf_WithNullGenerator_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => Generate.RangeOf<int>(1, null).ToList());
+        }
+
+        [Fact]
+        public void RandomNumber_WithMaximumExclusiveZero_ReturnsZero()
+        {
+            Assert.Equal(0, Generate.RandomNumber(0));
+        }
+
+        [Fact]
+        public void RandomNumber_WithEqualBounds_ReturnsLowerBound()
+        {
+            Assert.Equal(42, Generate.RandomNumber(42, 42));
+        }
+
+        [Fact]
+        public void RandomNumber_WithMinimumGreaterThanMaximum_ThrowsArgumentOutOfRangeException()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Generate.RandomNumber(2, 1));
+        }
+
+        [Fact]
+        public void FixedString_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Generate.FixedString('*', -1));
+        }
+
         private class CallsObjectPortrayalFromToString
         {
             public int Value { get; set; }

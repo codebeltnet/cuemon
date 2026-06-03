@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Codebelt.Extensions.Xunit;
 using Xunit;
@@ -169,6 +170,144 @@ namespace Cuemon.Extensions.Collections.Generic
             Assert.True(sut1.ContainsKey(1));
             Assert.Equal("Cuemon", sut1[1]);
             Assert.True(sut1.Count == 10);
+        }
+        [Fact]
+        public void CopyTo_ShouldCopyEntriesToDestination()
+        {
+            var sut1 = new Dictionary<int, string>
+            {
+                { 1, "Cuemon" },
+                { 2, "Geekle" }
+            };
+            var sut2 = sut1.CopyTo(new Dictionary<int, string>());
+
+            Assert.Equal(sut1, sut2);
+        }
+
+        [Fact]
+        public void CopyTo_ShouldThrowArgumentNullException_WhenSourceIsNull()
+        {
+            IDictionary<int, string> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.CopyTo(new Dictionary<int, string>()));
+        }
+
+        [Fact]
+        public void CopyTo_ShouldThrowArgumentNullException_WhenDestinationIsNull()
+        {
+            var sut = new Dictionary<int, string>();
+
+            Assert.Throws<ArgumentNullException>(() => sut.CopyTo(null));
+        }
+
+        [Fact]
+        public void CopyToWithCopier_ShouldCopyEntriesUsingCustomCopier()
+        {
+            var sut1 = new Dictionary<int, string>
+            {
+                { 1, "Cuemon" },
+                { 2, "Geekle" }
+            };
+            var sut2 = sut1.CopyTo(new Dictionary<int, string>(), (source, destination) =>
+            {
+                foreach (var item in source)
+                {
+                    destination[item.Key] = item.Value.ToUpperInvariant();
+                }
+            });
+
+            Assert.Equal("CUEMON", sut2[1]);
+            Assert.Equal("GEEKLE", sut2[2]);
+        }
+
+        [Fact]
+        public void CopyToWithCopier_ShouldThrowArgumentNullException_WhenCopierIsNull()
+        {
+            var sut = new Dictionary<int, string>();
+
+            Assert.Throws<ArgumentNullException>(() => sut.CopyTo(new Dictionary<int, string>(), null));
+        }
+
+#if NETSTANDARD2_0_OR_GREATER
+        [Fact]
+        public void GetValueOrDefault_ShouldThrowArgumentNullException_WhenDictionaryIsNull()
+        {
+            IDictionary<string, string> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.GetValueOrDefault("key"));
+        }
+
+        [Fact]
+        public void GetValueOrDefault_ShouldThrowArgumentNullException_WhenKeyIsNull()
+        {
+            var sut = new Dictionary<string, string>();
+
+            Assert.Throws<ArgumentNullException>(() => sut.GetValueOrDefault(null));
+        }
+#endif
+
+        [Fact]
+        public void GetValueOrDefault_ShouldThrowArgumentNullException_WhenDefaultProviderIsNull()
+        {
+            var sut = new Dictionary<string, string>();
+
+            Assert.Throws<ArgumentNullException>(() => sut.GetValueOrDefault("key", null));
+        }
+
+        [Fact]
+        public void TryGetValueOrFallback_ShouldThrowArgumentNullException_WhenDictionaryIsNull()
+        {
+            IDictionary<string, string> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.TryGetValueOrFallback("key", keys => keys.First(), out _));
+        }
+
+        [Fact]
+        public void ToEnumerable_ShouldThrowArgumentNullException_WhenDictionaryIsNull()
+        {
+            IDictionary<int, string> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.ToEnumerable());
+        }
+
+        [Fact]
+        public void TryAddWithCondition_ShouldThrowArgumentNullException_WhenDictionaryIsNull()
+        {
+            IDictionary<string, string> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.TryAdd("key", "value", _ => true));
+        }
+
+        [Fact]
+        public void TryAddWithCondition_ShouldThrowArgumentNullException_WhenKeyIsNull()
+        {
+            var sut = new Dictionary<string, string>();
+
+            Assert.Throws<ArgumentNullException>(() => sut.TryAdd(null, "value", _ => true));
+        }
+
+        [Fact]
+        public void TryAddWithCondition_ShouldThrowArgumentNullException_WhenConditionIsNull()
+        {
+            var sut = new Dictionary<string, string>();
+
+            Assert.Throws<ArgumentNullException>(() => sut.TryAdd("key", "value", null));
+        }
+
+        [Fact]
+        public void AddOrUpdate_ShouldThrowArgumentNullException_WhenDictionaryIsNull()
+        {
+            IDictionary<string, string> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.AddOrUpdate("key", "value"));
+        }
+
+        [Fact]
+        public void AddOrUpdate_ShouldThrowArgumentNullException_WhenKeyIsNull()
+        {
+            var sut = new Dictionary<string, string>();
+
+            Assert.Throws<ArgumentNullException>(() => sut.AddOrUpdate(null, "value"));
         }
     }
 }

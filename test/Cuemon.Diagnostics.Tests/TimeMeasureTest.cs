@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Cuemon.Extensions;
@@ -1238,6 +1239,53 @@ namespace Cuemon.Diagnostics
 
             TestOutput.WriteLine(profiler.Elapsed.ToString());
             TestOutput.WriteLine(profiler.Member.ToString());
+        }
+
+        [Fact]
+        public void WithAction_ShouldInvokeCompletedCallback_WhenThresholdIsMet()
+        {
+            var callbacks = new ConcurrentBag<TimeMeasureProfiler>();
+            var previous = TimeMeasure.CompletedCallback;
+            try
+            {
+                TimeMeasure.CompletedCallback = profiler =>
+                {
+                    callbacks.Add(profiler);
+                    previous?.Invoke(profiler);
+                };
+
+                var measured = TimeMeasure.WithAction(() => Thread.Sleep(TimeSpan.FromMilliseconds(50)), o => o.TimeMeasureCompletedThreshold = TimeSpan.FromMilliseconds(10));
+
+                Assert.Contains(callbacks, profiler => ReferenceEquals(profiler, measured));
+            }
+            finally
+            {
+                TimeMeasure.CompletedCallback = previous;
+            }
+        }
+
+        [Fact]
+        public void ToString_ShouldIncludeParameters_WhenProfilerHasData()
+        {
+            var profiler = TimeMeasure.WithAction((a1, a2) => Thread.Sleep(TimeSpan.FromMilliseconds(10)), 1, "two");
+
+            var result = profiler.ToString();
+
+            Assert.Contains("took", result);
+            Assert.Contains("Parameters: {", result);
+            foreach (var parameterName in profiler.Data.Keys)
+            {
+                Assert.Contains(parameterName + "=", result);
+            }
+        }
+
+        [Fact]
+        public void WithAction_ShouldHaveStoppedProfiler_WhenCompleted()
+        {
+            var profiler = TimeMeasure.WithAction(() => Thread.Sleep(TimeSpan.FromMilliseconds(10)));
+
+            Assert.False(profiler.IsRunning);
+            Assert.False(profiler.Timer.IsRunning);
         }
     }
 }

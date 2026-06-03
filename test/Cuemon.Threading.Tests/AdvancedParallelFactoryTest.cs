@@ -123,7 +123,7 @@ namespace Cuemon.Threading
         public void While_ShouldThrowAggregateException_WhenWorkerFaults()
         {
             var queue = CreateQueue(6);
-            var exception = Assert.Throws<AggregateException>(() => AdvancedParallelFactory.While(queue, () => queue.TryPeek(out _), q => q.Dequeue(), i =>
+            var exception = Assert.Throws<AggregateException>(() => AdvancedParallelFactory.While(queue, () => queue.Count > 0, q => q.Dequeue(), i =>
             {
                 if (i == 3) { throw new InvalidOperationException("boom"); }
             }, CreateSyncSetup(CancellationToken.None)));
@@ -338,7 +338,7 @@ namespace Cuemon.Threading
         {
             var queue = CreateQueue(6);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => AdvancedParallelFactory.WhileAsync(queue, () => Task.FromResult(queue.TryPeek(out _)), q => q.Dequeue(), (i, ct) =>
+            await Assert.ThrowsAsync<InvalidOperationException>(() => AdvancedParallelFactory.WhileAsync(queue, () => Task.FromResult(queue.Count > 0), q => q.Dequeue(), (i, ct) =>
             {
                 if (i == 3) { return Task.FromException(new InvalidOperationException("boom")); }
                 return Task.CompletedTask;
@@ -380,7 +380,7 @@ namespace Cuemon.Threading
         {
             var reader = CreateQueue(count);
             var bag = new ConcurrentBag<int>();
-            execute(reader, () => reader.TryPeek(out _), q => q.Dequeue(), bag, CreateSyncSetup(CancellationToken.None));
+            execute(reader, () => reader.Count > 0, q => q.Dequeue(), bag, CreateSyncSetup(CancellationToken.None));
             return bag;
         }
 
@@ -388,20 +388,20 @@ namespace Cuemon.Threading
         {
             var reader = CreateQueue(count);
             var bag = new ConcurrentBag<int>();
-            await execute(reader, () => Task.FromResult(reader.TryPeek(out _)), q => q.Dequeue(), bag, CreateAsyncSetup(CancellationToken.None));
+            await execute(reader, () => Task.FromResult(reader.Count > 0), q => q.Dequeue(), bag, CreateAsyncSetup(CancellationToken.None));
             return bag;
         }
 
         private IEnumerable<int> ExecuteWhileResult(int count, Func<Queue<int>, Func<bool>, Func<Queue<int>, int>, Action<AsyncTaskFactoryOptions>, IReadOnlyCollection<int>> execute)
         {
             var reader = CreateQueue(count);
-            return execute(reader, () => reader.TryPeek(out _), q => q.Dequeue(), CreateSyncSetup(CancellationToken.None));
+            return execute(reader, () => reader.Count > 0, q => q.Dequeue(), CreateSyncSetup(CancellationToken.None));
         }
 
         private async Task<IEnumerable<int>> ExecuteWhileResultAsync(int count, Func<Queue<int>, Func<Task<bool>>, Func<Queue<int>, int>, Action<AsyncWorkloadOptions>, Task<IReadOnlyCollection<int>>> execute)
         {
             var reader = CreateQueue(count);
-            return await execute(reader, () => Task.FromResult(reader.TryPeek(out _)), q => q.Dequeue(), CreateAsyncSetup(CancellationToken.None));
+            return await execute(reader, () => Task.FromResult(reader.Count > 0), q => q.Dequeue(), CreateAsyncSetup(CancellationToken.None));
         }
 
         private static void AssertEquivalent(IEnumerable<int> expected, IEnumerable<int> actual)

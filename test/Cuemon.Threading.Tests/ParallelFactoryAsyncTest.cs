@@ -369,7 +369,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            await AdvancedParallelFactory.WhileAsync(ic, () => Task.FromResult(ic.TryPeek(out _)), intProvider => intProvider.Dequeue(), async (i, ct) =>
+            await AdvancedParallelFactory.WhileAsync(ic, () => Task.FromResult(ic.Count > 0), intProvider => intProvider.Dequeue(), async (i, ct) =>
             {
                 await Task.Delay(50, ct);
                 cb.Add(i);
@@ -394,7 +394,7 @@ namespace Cuemon.Threading
 
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             {
-                await AdvancedParallelFactory.WhileAsync(ic, () => Task.FromResult(ic.TryPeek(out _)), intProvider => intProvider.Dequeue(), async (i, ct) =>
+                await AdvancedParallelFactory.WhileAsync(ic, () => Task.FromResult(ic.Count > 0), intProvider => intProvider.Dequeue(), async (i, ct) =>
                 {
                     if (i > 450) { cts.Cancel(); }
                     await Task.Delay(Generate.RandomNumber(25, 75), ct);
@@ -416,7 +416,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            await AdvancedParallelFactory.WhileAsync(ic, () => Task.FromResult(ic.TryPeek(out _)), intProvider => intProvider.Dequeue(), async (i, ct) =>
+            await AdvancedParallelFactory.WhileAsync(ic, () => Task.FromResult(ic.Count > 0), intProvider => intProvider.Dequeue(), async (i, ct) =>
             {
                 await Task.Delay(_longRunningTaskWaitTime, ct);
                 cb.Add(i);
@@ -435,7 +435,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            await AdvancedParallelFactory.WhileAsync(ic, () => Task.FromResult(ic.TryPeek(out _)), intProvider => intProvider.Dequeue(), async (i, ct) =>
+            await AdvancedParallelFactory.WhileAsync(ic, () => Task.FromResult(ic.Count > 0), intProvider => intProvider.Dequeue(), async (i, ct) =>
             {
                 await Task.Delay(5, ct);
                 cb.Add(i);
@@ -458,7 +458,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            var result = await AdvancedParallelFactory.WhileResultAsync(ic, () => Task.FromResult(ic.TryPeek(out _)), intProvider => intProvider.Dequeue(), async (i, ct) =>
+            var result = await AdvancedParallelFactory.WhileResultAsync(ic, () => Task.FromResult(ic.Count > 0), intProvider => intProvider.Dequeue(), async (i, ct) =>
             {
                 await Task.Delay(50, ct);
                 cb.Add(i);
@@ -484,7 +484,7 @@ namespace Cuemon.Threading
 
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             {
-                await AdvancedParallelFactory.WhileResultAsync(ic, () => Task.FromResult(ic.TryPeek(out _)), intProvider => intProvider.Dequeue(), async (i, ct) =>
+                await AdvancedParallelFactory.WhileResultAsync(ic, () => Task.FromResult(ic.Count > 0), intProvider => intProvider.Dequeue(), async (i, ct) =>
                 {
                     if (i > 450) { cts.Cancel(); }
                     await Task.Delay(Generate.RandomNumber(25, 75), ct);
@@ -507,7 +507,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            var result = await AdvancedParallelFactory.WhileResultAsync(ic, () => Task.FromResult(ic.TryPeek(out _)), intProvider => intProvider.Dequeue(), async (i, ct) =>
+            var result = await AdvancedParallelFactory.WhileResultAsync(ic, () => Task.FromResult(ic.Count > 0), intProvider => intProvider.Dequeue(), async (i, ct) =>
             {
                 await Task.Delay(_longRunningTaskWaitTime, ct);
                 cb.Add(i);
@@ -527,7 +527,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            var result = await AdvancedParallelFactory.WhileResultAsync(ic, () => Task.FromResult(ic.TryPeek(out _)), intProvider => intProvider.Dequeue(), async (i, ct) =>
+            var result = await AdvancedParallelFactory.WhileResultAsync(ic, () => Task.FromResult(ic.Count > 0), intProvider => intProvider.Dequeue(), async (i, ct) =>
             {
                 await Task.Delay(5, ct);
                 cb.Add(i);

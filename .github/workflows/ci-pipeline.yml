@@ -191,7 +191,7 @@ jobs:
           SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
 
       - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: build-${{ matrix.configuration }}-X64
           merge-multiple: true

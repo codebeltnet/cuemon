@@ -12,12 +12,12 @@ This is a patch release focused on fixing request service provider resolution fo
 
 ### Fixed
 
-- `ServiceProviderExtensions.GetServiceDescriptors()` method to properly traverse and handle wrapped service providers with cycle detection; the method now correctly resolves descriptors when the provider is wrapped by third-party components such as AspVersioning's InjectApiVersion,
+- `ServiceProviderExtensions.GetServiceDescriptors()` method to properly traverse and handle wrapped service providers, including detection and rejection of cyclic provider graphs; the method now correctly resolves descriptors when the provider is wrapped by third-party components such as AspVersioning's InjectApiVersion and throws `NotSupportedException` with descriptive messages when ambiguous or cyclic provider structures are encountered,
 - `UseFaultDescriptorExceptionHandler()` middleware to work correctly when request services are wrapped by external decorators or proxies.
 
 ### Added
 
-- `ServiceProviderExtensionsTest` unit test class with comprehensive test coverage for `GetServiceDescriptors()` method, including scenarios for delegating providers, AspVersioning wrapped providers, and ambiguous multi-provider cases,
+- `ServiceProviderExtensionsTest` unit test class with comprehensive test coverage for `GetServiceDescriptors()` method, including scenarios for delegating providers, ambiguous multi-provider cases, and cyclic provider graph detection,
 - Functional test in `ApplicationBuilderExtensionsTest` to verify fault descriptor exception handling works correctly with wrapped request services.
 
 ## [10.5.2] - 2026-05-18

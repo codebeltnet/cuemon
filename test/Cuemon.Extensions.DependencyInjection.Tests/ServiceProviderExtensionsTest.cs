@@ -42,14 +42,30 @@ namespace Cuemon.Extensions.DependencyInjection
         }
 
         [Fact]
-        public void GetServiceDescriptors_ShouldThrowNotSupportedException_WhenProviderWrapsMultipleServiceProviders()
+        public void GetServiceDescriptors_ShouldThrowNotSupportedExceptionWithUnsupportedProviderMessage_WhenProviderWrapsMultipleServiceProviders()
         {
             var services = new ServiceCollection();
             var primaryProvider = services.BuildServiceProvider();
             var secondaryProvider = services.BuildServiceProvider();
             var wrappedProvider = new AmbiguousDelegatingServiceProvider(primaryProvider, secondaryProvider);
 
-            Assert.Throws<NotSupportedException>(() => wrappedProvider.GetServiceDescriptors().ToList());
+            var exception = Assert.Throws<NotSupportedException>(() => wrappedProvider.GetServiceDescriptors().ToList());
+
+            Assert.Contains("This method does not support", exception.Message, StringComparison.Ordinal);
+            Assert.Contains(typeof(AmbiguousDelegatingServiceProvider).FullName, exception.Message, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        public void GetServiceDescriptors_ShouldThrowNotSupportedExceptionWithCycleMessage_WhenProviderGraphIsCyclic()
+        {
+            var primaryProvider = new CyclicDelegatingServiceProvider();
+            var secondaryProvider = new CyclicDelegatingServiceProvider();
+            primaryProvider.Provider = secondaryProvider;
+            secondaryProvider.Provider = primaryProvider;
+
+            var exception = Assert.Throws<NotSupportedException>(() => primaryProvider.GetServiceDescriptors().ToList());
+
+            Assert.Contains("cyclic IServiceProvider graph", exception.Message, StringComparison.Ordinal);
         }
 
         private sealed class DelegatingServiceProvider : IServiceProvider
@@ -64,6 +80,16 @@ namespace Cuemon.Extensions.DependencyInjection
             public object GetService(Type serviceType)
             {
                 return _provider.GetService(serviceType);
+            }
+        }
+
+        private sealed class CyclicDelegatingServiceProvider : IServiceProvider
+        {
+            public IServiceProvider Provider { get; set; }
+
+            public object GetService(Type serviceType)
+            {
+                return Provider.GetService(serviceType);
             }
         }
 

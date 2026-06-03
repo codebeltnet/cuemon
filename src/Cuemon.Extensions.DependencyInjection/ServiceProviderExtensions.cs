@@ -15,7 +15,7 @@ namespace Cuemon.Extensions.DependencyInjection
         /// </summary>
         /// <param name="provider">The <see cref="IServiceProvider"/> to extend.</param>
         /// <returns>An enumeration of ALL <see cref="ServiceDescriptor"/> instances from the specified <paramref name="provider"/>.</returns>
-        /// <exception cref="NotSupportedException">This method does not support {providerType.FullName}.</exception>
+        /// <exception cref="NotSupportedException">This method does not support {providerType.FullName}; or a cyclic provider graph was detected.</exception>
         public static IEnumerable<ServiceDescriptor> GetServiceDescriptors(this IServiceProvider provider)
         {
             Validator.ThrowIfNull(provider);
@@ -32,7 +32,10 @@ namespace Cuemon.Extensions.DependencyInjection
                 }
 
                 if (!TryLocateEmbeddedServiceProvider(provider, providerType, out var embeddedProvider)) { break; }
-                if (visitedProviders.Any(visitedProvider => ReferenceEquals(visitedProvider, embeddedProvider.ServiceProvider))) { break; }
+                if (visitedProviders.Any(visitedProvider => ReferenceEquals(visitedProvider, embeddedProvider.ServiceProvider)))
+                {
+                    throw new NotSupportedException($"A cyclic IServiceProvider graph was detected between {providerType.FullName} and {embeddedProvider.ProviderType.FullName}.");
+                }
                 provider = embeddedProvider.ServiceProvider;
                 providerType = embeddedProvider.ProviderType;
                 visitedProviders.Add(provider);

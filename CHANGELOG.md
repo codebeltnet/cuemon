@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.5.3] - 2026-06-03
+
+This is a patch release focused on fixing request service provider resolution for wrapped providers and improving test coverage for dependency injection scenarios.
+
+### Fixed
+
+- `ServiceProviderExtensions.GetServiceDescriptors()` method to properly traverse and handle wrapped service providers, including detection and rejection of cyclic provider graphs; the method now correctly resolves descriptors when the provider is wrapped by third-party components such as AspVersioning's InjectApiVersion and throws `NotSupportedException` with descriptive messages when ambiguous or cyclic provider structures are encountered,
+- `UseFaultDescriptorExceptionHandler()` middleware to work correctly when request services are wrapped by external decorators or proxies.
+
+### Added
+
+- `ServiceProviderExtensionsTest` unit test class with comprehensive test coverage for `GetServiceDescriptors()` method, including scenarios for delegating providers, ambiguous multi-provider cases, and cyclic provider graph detection,
+- Functional test in `ApplicationBuilderExtensionsTest` to verify fault descriptor exception handling works correctly with wrapped request services.
+
 ## [10.5.2] - 2026-05-18
 
 This is a service update that focuses on package dependencies.
@@ -1749,6 +1763,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.5.3]: https://github.com/codebeltnet/cuemon/compare/v10.5.2...v10.5.3
 [10.5.2]: https://github.com/codebeltnet/cuemon/compare/v10.5.1...v10.5.2
 [10.5.1]: https://github.com/codebeltnet/cuemon/compare/v10.5.0...v10.5.1
 [10.5.0]: https://github.com/codebeltnet/cuemon/compare/v10.4.0...v10.5.0

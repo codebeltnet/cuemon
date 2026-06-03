@@ -1,3 +1,9 @@
+Version: 10.5.3
+Availability: .NET 10 and .NET 9
+
+# Bug Fixes
+- FIXED UseFaultDescriptorExceptionHandler() middleware to work correctly when request services are wrapped by external decorators or proxies
+
 Version: 10.5.2
 Availability: .NET 10 and .NET 9
 

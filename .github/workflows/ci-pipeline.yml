@@ -12,6 +12,10 @@ on:
         options:
           - Debug
           - Release
+      run_mac_tests:
+        type: boolean
+        description: Run the macOS test matrix despite the additional cost and runtime.
+        default: false
 
 permissions:
   contents: read
@@ -22,6 +26,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       run-privileged-jobs: ${{ steps.vars.outputs.run-privileged-jobs }}
+      run-mac-tests: ${{ steps.vars.outputs.run-mac-tests }}
       strong-name-key-filename: ${{ steps.vars.outputs.strong-name-key-filename }}
       build-switches: ${{ steps.vars.outputs.build-switches }}
     steps:
@@ -29,6 +34,12 @@ jobs:
         name: calculate workflow variables
         shell: bash
         run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.run_mac_tests }}" == "true" ]]; then
+            echo "run-mac-tests=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run-mac-tests=false" >> "$GITHUB_OUTPUT"
+          fi
+
           if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
             echo "run-privileged-jobs=false" >> "$GITHUB_OUTPUT"
             echo "strong-name-key-filename=" >> "$GITHUB_OUTPUT"
@@ -130,6 +141,26 @@ jobs:
       restore: true # apparently we need to restore for .net48
       download-pattern: build-${{ matrix.configuration }}-${{ matrix.arch }}
 
+  test_mac:
+    if: ${{ needs.init.outputs.run-mac-tests == 'true' }}
+    name: call-test-mac
+    needs: [init, build, prepare_test]
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [X64, ARM64]
+        configuration: [Debug, Release]
+        project: ${{ fromJson(needs.prepare_test.outputs.json) }}
+    uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
+    with:
+      runs-on: ${{ matrix.arch == 'ARM64' && 'macos-26' || 'macos-26-intel' }}
+      configuration: ${{ matrix.configuration }}
+      build-switches: -p:SkipSignAssembly=true
+      projects: ${{ matrix.project }}
+      build: true # we need to build due to xUnitv3
+      restore: true # we need to restore since we disabled caching
+      download-pattern: build-${{ matrix.configuration }}-${{ matrix.arch }}
+
   integration_test:
     if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
     name: ⚗️ Integration Test
@@ -160,7 +191,7 @@ jobs:
           SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
 
       - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: build-${{ matrix.configuration }}-X64
           merge-multiple: true
@@ -270,10 +301,57 @@ jobs:
         with:
           command: down
 
+  test_qualitygate:
+    if: ${{ always() }}
+    name: test-qualitygate
+    needs: [init, test_linux, test_windows, test_mac, integration_test]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Evaluate test results
+        shell: bash
+        env:
+          RUN_MAC_TESTS: ${{ needs.init.outputs.run-mac-tests }}
+          RUN_PRIVILEGED_JOBS: ${{ needs.init.outputs.run-privileged-jobs }}
+          TEST_LINUX_RESULT: ${{ needs.test_linux.result }}
+          TEST_WINDOWS_RESULT: ${{ needs.test_windows.result }}
+          TEST_MAC_RESULT: ${{ needs.test_mac.result }}
+          INTEGRATION_TEST_RESULT: ${{ needs.integration_test.result }}
+        run: |
+          require_success() {
+            local job_name="$1"
+            local job_result="$2"
+
+            if [[ "$job_result" != "success" ]]; then
+              echo "::error::$job_name finished with '$job_result'."
+              exit 1
+            fi
+          }
+
+          require_success_or_skip() {
+            local job_name="$1"
+            local job_enabled="$2"
+            local job_result="$3"
+
+            if [[ "$job_enabled" == "true" ]]; then
+              require_success "$job_name" "$job_result"
+              return
+            fi
+
+            if [[ "$job_result" != "success" && "$job_result" != "skipped" ]]; then
+              echo "::error::$job_name finished with '$job_result' while disabled."
+              exit 1
+            fi
+          }
+
+          require_success "test_linux" "$TEST_LINUX_RESULT"
+          require_success "test_windows" "$TEST_WINDOWS_RESULT"
+          require_success_or_skip "test_mac" "$RUN_MAC_TESTS" "$TEST_MAC_RESULT"
+          require_success_or_skip "integration_test" "$RUN_PRIVILEGED_JOBS" "$INTEGRATION_TEST_RESULT"
+
   sonarcloud:
-    if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
+    if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}
     name: call-sonarcloud
-    needs: [init, build, test_linux, test_windows, integration_test]
+    needs: [init, build, test_qualitygate]
     uses: codebeltnet/jobs-sonarcloud/.github/workflows/default.yml@v3
     with:
       organization: geekle
@@ -283,9 +361,9 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   codecov:
-    if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
+    if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}
     name: call-codecov
-    needs: [init, build, test_linux, test_windows, integration_test]
+    needs: [init, build, test_qualitygate]
     uses: codebeltnet/jobs-codecov/.github/workflows/default.yml@v1
     with:
       repository: codebeltnet/cuemon
@@ -293,9 +371,9 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   codeql:
-    if: ${{ needs.init.outputs.run-privileged-jobs == 'true' }}
+    if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}
     name: call-codeql
-    needs: [init, build, test_linux, test_windows, integration_test]
+    needs: [init, build, test_qualitygate]
     uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
     with:
       timeout-minutes: 30
@@ -305,7 +383,7 @@ jobs:
   deploy:
     if: github.event_name != 'pull_request'
     name: call-nuget
-    needs: [build, pack, test_linux, test_windows, integration_test, sonarcloud, codecov, codeql]
+    needs: [build, pack, test_qualitygate, sonarcloud, codecov, codeql]
     uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3
     with:
       version: ${{ needs.build.outputs.version }}

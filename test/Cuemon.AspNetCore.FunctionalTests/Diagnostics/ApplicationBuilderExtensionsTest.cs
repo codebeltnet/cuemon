@@ -20,6 +20,41 @@ namespace Cuemon.AspNetCore.Diagnostics
         {
         }
 
+        [Fact]
+        public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_WhenRequestServicesIsWrappedByAspVersioningInjectApiVersion()
+        {
+            using var response = await WebHostTestFactory.RunAsync(
+                services =>
+                {
+                    services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
+                    services.AddJsonExceptionResponseFormatter();
+                },
+                app =>
+                {
+                    app.UseFaultDescriptorExceptionHandler();
+                    app.Use((Func<Microsoft.AspNetCore.Http.HttpContext, Func<Task>, Task>)((context, _) =>
+                    {
+                        context.RequestServices = new Asp.Versioning.Builder.EndpointBuilderFinalizer.InjectApiVersion(context.RequestServices);
+                        throw new NotFoundException();
+                    }));
+                },
+                responseFactory: client =>
+                {
+                    client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                    return client.GetAsync("/");
+                });
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            TestOutput.WriteLine(body);
+
+            Assert.Equal(404, (int)response.StatusCode);
+            Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
+            Assert.EndsWith("Asp.Versioning.Builder.EndpointBuilderFinalizer+InjectApiVersion", typeof(Asp.Versioning.Builder.EndpointBuilderFinalizer.InjectApiVersion).FullName, StringComparison.Ordinal);
+            Assert.Contains("\"title\": \"NotFound\"", body, StringComparison.Ordinal);
+            Assert.Contains("\"status\": 404", body, StringComparison.Ordinal);
+        }
+
         [Theory]
         [InlineData(FaultSensitivityDetails.All)]
         [InlineData(FaultSensitivityDetails.Evidence)]
@@ -734,6 +769,27 @@ namespace Cuemon.AspNetCore.Diagnostics
                               	</Request>
                               </ProblemDetails>
                               """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
+        }
+    }
+}
+
+namespace Asp.Versioning.Builder
+{
+    internal static class EndpointBuilderFinalizer
+    {
+        internal sealed class InjectApiVersion : IServiceProvider
+        {
+            private readonly IServiceProvider _serviceProvider;
+
+            public InjectApiVersion(IServiceProvider serviceProvider)
+            {
+                _serviceProvider = serviceProvider;
+            }
+
+            public object GetService(Type serviceType)
+            {
+                return _serviceProvider.GetService(serviceType);
+            }
         }
     }
 }

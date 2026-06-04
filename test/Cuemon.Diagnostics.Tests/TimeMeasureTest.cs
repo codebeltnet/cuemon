@@ -12,7 +12,7 @@ namespace Cuemon.Diagnostics
     {
         private static readonly TimeSpan ExpectedExecutionTime = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan LowerJitter = TimeSpan.FromMilliseconds(250);
-        private static readonly TimeSpan UpperJitter = TimeSpan.FromSeconds(2);
+        private static readonly TimeSpan UpperJitter = TimeSpan.FromMilliseconds(500);
 
         public TimeMeasureTest(ITestOutputHelper output) : base(output)
         {

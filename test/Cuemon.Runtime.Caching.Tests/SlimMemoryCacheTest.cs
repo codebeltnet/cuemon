@@ -235,6 +235,10 @@ namespace Cuemon.Runtime.Caching
             AssertNamespaceIsLogicallyExpired(Sliding30Namespace);
             AssertNamespaceIsLogicallyExpired(Absolute30Namespace);
 
+            AssertNamespaceIsPhysicallyPresent(Dependency30Namespace);
+            AssertNamespaceIsPhysicallyPresent(Sliding30Namespace);
+            AssertNamespaceIsPhysicallyPresent(Absolute30Namespace);
+
             AssertNamespaceIsPhysicallyRemoved(Dependency30Namespace);
             AssertNamespaceIsPhysicallyRemoved(Sliding30Namespace);
             AssertNamespaceIsPhysicallyRemoved(Absolute30Namespace);
@@ -248,6 +252,10 @@ namespace Cuemon.Runtime.Caching
             AssertNamespaceIsLogicallyExpired(Dependency60Namespace);
             AssertNamespaceIsLogicallyExpired(Sliding60Namespace);
             AssertNamespaceIsLogicallyExpired(Absolute60Namespace);
+
+            AssertNamespaceIsPhysicallyPresent(Dependency60Namespace);
+            AssertNamespaceIsPhysicallyPresent(Sliding60Namespace);
+            AssertNamespaceIsPhysicallyPresent(Absolute60Namespace);
 
             AssertNamespaceIsPhysicallyRemoved(Dependency60Namespace);
             AssertNamespaceIsPhysicallyRemoved(Sliding60Namespace);
@@ -323,6 +331,14 @@ namespace Cuemon.Runtime.Caching
         {
             Assert.True(SpinWait.SpinUntil(() => !_cache.Any(pair => pair.Value.Namespace == ns), CleanupTimeout),
                 $"Cache entries in namespace '{ns}' were not physically removed within {CleanupTimeout}.");
+        }
+
+        private void AssertNamespaceIsPhysicallyPresent(string ns)
+        {
+            var physicalCount = _cache.Where(pair => pair.Value.Namespace == ns).Count();
+
+            Assert.True(physicalCount == NumberOfItemsToCache,
+                $"Cache entries in namespace '{ns}' should remain physically present until cleanup. Expected {NumberOfItemsToCache}, actual {physicalCount}.");
         }
 
         private void AssertNamespaceIsLogicallyExpired(string ns)

@@ -29,7 +29,7 @@ namespace Cuemon.Resilience.Assets
 
         public static Task TriggerLatencyExceptionAsync(Guid id, ConcurrentDictionary<Guid, int> retryTracker, CancellationToken ct)
         {
-            Thread.Sleep(250);
+            Thread.Sleep(750);
             retryTracker[id] += 1;
             throw new HttpRequestException();
         }

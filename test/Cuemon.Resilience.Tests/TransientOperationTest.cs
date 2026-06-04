@@ -21,7 +21,7 @@ namespace Cuemon.Resilience
         private const int NormalRunIncrement = 1;
         private const int DescriptiveExceptionCauseIncrement = 1;
         private static readonly TimeSpan ExpectedRecoveryWaitTime = TimeSpan.FromSeconds(1);
-        private static readonly TimeSpan ExpectedMaximumAllowedLatency = TimeSpan.FromMilliseconds(250);
+        private static readonly TimeSpan ExpectedMaximumAllowedLatency = TimeSpan.FromMilliseconds(500);
 
         public TransientOperationTest(ITestOutputHelper output) : base(output)
         {

@@ -27,9 +27,9 @@ namespace Cuemon.Resilience.Assets
             throw new HttpRequestException();
         }
 
-        public static Task TriggerLatencyExceptionAsync(Guid id, ConcurrentDictionary<Guid, int> retryTracker, CancellationToken ct)
+        public static async Task TriggerLatencyExceptionAsync(Guid id, ConcurrentDictionary<Guid, int> retryTracker, CancellationToken ct)
         {
-            Thread.Sleep(750);
+            await Task.Delay(750, ct);
             retryTracker[id] += 1;
             throw new HttpRequestException();
         }

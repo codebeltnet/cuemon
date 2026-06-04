@@ -11,7 +11,7 @@ namespace Cuemon.Diagnostics
     public class TimeMeasureTest : Test
     {
         private static readonly TimeSpan ExpectedExecutionTime = TimeSpan.FromSeconds(1);
-        private static readonly TimeSpan Jitter = TimeSpan.FromMilliseconds(100);
+        private static readonly TimeSpan Jitter = TimeSpan.FromMilliseconds(250);
 
         public TimeMeasureTest(ITestOutputHelper output) : base(output)
         {

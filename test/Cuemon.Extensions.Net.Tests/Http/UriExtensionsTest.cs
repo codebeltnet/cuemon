@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -24,7 +24,7 @@ namespace Cuemon.Extensions.Net.Http
         public async Task HttpGetAsync_ShouldGetResponseFromUri()
         {
             // Test SlimHttpClientFactory robustness under parallel load using a reliable external server
-            var uri = new Uri("https://httpbin.org/status/200");
+            var uri = new Uri("https://free.mockerapi.com/200");
             var expected = 125;
             var atomicCount = 0;
 
@@ -44,7 +44,7 @@ namespace Cuemon.Extensions.Net.Http
         public async Task HttpGetAsync_ShouldHandleHttpStatusCodes()
         {
             // Test that the extension method properly returns non-OK status codes under parallel load
-            var uri = new Uri("https://httpbin.org/status/404");
+            var uri = new Uri("https://free.mockerapi.com/404");
             var expected = 50;
             var atomicCount = 0;
 

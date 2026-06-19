@@ -27,8 +27,8 @@ Complements: [Cuemon.AspNetCore.Configuration namespace](https://docs.cuemon.net
 [Cuemon.AspNetCore.App (Stable and Preview)](https://www.nuget.org/packages/Cuemon.AspNetCore.App)\
 ![NuGet Version](https://img.shields.io/nuget/v/Cuemon.AspNetCore.App?logo=nuget) ![NuGet Preview Version](https://img.shields.io/nuget/vpre/Cuemon.AspNetCore.App?logo=nuget) ![NuGet Downloads](https://img.shields.io/nuget/dt/Cuemon.AspNetCore.App?color=blueviolet&logo=nuget)
 
-### Extension Methods
+### Extension Members
 
 |Type|Ext|Methods|
 |--:|:-:|---|
-|IServiceCollection|⬇️|`AddCacheBusting{T}`, `AddAssemblyCacheBusting`, `AddDynamicCacheBusting`|
+|IServiceCollection|⬇️|`AddCacheBusting<T>`, `AddAssemblyCacheBusting`, `AddDynamicCacheBusting`|

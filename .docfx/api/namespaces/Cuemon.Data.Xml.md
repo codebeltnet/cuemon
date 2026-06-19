@@ -2,6 +2,6 @@
 uid: Cuemon.Data.Xml
 summary: *content
 ---
-The `Cuemon.Data.Xml` namespace contains an implementation of the DataReader class that provides a way of reading a forward-only stream of rows from an XML based data source.
+Query XML data through a familiar ADO.NET `DbDataReader` interface using a forward-only stream of rows from XML data sources. Use this namespace when you need ADO.NET-style data access over XML content. Start with `XmlDataReader` to read XML data as a tabular result set for XML-driven data access.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]

@@ -2,7 +2,7 @@
 uid: Cuemon.Runtime
 summary: *content
 ---
-The `Cuemon.Runtime` namespace contains types that support different namespaces such as the `Cuemon`, `Cuemon.Data`, `Cuemon.Net`, and the `Cuemon.Runtime.Caching` namespaces (to name a few). The namespace is an addition to the `System.Runtime` namespace.
+The `Cuemon.Runtime` namespace provides base types for background tasks, timed operations, and resource management across the Cuemon framework. Use `BackgroundTask` for long-running operations, or `Timer` for interval-based execution. The types in this namespace support caching, data synchronization, and networking components throughout the rest of the framework.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 

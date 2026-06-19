@@ -2,7 +2,7 @@
 uid: Cuemon.Diagnostics
 summary: *content
 ---
-The Cuemon.Diagnostics namespace contains types that provide ways for developers to describe exceptions including evidence to why an operation faulted. Also includes a flexible, generic and lambda friendly way to perform both synchronous and asynchronous time measuring operations. The namespace is an addition to the System.Diagnostics namespace.
+Capture structured exception context for logging and API error responses, or profile synchronous and asynchronous code execution. Use this namespace when you need detailed exception context or performance measurement. Start with `ExceptionDescriptor` for structured error reporting, or `TimeMeasure` / `TimeMeasureProfiler` for lambda-friendly code profiling.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 

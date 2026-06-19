@@ -2,7 +2,7 @@
 uid: Cuemon.AspNetCore.Mvc.Filters
 summary: *content
 ---
-The `Cuemon.AspNetCore.Mvc.Filters` namespace contains types that supports a generic way of working with built-in interfaces providing ready-to-use class abstractions. The namespace is an addition to the `Microsoft.AspNetCore.Mvc.Filters` namespace.
+Write custom ASP.NET Core MVC filters for caching, diagnostics, headers, model binding, and throttling without boilerplate infrastructure code. Use this namespace when you need base classes and abstractions that integrate with the ASP.NET Core filter pipeline. For a custom cache or diagnostic filter, start with `ConfigurableMvcFilterBase<T>`.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 

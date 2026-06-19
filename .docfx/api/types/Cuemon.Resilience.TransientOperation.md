@@ -1,0 +1,31 @@
+---
+uid: Cuemon.Resilience.TransientOperation
+example:
+- *content
+---
+
+```csharp
+using System;
+using System.Net.Http;
+using Cuemon.Resilience;
+
+namespace Cuemon.Resilience;
+
+public class TransientOperationExample
+{
+    public void Demonstrate()
+    {
+        var result = TransientOperation.WithFunc(() =>
+        {
+            using var client = new HttpClient();
+            return client.GetStringAsync("https://example.com").Result;
+        }, options =>
+        {
+            options.RetryAttempts = 3;
+            options.RetryStrategy = attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt));
+        });
+
+        Console.WriteLine($"Response length: {result.Length}");
+    }
+}
+```

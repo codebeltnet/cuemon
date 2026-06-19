@@ -2,7 +2,7 @@
 uid: Cuemon.AspNetCore.Mvc.Formatters
 summary: *content
 ---
-The `Cuemon.AspNetCore,Mvc.Formatters` namespace contains types that customizes working with both TextInputFormatter and TextOutputFormatter. The namespace is an addition to the `Microsoft.AspNetCore.Mvc.Formatters` namespace.
+Simplify working with raw request and response bodies in ASP.NET Core MVC using configurable input and output formatters, including stream-based formatters. Use this namespace when you need custom serialization or streaming support in your MVC pipeline. Start with `StreamInputFormatter` and `StreamOutputFormatter` for raw stream handling, or extend `ConfigurableInputFormatter` and `ConfigurableOutputFormatter` for custom format processing.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 

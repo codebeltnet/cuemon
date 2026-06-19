@@ -2,7 +2,7 @@
 uid: Cuemon.AspNetCore.Mvc
 summary: *content
 ---
-The `Cuemon.AspNetCore,Mvc` namespace contains types that specializes in cache expiration and validation models and an abundant range of ready-to-use filters in the ASP.NET Core MVC pipeline. The namespace is an addition to the `Microsoft.AspNetCore.Mvc` namespace.
+Build HTTP cache-aware MVC results and structured error responses in the ASP.NET Core MVC pipeline using cache expiration models, content-based result types, and exception-handling filters. Use this namespace when you need conditional GET support, ETag/last-modified validation, or consistent API error responses. Start with `CacheableFactory` for building cacheable responses or `ExceptionDescriptorResult` for formatted API errors.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 

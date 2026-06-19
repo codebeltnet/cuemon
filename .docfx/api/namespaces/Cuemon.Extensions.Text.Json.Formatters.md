@@ -2,7 +2,7 @@
 uid: Cuemon.Extensions.Text.Json.Formatters
 summary: *content
 ---
-The `Cuemon.Extensions.Text.Json.Formatters` namespace contains types that are used to serialize and deserialize objects into and from JSON format using a generic signature.
+Serialize and deserialize objects using `System.Text.Json` through type-safe JSON formatters that integrate with ASP.NET Core's output formatter infrastructure. Use this namespace when you need configurable, generic JSON serialization in pipelines. Start with `JsonFormatter<T>` for type-safe JSON formatting with custom options.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 

@@ -2,13 +2,13 @@
 uid: Cuemon.Extensions.Collections.Specialized
 summary: *content
 ---
-The `Cuemon.Extensions.Collections.Specialized` namespace contains extension methods that complements the `Cuemon.Collections.Specialized` namespace while being an addition to the `System.Collections.Specialized` namespace.
+Add dictionary-style operations like `ContainsKey` and `ToDictionary` to `NameValueCollection` for easier interoperability with generic collection types. Use this namespace when you need to bridge specialized `NameValueCollection` APIs with generic dictionary operations. Start with `ToDictionary` on `NameValueCollection` for LINQ integration, or `ToNameValueCollection` on `IDictionary{string, string[]}` for the reverse conversion.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 
 Complements: [Cuemon.Collections.Specialized namespace](/api/dotnet/Cuemon.Collections.Specialized.html) 📘
 
-### Extension Methods
+### Extension Members
 
 |Type|Ext|Methods|
 |--:|:-:|---|

@@ -2,7 +2,7 @@
 uid: Cuemon.Security.Cryptography
 summary: *content
 ---
-The `Cuemon.Security.Cryptography` namespace contains types related to cryptographic hashing (both keyed and non-keyed) and a ready-to-use implementation of the Advanced Encryption Standard (AES) symmetric algorithm. The namespace is an addition to the `System.Security.Cryptography` namespace.
+Compute cryptographic hashes (keyed and non-keyed) and perform AES symmetric encryption through a service-oriented API. Use this namespace when you need HMAC, cryptographic hashing, or symmetric encryption. Start with `KeyedHashFactory` for HMAC, `HashFactory` for cryptographic hashing, or `AesCryptographyService` for AES encryption.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 

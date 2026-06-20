@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.5.4] - 2026-06-20
+
+This is a patch release focused on dependency maintenance and comprehensive API documentation improvements. The release significantly expands published type-level and namespace-level guidance with concrete consumer-oriented examples, establishes DocFX documentation standards, and refactors test infrastructure for improved efficiency.
+
+### Changed
+
+- Upgrade dependencies to latest patch versions: Docker base image nginx (1.31.0 → 1.31.1), Codebelt.Extensions (11.0.9 → 11.1.0, 1.2.6 → 1.3.0), Microsoft.NET.Test.Sdk (18.5.1 → 18.6.0), and .NET 9/10 runtime packages,
+- Refactor cache expiration tests in `SlimMemoryCacheTest` for improved readability and efficiency.
+
+### Added
+
+- Comprehensive API documentation across 100+ namespace and 570+ type documentation files with consumer-oriented descriptions and guidance,
+- Type-level API documentation with concrete examples for 220+ public classes, structs, interfaces, and extension methods across the entire library,
+- Namespace-level documentation featuring extension member tables that enumerate all extension methods grouped by extended type,
+- DocFX documentation maintenance standards in `AGENTS.md` establishing requirements for public type documentation, examples, availability metadata, and verification workflows.
+
 ## [10.5.3] - 2026-06-03
 
 This is a patch release focused on fixing request service provider resolution for wrapped providers and significantly expanding test coverage across 15 assemblies to achieve >=95% coverage. The release consolidates ad-hoc coverage tests into integrated, maintainable test suites.
@@ -1782,6 +1798,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.5.4]: https://github.com/codebeltnet/cuemon/compare/v10.5.3...v10.5.4
 [10.5.3]: https://github.com/codebeltnet/cuemon/compare/v10.5.2...v10.5.3
 [10.5.2]: https://github.com/codebeltnet/cuemon/compare/v10.5.1...v10.5.2
 [10.5.1]: https://github.com/codebeltnet/cuemon/compare/v10.5.0...v10.5.1

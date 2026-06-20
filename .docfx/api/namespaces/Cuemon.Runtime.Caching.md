@@ -2,7 +2,7 @@
 uid: Cuemon.Runtime.Caching
 summary: *content
 ---
-The `Cuemon.Runtime.Caching` namespace contains types related to interfaces for generic caching in applications while providing a concrete in-memory cache implementation named SlimMemoryCache. The namespace is an addition to the `System.Runtime.Caching` namespace.
+Cache application data through a simple, generic caching API with `SlimMemoryCache` as the lightweight in-memory implementation. Use this namespace when you need application-level caching with a generic API. Start with `SlimMemoryCache` for in-memory caching, or implement `ICache<TKey>` for custom cache backends.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 

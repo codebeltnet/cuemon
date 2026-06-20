@@ -2,13 +2,13 @@
 uid: Cuemon.Extensions.Text
 summary: *content
 ---
-The `Cuemon.Extensions.Text` namespace contains extension methods that complements the `Cuemon.Text` namespace while being an addition to the `System` namespace.
+Detect character encodings and convert strings to their encoded byte representations without manual encoding logic. Use this namespace when you need encoding detection or string-to-encoded-byte conversion. Start with `DetectUnicodeEncoding` on `IEncodingOptions` for encoding detection, or `ToEncodedString` on `String` for encoding-aware string conversion.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 
 Complements: [Cuemon.Text namespace](/api/dotnet/Cuemon.Text.html) 📘
 
-### Extension Methods
+### Extension Members
 
 |Type|Ext|Methods|
 |--:|:-:|---|

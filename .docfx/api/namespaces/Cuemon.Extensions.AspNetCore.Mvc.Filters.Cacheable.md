@@ -2,14 +2,15 @@
 uid: Cuemon.Extensions.AspNetCore.Mvc.Filters.Cacheable
 summary: *content
 ---
-The `Cuemon.Extensions.AspNetCore.Mvc.Filters.Cacheable` namespace contains extension methods that complements the `Cuemon.AspNetCore.Mvc.Filters.Cacheable` namespace.
+Add or insert custom cacheable filters and attach ETag or Last-Modified headers to HTTP responses in the ASP.NET Core MVC pipeline. Use this namespace when you need to extend cacheable filters or attach HTTP caching headers to MVC responses. Start with `AddFilter<T>` to register a new cacheable filter or `AddEntityTagHeader` for ETag header support.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 
 Complements: [Cuemon.AspNetCore.Mvc.Filters.Cacheable namespace](/api/aspnet/Cuemon.AspNetCore.Mvc.Filters.Cacheable.html) 🔗
 
-### Extension Methods
+### Extension Members
 
 |Type|Ext|Methods|
 |--:|:-:|---|
-|ICacheableAsyncResultFilter|⬇️|`AddFilter{T}`, `AddFilter{T, TOptions}`, `InsertFilter{T}`, `InsertFilter{T, TOptions}`, `AddEntityTagHeader`, `AddLastModifiedHeader`|
+|IList<ICacheableAsyncResultFilter>|⬇️|`AddFilter<T>`, `AddFilter<T, TOptions>`, `InsertFilter<T>`, `InsertFilter<T, TOptions>`|
+|ICacheableAsyncResultFilter|⬇️|`AddEntityTagHeader`, `AddLastModifiedHeader`|

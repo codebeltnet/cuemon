@@ -2,7 +2,7 @@
 uid: Cuemon.Threading
 summary: *content
 ---
-The `Cuemon.Threading` namespace contains types related to working with long-running concurrent loops and regions that utilizes both synchronous and asynchronous delegates. The namespace is an addition to the `System.Threading` namespace.
+Execute parallel loops, manage concurrent regions, and apply advanced threading patterns with synchronous or asynchronous delegates. Use this namespace when you need fine-grained control over concurrent iterations. Start with `ParallelLoop` for synchronous parallelism or `AsyncParallelLoop` for asynchronous patterns with cancellation, throttling, and aggregation.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 

@@ -2,7 +2,7 @@
 uid: Cuemon.Messaging
 summary: *content
 ---
-The `Cuemon.Messaging` namespace contains types that assist in more advanced scenarios such as CQRS, microservices and event-driven architecture. The namespace is an addition to the `System.Messaging` namespace.
+The `Cuemon.Messaging` namespace provides types for implementing CQRS, microservices communication, and event-driven architectures. Use `CorrelationToken` to correlate messages across service boundaries, or the message envelope types when you need standardized request/response patterns with correlation support.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 

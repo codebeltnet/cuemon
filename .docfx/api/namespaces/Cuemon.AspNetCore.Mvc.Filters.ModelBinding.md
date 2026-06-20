@@ -2,7 +2,7 @@
 uid: Cuemon.AspNetCore.Mvc.Filters.ModelBinding
 summary: *content
 ---
-The `Cuemon.AspNetCore.Mvc.ModelBinding` namespace contains types that alters the built-in way of doing model binding. The namespace is an addition to the `Microsoft.AspNetCore.Mvc.ModelBinding` namespace.
+Control ASP.NET Core model binding at a granular level by disabling binding for specific properties or parameters. Use this namespace when you need to exclude certain parameters from model binding in your MVC controllers. Start with `DisableModelBindingAttribute` to annotate parameters or properties that should be excluded.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 

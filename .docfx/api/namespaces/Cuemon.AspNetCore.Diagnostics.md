@@ -2,7 +2,7 @@
 uid: Cuemon.AspNetCore.Diagnostics
 summary: *content
 ---
-The `Cuemon.AspNetCore.Diagnostics` namespace contains types that provides a way to support the Server-Timing header for communicating metrics about the request-response cycle to an user agent. The namespace is an addition to the `Microsoft.AspNetCore.Diagnostics` namespace.
+Handle HTTP errors and communicate request-response metrics in ASP.NET Core with structured exception descriptors, fault resolvers, and Server-Timing support. Use this namespace when you need consistent error responses, server-timing headers, or structured exception handling in your ASP.NET Core pipeline. Start with `HttpExceptionDescriptor` and `HttpFaultResolver` for mapping exceptions to HTTP error responses.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 
@@ -12,3 +12,13 @@ Related:
 
 - [Cuemon.AspNetCore.Mvc.Filters.Diagnostics namespace](/api/aspnet/Cuemon.AspNetCore.Mvc.Filters.Diagnostics.html) 📘
 - [Cuemon.Extensions.AspNetCore.Diagnostics namespace](/api/extensions/aspnet/Cuemon.Extensions.AspNetCore.Diagnostics.html) 📘
+
+### Extension Members
+
+|Type|Ext|Methods|
+|--:|:-:|---|
+|FaultDescriptorOptions|⬇️|`TryResolveHttpExceptionDescriptor`|
+|IDecorator<T>|⬇️|`TryResolveHttpExceptionDescriptor<T>`|
+|IDecorator<HttpExceptionDescriptor>|⬇️|`ToProblemDetails`|
+|HttpExceptionDescriptorResponseHandler|⬇️|`AddResponseHandler`|
+|IDecorator<IList<HttpFaultResolver>>|⬇️|`AddHttpFaultResolver<T>`|

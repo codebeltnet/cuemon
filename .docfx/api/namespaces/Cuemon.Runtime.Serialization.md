@@ -2,7 +2,7 @@
 uid: Cuemon.Runtime.Serialization
 summary: *content
 ---
-The `Cuemon.Runtime.Serialization` namespace contains types that are used to serialize objects into a hierarchy of nodes. The namespace is an addition to the `System.Runtime.Serialization` namespace.
+The `Cuemon.Runtime.Serialization` namespace provides a node-based serialization model that converts objects into a traversable hierarchy of `IXNode` elements, then formats the result as JSON, XML, or other structured outputs. Use this namespace when you need serialization that preserves structure and supports multiple output formats from a single object graph traversal.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 

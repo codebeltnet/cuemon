@@ -2,14 +2,14 @@
 uid: Cuemon.Extensions.Text.Json.Converters
 summary: *content
 ---
-The `Cuemon.Extensions.Text.Json.Converters` namespace contains both types and extension methods that complements the `System.Text.Json` namespace.
+Register `System.Text.Json` converters for Cuemon-specific types like `TransientFaultException`, `DataPair`, `ExceptionDescriptor`, and string-based enum serialization. Use this namespace when you need JSON serialization support for Cuemon types. Start with `AddStringEnumConverter` for enum serialization or `AddExceptionDescriptorConverterOf<T>` for structured error serialization.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 
 Complements: [System.Text.Json namespace](https://learn.microsoft.com/en-us/dotnet/api/system.text.json) 🔗
 
-### Extension Methods
+### Extension Members
 
 |Type|Ext|Methods|
 |--:|:-:|---|
-|JsonConverter|⬇️|`AddTransientFaultExceptionConverter`, `AddDateTimeConverter`, `AddStringEnumConverter`, `AddStringFlagsEnumConverter`, `AddExceptionDescriptorConverterOf{T}`, `AddExceptionConverter`, `AddDataPairConverter`, `AddFailureConverter`, `RemoveAllOf` and `RemoveAllOf{T}`|
+|ICollection<JsonConverter>|⬇️|`AddTransientFaultExceptionConverter`, `AddDateTimeConverter`, `AddStringEnumConverter`, `AddStringFlagsEnumConverter`, `AddExceptionDescriptorConverterOf<T>`, `AddExceptionConverter`, `AddDataPairConverter`, `AddFailureConverter`, `RemoveAllOf`, `RemoveAllOf<T>`|

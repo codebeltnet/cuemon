@@ -2,7 +2,7 @@
 uid: Cuemon.Runtime.Serialization.Formatters
 summary: *content
 ---
-The `Cuemon.Runtime.Serialization.Formatters` namespace contains types that are used to serialize and deserialize objects into and from a generic type. The namespace is an addition to the `System.Runtime.Serialization` namespace.
+Serialize and deserialize object graphs into JSON or XML through a node-based intermediate representation. Use this namespace when you need to format object hierarchies into JSON or XML output. Start with `JsonFormatter` for JSON serialization or `XmlFormatter` for XML serialization using the `HierarchySerializer` pipeline.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 

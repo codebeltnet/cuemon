@@ -229,37 +229,13 @@ namespace Cuemon.Runtime.Caching
         [Fact, Priority(8)]
         public void Add_VerifyBothLogicalAndActualCacheRemovalUponExpirationForThirtySecondsNamespaceSpecification()
         {
-            Thread.Sleep(TimeSpan.FromSeconds(30));
-
-            AssertNamespaceIsLogicallyExpired(Dependency30Namespace);
-            AssertNamespaceIsLogicallyExpired(Sliding30Namespace);
-            AssertNamespaceIsLogicallyExpired(Absolute30Namespace);
-
-            AssertNamespaceIsPhysicallyPresent(Dependency30Namespace);
-            AssertNamespaceIsPhysicallyPresent(Sliding30Namespace);
-            AssertNamespaceIsPhysicallyPresent(Absolute30Namespace);
-
-            AssertNamespaceIsPhysicallyRemoved(Dependency30Namespace);
-            AssertNamespaceIsPhysicallyRemoved(Sliding30Namespace);
-            AssertNamespaceIsPhysicallyRemoved(Absolute30Namespace);
+            VerifyBothLogicalAndActualCacheRemovalUponExpiration(Dependency30Namespace, Sliding30Namespace, Absolute30Namespace);
         }
 
         [Fact, Priority(9)]
         public void Add_VerifyBothLogicalAndActualCacheRemovalUponExpirationForSixtySecondsNamespaceSpecification()
         {
-            Thread.Sleep(TimeSpan.FromSeconds(20));
-
-            AssertNamespaceIsLogicallyExpired(Dependency60Namespace);
-            AssertNamespaceIsLogicallyExpired(Sliding60Namespace);
-            AssertNamespaceIsLogicallyExpired(Absolute60Namespace);
-
-            AssertNamespaceIsPhysicallyPresent(Dependency60Namespace);
-            AssertNamespaceIsPhysicallyPresent(Sliding60Namespace);
-            AssertNamespaceIsPhysicallyPresent(Absolute60Namespace);
-
-            AssertNamespaceIsPhysicallyRemoved(Dependency60Namespace);
-            AssertNamespaceIsPhysicallyRemoved(Sliding60Namespace);
-            AssertNamespaceIsPhysicallyRemoved(Absolute60Namespace);
+            VerifyBothLogicalAndActualCacheRemovalUponExpiration(Dependency60Namespace, Sliding60Namespace, Absolute60Namespace);
         }
 
         [Fact]
@@ -327,24 +303,61 @@ namespace Cuemon.Runtime.Caching
             services.AddSingleton<SlimMemoryCache>();
         }
 
-        private void AssertNamespaceIsPhysicallyRemoved(string ns)
+        private static void AssertNamespaceIsPhysicallyRemoved(SlimMemoryCache cache, string ns)
         {
-            Assert.True(SpinWait.SpinUntil(() => !_cache.Any(pair => pair.Value.Namespace == ns), CleanupTimeout),
+            Assert.True(SpinWait.SpinUntil(() => !cache.Any(pair => pair.Value.Namespace == ns), CleanupTimeout),
                 $"Cache entries in namespace '{ns}' were not physically removed within {CleanupTimeout}.");
         }
 
-        private void AssertNamespaceIsPhysicallyPresent(string ns)
+        private static void AssertNamespaceIsPhysicallyPresent(SlimMemoryCache cache, string ns)
         {
-            var physicalCount = _cache.Where(pair => pair.Value.Namespace == ns).Count();
+            var physicalCount = cache.Where(pair => pair.Value.Namespace == ns).Count();
 
             Assert.True(physicalCount == NumberOfItemsToCache,
                 $"Cache entries in namespace '{ns}' should remain physically present until cleanup. Expected {NumberOfItemsToCache}, actual {physicalCount}.");
         }
 
-        private void AssertNamespaceIsLogicallyExpired(string ns)
+        private static void AssertNamespaceIsLogicallyExpired(SlimMemoryCache cache, string ns)
         {
-            Assert.True(SpinWait.SpinUntil(() => _cache.Count(ns) == 0, CleanupTimeout),
+            Assert.True(SpinWait.SpinUntil(() => cache.Count(ns) == 0, CleanupTimeout),
                 $"Cache entries in namespace '{ns}' did not logically expire within {CleanupTimeout}.");
+        }
+
+        private static void VerifyBothLogicalAndActualCacheRemovalUponExpiration(string dependencyNs, string slidingNs, string absoluteNs)
+        {
+            using (var cache = CreateSlimMemoryCacheForExpirationTest())
+            {
+                var expires = TimeSpan.FromSeconds(1);
+                var keys = Generate.RangeOf(NumberOfItemsToCache, i => Guid.NewGuid().ToString("N")).ToList();
+
+                foreach (var key in keys)
+                {
+                    cache.Add(key, Generate.RandomString(5), new CountdownDependency(expires), dependencyNs);
+                    cache.Add(key, Generate.RandomString(5), expires, slidingNs);
+                    cache.Add(key, Generate.RandomString(5), DateTime.UtcNow.Add(expires), absoluteNs);
+                }
+
+                AssertNamespaceIsLogicallyExpired(cache, dependencyNs);
+                AssertNamespaceIsLogicallyExpired(cache, slidingNs);
+                AssertNamespaceIsLogicallyExpired(cache, absoluteNs);
+
+                AssertNamespaceIsPhysicallyPresent(cache, dependencyNs);
+                AssertNamespaceIsPhysicallyPresent(cache, slidingNs);
+                AssertNamespaceIsPhysicallyPresent(cache, absoluteNs);
+
+                AssertNamespaceIsPhysicallyRemoved(cache, dependencyNs);
+                AssertNamespaceIsPhysicallyRemoved(cache, slidingNs);
+                AssertNamespaceIsPhysicallyRemoved(cache, absoluteNs);
+            }
+        }
+
+        private static SlimMemoryCache CreateSlimMemoryCacheForExpirationTest()
+        {
+            return new SlimMemoryCache(o =>
+            {
+                o.FirstSweep = TimeSpan.FromSeconds(10);
+                o.SucceedingSweep = TimeSpan.FromSeconds(5);
+            });
         }
     }
 }

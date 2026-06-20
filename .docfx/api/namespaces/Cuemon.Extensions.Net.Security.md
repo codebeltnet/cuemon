@@ -2,11 +2,11 @@
 uid: Cuemon.Extensions.Net.Security
 summary: *content
 ---
-The `Cuemon.Extensions.Net.Security` namespace contains extension methods that provides a generic way to make a Uniform Resource Identifier signed and tampering protected. This could be used to make your own lightweight concept of a Azure shared access signatures (SAS). Originally part of Cuemon .NET Framework: https://github.com/gimlichael/CuemonNetFramework/blob/master/Cuemon.Web/Security/WebSecurityUtility.cs. Greatly simplified anno 2020.
+Create tamper-proof signed URIs that expire, enabling your own shared access signature (SAS) pattern without Azure dependencies. Use this namespace when you need to sign URIs with expiration for secure resource access. Start with `ToSignedUri` on a `String` or `Uri` to produce a signed URI, then call `ValidateSignedUri` to verify authenticity later.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 
-### Extension Methods
+### Extension Members
 
 |Type|Ext|Methods|
 |--:|:-:|---|

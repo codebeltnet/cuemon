@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to create an `ActionFactory` from a callback with arguments and execute it. It shows both creating a factory with `Create` and invoking directly with `Invoke`.
+
 ```csharp
 using System;
 using Cuemon;

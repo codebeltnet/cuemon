@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create `ServerTimingMetric` instances to record performance data for the Server-Timing header, supporting duration, description, and marker-only metrics.
+`ServerTimingMetric` records performance data points for the HTTP `Server-Timing` header, supporting metrics with or without duration and description. This example constructs three metrics — `"db-query"` with 135.2ms duration and a description, `"cache-hit"` as a marker-only metric, and `"redis-get"` with a 3.7ms duration — then integrates them with `IServerTiming` via `AddServerTiming` to build a complete server-timing collection. Key steps include creating metrics with various constructor overloads and iterating the final list. Console output shows header-value strings such as `db-query;dur=135.2;desc="Customer order lookup"` and `cache-hit`.
 
 ```csharp
 using System;

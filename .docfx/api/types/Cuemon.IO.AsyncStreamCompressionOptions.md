@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure AsyncStreamCompressionOptions to control compression level and buffer size when compressing stream data asynchronously.
+`AsyncStreamCompressionOptions` configures compression level and buffer size for asynchronous stream compression operations. This example creates default options with `CompressionLevel.Optimal` and an `81920` buffer size, fast options with `CompressionLevel.Fastest` and a `4096` buffer for CPU-sensitive scenarios, and no-compression options for testing or passthrough use. Key steps include compressing sample data using `DeflateStream` with the configured options and comparing original vs. compressed byte sizes. Console output shows the default level (`Optimal`), buffer size, and the compression ratio between original and compressed sizes.
 
 ```csharp
 using System;

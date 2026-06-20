@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to query global regions, statistical regions, and cultures using the `World` class. It prints region counts, looks up the United States by M.49 code, and enumerates cultures for a specific region.
+
 ```csharp
 using System;
 using System.Globalization;

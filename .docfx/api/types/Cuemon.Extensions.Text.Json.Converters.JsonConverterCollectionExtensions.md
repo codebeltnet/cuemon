@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.Extensions.Text.Json.Converters.JsonConverterCollectionExtensions> to configure a custom <see cref="T:System.Text.Json.JsonSerializerOptions"/> with specialized converters.
+`JsonConverterCollectionExtensions` provides fluent extension methods for building a `List<JsonConverter>` with specialized converters and applying them to a `JsonFormatter`. This example calls `AddDateTimeConverter`, `AddStringEnumConverter`, `AddStringFlagsEnumConverter`, `AddExceptionConverter`, `AddFailureConverter`, `AddTransientFaultExceptionConverter`, and `AddDataPairConverter` to register each converter, then demonstrates `RemoveAllOf<string>()` and `RemoveAllOf(typeof(TimeSpan))` to remove converters by type. The converter list is applied to a `JsonFormatter` with `CamelCase` naming policy to serialize an anonymous person object. Console output displays the resulting JSON with the configured formatting.
 
 ```csharp
 using System;

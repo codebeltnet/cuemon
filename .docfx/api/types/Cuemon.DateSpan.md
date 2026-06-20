@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to calculate the time span between two dates using `DateSpan`. It shows constructing a span, accessing years/months/days, parsing ISO 8601 date strings, and creating a span that defaults the end to today.
+
 ```csharp
 using System;
 using Cuemon;

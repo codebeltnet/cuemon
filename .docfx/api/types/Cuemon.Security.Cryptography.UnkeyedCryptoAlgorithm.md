@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the UnkeyedCryptoAlgorithm enumeration to select a hash algorithm (SHA-256, SHA-384, SHA-512, SHA-1, or MD5) for unkeyed hashing.
+`UnkeyedCryptoAlgorithm` is an enumeration that selects a hash algorithm (SHA-256, SHA-384, SHA-512, SHA-1, MD5, or SHA-512/256) for unkeyed hashing. This example computes hashes for each algorithm using `"The quick brown fox jumps over the lazy dog"` with `SHA256`, `SHA384`, `SHA512`, and `SHA1`. It also uses an `UnkeyedCryptoAlgorithm` value (`Sha512`) to output the selected algorithm name, and demonstrates enum value comparison to confirm `Sha256 == 0`. Console output displays each hex hash and the selected algorithm name.
 
 ```csharp
 using System;

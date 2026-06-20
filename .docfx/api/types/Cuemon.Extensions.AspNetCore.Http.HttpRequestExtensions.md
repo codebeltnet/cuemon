@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use HttpRequestExtensions to inspect HTTP request properties such as accepted MIME types, HTTP method checks, and client-side caching status using ETags and Last-Modified headers.
+`HttpRequestExtensions` provides extension methods for `HttpRequest` that inspect accepted MIME types, HTTP method type, and client-side caching status. This example sets up a request with `Accept` header values (`text/html`, `application/json`, `*/*` with quality scores), `If-None-Match` with an ETag, and `If-Modified-Since` with a date, then calls `AcceptMimeTypesOrderedByQuality` to sort by q-value, `IsGetOrHeadMethod` to check the HTTP method, and `IsClientSideResourceCached` with both a `ChecksumBuilder` ETag and a `Last-Modified` date overload. Console output shows the sorted MIME types (`application/json, text/html, */*`), the method check results, and the cache state booleans.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to serialize an <xref:System.Exception> to XML and deserialize it back using the <xref:Cuemon.Xml.Serialization.Converters.ExceptionConverter>.
+`ExceptionConverter` in the `Xml.Serialization` namespace serializes `Exception` instances to XML and deserializes them back, with optional stack trace and `Data` dictionary inclusion. This example creates an outer `InvalidOperationException` with an inner `ArgumentNullException` and a `"Server"` data entry, configures an `XmlFormatter` with the converter including stack trace and data, and serializes to XML output showing `<Source>`, `<Message>`, `<Stack>`, `<Data>`, and nested `<Inner>` elements. It also demonstrates deserializing from an XML string back to an exception instance with `converter.ReadXml`, and serialization without stack trace or data for simpler output. Console output displays the XML content and deserialized type name.
 
 ```csharp
 using System;

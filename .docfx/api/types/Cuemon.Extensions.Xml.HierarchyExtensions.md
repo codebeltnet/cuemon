@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to inspect and query XML serialization metadata such as qualified entity names, enumerable detection, and XML ignore attributes using HierarchyExtensions.
+`HierarchyExtensions` provides extension methods for inspecting XML serialization metadata on hierarchy nodes, including qualified entity names, enumerable detection, and XML ignore and ordering attributes. This example creates `HierarchySerializer` instances for `CatalogDocument` (with `[XmlAttribute]` on `Id` and a `List<string> Tags` property) and `IgnoredDocument` (with `[XmlIgnore]` on `Hidden`), then calls `GetXmlQualifiedEntity`, `IsNodeEnumerable`, `HasXmlIgnoreAttribute`, and `OrderByXmlAttributes` on individual nodes. Console output shows the qualified entity local name, whether the node is enumerable, whether it has `[XmlIgnore]`, and the reordered element order.
 
 ```csharp
 using System;

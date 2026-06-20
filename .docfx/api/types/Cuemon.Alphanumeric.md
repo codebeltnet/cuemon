@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to use the `Alphanumeric` class to access predefined character sets. It prints the available character ranges for digits, uppercase letters, hexadecimal characters, and punctuation marks.
+
 ```csharp
 using System;
 using Cuemon;

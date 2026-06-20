@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to create a `TesterFuncFactory` from a TryParse-style delegate. It shows both a successful parse and a failure case, printing the parsed value or fallback accordingly.
+
 ```csharp
 using System;
 using Cuemon;

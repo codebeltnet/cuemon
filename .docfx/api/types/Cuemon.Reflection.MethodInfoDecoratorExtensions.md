@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example shows how to detect whether a reflected method overrides a base implementation.
+`MethodInfoDecoratorExtensions` provides extension methods on `Decorator.Enclose` for detecting whether a reflected method overrides a base class implementation via `IsOverridden`. This example retrieves `MethodInfo` for `PricingCalculator.Calculate` (base method), `RegionalPricingCalculator.Calculate` (overridden), and `RegionalPricingCalculator.FormatRegion` (local method), then calls `IsOverridden()` on each. Console output shows `False` for the base method, `True` for the overridden method, and `False` for the local method that does not override anything.
 
 ```csharp
 using System;

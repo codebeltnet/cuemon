@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <see cref="Cuemon.Extensions.Text.Json.Converters.StringFlagsEnumConverter"/> to serialize and deserialize enum values decorated with <see cref="FlagsAttribute"/> as an array of strings.
+`StringFlagsEnumConverter` serializes and deserializes `[Flags]` enum values as an array of active flag string names instead of a single integer. This example registers the converter in `JsonSerializerOptions`, then serializes `FileShare.Read | FileShare.Write` which produces the JSON array `["Read", "Write"]`. Deserializing the array back to a `FileShare` value restores the combined flags, and the output displays `Read, Write`, confirming round-trip correctness for flags enum values.
 
 ```csharp
 using System;

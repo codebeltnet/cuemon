@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example shows how to store method lookup rules in `MethodBaseOptions` and apply them during reflection.
+`MethodBaseOptions` stores method lookup rules including binding flags, string comparison mode, and expected parameter types for use during reflection-based method resolution. This example configures options with `BindingFlags.Instance | BindingFlags.Public`, `StringComparison.OrdinalIgnoreCase`, and `typeof(decimal)` parameter types, then passes them to a custom `ResolveMethod` helper that searches the `PricingEngine` class for a method matching the name and parameter signature. Console output shows the resolved method name (`ApplyDiscount`) or `"not found"`, the binding flags, and the expected parameter type names (`Decimal, Decimal`).
 
 ```csharp
 using System;

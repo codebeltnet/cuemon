@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example creates a `DynamicXmlConverter<int>` with custom read and write delegates. Writing the value 42 produces an XML fragment containing a `<Value>` element; the converter can also read it back from XML.
+
 ```csharp
 using System;
 using System.IO;

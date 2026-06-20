@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use HttpResponseExtensions to manage HTTP response headers such as ETag and Last-Modified, write response bodies, and transform HttpResponseMessage content into the ASP.NET Core response pipeline.
+`HttpResponseExtensions` provides extension methods for `HttpResponse` to manage ETag and Last-Modified headers, write response bodies asynchronously, and transform `HttpResponseMessage` content into the ASP.NET Core response pipeline. This example calls `AddOrUpdateEntityTagHeader` with a `ChecksumBuilder` for ETag generation, `AddOrUpdateLastModifiedHeader` with a `2024-06-15T10:00:00Z` UTC date, `WriteBodyAsync` with a byte array delegate, and `OnStartingInvokeTransformer` to transfer an `HttpResponseMessage` with status `200 OK` and JSON content type. Each operation is demonstrated independently, with Console output confirming the header values and response modifications.
 
 ```csharp
 using System;

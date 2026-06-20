@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to convert common .NET types to byte arrays using `Convertible.GetBytes`. It demonstrates converting an integer and a string, then restoring the integer from its byte representation.
+
 ```csharp
 using System;
 using Cuemon;

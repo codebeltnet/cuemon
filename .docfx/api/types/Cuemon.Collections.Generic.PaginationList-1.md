@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates eager pagination of a customer list using `PaginationList`. It shows indexer-based access and page metadata such as total items, page count, and first/last page flags.
+
 ```csharp
 using System;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to work with XML data from streams using StreamExtensions, including creating XmlReaders, copying with indented formatting, detecting encoding, and removing namespace declarations.
+`StreamExtensions` in the `Xml` namespace provides stream-based XML operations including `XmlReader` creation, indented copying, encoding detection, and namespace removal. This example loads an XML string into a `MemoryStream` and demonstrates four operations: `ToXmlReader` to parse element names, `CopyXmlStream` with `Indent = true` for pretty-printed XML output, `TryDetectXmlEncoding` to identify `UTF-8` encoding, and `RemoveXmlNamespaceDeclarations` to strip namespace prefixes from elements. Each operation repositions the stream to `Position = 0` before proceeding. Console output shows element names (`root`, `item`), the indented XML, the detected encoding name (`Unicode (UTF-8)`), and the namespace-cleaned content.
 
 ```csharp
 using System;

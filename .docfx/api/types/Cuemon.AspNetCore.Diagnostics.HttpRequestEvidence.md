@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to capture HTTP request evidence, including headers, query parameters, form data, and the request body, for diagnostic purposes.
+`HttpRequestEvidence` captures HTTP request diagnostic data including headers, query parameters, form data, and the request body for logging and debugging scenarios. This example sets up a `DefaultHttpContext` with a POST request to `https://api.example.com/orders`, including an `Authorization` header, `X-Trace-Id`, a `status=pending` query string, form data with `customerId=42`, and a captured request body. Key steps include constructing an `HttpRequestEvidence` from the request and supplying a custom body converter delegate that redacts sensitive values by replacing `"42"` with `"***"`. Console output displays each evidence property (location, method, headers, query, form, body, and redacted body).
 
 ```csharp
 using System;

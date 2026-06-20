@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the decorator extensions to merge, sanitize, and update HTTP header dictionaries.
+`HeaderDictionaryDecoratorExtensions` provides extension methods on `Decorator.Enclose` for merging, sanitizing, and updating `IHeaderDictionary` instances. This example creates a target `HeaderDictionary` with `"X-Existing"` and a source with both `"X-Existing"` and `"X-New"`, then calls `AddRange` to selectively add only non-existing headers. It also demonstrates `AddOrUpdateHeader` with control-character sanitization (removing `\r\n` from a value) and `AddOrUpdateHeaders` to copy `HttpResponseMessage` response headers into the target. Console output confirms `"X-Existing"` retains its original value, `"X-New"` is added, sanitized headers are cleaned to `"helloworld"`, and response headers are merged as `"alpha,beta"`.
 
 ```csharp
 using System;

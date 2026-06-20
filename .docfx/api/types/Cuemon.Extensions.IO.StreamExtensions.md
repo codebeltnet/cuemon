@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to transform, compress, and decompress streams by invoking the available stream extensions.
+`StreamExtensions` provides extension methods for `Stream` covering concatenation, encoding conversion, compression (GZip, Deflate, Brotli), and encoding detection. This example creates memory streams from `"Cue"` and `"mon"` and concatenates them with `Concat`, then converts the result to byte arrays, character arrays, and encoded strings both synchronously and asynchronously. It demonstrates compression round-trips for GZip, Deflate, and Brotli — each compressing a source stream, decompressing back, and reading the result — and also includes `TryDetectUnicodeEncoding` on a BOM-prefixed stream and `WriteAllAsync` for asynchronous writes. Console output confirms that all compressed round-trips preserve the original payload (`"gzip payload"`, `"deflate payload"`, `"brotli payload"`), that detected encoding is UTF-8, and that byte counts and string values agree across sync and async paths.
 
 ```csharp
 using System;

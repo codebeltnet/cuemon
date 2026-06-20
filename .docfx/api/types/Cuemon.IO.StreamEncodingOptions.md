@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure StreamEncodingOptions for preamble handling and encoding detection when reading stream content as strings.
+`StreamEncodingOptions` configures preamble handling and encoding detection when reading stream content as strings. This example creates a `MemoryStream` with UTF-32 encoded `"Hello with BOM!"` text including a BOM preamble, then reads it twice using the decorator pattern: first with `PreambleSequence.Remove` to strip the BOM (resulting text matches the original), then with `PreambleSequence.Keep` to preserve the BOM bytes in the output. Console output displays the decoded text (`"Hello with BOM!"`), the increased string length when BOM is kept, and confirms the stream is disposed after the second read.
 
 ```csharp
 using System;

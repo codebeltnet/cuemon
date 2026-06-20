@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create a MethodDescriptor from a MethodInfo, inspect its parameters, append runtime arguments, and merge parameter signatures with values.
+`MethodDescriptor` provides a structured representation of a method's metadata including its caller type, method name, parameters, and optional runtime arguments. This example creates a `MethodDescriptor` from `string.IndexOf`'s `MethodInfo`, inspects its `Caller` (`System.String`), `MethodName` (`IndexOf`), and `Parameters` (value and comparisonType), then appends runtime arguments via `AppendRuntimeArguments("Hello", StringComparison.OrdinalIgnoreCase)`. It also demonstrates the static `Create` factory and `MergeParameters` to combine parameter signatures with runtime values. Console output displays the caller full name, method name, signature, parameter list, runtime argument key-value pairs, and merged parameter values.
 
 ```csharp
 using System;

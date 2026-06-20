@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref cref="Cuemon.IO.StreamDecoratorExtensions"/> extension methods for stream operations including conversion, compression, and copying.
+`StreamDecoratorExtensions` provides extension methods on `Decorator.Enclose` for stream operations including byte array conversion, string encoding, compression (GZip, Deflate, Brotli), and copying. This example creates multiple `MemoryStream` instances with sample text and demonstrates `ToByteArray` and `ToByteArrayAsync`, `ToEncodedString` and `ToEncodedStringAsync`, `CopyStream` and `CopyStreamAsync`, `CompressGZip`/`DecompressGZip`, `CompressDeflate`/`DecompressDeflate`, `CompressBrotli`/`DecompressBrotli`, and `WriteAllAsync` — all via the decorator pattern. Console output confirms each operation's result, such as byte array lengths, decompressed strings matching the original content, and stream copy sizes.
 
 ```csharp
 using System;

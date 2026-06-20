@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the `QueryFormat` enumeration to control how query fragments — including delimited, quoted, and bracketed formats — are generated when building SQL queries.
+`QueryFormat` is an enumeration that controls how `QueryBuilder.EncodeFragment` formats column and value fragments for SQL statement generation. This example calls `EncodeFragment` with `QueryFormat.Delimited` on column names (`"FirstName,LastName,Email"`), `DelimitedString` on string values (`"'John','Doe'"`), and `DelimitedSquareBracket` on identifiers (`"[FirstName],[LastName]"`). It also demonstrates the `distinct: true` option that removes duplicate values from the output. Console output shows each formatting style applied to the sample data, such as `FirstName,LastName,Email` for delimited and `[FirstName],[LastName]` for square-bracket delimited.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use NameValueCollectionExtensions to check for key existence and convert a NameValueCollection into a dictionary with string array values.
+`NameValueCollectionExtensions` provides extension methods for `NameValueCollection` including case-insensitive key lookup and conversion to `IDictionary<string, string[]>`. This example creates a collection with `"name": "John Doe"` and `"tag": ["dotnet", "csharp"]` (duplicate key), then calls `ContainsKey("NAME")` to verify case-insensitive matching and `ToDictionary()` to materialize entries as a dictionary with string array values. It also demonstrates `ToDictionary` with a custom `";"` delimiter for splitting multi-valued entries. Console output confirms boolean key-lookup results, the individual array elements `"dotnet"` and `"csharp"`, and the array length when using the custom delimiter.
 
 ```csharp
 using System;

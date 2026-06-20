@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the decorator extensions on `HttpContext` to invoke throttling sentinels, API key sentinels, user-agent sentinels, and write exception descriptor responses.
+`HttpContextDecoratorExtensions` provides extension methods on `Decorator.Enclose` for invoking throttling sentinels, API key sentinels, user-agent sentinels, and writing exception descriptor responses on `HttpContext`. This example configures a `DefaultHttpContext` with `"X-Api-Key: secret-key"` and `"User-Agent: Cuemon Docs"` headers, sets up `ThrottlingSentinelOptions` with a quota of 2 requests per minute, `ApiKeySentinelOptions` with allowed keys, and `UserAgentSentinelOptions`. Key steps include calling `InvokeThrottlerSentinelAsync`, `InvokeApiKeySentinelAsync`, and `InvokeUserAgentSentinelAsync`, then writing a `400 Bad Request` exception descriptor response via `WriteExceptionDescriptorResponseAsync`. Console output confirms the final response status code.
 
 ```csharp
 using System;

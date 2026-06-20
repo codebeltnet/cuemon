@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to execute an HTTP request with retry logic using `TransientOperation`. It configures three retry attempts with exponential backoff and prints the response length on success.
+
 ```csharp
 using System;
 using System.Net.Http;

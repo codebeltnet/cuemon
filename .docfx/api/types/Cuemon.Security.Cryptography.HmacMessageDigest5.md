@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to compute and verify HMAC-MD5 message authentication codes using HmacMessageDigest5, including tamper detection.
+`HmacMessageDigest5` computes and verifies HMAC-MD5 message authentication codes with support for custom byte order and direct string input. This example creates a 64-byte secret key, computes the HMAC of `"Important: Transfer $100 to account 12345"`, then verifies it by recomputing with the same secret. A tampered message with a different account number produces a different HMAC, confirming tamper detection. It also demonstrates options-based construction with `Endianness.LittleEndian` and direct `ComputeHash(string)` overload. Console output shows the hex and base64 HMAC values, verification status (`True`), tamper detection (`False`), and options-based result.
 
 ```csharp
 using System;

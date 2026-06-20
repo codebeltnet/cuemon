@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example shows how to extend `int` with `IntegerDecoratorExtensions` methods to clamp integer values to a minimum bound via the decorator pattern.
+`IntegerDecoratorExtensions` provides extension methods on `Decorator.Enclose` for clamping integer values to a minimum bound using the `Max` extension method. This example wraps `int` values of `42`, `500`, and `-10`, then calls `Max` with a minimum threshold of `100` or `0`. Key setup includes comparing the wrapped value against the minimum and returning the larger of the two. Console output shows `100` for `42.Max(100)`, `500` for `500.Max(100)` (pass-through), and `0` for `(-10).Max(0)`.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure StreamCopyOptions to control buffer size and whether the source stream remains open after copying.
+`StreamCopyOptions` configures buffer size and whether the source stream remains open after synchronous copy operations. This example creates custom options with `BufferSize = 4096` and `LeaveOpen = true`, converts a `MemoryStream` to a byte array via the decorator pattern with these options, then confirms the source stream is still readable (`CanRead = True`). It also demonstrates the default behavior where `LeaveOpen = false` disposes the source stream after copying, showing `CanRead = False`. Console output displays the byte count (`26`), the decoded string (`"Hello, StreamCopyOptions!"`), and the stream's open/disposed state.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to URL-encode byte array data using ByteArrayDecoratorExtensions, with support for partial encoding and custom character encoding options.
+`ByteArrayDecoratorExtensions` in the `Net` namespace provides URL-encoding extension methods on `Decorator.Enclose` for byte arrays with partial encoding and custom encoding support. This example creates UTF-8 bytes from `"hello world & more <stuff>"` and calls `UrlEncode` with default parameters producing `"hello+world+%26+more+%3cstuff%3e"`, then demonstrates partial encoding on the first 5 bytes of `"a & b & c"` producing `"a+%26+b"`. It also shows custom UTF-32 encoding and empty array handling where `Array.Empty<byte>()` returns an encoded array of length `0`. Console output displays each encoded result.
 
 ```csharp
 using System;

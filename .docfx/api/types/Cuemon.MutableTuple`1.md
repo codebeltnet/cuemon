@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to create a single-argument `MutableTuple<T>` and access its value. It demonstrates both reading and updating the `Arg1` property.
+
 ```csharp
 using System;
 using Cuemon;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure AsyncStreamCopyOptions to control buffer size and stream lifetime when copying data asynchronously between streams.
+`AsyncStreamCopyOptions` configures buffer size and stream lifetime for asynchronous stream copy operations. This example creates options with `BufferSize = 4096` and `LeaveOpen = true`, then copies UTF-8 string content from one `MemoryStream` to another using `Decorator.Enclose(source).CopyStreamAsync(destination, options.BufferSize, ...)`. The copied data is read back as a string and printed to confirm `"Copy me asynchronously."` was transferred intact, while the source stream remains open due to `LeaveOpen = true`.
 
 ```csharp
 using System;

@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+`CollectionDecoratorExtensions` provides extension methods on `Decorator.Enclose` for bulk-adding elements to `ICollection<T>` instances using `AddRange`. This example wraps a `List<string>` with `"apple", "banana"` and calls `AddRange` with individual `"cherry", "date", "elderberry"` arguments and an array `["fig", "grape"]` to insert them in a single operation. Key setup includes calling `Decorator.Enclose(list).AddRange(...)` to access the non-common extension methods. Console output lists all entries after both bulk insertions, confirming that `AddRange` accepts both parameterized and array overloads.
+
 ```csharp
 using System;
 using System.Collections.Generic;

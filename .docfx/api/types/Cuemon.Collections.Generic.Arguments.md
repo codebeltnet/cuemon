@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to use the `Arguments` class to create arrays and enumerables from argument lists. It shows array concatenation, single-element yielding, and object-based overloads.
+
 ```csharp
 using System;
 using System.Collections.Generic;

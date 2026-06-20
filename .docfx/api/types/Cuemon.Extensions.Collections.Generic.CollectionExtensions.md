@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to add a range of values to a collection and iterate it through a partitioner.
+`CollectionExtensions` provides extension methods for `ICollection<T>` including `AddRange` for bulk insertion and `ToPartitioner` for batched iteration. This example creates an empty `List<int>`, calls `AddRange(1, 2, 3, 4)` to insert four integers at once, then creates a partitioner with `ToPartitioner(2)` to split elements into batches of two. Console output confirms the element count (`4`) and the partition count (`2`), demonstrating batch processing of collection contents.
 
 ```csharp
 using System;

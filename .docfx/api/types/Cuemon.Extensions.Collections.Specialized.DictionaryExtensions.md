@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to convert a Dictionary with string array values into a NameValueCollection using DictionaryExtensions, with support for custom delimiters.
+`DictionaryExtensions` in the `Specialized` namespace converts `Dictionary<string, string[]>` into `NameValueCollection` instances, joining multi-valued keys with a configurable delimiter. This example creates a dictionary with `"colors": ["red", "green", "blue"]` and `"sizes": ["small", "large"]`, calls `ToNameValueCollection()` to produce a collection using the default comma delimiter, then calls `ToNameValueCollection` with a custom `";"` delimiter via an options delegate. Console output confirms that `"colors"` becomes `"red,green,blue"` with the default delimiter and `"red;green;blue"` with the custom semicolon delimiter.
 
 ```csharp
 using System;

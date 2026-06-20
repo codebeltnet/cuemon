@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates basic parallel loops using `ParallelFactory.For` and `ParallelFactory.ForEach`. Each iteration prints its index or item to the console, illustrating how the factory distributes work across threads.
+
 ```csharp
 using System;
 using Cuemon.Threading;

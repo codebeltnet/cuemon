@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.Reflection.AssemblyDecoratorExtensions> to inspect assemblies and load embedded resources via the decorator pattern.
+`AssemblyDecoratorExtensions` provides extension methods on `Decorator.Enclose` for inspecting assembly metadata, loading embedded resources, and filtering types. This example wraps the entry assembly and calls `IsDebugBuild`, `GetAssemblyVersion`, `GetFileVersion`, and `GetProductVersion` to retrieve version information. It also demonstrates `GetTypes` with optional namespace and interface filters, and `GetManifestResources` with various match modes including `ContainsName`, `Extension`, and `Name`. Console output displays each version string, boolean flags, and resource character counts.
 
 ```csharp
 using System;

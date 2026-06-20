@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <see cref="Cuemon.Extensions.Text.Json.Converters.StringEnumConverter"/> to serialize and deserialize non-flags enum values as their string representation rather than their underlying integer value.
+`StringEnumConverter` serializes and deserializes non-flags enum values as their string names rather than underlying integer values in `System.Text.Json`. This example creates `JsonSerializerOptions` with `CamelCase` naming policy and adds the converter, then serializes an anonymous object with `DayOfWeek.Friday` and `UriKind.Relative`. The JSON output shows `"friday"` and `"relative"` instead of numeric values like `5` or `2`. Deserializing the JSON back into a typed `Payload` object confirms that the string values round-trip correctly to the original enum members, with `restored.Day` output as `Friday`.
 
 ```csharp
 using System;

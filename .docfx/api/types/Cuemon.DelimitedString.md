@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to create a delimited string from an array of integers and split it back into parts using `DelimitedString`. The delimiter and string converter are configured through setup options.
+
 ```csharp
 using System;
 using System.Globalization;

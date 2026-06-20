@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure `DataStatementOptions` for text commands and stored procedures with custom timeout and parameters.
+`DataStatementOptions` provides configuration for `DataStatement` instances including command type, timeout, and parameters. This example creates a text command option with a 30-second timeout and prints its `CommandType` and timeout values, then creates a stored procedure option with a 5-minute timeout and an empty `IDataParameter` array. After configuration, `ValidateOptions()` is called to confirm the stored procedure settings are valid. Console output displays the command type, timeout in seconds, and validation status.
 
 ```csharp
 using System;

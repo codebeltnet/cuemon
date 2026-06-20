@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example creates an `XPathDocument` from an XML string using `XPathDocumentFactory`, then queries it with an XPath expression to retrieve the text content of an `<item>` element. The resulting value "Hello" is written to the console.
+
 ```csharp
 using System;
 using System.Xml.XPath;

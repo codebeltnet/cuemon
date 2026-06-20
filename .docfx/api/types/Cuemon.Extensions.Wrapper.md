@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to wrap values using `Wrapper<T>` to access the inner instance, its type, and a parsed string representation. It shows wrapping both an integer and a string value.
+
 ```csharp
 using System;
 using Cuemon;

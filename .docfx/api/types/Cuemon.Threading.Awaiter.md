@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example retries an asynchronous operation until it succeeds or a timeout is reached. The delegate returns `UnsuccessfulValue` twice before returning `SuccessfulValue`, and the output confirms the operation succeeded after three attempts.
+
 ```csharp
 using System;
 using System.Threading.Tasks;

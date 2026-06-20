@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to get or add a cached value using `CachingManager.Cache`. It checks for an existing key, adds a value with a 5-minute expiration if not found, and verifies the cached instance is reused on subsequent accesses.
+
 ```csharp
 using System;
 using Cuemon.Runtime.Caching;

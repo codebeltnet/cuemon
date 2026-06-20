@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to create custom `IComparer<T>` instances using `DynamicComparer` with lambda expressions. It demonstrates sorting by string length and in descending order, printing each sorted array.
+
 ```csharp
 using System;
 using System.Collections.Generic;

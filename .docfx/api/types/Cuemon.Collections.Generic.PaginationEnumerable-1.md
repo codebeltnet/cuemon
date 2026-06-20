@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates lazy pagination of a string array using `PaginationEnumerable`. It shows how to access page 2 with 3 items per page and prints page metadata such as page count and navigation flags.
+
 ```csharp
 using System;
 using System.Collections.Generic;

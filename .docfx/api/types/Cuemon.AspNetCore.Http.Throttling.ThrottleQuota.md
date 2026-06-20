@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to create `ThrottleQuota` instances using different time units and a `TimeSpan` directly. It then tracks request usage with `ThrottleRequest`, including incrementing and refreshing the window.
+
 ```csharp
 using System;
 using Cuemon;

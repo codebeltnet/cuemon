@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example shows how to extend `DateTime` with `DateTimeDecoratorExtensions` methods to perform Unix epoch conversions and adjust `DateTimeKind` without changing the underlying ticks.
+`DateTimeDecoratorExtensions` provides extension methods for converting between `DateTime` and Unix epoch time and for switching `DateTimeKind` without altering the underlying ticks. This example retrieves the Unix epoch via `Decorator.Syntactic<DateTime>().GetUnixEpoch()`, converts `DateTime.UtcNow` to seconds since epoch with `ToUnixEpochTime`, and transforms `DateTimeKind` between `Utc`, `Local`, and `Unspecified` using `ToUtcKind`, `ToLocalKind`, and `ToDefaultKind`. Key setup includes creating UTC and local `DateTime` values, then verifying each kind-only transformation preserves the tick count. Console output shows the epoch value, Unix timestamp, and confirms `Kind` changes while `Ticks == localTime.Ticks` remains `True`.
 
 ```csharp
 using System;

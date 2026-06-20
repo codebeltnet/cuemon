@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use `DataTransferColumn` to inspect column metadata — name, ordinal, and data type — from a data reader.
+`DataTransferColumn` provides column metadata such as ordinal position, name, and data type for fields retrieved from an `IDataReader`. This example builds a `DataTable` with `EmployeeId`, `FirstName`, `LastName`, and `HireDate` columns containing two sample rows, creates a data reader, and retrieves a `DataTransferColumnCollection` via `DataTransfer.GetColumns`. It iterates each column to display ordinal, name, and `DataType.Name`, accesses the `"FirstName"` column by name to get its ordinal, and calls `ToString()` on a column instance. Console output shows column metadata such as `[0] EmployeeId (Int32)` and confirms the column name string representation.
 
 ```csharp
 using System;

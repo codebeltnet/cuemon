@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to encrypt and decrypt data using AES encryption with AesCryptor, including key generation, custom cipher modes, and padding options.
+`AesCryptor` provides AES encryption and decryption with configurable key size, cipher mode, and padding. This example generates a 256-bit key and 128-bit IV using `AesCryptor.GenerateKey()` and `GenerateInitializationVector()`, encrypts `"This is a sensitive message that needs encryption."`, decrypts the ciphertext, and verifies the round-trip matches the original. It also demonstrates explicit CBC mode with PKCS7 padding via an options delegate, custom key sizes (`AesSize.Aes128` and `AesSize.Aes192`), and the default constructor that generates random credentials automatically. Console output confirms key and IV lengths, base64 ciphertext, round-trip success, and explicit options round-trip verification.
 
 ```csharp
 using System;

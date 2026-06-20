@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how <see cref="TimeMeasure"/> returns <see cref="TimeMeasureProfiler"/> instances for measured work.
+`TimeMeasureProfiler` captures performance timing metrics for synchronous operations via the `TimeMeasure` API. This example calls `TimeMeasure.WithAction(() => Thread.Sleep(25))` to profile a 25ms sleep and `TimeMeasure.WithFunc(() => 42)` to profile a function returning a result. Key steps include checking the profiler's `Elapsed` time and `IsRunning` state, and accessing the `Result` of the function profiler. Console output confirms `Elapsed > TimeSpan.Zero` for both profilers, `IsRunning` is `False` after completion, and the function result is `42`.
 
 ```csharp
 using System;

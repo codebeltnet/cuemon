@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create a custom XML converter using DynamicXmlConverterCore, with read and write delegates for serializing and deserializing objects to and from XML.
+`DynamicXmlConverterCore` enables creating custom XML converters using read and write delegates, supporting both read/write and write-only scenarios. This example creates a `Person` class and builds a `DynamicXmlConverter` with a writer delegate that serializes `FirstName`, `LastName`, and `Age` as child elements and a reader delegate that deserializes them back. A `Person` instance is serialized to XML and deserialized to confirm round-trip fidelity, and a write-only converter is also demonstrated for scenarios where only serialization is needed. Console output displays the serialized XML, deserialized property values, and the converter's `CanRead`/`CanWrite` capabilities.
 
 ```csharp
 using System;

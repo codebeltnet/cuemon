@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.Xml.XmlWriterDecoratorExtensions> to serialize objects directly to an <see cref="T:System.Xml.XmlWriter"/> via the decorator pattern.
+`XmlWriterDecoratorExtensions` provides extension methods on `Decorator.Enclose` for serializing objects directly to `XmlWriter` with root element handling, conditional encapsulation, and custom root naming. This example creates an `XmlWriter` targeting a `StringWriter` with indented settings, then uses `WriteXmlRootElement` with a custom delegate that writes a root element, serializes an anonymous `Person` object, and conditionally wraps notes in an encapsulating `<Notes>` element via `WriteEncapsulatingElementIfNotNull`. A second example shows `WriteObject` to serialize a `Version` with a custom `RootName = new XmlQualifiedEntity("Version")`. Console output displays both XML results with the correct element structure.
 
 ```csharp
 using System;

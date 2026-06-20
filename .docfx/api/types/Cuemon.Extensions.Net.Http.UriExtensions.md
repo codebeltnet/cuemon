@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to perform HTTP requests (GET, POST, PUT, DELETE, and more) directly on a Uri using UriExtensions, with support for media types and cancellation tokens.
+`UriExtensions` provides HTTP extension methods directly on `Uri` covering GET, POST, PUT, DELETE, HEAD, OPTIONS, PATCH, and TRACE with support for custom headers, content types, and cancellation. This example assigns a stub `IHttpClientFactory` that returns a fixed `200 OK` response, then calls each HTTP method variant including `HttpGetAsync`, `HttpDeleteAsync`, `HttpPostAsync` with JSON content, `HttpPutAsync` with a stream body, `HttpPatchAsync`, `HttpTraceAsync`, and the generic `HttpAsync` overload for full `HttpRequestOptions` control with custom headers. It also demonstrates passing a `CancellationToken` with a timeout that triggers a `TaskCanceledException`. Console output confirms that each request returns `200 OK` and that cancellation is handled gracefully.
 
 ```csharp
 using System.Text;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure `AsyncStreamEncodingOptions` when reading text from a stream asynchronously.
+`AsyncStreamEncodingOptions` configures encoding, preamble handling, and stream lifetime when reading text from a stream asynchronously. This example creates options with `Encoding.UTF8`, `PreambleSequence.Remove` to strip the BOM from output, and `LeaveOpen = false`, then creates a `MemoryStream` with UTF-8 encoded text and reads the content using a `StreamReader` with the configured encoding. Console output displays `"Hello, AsyncStreamEncodingOptions!"`, confirming the text was read correctly with the configured encoding settings.
 
 ```csharp
 using System;

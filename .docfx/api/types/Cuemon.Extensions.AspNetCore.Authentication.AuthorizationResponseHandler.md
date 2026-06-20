@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to construct `AuthorizationResponseHandler` with configured options and the required logger dependency.
+The following example demonstrates how to construct `AuthorizationResponseHandler` with configured options and the required logger dependency. It registers `AuthorizationResponseHandlerOptions` with `FaultSensitivityDetails.All`, adds logging services, and builds the service provider. The handler is then created from the resolved `ILogger<T>` and `IOptions<T>` instances, and its type name is written to the console, confirming the dependency-injection wiring works correctly.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create XmlQualifiedEntity instances from local names, namespaces, prefixes, and XML serialization attributes to control element naming.
+`XmlQualifiedEntity` represents an XML element or attribute name with optional namespace and prefix, and can be created from XML serialization attributes. This example creates entities from a local name only (`"Order"`), with a namespace (`"http://example.com/orders"`), and with a prefix/namespace combination (`"o"`, `"Order"`, `"http://example.com/orders"`). It then creates entities from `XmlRootAttribute("PurchaseOrder")`, `XmlElementAttribute("LineItem")`, and `XmlAttributeAttribute("Quantity")`, and demonstrates using `XmlQualifiedEntity` with `XmlSerializerOptions` to set a custom root name. Console output displays each entity's `LocalName`, `Namespace`, `Prefix`, and decoration flags.
 
 ```csharp
 using System;

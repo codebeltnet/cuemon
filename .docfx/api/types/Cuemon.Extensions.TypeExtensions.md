@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.Extensions.TypeExtensions> to inspect types with concise extension methods.
+`TypeExtensions` provides extension methods for `Type` that simplify classification and metadata retrieval via methods like `ToFriendlyName`, `ToTypeCode`, and various `Has*`/`Is*` predicates. This example inspects `IList<string>`, `ConcurrentDictionary<string, int>`, `StringComparer`, `int?`, and anonymous types, calling `HasEnumerableImplementation`, `HasDictionaryImplementation`, `IsNullable`, `IsComplex`, `GetDefaultValue`, and `ToFriendlyName`. It also demonstrates `HasAnonymousCharacteristics` on an anonymous object, `HasTypes` for hierarchy checks, `HasInterfaces` for generic interface matching, and `HasAttributes` for attribute presence. Console output prints friendly type names like `IList<String>`, boolean capability flags, and the default value `0` for `typeof(int)`.
 
 ```csharp
 using System;

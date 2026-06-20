@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to throw an `ArgumentReservedKeywordException` when a parameter value matches a reserved SQL keyword. It demonstrates the expected validation failure and how to catch the exception with access to the parameter name.
+
 ```csharp
 using System;
 using Cuemon;

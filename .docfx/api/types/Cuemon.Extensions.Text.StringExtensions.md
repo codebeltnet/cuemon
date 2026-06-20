@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to encode strings between different character encodings using StringExtensions, with support for fallback handling and ASCII sanitization.
+`StringExtensions` in the `Text` namespace provides encoding conversion between character encodings with custom fallback handling and ASCII sanitization. This example takes `"Café au lait: 2,50 €"` and converts it to UTF-8 (preserves all characters), ASCII with `EncoderReplacementFallback("?")` (replaces `é` and `€` with `?`), and Windows-1252 (preserves Western European characters). It also demonstrates `ToAsciiEncodedString` for quick ASCII sanitization that removes unsupported characters by default. Console output shows each encoded result, such as `"Caf? au lait: 2,50 ?"` for the ASCII replacement case and `"Cafe au lait: 2,50 "` for the quick ASCII sanitization.
 
 ```csharp
 using System;

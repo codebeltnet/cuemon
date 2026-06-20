@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use <xref cref="Cuemon.Collections.Generic.PartitionerEnumerable{T}"/> to iterate over a sequence in fixed-size partitions.
+The following example demonstrates how to use <xref cref="Cuemon.Collections.Generic.PartitionerEnumerable{T}"/> to iterate over a sequence in fixed-size partitions. It wraps a sequence of 1000 integers with a partition size of 100, then processes partitions sequentially using `ToList` while tracking the remaining partitions via `HasPartitions`. A smaller string partitioner shows the same behavior with an uneven final batch. The example outputs partition counts and content to the console, verifying that batching works correctly.
 
 ```csharp
 using System;

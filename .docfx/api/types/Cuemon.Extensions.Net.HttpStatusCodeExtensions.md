@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.Extensions.Net.HttpStatusCodeExtensions> extension methods to classify HTTP status codes by range directly from <see cref="System.Net.HttpStatusCode"/> values.
+`HttpStatusCodeExtensions` provides extension methods for `HttpStatusCode` that classify status codes by HTTP range: informational (100–199), success (200–299), redirection (300–399), client error (400–499), and server error (500–599). This example evaluates `NotFound` (404), `OK` (200), `MovedPermanently` (301), `Forbidden` (403), `InternalServerError` (500), and `Continue` (100) using methods like `IsClientErrorStatusCode`, `IsSuccessStatusCode`, `IsRedirectionStatusCode`, and `IsServerErrorStatusCode`. Console output confirms each classification, such as `200 OK is success: True` and `404 NotFound is client error: True`.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to serialize an <see cref="Exception"/> to JSON including its stack trace and data dictionary.
+`ExceptionConverter` serializes `Exception` instances to JSON, including optional stack trace and `Data` dictionary content. This example configures `JsonSerializerOptions` with `WriteIndented = true` and adds the converter with `includeStackTrace: true` and `includeData: true`, then creates a nested `InvalidOperationException("Outer operation failed.")` with an inner `InvalidOperationException("Inner operation failed.")` and a `CorrelationId` data entry. The resulting JSON includes top-level fields (`Type`, `Source`, `Message`, `Stack`, `Data`) and a nested `Inner` section for the inner exception with its own `Type` and `Message`. Console output displays the complete JSON structure.
 
 ```csharp
 using System;

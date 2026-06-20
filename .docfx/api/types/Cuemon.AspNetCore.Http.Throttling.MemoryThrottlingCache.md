@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to create a `MemoryThrottlingCache`, add a throttle request for a client, and retrieve the request count from the cache.
+
 ```csharp
 using System;
 

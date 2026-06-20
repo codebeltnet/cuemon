@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to create default and custom `ThrottlingSentinelOptions` to configure rate-limiting behavior. It demonstrates setting the quota, context resolver, header names, and retry-after scope, then validates the configuration and prints the selected values.
+
 ```csharp
 using System;
 using Cuemon.AspNetCore.Http.Headers;

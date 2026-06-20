@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates using `AdvancedParallelFactory` to compute an iterator value and evaluate a loop condition. The output shows the result of `5 + 3` and whether that result satisfies the greater-than-or-equal check of 8.
+
 ```csharp
 using System;
 using Cuemon.Threading;

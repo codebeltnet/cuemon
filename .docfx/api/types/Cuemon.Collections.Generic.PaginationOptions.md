@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to configure pagination options with a custom page size and number. It shows both lazy (`PaginationEnumerable`) and eager (`PaginationList`) pagination, printing page metadata and specific items.
+
 ```csharp
 using System;
 using System.Collections.Generic;

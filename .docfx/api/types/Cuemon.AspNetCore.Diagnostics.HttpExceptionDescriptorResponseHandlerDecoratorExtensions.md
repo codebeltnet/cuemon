@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register additional HTTP exception descriptor response handlers using the decorator pattern.
+`HttpExceptionDescriptorResponseHandlerDecoratorExtensions` provides extension methods on `Decorator.Enclose` for registering additional response handlers that control how HTTP exception descriptors are serialized and returned. This example creates an initial `HttpExceptionDescriptorResponseHandler` for `application/json` with a `500 Internal Server Error` status, wraps a `List<HttpExceptionDescriptorResponseHandler>` containing it, and calls `AddResponseHandler` with an options delegate specifying a custom content type, `ContentFactory`, and `StatusCodeFactory`. After execution, the list contains both handlers configured for different response scenarios in the error pipeline.
 
 ```csharp
 using System.Collections.Generic;

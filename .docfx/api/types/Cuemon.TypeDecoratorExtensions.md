@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.TypeDecoratorExtensions> to generate a reflection report before loading a plugin type.
+`TypeDecoratorExtensions` provides extension methods on `Decorator.Enclose` for deep reflection inspection of .NET types, including member enumeration, interface detection, attribute checking, and circular-reference detection. This example wraps `AuditedOrder` (annotated with `[DataContract]`) and calls `GetAllProperties`, `GetAllFields`, `GetAllEvents`, and `GetAllMethods` to enumerate members across the full hierarchy including its base `TrackedEntity`. It also uses predicate methods like `HasTypes` (for `FileStream` → `Stream`), `HasInterfaces`, `HasAttribute`, `HasEnumerableImplementation`, `IsNullable`, and `HasAnonymousCharacteristics` to classify type capabilities. Console output includes sorted member names, boolean capability flags, default values such as `00000000-0000-0000-0000-000000000000` for `Guid`, friendly type names like `IList<String>`, and circular-reference detection results for a `LinkedNode` with a self-referencing loop.
 
 ```csharp
 using System;

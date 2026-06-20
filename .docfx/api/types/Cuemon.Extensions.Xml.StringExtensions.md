@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to escape and unescape XML special characters, sanitize strings for use as XML element names, and remove invalid XML control characters using StringExtensions.
+`StringExtensions` in the `Xml` namespace provides XML escaping, unescaping, element name sanitization, and control-character removal for text content. This example starts with `"Use & < > \" ' in XML"` and calls `EscapeXml` to produce `"Use &amp; &lt; &gt; &quot; &apos; in XML"`, then round-trips back with `UnescapeXml`. It also demonstrates `SanitizeXmlElementName` on `"1st Element Name!"` to replace leading digits and punctuation with underscores, and `SanitizeXmlElementText` to remove control characters except `\t`, `\n`, `\r`, with optional CDATA section protection that removes `"]]>"` sequences. Console output displays each transformation result.
 
 ```csharp
 using System;

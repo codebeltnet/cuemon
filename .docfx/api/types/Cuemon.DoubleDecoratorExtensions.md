@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example shows how to extend `double` with `DoubleDecoratorExtensions` methods to convert numeric values into `TimeSpan` instances using a specified `TimeUnit`.
+`DoubleDecoratorExtensions` provides extension methods on `Decorator.Enclose` for converting `double` values into `TimeSpan` instances using the `ToTimeSpan` method with a specified `TimeUnit`. This example creates four `double` values representing 1.5 days, 90 minutes, 5000 milliseconds, and 2.5 hours, each wrapped with `Decorator.Enclose` and passed to `ToTimeSpan` with the matching time unit. Key setup includes choosing the correct `TimeUnit` enum value for each conversion. Console output shows `1.12:00:00` for 1.5 days, `01:30:00` for 90 minutes, `00:00:05` for 5000 milliseconds, and `02:30:00` for 2.5 hours.
 
 ```csharp
 using System;

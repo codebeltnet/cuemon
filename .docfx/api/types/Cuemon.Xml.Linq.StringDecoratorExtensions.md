@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to validate and parse XML strings into XElement objects using StringDecoratorExtensions, with support for load options and whitespace preservation.
+`StringDecoratorExtensions` in the `Xml.Linq` namespace provides extension methods on `Decorator.Enclose` for validating and parsing XML strings into `XElement` objects. This example checks valid XML (`"<root><item id=\"1\">value</item></root>"`) with `IsXmlString` returning `True`, parses it via `TryParseXElement` and navigates to read the root name, item attribute, and value. Invalid XML (`"not xml at all"`) returns `False` for `IsXmlString` and `TryParseXElement` returns `false` with `null`. It also demonstrates `TryParseXElement` with `LoadOptions.PreserveWhitespace` to retain whitespace in the parsed output. Console output confirms each validation and parsing result.
 
 ```csharp
 using System;

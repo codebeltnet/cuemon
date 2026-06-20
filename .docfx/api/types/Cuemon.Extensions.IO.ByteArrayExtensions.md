@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to convert a byte array into a seekable MemoryStream using ByteArrayExtensions, with both synchronous and asynchronous overloads.
+`ByteArrayExtensions` provides extension methods for converting `byte[]` into seekable `MemoryStream` instances, with both synchronous and asynchronous overloads. This example encodes `"Hello, World!"` into a UTF-8 byte array, then calls `ToStream()` and `ToStreamAsync()` to create streams, verifying that the synchronous stream has `Length = 13` and `CanSeek = True`. The content is read back with a `StreamReader` to confirm round-trip fidelity, and the asynchronous overload is demonstrated with a `CancellationToken`. Console output confirms the stream properties and that re-read content matches the original string.
 
 ```csharp
 using System.Threading;

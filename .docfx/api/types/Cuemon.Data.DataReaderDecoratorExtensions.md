@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the decorator extensions to convert an `IDataReader` to an encoded string, an async string, or a stream.
+`DataReaderDecoratorExtensions` provides extension methods on `Decorator.Enclose` for converting `IDataReader` content into encoded strings or streams, both synchronously and asynchronously. This example creates a single-column DSV data source backed by `DsvDataReader` with three rows of data, then wraps it and calls `ToEncodedString`, `ToEncodedStringAsync`, and `ToStream`. Key steps include repositioning the underlying stream between conversions and using `DsvDataReader` as the input source. Console output shows the string representation of the data and the stream length.
 
 ```csharp
 using System;

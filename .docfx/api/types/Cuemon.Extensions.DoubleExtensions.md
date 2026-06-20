@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use DoubleExtensions for numeric operations such as Unix epoch conversion, time span creation, factorial computation, and rounding to specified accuracy.
+`DoubleExtensions` provides extension methods for `Double` covering Unix epoch conversion, time span creation, factorial computation, and precision rounding. This example starts with a Unix timestamp of `1617738277` and converts it to a local `DateTime` via `FromUnixEpochTime`, creates a `TimeSpan` from `3661` seconds using `ToTimeSpan`, computes `5!` using `Factorial`, and rounds `123456789.987654321` to the nearest thousand and million using `RoundOff`. Console output shows the resulting date (`O` format), the duration (`01:01:01`), the factorial value (`120`), and the rounded figures (`123457000` and `123000000`).
 
 ```csharp
 using System;

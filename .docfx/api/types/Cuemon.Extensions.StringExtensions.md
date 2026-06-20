@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.Extensions.StringExtensions> extension methods to manipulate and inspect a string value.
+`StringExtensions` provides a comprehensive set of extension methods for `string` covering trimming, casing, content inspection, encoding, parsing, and utility operations. This example applies `TrimAll` to remove whitespace, `ToCasing` with `LowerCase`, `UpperCase`, and `TitleCase` modes, and content checks like `IsEmailAddress`, `IsGuid`, `IsHex`, `IsNumeric`, and `IsBase64`. It also demonstrates encoding conversions (`ToByteArray`, `ToHexadecimal`, `FromBase64`, `FromUrlEncodedBase64`), enum parsing (`"Monday".ToEnum<DayOfWeek>()`), delimited-string splitting (`SplitDelimited` with quoted fields), and utility operations such as `Count`, `Difference`, `JsEscape`, `Chunk`, `PrefixWith`, `SuffixWith`, and `ToGuid`. Console output confirms transformations like `" Hello, World! "` trimmed to `"Hello,World!"`, `"hello".SuffixWith(" world")` producing `"hello world"`, and `"Monday".ToEnum<DayOfWeek>()` returning `DayOfWeek.Monday`.
 
 ```csharp
 using System.Text;

@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to compute SHA-256 and SHA-512 hashes for data integrity using `UnkeyedHashFactory`. It hashes a sample input and prints the hexadecimal digest for each algorithm.
+
 ```csharp
 using System;
 using System.Text;

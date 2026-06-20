@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example registers built-in and custom XML converters, then reuses the configured list through <xref:Cuemon.Xml.Serialization.XmlSerializer>.
+`XmlConverterExtensions` provides extension methods for building a list of `XmlConverter` instances with both built-in and custom converters that can be reused through `XmlSerializer`. This example creates an `IList<XmlConverter>` and calls `InsertXmlConverter<string>` to register a custom string converter at position 0, `AddXmlConverter<int>` for an integer converter, and fluent methods like `AddEnumerableConverter`, `AddExceptionDescriptorConverter`, `AddUriConverter`, `AddDateTimeConverter`, `AddTimeSpanConverter`, `AddStringConverter`, `AddExceptionConverter`, and `AddFailureConverter`. It then uses `FirstOrDefaultWriterConverter` and `FirstOrDefaultReaderConverter` to query converters, applies them to `XmlSerializerOptions`, and serializes a `Uri` to XML. Console output confirms converter lookup results and displays the serialized XML.
 
 ```csharp
 using System;

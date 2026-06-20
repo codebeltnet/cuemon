@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to compute an HMAC-SHA256 hash for message authentication using `KeyedHashFactory`. It creates a keyed hash algorithm with a secret key, hashes an input string, and prints the hexadecimal digest.
+
 ```csharp
 using System;
 using System.Text;

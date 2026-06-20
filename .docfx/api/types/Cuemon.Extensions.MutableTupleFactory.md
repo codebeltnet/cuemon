@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to create mutable tuples with zero to five arguments using `MutableTupleFactory`. It shows accessing tuple values and constructing tuples of various sizes.
+
 ```csharp
 using System;
 using Cuemon;

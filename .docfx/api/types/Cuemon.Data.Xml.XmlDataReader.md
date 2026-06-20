@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to read XML data as a tabular result set using `XmlDataReader`. It iterates through records, accesses fields by name, and prints row metadata such as depth and field count.
+
 ```csharp
 using System;
 using System.IO;

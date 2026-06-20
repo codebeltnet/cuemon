@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to configure `CorrelationIdentifierOptions` with a custom correlation token. After validation, it prints the token's correlation ID.
+
 ```csharp
 using System;
 using Cuemon.Messaging;

@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates parsing a GUID string, a Base64-encoded value, and a URI string using the factory methods provided by `ParserFactory`. Each parser is created via a dedicated factory method and then invoked to produce a strongly typed result.
+
 ```csharp
 using System;
 using Cuemon.Text;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example configures the MVC builder with the same option families covered by the unit tests: API-key enforcement, throttling, user-agent validation, fault descriptors, and cache headers.
+The following example configures the MVC builder with the same option families covered by the unit tests: API-key enforcement, throttling, user-agent validation, fault descriptors, and cache headers. It chains `AddApiKeySentinelOptions`, `AddThrottlingSentinelOptions`, `AddUserAgentSentinelOptions`, `AddFaultDescriptorOptions`, and `AddHttpCacheableOptions` on the MVC builder. The resulting service count is written to the console, demonstrating how to register security, throttling, and caching middleware in a single fluent configuration.
 
 ```csharp
 using System;

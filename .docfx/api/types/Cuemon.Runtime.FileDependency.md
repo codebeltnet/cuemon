@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example shows how to defer file-watcher creation until a dependency starts monitoring.
+`FileDependency` defers `FileWatcher` creation until monitoring begins by accepting a `Lazy<FileWatcher>` factory. This example creates a temporary `settings.json` file, wraps a `FileWatcher` in a `Lazy<>` with a 500ms polling period, and passes it to `FileDependency` with `breakTieOnChanged: true`. Key steps include checking `lazyWatcher.IsValueCreated` before and after `StartAsync` to confirm deferred creation, subscribing to `DependencyChanged`, and inspecting `HasChanged` after signaling. Console output shows the watcher creation status, `BreakTieOnChanged` value, and the changed state.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use `SqlQueryBuilder` to generate SELECT, INSERT, UPDATE, DELETE, and EXISTS queries for SQL Server with table and column encapsulation, dirty reads, and read limits.
+`SqlQueryBuilder` generates SQL Server-specific SELECT, INSERT, UPDATE, DELETE, and EXISTS queries from key and column mapping dictionaries. This example configures multiple `SqlQueryBuilder` instances for an `Employees` table with key column `EmployeeId` and optional columns `FirstName`, `LastName`, and `Email`. Settings include `EnableTableAndColumnEncapsulation` for bracket-delimited identifiers, `EnableDirtyReads` for `WITH(NOLOCK)`, and `EnableReadLimit` with `ReadLimit = 50` for `TOP 50`. Console output shows the generated SQL for each query type, such as `SELECT TOP 50 [EmployeeId],[FirstName],[LastName],[Email] FROM [Employees] WITH(NOLOCK) WHERE [EmployeeId]=@EmployeeId`.
 
 ```csharp
 using System;

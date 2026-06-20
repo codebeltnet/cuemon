@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to detect whether a property uses an auto-implemented backing field.
+`PropertyInfoExtensions` provides extension methods for `PropertyInfo` to detect auto-implemented properties via `IsAutoProperty`. This example defines a `Sample` class with an auto-property (`AutoProperty`) and a manually implemented property (`ManualProperty`) that uses a backing field with a null-guard in its setter, then retrieves both `PropertyInfo` instances via reflection and calls `IsAutoProperty` on each. Console output displays `True` for the auto-property and `False` for the manual one, confirming the extension correctly distinguishes compiler-generated get/set accessors from custom implementations.
 
 ```csharp
 using System;

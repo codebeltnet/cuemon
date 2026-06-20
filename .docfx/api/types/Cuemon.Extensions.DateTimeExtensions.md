@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates common `DateTime` extension methods for rounding, range checking, time-of-day classification, and timezone kind conversion.
+`DateTimeExtensions` provides extension methods for `DateTime` including rounding, range checking, time-of-day classification, kind conversion, and Unix epoch round-tripping. This example creates UTC and local `DateTime` values and applies `Floor` to snap to the nearest hour, `Ceiling` to round up to the next hour, `IsWithinRange` for containment checks, and classification methods like `IsTimeOfDayMorning` and `IsTimeOfDayEvening`. It also converts between `DateTimeKind` values using `ToUtcKind`, `ToLocalKind`, and `ToDefaultKind`, and round-trips through Unix epoch seconds via `ToUnixEpochTime` and `FromUnixEpochTime`. Console output confirms each result, including the snapped timestamp, boolean range check, time-of-day flags, updated `Kind` values, and the restored timestamp.
 
 ```csharp
 using System;

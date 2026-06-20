@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates flattening nested exception hierarchies using the <xref:Cuemon.Extensions.ExceptionExtensions.Flatten(System.Exception)> extension method.
+`ExceptionExtensions.Flatten` unwinds deeply nested exception hierarchies into a flat `IEnumerable<Exception>` while preserving insertion order. This example constructs a four-level exception chain starting with an `InvalidOperationException("First")` containing `AmbiguousMatchException`, `OutOfMemoryException`, and an inner `AggregateException` with an `AccessViolationException`. Key setup includes building the nested exception tree and calling `Flatten()` to produce a flat sequence. Console output shows the count of `4` and each exception type name in order: `InvalidOperationException`, `AmbiguousMatchException`, `OutOfMemoryException`, `AccessViolationException`.
 
 ```csharp
 using System;

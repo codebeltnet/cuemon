@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to use the `Calculator` class to perform basic arithmetic and bitwise operations. Each method call prints the computed result to the console.
+
 ```csharp
 using System;
 using Cuemon;

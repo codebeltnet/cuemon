@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example writes XML directly to an <xref:System.Xml.XmlWriter> by combining object serialization, qualified element names, and conditional wrapper elements.
+`XmlWriterExtensions` provides extension methods for `XmlWriter` including object serialization, qualified element names, conditional wrapping, and root element generation. This example creates an `XmlWriter` targeting a `StringWriter` with indented, declaration-free settings, then calls `WriteObject` to serialize an `InvalidOperationException`, `WriteStartElement` with an `XmlQualifiedEntity("Cuemon")` for a standalone element, `WriteEncapsulatingElementWhenNotNull` to conditionally wrap an exception in a `"MyWrappedElement"`, and `WriteXmlRootElement` to produce a `Root` element with a `"cuemon"` namespace URI. Console output displays four separate XML results showing the serialized exception, the standalone element, the wrapped exception, and the namespace-qualified root element.
 
 ```csharp
 using System;

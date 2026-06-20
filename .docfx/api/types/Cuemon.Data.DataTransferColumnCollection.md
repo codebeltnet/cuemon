@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use `DataTransferColumnCollection` to access column metadata retrieved from a data reader, including lookup by name or ordinal.
+`DataTransferColumnCollection` is a strongly typed collection of `DataTransferColumn` objects that provides access to column metadata by index and by name. This example creates a `DataTable` with `Id`, `Name`, and `Created` columns containing one data row, then retrieves the column collection via `DataTransfer.GetColumns` from the data reader. It accesses the first column by index, looks up the `"Name"` column by name to get its ordinal, and checks whether a missing column name returns `null`. Console output shows the column count, the first column's name and data type, and the missing-column lookup result.
 
 ```csharp
 using System;

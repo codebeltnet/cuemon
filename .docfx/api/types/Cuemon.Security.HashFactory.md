@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to compute non-cryptographic hashes using `HashFactory`. It demonstrates FNV-1a 32-bit, CRC-32, and FNV-1a 256-bit hashing of a sample input, printing each hexadecimal digest.
+
 ```csharp
 using System;
 using System.Text;

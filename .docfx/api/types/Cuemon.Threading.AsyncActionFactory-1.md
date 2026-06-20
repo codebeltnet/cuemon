@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create and execute an <xref:Cuemon.Threading.AsyncActionFactory`1> for deferred asynchronous work with typed arguments.
+`AsyncActionFactory<T>` encapsulates a deferred asynchronous action with typed arguments, with support for cloning for safe concurrent execution. This example creates a factory using `AsyncActionFactory.Create<string, int>` with a lambda that takes a channel name (`"orders"`) and retry count (`3`), delays 10ms, and prints them, then calls `ExecuteMethodAsync` to run it. Key steps include cloning the factory via `(AsyncActionFactory<MutableTuple<string, int>>)factory.Clone()` and executing the clone separately. Console output displays `"orders:3"` for both the original and cloned execution, confirming that cloned factories produce identical results.
 
 ```csharp
 using System;

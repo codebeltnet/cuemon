@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example follows the same pattern as the sample MVC app in the test project: controller actions populate breadcrumbs from the current model, and a shared Razor partial reads them back from <see cref="ViewDataDictionary"/>.
+The following example follows the same pattern as the sample MVC app in the test project: controller actions populate breadcrumbs from the current model, and a shared Razor partial reads them back from <see cref="ViewDataDictionary"/>. Three `RegionController` actions call `AddBreadcrumbs` with a `RegionPageModel` that holds hierarchical labels. A `BreadcrumbPartial` class then retrieves the breadcrumbs via `GetBreadcrumbs` and projects each into a readable string, demonstrating hierarchical navigation-data propagation in ASP.NET Core MVC.
 
 ```csharp
 using System.Collections.Generic;

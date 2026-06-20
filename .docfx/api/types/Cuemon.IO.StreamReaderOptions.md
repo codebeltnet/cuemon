@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure StreamReaderOptions to control encoding, preamble handling, and buffer size when reading from streams.
+`StreamReaderOptions` configures encoding, preamble handling, and buffer size for reading from streams via `StreamReader`. This example shows default options (UTF-8, `PreambleSequence.Remove`, `BufferSize = 81920`) and custom options for UTF-32 with `PreambleSequence.Keep` and `BufferSize = 4096`. A `StreamReader` is created using the custom options to read `"Hello, World!"` UTF-32 data from a `MemoryStream`, and the default preamble and buffer size values are also printed. Console output displays the default encoding name (`UTF-8`), preamble mode, buffer size, and the read content.
 
 ```csharp
 using System;

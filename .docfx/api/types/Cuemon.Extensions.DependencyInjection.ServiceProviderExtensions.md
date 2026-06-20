@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example wraps the built service provider and then uses `GetServiceDescriptors()` to inspect the registrations that were added to the container.
+The following example wraps the built service provider and then uses `GetServiceDescriptors()` to inspect the registrations that were added to the container. It registers singleton and scoped services in a `ServiceCollection`, builds the provider, and wraps it in a `DelegatingServiceProvider`. The wrapped provider's descriptors are queried for the registered types, and the results are written to the console, showing how to introspect service registrations at runtime.
 
 ```csharp
 using System;

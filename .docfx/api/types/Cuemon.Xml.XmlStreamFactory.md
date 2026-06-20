@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example builds an XML document inline using `XmlStreamFactory.CreateStream` with an `XmlWriter` delegate. The resulting stream is read back as a string, producing a well-formed XML document with a `<Configuration>` root element.
+
 ```csharp
 using System;
 using System.IO;

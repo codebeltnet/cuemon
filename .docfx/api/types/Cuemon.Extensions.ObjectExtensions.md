@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.Extensions.ObjectExtensions> to wrap, convert, and adjust objects.
+`ObjectExtensions` provides extension methods for type conversion with fallback (`As<T>`), wrapper creation (`UseWrapper`), collection manipulation (`Adjust`, `Alter`), and delimited-string formatting. This example converts `"42"` to an `int`, handles `"not-a-number"` with a fallback of `99`, wraps a string with `UseWrapper` to attach metadata, adjusts a `List<int>` by appending elements, and alters it in-place. Key steps include using the `As` method for safe casts, `UseWrapper` for attaching diagnostic data, and `Adjust`/`Alter` for immutable/mutable collection operations. Console output confirms each conversion result, the wrapper data value `"example"`, hash codes, and the delimited string `"1;2;3;4"`.
 
 ```csharp
 using System;

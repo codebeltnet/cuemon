@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example registers a concrete handler once and lets `Add<TService>` forward both its typed service contract and its dependency-injection marker so the same scoped instance can be resolved through each public entry point.
+`ServiceCollectionExtensions` provides registration methods for `IServiceCollection` that support multi-contract resolution, typed options, and bulk post-configuration. This example defines an `OrdersMessageHandler` implementing both `IMessageHandler<OrdersChannel>` and `IDependencyInjectionMarker<OrdersChannel>`, then registers it with various lifecycle options using `Add`, `TryAdd`, and `TryConfigure` overloads including scoped and singleton lifetimes. It also demonstrates `PostConfigureAllOf<HandlerOptions>` for bulk configuration of options instances. After building the service provider and creating a scope, the concrete handler, typed contract, and marker are resolved and compared by reference. Console output confirms that all three resolve to the same instance and that `HandlerOptions.Label` is correctly set to `"post-configured"`.
 
 ```csharp
 using System;

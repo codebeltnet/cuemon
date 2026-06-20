@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to use `TryPop` to safely remove items from a `Stack<string>`. It demonstrates popping until the stack is empty, after which `TryPop` returns `false` and sets the result to `null`.
+
 ```csharp
 using System;
 using System.Collections.Generic;

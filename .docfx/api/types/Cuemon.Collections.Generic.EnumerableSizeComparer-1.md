@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to compare the sizes of enumerable collections using `EnumerableSizeComparer`. It shows comparisons between collections of different and equal sizes, including null-value handling.
+
 ```csharp
 using System;
 using System.Collections;

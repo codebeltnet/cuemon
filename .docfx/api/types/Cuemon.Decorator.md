@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to wrap values using `Decorator.Enclose` and related methods. It shows accessing the inner value, argument name, syntactic default, and raw (nullable) wrapping.
+
 ```csharp
 using System;
 using Cuemon;

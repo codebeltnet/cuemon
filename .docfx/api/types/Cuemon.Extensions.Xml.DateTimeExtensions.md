@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to format DateTime values as XML strings using DateTimeExtensions, supporting UTC, local, round-trip, and unspecified serialization modes.
+`DateTimeExtensions` in the `Xml` namespace formats `DateTime` values as XML strings using `XmlDateTimeSerializationMode` enum values. This example creates `DateTime.UtcNow` and `DateTime.Now`, then calls `ToString` with `XmlDateTimeSerializationMode.Utc` (appends `Z`), `Local` (includes timezone offset like `+02:00`), `RoundtripKind` (preserves `Kind` information), and `Unspecified` (omits timezone info). Console output for each mode shows how time zone information is represented or omitted, such as `2026-06-16T12:34:56.789Z` for UTC and `2026-06-16T14:34:56.789+02:00` for local.
 
 ```csharp
 using System;

@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to register a custom JSON converter for the `Version` type using `DynamicJsonConverter`. It serializes a version to JSON and deserializes it back, printing each result.
+
 ```csharp
 using System;
 using System.Text.Json;

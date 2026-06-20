@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example wraps an anonymous object with `DynamicXmlSerializable` and provides a custom writer that emits `Name` and `Score` child elements. The resulting XML is written to a `StringWriter` and printed to the console.
+
 ```csharp
 using System;
 using System.IO;

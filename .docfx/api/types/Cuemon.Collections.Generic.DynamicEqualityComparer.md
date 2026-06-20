@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to create a case-insensitive `IEqualityComparer<string>` using `DynamicEqualityComparer` with lambda expressions. It filters distinct values from a mixed-case word list and prints the result.
+
 ```csharp
 using System;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use FileVersionInfoExtensions to extract structured product and file version information from an assembly's FileVersionInfo.
+`FileVersionInfoExtensions` provides extension methods for `FileVersionInfo` to extract structured version information as `VersionResult` objects from an assembly's metadata. This example obtains the `FileVersionInfo` for the current assembly, then calls `ToProductVersion` to retrieve the NuGet/semantic version string and `ToFileVersion` to retrieve the file version string. Key steps include checking `IsSemanticVersion()` and `HasAlphanumericVersion` on the product version, and converting the file version to a `System.Version` via `ToVersion()`. Console output displays the assembly full name, original version strings, structured version results, and boolean flags for version characteristics.
 
 ```csharp
 using System;

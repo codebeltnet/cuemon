@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to monitor an HTTP resource for changes using HttpDependency, which wraps an HttpWatcher to detect modifications via ETag and Last-Modified headers.
+`HttpDependency` wraps an `HttpWatcher` to monitor an HTTP resource for changes, detecting modifications via ETag and Last-Modified headers. This example creates a `Lazy<HttpWatcher>` that monitors `https://example.com/api/status` with HEAD requests at 30-second intervals, then constructs an `HttpDependency` from the factory and subscribes to the `DependencyChanged` event. Key steps include calling `StartAsync` to begin monitoring and handling the `DependencyChanged` event to react to changes. Console output prints the UTC timestamp when a resource change is detected.
 
 ```csharp
 using System;

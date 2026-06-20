@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use <xref cref="Cuemon.AspNetCore.Http.TooManyRequestsException"/> to signal HTTP 429 Too Many Requests responses.
+The following example demonstrates how to use <xref cref="Cuemon.AspNetCore.Http.TooManyRequestsException"/> to signal HTTP 429 Too Many Requests responses. It creates instances with default and custom messages, wraps an inner exception, and resolves by status code via `TryParse`. A rate-limit simulation checks request count against a threshold, then sets the `Retry-After` header. Each variation outputs status code, message, and header values to the console, illustrating rate-limit enforcement patterns.
 
 ```csharp
 using System;

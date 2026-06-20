@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to filter and enumerate loaded assemblies using `AssemblyContext`. It retrieves all assemblies whose name starts with "Cuemon" and prints each assembly name.
+
 ```csharp
 using System;
 using System.Linq;

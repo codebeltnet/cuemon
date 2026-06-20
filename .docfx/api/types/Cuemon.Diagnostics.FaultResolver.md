@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use <see cref="FaultResolver"/> to register exception-to-descriptor mappings for structured error reporting.
+`FaultResolver` registers exception-to-descriptor mappings for structured error reporting, using a validator predicate and a descriptor factory. This example registers a resolver that matches `ArgumentNullException` and produces an `ExceptionDescriptor` with code `"ERR_NULL_ARG"` and a message including the parameter name. It then tests resolution against both a matching `ArgumentNullException("value")` and a non-matching `InvalidOperationException`. Console output shows `True`, `ERR_NULL_ARG`, the descriptive message, the failure details (`"value"`), and `False` for the unmatched case where the result is `null`.
 
 ```csharp
 using System;

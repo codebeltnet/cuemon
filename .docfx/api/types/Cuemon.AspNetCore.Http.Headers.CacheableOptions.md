@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to configure `CacheableOptions` with cache-control and expiration headers. After validation, it prints whether each header type is enabled.
+
 ```csharp
 using System;
 using Microsoft.Net.Http.Headers;

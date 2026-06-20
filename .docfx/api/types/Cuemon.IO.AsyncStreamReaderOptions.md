@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure AsyncStreamReaderOptions to control encoding, preamble handling, and buffer size when reading stream content asynchronously.
+`AsyncStreamReaderOptions` configures encoding, preamble handling, and buffer size for asynchronous stream reading operations. This example creates a `MemoryStream` with UTF-8 preamble bytes followed by `"Hej Cuemon"` text, sets up options with `PreambleSequence.Remove` to strip the BOM, `Encoding = EncodingOptions.DefaultEncoding` for auto-detection, and `BufferSize = 4096`, then calls `ToEncodedStringAsync` via the decorator pattern. Console output shows the encoding web name (`utf-8`) and the decoded text with the preamble stripped, confirming correct preamble handling.
 
 ```csharp
 using System;

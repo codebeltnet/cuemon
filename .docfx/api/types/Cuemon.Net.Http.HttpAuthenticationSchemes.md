@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to use the `HttpAuthenticationSchemes` constants to construct HTTP Authorization headers. It prints each scheme name and creates a Basic authentication header value.
+
 ```csharp
 using System;
 using System.Net.Http.Headers;

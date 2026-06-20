@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use `UniqueIndexViolationException` to represent a unique index or unique constraint violation in a data source.
+`UniqueIndexViolationException` represents a unique index or constraint violation error, with support for inner exceptions and parameterless construction. This example throws a new instance with a descriptive message about a duplicate key in `dbo.Users` and catches it to print the message. It also creates a wrapped exception with an inner `InvalidOperationException` as the cause, and demonstrates the default parameterless constructor with type name resolution via `GetType().Name`. Console output shows the exception messages and the resolved type name `UniqueIndexViolationException`.
 
 ```csharp
 using System;

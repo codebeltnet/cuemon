@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to detect and remove byte order marks (BOM) from a UTF-8 byte array and detect encoding from a stream. The output shows the detected encoding name, the byte count after BOM removal, and the encoding detected from the stream.
+
 ```csharp
 using System;
 using System.IO;

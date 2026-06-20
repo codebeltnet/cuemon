@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create and execute a function asynchronously using AsyncFuncFactory, with support for cloning for safe concurrent use.
+`AsyncFuncFactory<TArg1, TArg2, TResult>` encapsulates a deferred asynchronous function with typed arguments and return value, with cloning support for safe concurrent use. This example creates a factory using `AsyncFuncFactory.Create` with a lambda that takes `"Hello"` and `"World"` and returns their combined length, then calls `ExecuteMethodAsync` to compute the result. Key steps include checking `HasDelegate` and `DelegateInfo` properties, and cloning the factory via `(AsyncFuncFactory<MutableTuple<string, string>, int>)factory.Clone()` to execute independently. Console output confirms `HasDelegate` is `True`, the combined length is `10`, and the cloned result is also `10`.
 
 ```csharp
 using System;

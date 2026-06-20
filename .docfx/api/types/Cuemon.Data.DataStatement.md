@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create `DataStatement` instances for text queries, stored procedures, and parameterized commands.
+`DataStatement` represents a database command with support for text queries, stored procedures, and parameterized commands. This example creates three different statements: a text query via implicit conversion from `"SELECT * FROM Product"`, a stored procedure `"dbo.GetOrdersByDate"` with a 120-second timeout configured through an options delegate, and a parameterized `UPDATE` command with two `IDataParameter` inputs (`@qty` and `@id`). Console output shows each statement's text, `CommandType`, timeout, parameter count, and parameter names.
 
 ```csharp
 using System;

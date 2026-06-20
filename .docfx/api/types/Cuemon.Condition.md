@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the `Condition` class to perform common validation checks, equality comparisons, conditional branching, and range assertions.
+The following example demonstrates how to use the `Condition` class to perform common validation checks, equality comparisons, conditional branching, and range assertions. It exercises `AreEqual`, `AreNotEqual`, and `AreSame` for equality, `FlipFlop` and `TernaryIf` for conditional execution, and validation helpers such as `IsEmail`, `IsGuid`, `IsNumeric`, `IsPrime`, and `IsWithinRange`. An async flip-flop variant confirms the API works with task-based delegates. Each result is written to the console, illustrating the full validation utility surface.
 
 ```csharp
 using System;

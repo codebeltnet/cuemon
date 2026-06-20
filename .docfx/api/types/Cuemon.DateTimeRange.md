@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use `DateTimeRange` to represent and query a range between two `DateTime` values, including duration, formatting, and equality comparison.
+The following example demonstrates how to use `DateTimeRange` to represent and query a range between two `DateTime` values. It creates a range for January 2026, queries the start and end points, computes the duration, and tests equality against another range. Custom formatting and hash-code access are also shown. Each result is written to the console, confirming that date-range creation, comparison, and formatting behave as expected.
 
 ```csharp
 using System;

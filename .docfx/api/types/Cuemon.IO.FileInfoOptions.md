@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure FileInfoOptions to control the number of bytes read from a file, useful for reading headers or file signatures.
+`FileInfoOptions` controls the maximum number of bytes read from a file, useful for reading headers or file signatures. This example demonstrates default options where `BytesToRead = 0` means no limit, a 100-byte limit for reading file headers, and a 16-byte limit for file signature detection. A temporary file with 1000 `'A'` characters is created, then read with the 100-byte limit and the actual bytes read is reported. Console output shows the default `BytesToRead` value, the requested vs. actual bytes read, and confirms that `BytesToRead = 0` means no limit.
 
 ```csharp
 using System;

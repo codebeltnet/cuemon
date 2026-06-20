@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create an `InOperatorResult` by using a custom `InOperator<T>` subclass and then access its arguments, parameters, and string representation.
+The following example demonstrates how to create an `InOperatorResult` by using a custom `InOperator<T>` subclass and then access its arguments, parameters, and string representation. The `IntInOperator` maps integer values to parameterized SQL-safe placeholders prefixed with `@p`. Calling `ToSafeResult` with three values produces an `InOperatorResult` whose arguments CSV and parameter metadata are written to the console, showing how to generate safe SQL IN clauses programmatically.
 
 ```csharp
 using System;

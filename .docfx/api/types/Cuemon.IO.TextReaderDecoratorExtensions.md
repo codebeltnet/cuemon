@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to copy content from one TextReader to a TextWriter asynchronously using TextReaderDecoratorExtensions, with configurable buffer sizes.
+`TextReaderDecoratorExtensions` provides extension methods on `Decorator.Enclose` for copying `TextReader` content to `TextWriter` instances asynchronously with configurable buffer sizes. This example creates a `StringReader` with three lines of text, copies to a `StringWriter` via `CopyToAsync`, and outputs the result. It also demonstrates a custom buffer size of `1024` for the copy operation and copying between different reader/writer types (`StreamReader` to `StringWriter`). Console output confirms the copied content matches the source for all three scenarios.
 
 ```csharp
 using System.Text;

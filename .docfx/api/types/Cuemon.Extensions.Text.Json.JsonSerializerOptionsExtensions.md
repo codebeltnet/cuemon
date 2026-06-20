@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates cloning <see cref="JsonSerializerOptions"/> and applying property naming policies using the <xref:Cuemon.Extensions.Text.Json.JsonSerializerOptionsExtensions.Clone(System.Text.Json.JsonSerializerOptions,System.Action{System.Text.Json.JsonSerializerOptions})> and <xref:Cuemon.Extensions.Text.Json.JsonSerializerOptionsExtensions.SetPropertyName(System.Text.Json.JsonSerializerOptions,System.String)> extension methods.
+`JsonSerializerOptionsExtensions` provides `Clone`, `SetPropertyName`, and `DefaultOrConvertName` extension methods for duplicating and transforming `JsonSerializerOptions` instances. This example creates base options with `CamelCase` and `WriteIndented = true`, clones them with `WriteIndented = false` via `Clone`, and demonstrates `SetPropertyName` which converts property names according to the naming policy. Key steps include passing a setup delegate to `Clone` to override specific settings without modifying the original. Console output confirms the original has `WriteIndented = True` while the clone has `False`, and `SetPropertyName("OrderDate")` returns `"orderDate"` under CamelCase or `"OrderDate"` when no policy is set.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example shows how to inspect reflected properties for auto-property and override behavior.
+`PropertyInfoDecoratorExtensions` provides extension methods on `Decorator.Enclose` for detecting auto-implemented properties and override behavior via `IsAutoProperty` and `IsOverridden`. This example retrieves `PropertyInfo` for `Product.Code` (auto-property), `Product.Label` (expression-bodied), and `FeaturedProduct.Summary` (overridden in a derived class), then calls `IsAutoProperty` on the first two and `IsOverridden` on the third. Console output shows `True` for the auto-property, `False` for the expression-bodied property, and `True` for the overridden property, confirming correct identification of property characteristics.
 
 ```csharp
 using System;

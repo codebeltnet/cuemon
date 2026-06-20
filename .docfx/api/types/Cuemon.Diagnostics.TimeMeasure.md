@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to profile actions and functions using <see cref="TimeMeasure"/>.
+The following example demonstrates how to profile actions and functions using <see cref="TimeMeasure"/>. It profiles parameterless and parameterized actions via `WithAction`, profiles functions with return values via `WithFunc`, and configures a completion threshold. Each profiler's elapsed time and, where applicable, return value are written to the console, illustrating how to measure execution duration of synchronous delegates.
 
 ```csharp
 using System;

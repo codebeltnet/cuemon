@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example applies <xref cref="Cuemon.AspNetCore.Mvc.Filters.Diagnostics.ServerTimingAttribute"/> to a controller action and configures the attribute directly.
+The following example applies <xref cref="Cuemon.AspNetCore.Mvc.Filters.Diagnostics.ServerTimingAttribute"/> to a controller action and configures the attribute directly. It instantiates the attribute with a name, description, threshold in milliseconds, and desired log level, then applies it declaratively to a `WeatherController` GET endpoint. The attribute outputs its configuration and confirms it implements `IFilterFactory`, demonstrating how to instrument ASP.NET Core endpoints with server-timing metrics.
 
 ```csharp
 using System;

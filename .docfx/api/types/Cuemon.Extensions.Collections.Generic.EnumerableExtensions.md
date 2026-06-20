@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to partition, reorder, paginate, and materialize a sequence by using the available enumerable extensions.
+`EnumerableExtensions` provides extension methods for `IEnumerable<T>` including chunking, shuffling, ordering, pagination, and materialization. This example starts with an `int[] { 4, 1, 3, 2 }` and applies `Chunk(2)` to split into batches, `Shuffle` with both random and deterministic seeds, `OrderAscending` and `OrderDescending` for sorted output, `RandomOrDefault` for element selection, and `Yield` to wrap a single value. It also demonstrates `ToDictionary` from `KeyValuePair` sequences, `ToPartitioner` for partitioned iteration, and `ToPagination`/`ToPaginationList` for page-based access. Console output confirms each operation's results, such as chunk count (`2`), sorted order (`1, 2, 3, 4`), and dictionary value for key `"beta"`.
 
 ```csharp
 using System;

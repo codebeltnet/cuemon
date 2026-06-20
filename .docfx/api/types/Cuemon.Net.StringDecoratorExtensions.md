@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to URL-encode and URL-decode strings using StringDecoratorExtensions, with support for custom encodings.
+`StringDecoratorExtensions` in the `Net` namespace provides URL-encoding and URL-decoding extension methods on `Decorator.Enclose` for strings with custom encoding support. This example encodes `"hello world & some <stuff>"` via `UrlEncode` producing `"hello+world+%26+some+%3cstuff%3e"`, decodes it back to the original via `UrlDecode`, and also demonstrates calling the static methods directly on `Cuemon.Net.StringDecoratorExtensions.UrlEncode`. Custom encoding with UTF-8 on `"a=b&c=d"` produces `"a%3db%26c%3dd"`. Console output confirms each encode and decode operation's round-trip behavior.
 
 ```csharp
 using System;

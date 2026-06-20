@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to inspect a type hierarchy and member set with <see cref="TypeExtensions" />.
+`TypeExtensions` in the `Reflection` namespace provides methods for inspecting type hierarchies and enumerating members across the inheritance tree. This example uses `typeof(Stream)` to retrieve derived, inherited, and hierarchy types via `GetDerivedTypes`, `GetInheritedTypes`, and `GetHierarchyTypes`, then uses `TypeCatalog` (extending `BaseCatalog`) with `GetAllProperties`, `GetAllEvents`, `GetAllFields`, and `GetAllMethods` to enumerate members. It also demonstrates `GetRuntimePropertiesExceptOf<BaseCatalog>` to exclude inherited properties, `GetEmbeddedResources` for assembly resource lookup, and `ToFullNameIncludingAssemblyName` for a fully qualified type name. Console output confirms member names, hierarchy inclusion (e.g., `Stream` in `GetHierarchyTypes`), and assembly-qualified type identity.
 
 ```csharp
 using System;

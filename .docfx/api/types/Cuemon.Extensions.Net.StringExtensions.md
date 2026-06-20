@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to URL-encode and URL-decode strings directly using StringExtensions, with support for custom encodings and null-safe handling.
+`StringExtensions` in the `Net` namespace provides URL-encoding and URL-decoding extension methods on `string` with custom encoding support and null-safe handling. This example encodes `"hello world"` to `"hello+world"`, decodes it back, encodes with UTF-32 where each character produces 4 bytes, and handles query-string special characters in `"name=Jane Doe&city=Copenhagen"` producing `"name%3dJane+Doe%26city%3dCopenhagen"`. It also demonstrates null input safety where `((string)null).UrlEncode()` returns `null`. Console output confirms each round-trip operation and the null-safe result.
 
 ```csharp
 using System.Text;

@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to build and traverse a hierarchical tree structure using `Hierarchy`. It shows adding nodes, printing paths, searching for nodes with `Find`, and generating an object hierarchy from an anonymous type.
+
 ```csharp
 using System;
 using System.Linq;

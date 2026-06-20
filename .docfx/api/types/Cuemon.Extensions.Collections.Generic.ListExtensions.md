@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.Extensions.Collections.Generic.ListExtensions> extension methods to safely navigate and manipulate lists.
+`ListExtensions` provides extension methods for `List<T>` for safe navigation and manipulation including predicate-based removal, bounds checking, adjacent-element access, and conditional addition. This example creates a list of fruit names `["Apple", "Banana", "Cherry", "Date"]`, calls `Remove` with a predicate to delete `"Banana"`, checks whether index `5` exists with `HasIndex`, and retrieves adjacent elements using `Next(0)` and `Previous(2)` without throwing on out-of-bounds access. `TryAdd` conditionally adds `"Cherry"` (duplicate, returns `false`) and `"Elderberry"` (new, returns `true`). Console output confirms the removal, bounds-check results, neighbor values, and the success of each conditional addition.
 
 ```csharp
 using System;

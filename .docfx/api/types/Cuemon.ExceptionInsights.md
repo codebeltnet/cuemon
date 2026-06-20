@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to enrich an exception with thread and environment information using `ExceptionInsights.Embed`. It catches an exception, embeds runtime parameters and system snapshots, then checks for the embedded insight data in the exception's Data dictionary.
+
 ```csharp
 using System;
 using System.Reflection;

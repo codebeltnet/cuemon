@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use <see cref="HttpManager" /> with a custom in-memory HTTP handler.
+`HttpManager` provides HTTP operation methods backed by a configurable `IHttpClientFactory`. This example creates an `HttpManager` with a custom `EchoHandler` that returns `200 OK` for all requests, then calls `HttpGetAsync` on a test URI. Key setup includes passing a factory delegate that returns `HttpClient` instances backed by the echo handler. Console output confirms the response status code (`OK`) and that `Timeout` is greater than `TimeSpan.Zero`.
 
 ```csharp
 using System;

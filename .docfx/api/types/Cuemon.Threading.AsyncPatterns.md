@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use `AsyncPatterns` for safe disposal of `IDisposable` resources (CA2000) in asynchronous workflows.
+`AsyncPatterns` provides safe asynchronous patterns for resource management, including `SafeInvokeAsync` that ensures proper disposal of `IDisposable` resources (CA2000 compliant). This example calls `SafeInvokeAsync` with a factory delegate creating a `MemoryStream`, an invocation delegate that writes `"Cuemon"` bytes to it and returns the stream, and a `CancellationToken`. The resulting stream is read back via `StreamReader` to confirm the content, and the `AsyncPatterns.Use` sentinel is compared with itself to verify static reference identity. Console output displays `"Cuemon"` and `True` for the reference comparison.
 
 ```csharp
 using System;

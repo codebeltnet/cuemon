@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create TransientFaultEvidence instances to capture retry attempt details, recovery wait times, and latency information for transient fault handling.
+`TransientFaultEvidence` captures retry attempt details, recovery wait times, latency, and method signature information for transient fault handling scenarios. This example creates evidence with `attempts = 3`, `RecoveryWaitTime = 2s`, `TotalRecoveryWaitTime = 5s`, `Latency = 1500ms`, and a `MethodSignature` for `PaymentService.ProcessPayment`. It also demonstrates equality comparison between two identical evidence instances, and a minimal-info creation with `attempts = 1` and `Latency = 200ms` for simple scenarios. Console output displays the evidence's `ToString` representation, individual property values, equality results, and hash code consistency.
 
 ```csharp
 using System;

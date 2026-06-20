@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to read lines from a <see cref="TextReader" /> and copy its content asynchronously.
+`TextReaderExtensions` provides extension methods for `TextReader` including `ReadAllLines`, `ReadAllLinesAsync`, and `CopyToAsync` for reading and copying text content. This example creates a multi-line string `"line one\nline two\nline three"`, converts it to a `TextReader` via `ToTextReader`, then calls `ReadAllLines` synchronously and `ReadAllLinesAsync` asynchronously to collect each line. It also uses `CopyToAsync` to write the reader content into a `StringWriter`. Console output confirms all three approaches produce the correct line count of `3` and that the copied content contains `"line two"`.
 
 ```csharp
 using System;

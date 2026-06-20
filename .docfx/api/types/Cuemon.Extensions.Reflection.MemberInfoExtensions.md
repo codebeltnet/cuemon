@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates checking whether a member has specific custom attributes using the <xref:Cuemon.Extensions.Reflection.MemberInfoExtensions.HasAttributes(System.Reflection.MemberInfo,System.Type[])> extension method.
+`MemberInfoExtensions` provides extension methods for `MemberInfo` to check for the presence of one or more custom attributes via `HasAttributes`. This example defines a class with an `[Description]`-annotated property, an `[Obsolete]`-annotated field, and a regular property with no attributes, then iterates all public instance members calling `HasAttributes` with `DescriptionAttribute` and `ObsoleteAttribute` types. Console output shows each member name, its `MemberType`, and whether it carries any of the target attributes, demonstrating attribute-based filtering or validation of reflected members.
 
 ```csharp
 using System;

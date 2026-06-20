@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example shows how to extend `IEnumerable<char>` with `CharDecoratorExtensions` methods to convert character sequences into single-character strings and back to a combined string.
+`CharDecoratorExtensions` provides extension methods on `Decorator.Enclose` for converting between `IEnumerable<char>` sequences and string collections. This example wraps the characters of `"Hello"` and calls `ToEnumerable` to split them into single-character strings, then `ToStringEquivalent` to rejoin them back into the original string. It also demonstrates the same round-trip with a `char[]` array of `'A'`, `'B'`, `'C'`. Console output confirms the split produces `"H, e, l, l, o"` and the rejoined result matches `"Hello"` and `"ABC"`.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure `DataManagerOptions` with a connection string, reader behavior, and connection lifecycle settings.
+`DataManagerOptions` configures connection strings, reader behavior, and connection lifecycle settings for use with `DataManager`. This example creates an options instance with `ConnectionString = "Data Source=app.db"`, `PreferredReaderBehavior` set to `SequentialAccess | CloseConnection`, and both `LeaveConnectionOpen` and `LeaveCommandOpen` set to `false`. After configuration, `ValidateOptions()` is called to confirm the settings are valid. Console output prints the connection string, reader behavior flag, and lifecycle settings.
 
 ```csharp
 using System;

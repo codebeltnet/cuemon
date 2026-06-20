@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example shows how to extend `Exception` with `ExceptionDecoratorExtensions` methods to flatten nested exception hierarchies into a flat sequence.
+`ExceptionDecoratorExtensions` provides extension methods on `Decorator.Enclose` for flattening deeply nested exception hierarchies into a flat sequence via the `Flatten` method. This example creates a three-level exception chain (`InvalidOperationException` → `ArgumentException` → `TimeoutException`) and an `AggregateException` containing two root-level exceptions. Key steps include wrapping each exception with `Decorator.Enclose`, calling `Flatten()`, and materializing the result with `ToList()`. Console output shows the flattened chain order (`InvalidOperationException -> ArgumentException -> TimeoutException`) and the aggregate exception count, confirming the full hierarchy is unwound without losing any exceptions.
 
 ```csharp
 using System;

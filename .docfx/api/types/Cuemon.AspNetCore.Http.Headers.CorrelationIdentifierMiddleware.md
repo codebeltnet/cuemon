@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to register `CorrelationIdentifierMiddleware` in the ASP.NET Core pipeline with a custom header name and correlation token. It then reads the correlation ID from an endpoint to confirm the middleware is working.
+
 ```csharp
 using System.Threading.Tasks;
 using System;

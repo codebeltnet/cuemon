@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example configures default `XmlSerializerOptions` on `XmlConvert` with UTF-8 encoding and tab indentation, then reads back the defaults and prints the encoding name. This demonstrates how to override global XML serialization settings.
+
 ```csharp
 using System;
 using System.Text;

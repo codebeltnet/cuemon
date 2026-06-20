@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.Extensions.Globalization.StatisticalRegionExtensions> to classify geographic regions using the UN M.49 standard.
+`StatisticalRegionExtensions` provides extension methods for classifying geographic regions using the UN M.49 standard via the `World` class. This example retrieves `StatisticalRegion` instances for the world (`"001"`), Europe (`"150"`), Western Europe (`"155"`), Denmark (`"208"`), and the United States (`"840"`), then calls classification methods like `IsWorld`, `IsRegion`, `IsSubregion`, `IsCountryOrTerritory`, `IsArea`, and `HasIsoCodes`. It also traverses Denmark's hierarchy using `GetAncestors()` to show parent regions, finds the US by `RegionInfo`, and counts all countries via `world.Countries.Count()`. Console output confirms each classification, such as `True` for `denmark.IsCountryOrTerritory()` and the ancestor chain `Northern Europe → Europe → World`.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use <xref cref="Cuemon.AspNetCore.Http.PayloadTooLargeException"/> to signal HTTP 413 Payload Too Large responses.
+The following example demonstrates how to use <xref cref="Cuemon.AspNetCore.Http.PayloadTooLargeException"/> to signal HTTP 413 Payload Too Large responses. It constructs the exception with default and custom messages, wraps an inner exception, and uses `TryParse` to resolve by status code. A payload-size guard check then creates the exception conditionally. Each variant writes status code, reason phrase, and message to the console, showing how to communicate request-entity-size violations.
 
 ```csharp
 using System.IO;

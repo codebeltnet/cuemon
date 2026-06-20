@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to inspect XML-related metadata on a hierarchy node with <xref:Cuemon.Xml.HierarchyDecoratorExtensions>.
+`HierarchyDecoratorExtensions` provides extension methods on `Decorator.Enclose` for inspecting XML serialization metadata on `IHierarchy<object>` nodes. This example creates a `Hierarchy<object>` tree with a `Person` node (annotated with `[XmlRoot("person")]`) and an `Address` child node, then uses decorator methods to call `GetXmlQualifiedEntity`, `TryGetXmlRootAttribute`, `TryGetXmlElementAttribute`, `TryGetXmlTextAttribute`, `TryGetXmlAttributeAttribute`, `IsNodeEnumerable`, `HasXmlIgnoreAttribute`, and `OrderByXmlAttributes`. Console output displays the qualified entity local name, boolean results for attribute detection, and the count of ordered nodes.
 
 ```csharp
 using System;

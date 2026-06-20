@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register throttling and rate-limiting services in an ASP.NET Core application using ServiceCollectionExtensions, including in-memory throttling cache and custom rate-limit sentinel options.
+`ServiceCollectionExtensions` in the `Throttling` namespace registers rate-limiting services in an ASP.NET Core `IServiceCollection`. This example calls `AddMemoryThrottlingCache` and `AddThrottlingCache<MemoryThrottlingCache>` to register in-memory and custom throttling cache implementations as singletons, then configures `ThrottlingSentinelOptions` with a `ContextResolver` that uses the remote IP address, a quota of `100` requests per minute, custom rate-limit header names (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`), and `RetryAfter` header behavior in delta-seconds format. After this setup in `ConfigureServices`, the middleware pipeline can enforce the configured throttling rules for each client.
 
 ```csharp
 using System;

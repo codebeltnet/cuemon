@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to resolve .NET types from qualified type-name strings using the `Formatter` class. It demonstrates both a direct resolution and a safe TryGetType call that avoids exceptions.
+
 ```csharp
 using System;
 using Cuemon.Runtime.Serialization.Formatters;

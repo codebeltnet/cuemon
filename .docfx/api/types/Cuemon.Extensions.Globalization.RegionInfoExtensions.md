@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use RegionInfoExtensions to retrieve the cultures associated with a specific geographic region.
+`RegionInfoExtensions` provides extension methods for `RegionInfo` to enumerate all cultures associated with a geographic region via the `GetCultures` method. This example creates `RegionInfo` instances for `"US"` and `"JP"`, then calls `GetCultures()` on each to retrieve their associated culture collections. Key steps include iterating the culture results and printing the culture name and English name for each. Console output lists cultures such as `en-US` for the US and `ja-JP` for Japan, along with their English names.
 
 ```csharp
 using System;

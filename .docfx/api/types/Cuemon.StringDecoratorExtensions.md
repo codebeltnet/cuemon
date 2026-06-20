@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.StringDecoratorExtensions> to manipulate strings via the decorator pattern.
+`StringDecoratorExtensions` provides extension methods on `Decorator.Enclose` for string manipulation including casing conversion, encoding, URI conversion, set operations, and content inspection. This example wraps `" Hello World! "` and applies `ToCasing` with `LowerCase`, `UpperCase`, and `TitleCase` modes, converts the string to a byte array and stream with configurable encoding, and extracts the differing portion between `"Hello World!"` and `"Hello Universe!"` using `Difference`. Key steps also include `StartsWith` checks with multiple candidate strings and `ContainsAny` for character matching. Console output confirms each transformed value, such as `" hello world! "` for lower-casing and `"Universe!"` for the set difference.
 
 ```csharp
 using System;

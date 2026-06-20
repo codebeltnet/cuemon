@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to create an `EntityInfo` with strong data integrity validation and create a `CacheValidator` that uses it. It demonstrates switching on the validation level and printing the resulting checksum.
+
 ```csharp
 using System;
 using System.Text;

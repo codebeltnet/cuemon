@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to serialize a <xref:Cuemon.Diagnostics.Failure> object to XML using the <xref:Cuemon.Xml.Serialization.Converters.FailureConverter>.
+`FailureConverter` serializes `Failure` objects to XML via `XmlFormatter`, providing structured error output including exception type, source, and message. This example creates a `Failure` from an `InvalidOperationException("The requested resource was not found.")` with `Source = "MyApi"` and `FaultSensitivityDetails.None`, configures an `XmlFormatter` with the converter, and serializes to XML. The resulting XML output includes `<InvalidOperationException>` with `<Source>MyApi</Source>` and `<Message>The requested resource was not found.</Message>`, showing the default serialization format for failure objects.
 
 ```csharp
 using System;

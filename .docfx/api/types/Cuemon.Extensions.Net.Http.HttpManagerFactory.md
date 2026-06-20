@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to create an HTTP manager using `HttpManagerFactory` with a custom `IHttpClientFactory`. It performs a GET request and prints the response content.
+
 ```csharp
 using System;
 using System.Net.Http;

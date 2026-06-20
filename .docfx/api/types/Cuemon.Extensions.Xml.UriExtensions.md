@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create an XmlReader from a file URI using UriExtensions, with configurable reader settings for comment handling and DTD processing.
+`UriExtensions` in the `Xml` namespace creates `XmlReader` instances from file URIs with configurable reader settings. This example writes a simple XML snippet to a temporary file, constructs a `Uri` pointing to it, and calls `ToXmlReader` with settings that ignore XML comments and disable DTD processing. After positioning the reader with `MoveToFirstElement`, the local element name is output as `"root"`. A `finally` block ensures the temporary file is deleted after the demonstration.
 
 ```csharp
 using System;

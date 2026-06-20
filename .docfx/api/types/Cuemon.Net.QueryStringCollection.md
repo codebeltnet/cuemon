@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create, parse, and manipulate URI query string parameters using QueryStringCollection, with support for URL decoding and cloning.
+`QueryStringCollection` provides creation, parsing, and manipulation of URI query string parameters, extending `NameValueCollection` with URL decoding support. This example creates an empty collection and adds `"search"`, `"page"`, and `"sort"` parameters, parses an existing query string (`"?category=books&author=tolkien"`) with and without URL decoding, and iterates key-value pairs. It also demonstrates cloning the collection and modifying the clone independently to verify they are separate instances. Console output shows the query string representation, decoded values, keys, clone independence, and entry counts.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to retrieve assembly version, file version, and product version information from an assembly using AssemblyExtensions.
+`AssemblyExtensions` provides extension methods for `Assembly` to retrieve version information and debug-build status. This example obtains the entry assembly and calls `GetAssemblyVersion`, `GetFileVersion`, and `GetProductVersion` to read version attributes, then checks `HasAlphanumericVersion` and `IsSemanticVersion()` on the returned `SourceVersion` objects. It also calls `IsDebugBuild()` to determine whether the assembly was compiled in Debug configuration. Console output displays each version string (e.g., `1.0.0.0`), whether it has alphanumeric or semantic version characteristics, and the debug-build flag.
 
 ```csharp
 using System;

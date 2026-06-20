@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register and use the <see cref="Cuemon.Extensions.Text.Json.Converters.DateTimeConverter"/> to serialize and deserialize <see cref="DateTime"/> values with a custom format and culture-specific formatting.
+`DateTimeConverter` enables custom format and culture-aware serialization of `DateTime` values in `System.Text.Json`. This example registers the converter in `JsonSerializerOptions` with the French date format `"dd/MM/yyyy"` and `fr-FR` culture, then serializes a UTC `DateTime` (`2026-06-16`). The JSON output contains the date as `"16/06/2026"`. Deserializing the same JSON back to a `DateTime` and formatting it again with `"dd/MM/yyyy"` produces `"16/06/2026"`, confirming round-trip fidelity with culture-aware formatting.
 
 ```csharp
 using System;

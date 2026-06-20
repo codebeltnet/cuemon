@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register `DigestAuthenticationHandler` with ASP.NET Core authentication services.
+The following example demonstrates how to register `DigestAuthenticationHandler` with ASP.NET Core authentication services. It configures DI with `INonceTracker`, registers a digest authentication scheme with a username/password lookup callback, and builds the service provider. The handler is resolved from DI and its type name is written to the console, verifying that digest authentication wiring is operational.
 
 ```csharp
 using System;

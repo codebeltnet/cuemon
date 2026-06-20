@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use MethodDescriptorExtensions to inspect a method's parameter information using the MethodDescriptor API.
+`MethodDescriptorExtensions` provides extension methods for `MethodDescriptor` to inspect parameter information and method metadata. This example retrieves `MethodInfo` for `Console.WriteLine(string)` (which has a parameter) and `Guid.NewGuid()` (which has none), creates `MethodDescriptor` instances via `MethodDescriptor.Create`, then calls `HasParameters()` to check each for parameters. Key steps include resolving the method info via reflection and calling `HasParameters` on each descriptor. Console output confirms `True` for `WriteLine`, `False` for `NewGuid`, and displays the method name and caller name.
 
 ```csharp
 using System;

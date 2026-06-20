@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to return a 403 Forbidden response with a diagnostic payload using `ForbiddenObjectResult`, optionally overriding the status code.
+`ForbiddenObjectResult` is an `ObjectResult` subclass that returns a `403 Forbidden` HTTP response with an optional diagnostic payload. This example creates a first result with an anonymous object containing `error` and `requiredRole` fields, then inspects its `StatusCode` (403) and `Value`. A second result demonstrates overriding the status code to `404 Not Found` to obscure resource existence when security through obscurity is preferred. Console output confirms the status code values and the diagnostic payload content.
 
 ```csharp
 using System;

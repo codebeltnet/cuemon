@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates applying a naming policy to a property name using the <xref:Cuemon.Extensions.Text.Json.JsonNamingPolicyExtensions.DefaultOrConvertName(System.Text.Json.JsonNamingPolicy,System.String)> extension method.
+`JsonNamingPolicyExtensions` provides the `DefaultOrConvertName` extension method that applies a `JsonNamingPolicy` to a property name or returns it unchanged when the policy is `null`. This example applies `JsonNamingPolicy.CamelCase` to `"OrderDate"`, producing `"orderDate"`, and demonstrates that a `null` policy returns the name unaltered. Key steps include calling `DefaultOrConvertName` directly on a policy instance and using it within a `JsonSerializerOptions` configuration. Console output confirms `"orderDate"` for the camelCase transformation and `"OrderDate"` for the null policy case, and `"shippingAddress"` when sourced from serializer options.
 
 ```csharp
 using System;

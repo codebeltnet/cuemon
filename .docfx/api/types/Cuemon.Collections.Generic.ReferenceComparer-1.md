@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to compare objects by their inheritance depth using `ReferenceComparer`. It shows how objects with deeper inheritance chains are considered greater, including null-value comparisons.
+
 ```csharp
 using System;
 using System.Collections.Generic;

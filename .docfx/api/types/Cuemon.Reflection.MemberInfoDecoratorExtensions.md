@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to check whether a MemberInfo has one or more custom attributes using MemberInfoDecoratorExtensions.
+`MemberInfoDecoratorExtensions` provides extension methods on `Decorator.Enclose` for checking whether a `MemberInfo` has one or more custom attributes via `HasAttribute`. This example gets `MemberInfo` for a method without attributes and another decorated with `[Obsolete]`, then calls `HasAttribute` with single (`ObsoleteAttribute`) and multiple attribute types on each. Console output shows `False` for the method without `ObsoleteAttribute`, `False` for `Obsolete` or `EditorBrowsable`, and `True` for the deprecated method, confirming correct attribute detection through the decorator pattern.
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates writing a dynamic object to JSON using the <xref:Cuemon.Extensions.Text.Json.Utf8JsonWriterExtensions.WriteObject(System.Text.Json.Utf8JsonWriter,System.Object,System.Text.Json.JsonSerializerOptions)> extension method.
+`Utf8JsonWriterExtensions` provides the `WriteObject` extension method for serializing .NET objects directly into a `Utf8JsonWriter` stream. This example creates a `Person` instance with `Name`, `Age`, and `City` properties, configures `JsonSerializerOptions` with `CamelCase` naming and indented output, and calls `WriteObject` on a `Utf8JsonWriter` backed by a `MemoryStream`. Key steps include flushing the writer and reading the stream content as a UTF-8 string. Console output displays the formatted JSON with camelCase property names, such as `"name": "John Doe"`.
 
 ```csharp
 using System;

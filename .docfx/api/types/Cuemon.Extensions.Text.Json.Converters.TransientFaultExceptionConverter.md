@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to serialize and deserialize a <xref:Cuemon.Resilience.TransientFaultException> using the <xref:Cuemon.Extensions.Text.Json.Converters.TransientFaultExceptionConverter>.
+`TransientFaultExceptionConverter` serializes and deserializes `TransientFaultException` instances including their `TransientFaultEvidence` with attempt count, recovery wait times, latency, and method signature. This example creates a `TransientFaultException` with evidence (`Attempts = 3`, `RecoveryWaitTime = 2s`, etc.) and a method descriptor, then configures a `JsonFormatter` with the converter and serializes it to JSON. The deserialization part reads the JSON back through the same formatter, reconstructing the exception with its `Evidence` properties intact. Console output displays the round-tripped message (`"Failed to connect after 3 retries."`) and evidence attempt count (`3`).
 
 ```csharp
 using System;

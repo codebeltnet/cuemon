@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates `CallerArgumentExpressionAttribute` in a validation helper. `Validate` captures the source expression of its `condition` argument, so when `value > 0` is passed the console prints "Assertion passed: value > 0".
+
 ```csharp
 using System;
 using System.Runtime.CompilerServices;

@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to configure `FileChecksumOptions` and create cache validators with different integrity methods for a file. It demonstrates default settings, combined validation, and strong validation with a limited byte read.
+
 ```csharp
 using System;
 using System.IO;

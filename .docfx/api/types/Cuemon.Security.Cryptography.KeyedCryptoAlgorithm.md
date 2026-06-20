@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the KeyedCryptoAlgorithm enumeration to select an HMAC algorithm (SHA-256, SHA-384, SHA-512, SHA-1, or MD5) for keyed hashing.
+`KeyedCryptoAlgorithm` is an enumeration that selects an HMAC algorithm (SHA-256, SHA-384, SHA-512, SHA-1, or MD5) for keyed hashing operations. This example computes HMAC hashes for each algorithm using a shared key and sample data (`"The quick brown fox jumps over the lazy dog"`) with `HMACSHA256`, `HMACSHA384`, `HMACSHA512`, and `HMACSHA1`. It also uses a `KeyedCryptoAlgorithm` value in a switch expression to dynamically select the algorithm name, and demonstrates enum value comparison to confirm `HmacSha256 == 0`. Console output displays each hex hash and the selected algorithm name.
 
 ```csharp
 using System;

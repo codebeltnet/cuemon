@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to use `TryPeek` to safely inspect the front of a `Queue<string>` without removing the item. It demonstrates that successive calls return the same element.
+
 ```csharp
 using System;
 using System.Collections.Generic;

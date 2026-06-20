@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates how to create a `FuncFactory` from a delegate and execute it to produce a result. It shows both creating a factory with `Create` and invoking directly with `Invoke` using a mutable tuple.
+
 ```csharp
 using System;
 using Cuemon;

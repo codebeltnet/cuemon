@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use `SlimMemoryCache` to store and retrieve cached values with various expiration strategies.
+`SlimMemoryCache` provides in-memory caching with absolute and sliding expiration, namespace grouping, and automatic cleanup. This example creates a cache with cleanup enabled (`FirstSweep = 30s`, `SucceedingSweep = 10s`), adds a config entry with absolute expiration, a session entry with sliding expiration under the `"sessions"` namespace, and updates the config entry via the indexer. It demonstrates safe retrieval with `TryGet`, key-based removal with `Remove`, namespace-based counting with `Count("data")`, and bulk namespace removal with `RemoveAll("data")`. Console output confirms the cached values, update status, removal success, and namespace counts before and after removal.
 
 ```csharp
 using System;

@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates dictionary extension methods available through the `Decorator` wrapper. It shows get-or-fallback, try-add, add-or-update, copying, and depth-indexing operations, printing each result to the console.
+
 ```csharp
 using System;
 using System.Collections.Generic;

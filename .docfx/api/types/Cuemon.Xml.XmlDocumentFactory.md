@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example parses an XML string into an `XmlDocument` using `XmlDocumentFactory`, then navigates the document to read the root element name and a book's title attribute. The output displays "books" and "1984".
+
 ```csharp
 using System;
 using System.Xml;

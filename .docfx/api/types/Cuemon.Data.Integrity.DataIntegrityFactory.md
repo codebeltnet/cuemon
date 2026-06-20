@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to create an <see cref="IDataIntegrity"/> implementation from a file using <see cref="DataIntegrityFactory"/>.
+The following example demonstrates how to create an <see cref="IDataIntegrity"/> implementation from a file using <see cref="DataIntegrityFactory"/>. It writes sample data to a temporary file, then calls `CreateIntegrity` with a custom converter that computes a CRC64 hash over the file content. The resulting checksum and file name are written to the console, showing how to verify file integrity with configurable hashing algorithms.
 
 ```csharp
 using System;

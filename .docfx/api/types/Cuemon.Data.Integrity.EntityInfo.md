@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example demonstrates various ways to construct `EntityInfo` instances with timestamps and optional checksums for data integrity. It shows creation-only, created-and-modified, validated, and local-time normalization scenarios, printing the resulting values.
+
 ```csharp
 using System;
 using Cuemon.Data.Integrity;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example shows how to extend `Delegate` with `DelegateDecoratorExtensions` methods to resolve `MethodInfo` from a delegate instance through the decorator pattern.
+`DelegateDecoratorExtensions` provides extension methods on `Decorator.Enclose` for resolving `MethodInfo` from delegate instances via reflection. This example creates a `Func<int, int, int> add` delegate and an `Action greet` delegate, then calls `ResolveDelegateInfo` to retrieve their underlying `MethodInfo`, with optional fallback to the decorator wrapper when one parameter is null. Key steps include wrapping `null` as a fallback delegate and resolving `MethodInfo` from both the original and wrapped delegates. Console output prints the method name, declaring type name, and static status for each resolved method.
 
 ```csharp
 using System;

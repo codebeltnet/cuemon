@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to add XML serialization formatters to an MVC builder.
+The following example demonstrates how to add XML serialization formatters to an MVC builder. It calls `AddXmlFormatters` with indentation enabled, then `AddXmlFormattersOptions` with indentation disabled, on the builder returned by `AddControllers`. Both calls configure the underlying `XmlWriter` settings, showing how to register and customize XML input/output formatters for ASP.NET Core API controllers.
 
 ```csharp
 using Cuemon.Extensions.AspNetCore.Mvc.Formatters.Xml;

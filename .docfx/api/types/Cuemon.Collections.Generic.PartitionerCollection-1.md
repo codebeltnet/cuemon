@@ -4,6 +4,8 @@ example:
 - *content
 ---
 
+The following example shows how to partition a list of numbers into fixed-size groups using `PartitionerCollection`. It iterates through each partition and prints partition-level and collection-level metadata.
+
 ```csharp
 using System;
 using System.Collections.Generic;

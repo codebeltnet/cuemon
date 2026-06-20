@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use <see cref="DatabaseDependency"/> to monitor a relational data source for changes and notify dependent objects.
+The following example demonstrates how to use <see cref="DatabaseDependency"/> to monitor a relational data source for changes and notify dependent objects. It sets up a `Lazy<DatabaseWatcher>` with a stub connection and a command that executes `SELECT COUNT(*) FROM Products`, then creates a `DatabaseDependency` with a change event handler that writes to the console. The dependency is started asynchronously, showing how to watch a relational data source for data-change notifications.
 
 ```csharp
 using System;

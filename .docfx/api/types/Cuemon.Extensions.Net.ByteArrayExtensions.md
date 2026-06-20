@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to URL-encode byte array data for safe HTTP transmission using ByteArrayExtensions, with support for partial encoding and custom character encodings.
+`ByteArrayExtensions` in the `Net` namespace URL-encodes byte arrays for safe HTTP transmission with support for partial encoding and custom character encodings. This example converts `"hello world"` to a UTF-8 byte array and calls `UrlEncode` to produce `hello%20world`, then demonstrates partial encoding of only the first five bytes (producing `hello`) and encoding with UTF-32 where each character is encoded as 4 bytes. Console output displays each encoded result, confirming that full encoding, partial ranges, and non-default encodings all produce correct percent-encoded output.
 
 ```csharp
 using System;

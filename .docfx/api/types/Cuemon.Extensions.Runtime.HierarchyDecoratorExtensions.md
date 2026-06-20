@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.Extensions.Runtime.HierarchyDecoratorExtensions> to navigate a hierarchy, replace matching nodes, and materialize typed values from <xref:Cuemon.DataPair> nodes.
+`HierarchyDecoratorExtensions` provides extension methods on `Decorator.Enclose` for navigating, replacing, and materializing hierarchy trees built from `Hierarchy<T>` nodes. This example builds a three-level string hierarchy (`root` → `child-one` → `grandchild`) and demonstrates root navigation, ancestor/descendant/sibling traversal, node replacement, and `DataPair` value extraction using typed formatters like `UseConvertibleFormatter`, `UseDateTimeFormatter`, and `UseGuidFormatter`. Key steps include using `Decorator.Enclose` to call methods such as `Root()`, `AncestorsAndSelf()`, `Replace()`, and `UseCollection()`. Console output confirms the root node name (`"root"`), ancestor chain (`"root > child-one"`), and typed values extracted from `DataPair` nodes.
 
 ```csharp
 using System;

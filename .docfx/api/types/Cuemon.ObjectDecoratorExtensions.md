@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the <xref:Cuemon.ObjectDecoratorExtensions> extension methods to convert object types and traverse hierarchical structures through the <xref:Cuemon.Decorator`1> pattern.
+`ObjectDecoratorExtensions` provides extension methods on `Decorator.Enclose` for type conversion, hierarchical tree traversal, and property resolution via reflection. This example converts string representations of `"42"`, `"2024-01-15T10:30:00Z"`, `"not-a-number"`, and `"Ascending"` into their target types using `ChangeType<T>` and `ChangeTypeOrDefault<T>` with fallback support. It also builds a three-level `TreeNode` hierarchy and visits all nodes with `TraverseWhileNotEmpty`, and reads a property value through `DefaultPropertyValueResolver`. Console output confirms each type conversion succeeded and lists all visited node names in depth-first traversal order.
 
 ```csharp
 using System;

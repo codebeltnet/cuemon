@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to build a query string from a dictionary of string arrays using DictionaryExtensions, with optional URL encoding.
+`DictionaryExtensions` in the `Net` namespace converts `Dictionary<string, string[]>` into URL query strings with optional percent-encoding. This example creates a dictionary with parameters `"search": ["dotnet"]`, `"page": ["1"]`, and `"tags": ["aspnet", "core"]`, then calls `ToQueryString()` to produce `search=dotnet&page=1&tags=aspnet&tags=core` and `ToQueryString(urlEncode: true)` for URL-encoded output. It also handles an empty dictionary that returns an empty string. Console output shows the raw query string, the encoded variant, and the empty-collection result `"Empty: ''"`.
 
 ```csharp
 using System;

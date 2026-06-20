@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example mirrors the cacheable object patterns covered by the unit tests: a payload can expose Last-Modified metadata, an ETag, or both headers at once.
+The following example mirrors the cacheable object patterns covered by the unit tests: a payload can expose Last-Modified metadata, an ETag, or both at once. It calls `WithLastModifiedHeader`, `WithEntityTagHeader`, and `WithCacheableHeaders` in sequence on a `ProductDto`, each with timestamp and checksum provider callbacks. The resulting `ICacheableObjectResult` is read back to display the modified timestamp and entity-tag validation, showing how to attach HTTP caching headers to response payloads.
 
 ```csharp
 using System;

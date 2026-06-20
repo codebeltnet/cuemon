@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use the `FaultDescriptorOptions` decorator extensions to try resolving an HTTP exception descriptor from a failure.
+`FaultDescriptorOptionsDecoratorExtensions` provides extension methods on `Decorator.Enclose` for resolving HTTP exception descriptors from failure objects using `FaultDescriptorOptions`. This example creates a `FaultDescriptorOptions` instance and a `BadRequestException` as the failure input, then wraps the options with `Decorator.Enclose` and calls `TryResolveHttpExceptionDescriptor` with the failure and an `HttpContext`. The resolved descriptor's `StatusCode` is output as `400`, confirming the failure was correctly mapped to a `Bad Request` HTTP response.
 
 ```csharp
 using System;

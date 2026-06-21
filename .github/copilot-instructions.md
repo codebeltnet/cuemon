@@ -183,6 +183,28 @@ Internal classes and methods must be validated by exercising the public API that
 - Public entry points provide sufficient coverage of internal code paths.
 - The internal implementation exists solely as a helper or utility for public-facing functionality.
 
+## 10. ExcludeFromCodeCoverage Prohibition
+
+**Do not use `ExcludeFromCodeCoverage` attribute on any code.** This includes:
+
+- Test classes or test methods
+- Production code
+- Configuration code
+- Any other code path
+
+### Rationale
+
+- Excluding code from coverage hides gaps and creates false confidence in test completeness.
+- If a code path cannot or should not be tested, refactor the code to eliminate that path rather than hiding it from metrics.
+- Every executable line should be covered by tests or be genuinely unreachable (dead code to be removed).
+
+### Alternative Approaches
+
+- **Untestable code paths**: Refactor to separate concerns and eliminate the untestable path.
+- **External dependencies**: Use test doubles (fakes, stubs, spies) instead of excluding from coverage.
+- **Configuration-only code**: Move to configuration files or extract into testable methods.
+- **Generated or third-party code**: These should not be in the primary codebase; use NuGet packages or dedicated vendor folders if necessary.
+
 ---
 description: 'Writing Performance Tests in Cuemon'
 applyTo: "tuning/**, **/*Benchmark*.cs"

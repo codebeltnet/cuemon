@@ -2,7 +2,7 @@
 uid: Cuemon.AspNetCore.Http.Throttling
 summary: *content
 ---
-The `Cuemon.AspNetCore.Http.Throttling` namespace contains types that provides a middleware based throttling mechanism by specifying allowed quota and window duration of HTTP requests tied to a custom context (eg. IP-address, Authorization header, etc.).
+Limit HTTP requests in ASP.NET Core using a middleware-based throttling mechanism with configurable quotas and time windows tied to request context (IP address, authorization header, etc.). Use this namespace when you need rate limiting per client or request characteristic. Start with `ThrottlingSentinelMiddleware` and `ThrottlingSentinelOptions` to configure quotas and windows. For custom throttling storage, implement `IThrottlingCache`.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Codebelt.Extensions.Xunit;
 using Cuemon.Collections.Generic;
@@ -295,6 +296,98 @@ namespace Cuemon.Extensions.Collections.Generic
                 i => Assert.Equal(1021, i),
                 i => Assert.Equal(1022, i),
                 i => Assert.Equal(1023, i));
+        }
+        [Fact]
+        public void Chunk_ShouldThrowArgumentNullException_WhenSourceIsNull()
+        {
+            IEnumerable<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.Chunk());
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void Chunk_ShouldThrowArgumentOutOfRangeException_WhenSizeIsInvalid(int size)
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Enumerable.Range(0, 8).Chunk(size));
+        }
+
+        [Fact]
+        public void Shuffle_ShouldThrowArgumentNullException_WhenSourceIsNull()
+        {
+            IEnumerable<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.Shuffle().ToList());
+        }
+
+        [Fact]
+        public void Shuffle_ShouldThrowArgumentNullException_WhenRandomizerIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => Enumerable.Range(0, 8).Shuffle(null).ToList());
+        }
+
+        [Fact]
+        public void OrderAscending_ShouldThrowArgumentNullException_WhenSourceIsNull()
+        {
+            IEnumerable<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.OrderAscending().ToList());
+        }
+
+        [Fact]
+        public void OrderAscending_ShouldThrowArgumentNullException_WhenComparerIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => Enumerable.Range(0, 8).OrderAscending(null).ToList());
+        }
+
+        [Fact]
+        public void OrderDescending_ShouldThrowArgumentNullException_WhenSourceIsNull()
+        {
+            IEnumerable<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.OrderDescending().ToList());
+        }
+
+        [Fact]
+        public void OrderDescending_ShouldThrowArgumentNullException_WhenComparerIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => Enumerable.Range(0, 8).OrderDescending(null).ToList());
+        }
+
+        [Fact]
+        public void RandomOrDefault_ShouldReturnDefault_WhenSourceIsEmpty()
+        {
+            var sut = Array.Empty<int>();
+
+            Assert.Equal(default, sut.RandomOrDefault());
+        }
+
+        [Fact]
+        public void RandomOrDefault_ShouldThrowArgumentNullException_WhenSourceIsNull()
+        {
+            IEnumerable<int> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.RandomOrDefault());
+        }
+
+        [Fact]
+        public void ToDictionary_ShouldThrowArgumentNullException_WhenSourceIsNull()
+        {
+            IEnumerable<KeyValuePair<string, int>> sut = null;
+
+            Assert.Throws<ArgumentNullException>(() => sut.ToDictionary());
+        }
+
+        [Fact]
+        public void ToDictionary_ShouldThrowArgumentNullException_WhenComparerIsNull()
+        {
+            var sut = new[]
+            {
+                new KeyValuePair<string, int>("a", 1)
+            };
+
+            Assert.Throws<ArgumentNullException>(() => sut.ToDictionary(null));
         }
     }
 }

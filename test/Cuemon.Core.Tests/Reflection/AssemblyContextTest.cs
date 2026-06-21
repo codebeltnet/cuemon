@@ -106,12 +106,13 @@ namespace Cuemon.Reflection
         [Fact]
         public void GetCurrentDomainAssemblies_ShouldReturnAtLeastAsManyAssemblies_WhenReferencedAssembliesIncluded()
         {
-            var withRefs = AssemblyContext.GetCurrentDomainAssemblies(o => o.IncludeReferencedAssemblies = true);
             var withoutRefs = AssemblyContext.GetCurrentDomainAssemblies(o => o.IncludeReferencedAssemblies = false);
+            var withRefs = AssemblyContext.GetCurrentDomainAssemblies(o => o.IncludeReferencedAssemblies = true);
+            var missing = withoutRefs.Except(withRefs).ToList();
 
             TestOutput.WriteLine($"With referenced: {withRefs.Count}, without referenced: {withoutRefs.Count}");
 
-            Assert.True(withRefs.Count >= withoutRefs.Count);
+            Assert.Empty(missing);
         }
 
         [Fact]

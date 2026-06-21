@@ -2,7 +2,7 @@
 uid: Cuemon.AspNetCore.Mvc.Filters.Cacheable
 summary: *content
 ---
-The `Cuemon.AspNetCore.Mvc.Filters.Cacheable` namespace contains types that specializes in cache expiration and validation models. The namespace is an addition to the `Microsoft.AspNetCore.Mvc.Filters` namespace.
+Enable conditional GET requests and HTTP caching for ASP.NET Core MVC controllers using action filters and result filters backed by ETag and last-modified headers. Use this namespace when you need fine-grained HTTP cache validation. Start with `HttpCacheableFilter` for full cache support, or use `HttpEntityTagHeaderFilter` and `HttpLastModifiedHeaderFilter` individually for ETag-only or last-modified-only scenarios.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 

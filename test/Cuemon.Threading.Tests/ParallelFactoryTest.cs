@@ -406,7 +406,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            AdvancedParallelFactory.While(ic, () => ic.TryPeek(out _), intProvider => intProvider.Dequeue(), i =>
+            AdvancedParallelFactory.While(ic, () => ic.Count > 0, intProvider => intProvider.Dequeue(), i =>
             {
                 Thread.Sleep(50);
                 cb.Add(i);
@@ -431,7 +431,7 @@ namespace Cuemon.Threading
             var x = 0;
             var ae = Assert.Throws<AggregateException>(() =>
             {
-                AdvancedParallelFactory.While(ic, () => ic.TryPeek(out _), intProvider => intProvider.Dequeue(), i =>
+                AdvancedParallelFactory.While(ic, () => ic.Count > 0, intProvider => intProvider.Dequeue(), i =>
                 {
                     Interlocked.Increment(ref x);
                     if (i > 450) { cts.Cancel(); }
@@ -460,7 +460,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            AdvancedParallelFactory.While(ic, () => ic.TryPeek(out _), intProvider => intProvider.Dequeue(), i =>
+            AdvancedParallelFactory.While(ic, () => ic.Count > 0, intProvider => intProvider.Dequeue(), i =>
             {
                 Thread.Sleep(_longRunningTaskWaitTime);
                 cb.Add(i);
@@ -479,7 +479,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            AdvancedParallelFactory.While(ic, () => ic.TryPeek(out _), intProvider => intProvider.Dequeue(), i =>
+            AdvancedParallelFactory.While(ic, () => ic.Count > 0, intProvider => intProvider.Dequeue(), i =>
             {
                 Thread.Sleep(5);
                 cb.Add(i);
@@ -502,7 +502,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            var result = AdvancedParallelFactory.WhileResult(ic, () => ic.TryPeek(out _), intProvider => intProvider.Dequeue(), i =>
+            var result = AdvancedParallelFactory.WhileResult(ic, () => ic.Count > 0, intProvider => intProvider.Dequeue(), i =>
             {
                 Thread.Sleep(50);
                 cb.Add(i);
@@ -528,7 +528,7 @@ namespace Cuemon.Threading
             var x = 0;
             var ae = Assert.Throws<AggregateException>(() =>
             {
-                AdvancedParallelFactory.WhileResult(ic, () => ic.TryPeek(out _), intProvider => intProvider.Dequeue(), i =>
+                AdvancedParallelFactory.WhileResult(ic, () => ic.Count > 0, intProvider => intProvider.Dequeue(), i =>
                 {
                     Interlocked.Increment(ref x);
                     if (i > 450) { cts.Cancel(); }
@@ -559,7 +559,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            var result = AdvancedParallelFactory.WhileResult(ic, () => ic.TryPeek(out _), intProvider => intProvider.Dequeue(), i =>
+            var result = AdvancedParallelFactory.WhileResult(ic, () => ic.Count > 0, intProvider => intProvider.Dequeue(), i =>
             {
                 Thread.Sleep(_longRunningTaskWaitTime);
                 cb.Add(i);
@@ -579,7 +579,7 @@ namespace Cuemon.Threading
             var ic = new Queue<int>(expected);
             var cb = new ConcurrentBag<int>();
 
-            var result = AdvancedParallelFactory.WhileResult(ic, () => ic.TryPeek(out _), intProvider => intProvider.Dequeue(), i =>
+            var result = AdvancedParallelFactory.WhileResult(ic, () => ic.Count > 0, intProvider => intProvider.Dequeue(), i =>
             {
                 Thread.Sleep(5);
                 cb.Add(i);

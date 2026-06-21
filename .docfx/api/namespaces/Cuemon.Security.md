@@ -2,7 +2,7 @@
 uid: Cuemon.Security
 summary: *content
 ---
-The `Cuemon.Security` namespace contains types related to hashing (both non-cryptographic and CRC) and has the base class from which all implementations of hash algorithms and checksums should derive. The namespace is an addition to the `System.Security` namespace.
+Compute non-cryptographic hashes and CRC (Cyclic Redundancy Check) checksums for fast data integrity verification. Use this namespace when you need fast integrity verification without cryptographic overhead. Start with `Hash` or `Hash<T>` for custom hash algorithms, or use the built-in CRC types for cyclic redundancy checks.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 

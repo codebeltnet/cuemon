@@ -19,6 +19,11 @@ public static class AssemblyContext
     /// <exception cref="ArgumentException">
     /// <paramref name="setup"/> failed to configure an instance of <see cref="AssemblyContextOptions"/> in a valid state.
     /// </exception>
+    /// <remarks>
+    /// When <see cref="AssemblyContextOptions.IncludeReferencedAssemblies"/> is <c>true</c>,
+    /// referenced assemblies may be loaded into the current application domain during traversal.
+    /// This can change subsequent results returned by <see cref="AppDomain.GetAssemblies"/>.
+    /// </remarks>
     public static IReadOnlyList<Assembly> GetCurrentDomainAssemblies(Action<AssemblyContextOptions> setup = null)
     {
         Validator.ThrowIfInvalidConfigurator(setup, out var options);

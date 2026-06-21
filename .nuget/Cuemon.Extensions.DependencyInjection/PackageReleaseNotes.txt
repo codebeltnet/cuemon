@@ -5,6 +5,18 @@ Availability: .NET 11, .NET 10 and .NET Standard 2.0
 - ADDED Support for TFM .NET 11 (LTS)
 - REMOVED Support for TFM .NET 9 (STS)
 
+Version: 10.5.4
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+Version: 10.5.3
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# Bug Fixes
+- FIXED ServiceProviderExtensions.GetServiceDescriptors() method to properly traverse and handle wrapped service providers with cycle detection; now correctly resolves descriptors when the provider is wrapped by third-party components
+
 Version: 10.5.2
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

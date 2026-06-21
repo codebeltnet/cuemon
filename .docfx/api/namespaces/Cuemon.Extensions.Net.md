@@ -2,13 +2,13 @@
 uid: Cuemon.Extensions.Net
 summary: *content
 ---
-The `Cuemon.Extensions.Net` namespace contains both types and extension methods that complements the `Cuemon.Net` namespace while being an addition to the `System.Net` namespace. Includes support for both traditional and factory based ways of working with HttpMangager instances while also including a simple and lightweight implementation of the IHttpClientFactory interface named SlimHttpClientFactory (that provides "managed" HttpClient instances).
+Build query strings, encode and decode URLs, evaluate HTTP status codes concisely, and manage `HttpClient` instances without the boilerplate. Use this namespace when you need URL encoding, query string construction, HTTP status classification, or a lightweight `IHttpClientFactory`. Start with `ToQueryString` on `IDictionary{string, string[]}` for building query strings or `SlimHttpClientFactory` for managed HTTP clients.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 
 Complements: [Cuemon.Net namespace](/api/dotnet/Cuemon.Net.html) 📘
 
-### Extension Methods
+### Extension Members
 
 |Type|Ext|Methods|
 |--:|:-:|---|

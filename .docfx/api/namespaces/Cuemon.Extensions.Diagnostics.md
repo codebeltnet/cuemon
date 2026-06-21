@@ -2,13 +2,13 @@
 uid: Cuemon.Extensions.Diagnostics
 summary: *content
 ---
-The `Cuemon.Extensions.Diagnostics` namespace contains extension methods that complements the `Cuemon.Diagnostics` namespace while being an addition to the `System.Diagnostics` namespace.
+Read product and file version information from assemblies in a standardized format. Use this namespace when you need consistent version reporting from assembly metadata. Start with `ToProductVersion` or `ToFileVersion` on `FileVersionInfo` to get standardized version strings.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 
 Complements: [Cuemon.Diagnostics namespace](/api/dotnet/Cuemon.Diagnostics.html) 📘
 
-### Extension Methods
+### Extension Members
 
 |Type|Ext|Methods|
 |--:|:-:|---|

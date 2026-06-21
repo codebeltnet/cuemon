@@ -41,6 +41,55 @@ The .NET update is straightforward: `net11.0` is now part of the target matrix a
 - `Resolve-PackageReleaseNotesConflicts.ps1` script improved to correctly handle and resolve merge conflict markers in all PackageReleaseNotes.txt files with more robust regex pattern matching,
 - Merge conflict resolution output cleaned up to remove spurious double line breaks and duplicate version entries.
 
+## [10.5.4] - 2026-06-20
+
+This is a patch release focused on dependency maintenance and comprehensive API documentation improvements. The release significantly expands published type-level and namespace-level guidance with concrete consumer-oriented examples, establishes DocFX documentation standards, and refactors test infrastructure for improved efficiency.
+
+### Changed
+
+- Upgrade dependencies to latest patch versions: Docker base image nginx (1.31.0 → 1.31.1), Codebelt.Extensions (11.0.9 → 11.1.0, 1.2.6 → 1.3.0), Microsoft.NET.Test.Sdk (18.5.1 → 18.6.0), and .NET 9/10 runtime packages,
+- Refactor cache expiration tests in `SlimMemoryCacheTest` for improved readability and efficiency.
+
+### Added
+
+- Comprehensive API documentation across 100+ namespace and 570+ type documentation files with consumer-oriented descriptions and guidance,
+- Type-level API documentation with concrete examples for 220+ public classes, structs, interfaces, and extension methods across the entire library,
+- Namespace-level documentation featuring extension member tables that enumerate all extension methods grouped by extended type,
+- DocFX documentation maintenance standards in `AGENTS.md` establishing requirements for public type documentation, examples, availability metadata, and verification workflows.
+
+## [10.5.3] - 2026-06-03
+
+This is a patch release focused on fixing request service provider resolution for wrapped providers and significantly expanding test coverage across 15 assemblies to achieve >=95% coverage. The release consolidates ad-hoc coverage tests into integrated, maintainable test suites.
+
+### Fixed
+
+- `ServiceProviderExtensions.GetServiceDescriptors()` method to properly traverse and handle wrapped service providers, including detection and rejection of cyclic provider graphs; the method now correctly resolves descriptors when the provider is wrapped by third-party components such as AspVersioning's InjectApiVersion and throws `NotSupportedException` with descriptive messages when ambiguous or cyclic provider structures are encountered,
+- `UseFaultDescriptorExceptionHandler()` middleware to work correctly when request services are wrapped by external decorators or proxies,
+- `CollectionExtensions` class in the Cuemon.Extensions.Collections.Generic namespace to add null guard validation in the `Concat<T>` method.
+
+### Added
+
+- Comprehensive unit test coverage for Cuemon.Core: `EradicateTest`, `ExceptionInsightsTest`, `MutableTupleFactoryTest`, `StringFactoryTest`, `WatcherTest`, `GenerateTest`, `StringReplacePairTest`,
+- Comprehensive unit test coverage for Cuemon.IO: `StreamFactoryTest`, `StreamOptionsTest`, `TextReaderDecoratorExtensionsTest`,
+- Comprehensive unit test coverage for Cuemon.Xml: `XmlDocumentFactoryTest`, `XPathDocumentFactoryTest`, and extension tests for Stream, String, XmlReader, XmlWriter, Linq.String decorators,
+- Comprehensive unit test coverage for Cuemon.Diagnostics: `FaultResolverTest`, `TimeMeasureTest`,
+- Comprehensive unit test coverage for Cuemon.Runtime.Caching: `CacheEntryTest`, `CacheEntryEventArgsTest`, `CacheInvalidationTest`, `SlimMemoryCacheTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.Collections.Generic: `QueueExtensionsTest` and collection extension test updates,
+- Comprehensive unit test coverage for Cuemon.Extensions.Runtime.Caching: `CacheEnumerableExtensionsTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.Text.Json: `StringEnumConverterTest`, `StringFlagsEnumConverterTest`, `DynamicJsonConverterTest`, `JsonNamingPolicyExtensionsTest`, `JsonSerializerOptionsExtensionsTest`, and net48 TFM support,
+- Comprehensive unit test coverage for Cuemon.AspNetCore: `MiddlewareTest`, `HttpStatusCodeExceptionTest`, `InternalServerErrorExceptionTest`, `HttpRequestDecoratorExtensionsTest`, `HttpResponseDecoratorExtensionsTest`, `HeaderDictionaryDecoratorExtensionsTest`, `Int32DecoratorExtensionsTest`, `HttpRequestEvidenceTest`, `HttpExceptionDescriptorDecoratorExtensionsTest`, `HttpExceptionDescriptorResponseFormatterTest`, `DynamicCacheBustingTest`,
+- Comprehensive unit test coverage for Cuemon.AspNetCore.Mvc: `BreadcrumbTest`, `ResultClassesTest`, `ConfigurableFilterBaseTest`, `MvcFaultDescriptorOptionsTest`, `HttpCacheHeaderOptionsTest`, `HttpEntityTagHeaderFilterTest`, `DisableModelBindingAttributeTest`, `FormatterBaseTest`,
+- Comprehensive unit test coverage for Cuemon.AspNetCore.Authentication: `AuthenticatorTest`, `AuthenticationHandlerFeatureTest`, `MemoryNonceTrackerTest`, `NonceTrackerEntryTest`, `DigestHashFactoryTest`, `MiddlewareConstructorTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.AspNetCore: `ApplicationBuilderExtensionsTest`, `ServiceCollectionExtensionsCoverageTest`, Headers and Throttling integration tests, `HttpExceptionDescriptorResponseFormatterExtensionsTest`, `XmlConverterExtensionsTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.AspNetCore.Mvc: `FilterCollectionExtensionsTest`, `MvcBuilderExtensionsTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.AspNetCore.Authentication: `AuthorizationResponseHandlerOptionsTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.Xml: `HierarchyExtensionsTest`, `XElementExtensionsTest`, `XmlConverterExtensionsTest`, `XmlSerializerOptionsExtensionsTest`, `XmlExtensionsTest`,
+- Comprehensive unit test coverage for Cuemon.Extensions.Net: `HttpMethodExtensionsTest`, `SlimHttpClientFactoryTest`, `HttpStatusCodeExtensionsTest`, `StringExtensionsTest`, `ByteArrayDecoratorExtensionsTest`.
+
+### Changed
+
+- Enhanced code documentation and test guidelines in `AGENTS.md` with clarifications on testing best practices.
+
 ## [10.5.2] - 2026-05-18
 
 This is a service update that focuses on package dependencies.
@@ -1784,7 +1833,9 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
-[11.0.0-preview.4]: https://github.com/codebeltnet/cuemon/compare/v10.5.2...v11.0.0
+[11.0.0-preview.4]: https://github.com/codebeltnet/cuemon/compare/v10.5.4...v11.0.0
+[10.5.4]: https://github.com/codebeltnet/cuemon/compare/v10.5.3...v10.5.4
+[10.5.3]: https://github.com/codebeltnet/cuemon/compare/v10.5.2...v10.5.3
 [10.5.2]: https://github.com/codebeltnet/cuemon/compare/v10.5.1...v10.5.2
 [10.5.1]: https://github.com/codebeltnet/cuemon/compare/v10.5.0...v10.5.1
 [10.5.0]: https://github.com/codebeltnet/cuemon/compare/v10.4.0...v10.5.0

@@ -25,6 +25,7 @@ namespace Cuemon.Runtime.Caching
         private const string Dependency60Namespace = "Dependency60";
 
         private const int NumberOfItemsToCache = 1000;
+        private static readonly TimeSpan CleanupTimeout = TimeSpan.FromSeconds(15);
 
         public SlimMemoryCacheTest(ManagedHostFixture hostFixture, ITestOutputHelper output = null) : base(hostFixture, output)
         {
@@ -228,41 +229,68 @@ namespace Cuemon.Runtime.Caching
         [Fact, Priority(8)]
         public void Add_VerifyBothLogicalAndActualCacheRemovalUponExpirationForThirtySecondsNamespaceSpecification()
         {
-            Thread.Sleep(TimeSpan.FromSeconds(30));
-
-            Assert.Equal(0, _cache.Count(Dependency30Namespace));
-            Assert.Equal(0, _cache.Count(Sliding30Namespace));
-            Assert.Equal(0, _cache.Count(Absolute30Namespace));
-
-            Assert.Equal(NumberOfItemsToCache, _cache.Where(pair => pair.Value.Namespace == Dependency30Namespace).ToList().Count);
-            Assert.Equal(NumberOfItemsToCache, _cache.Where(pair => pair.Value.Namespace == Sliding30Namespace).ToList().Count);
-            Assert.Equal(NumberOfItemsToCache, _cache.Where(pair => pair.Value.Namespace == Absolute30Namespace).ToList().Count);
-
-            Thread.Sleep(TimeSpan.FromSeconds(10));
-
-            Assert.Equal(0, _cache.Where(pair => pair.Value.Namespace == Dependency30Namespace).ToList().Count);
-            Assert.Equal(0, _cache.Where(pair => pair.Value.Namespace == Sliding30Namespace).ToList().Count);
-            Assert.Equal(0, _cache.Where(pair => pair.Value.Namespace == Absolute30Namespace).ToList().Count);
+            VerifyBothLogicalAndActualCacheRemovalUponExpiration(Dependency30Namespace, Sliding30Namespace, Absolute30Namespace);
         }
 
         [Fact, Priority(9)]
         public void Add_VerifyBothLogicalAndActualCacheRemovalUponExpirationForSixtySecondsNamespaceSpecification()
         {
-            Thread.Sleep(TimeSpan.FromSeconds(20));
+            VerifyBothLogicalAndActualCacheRemovalUponExpiration(Dependency60Namespace, Sliding60Namespace, Absolute60Namespace);
+        }
 
-            Assert.Equal(0, _cache.Count(Dependency60Namespace));
-            Assert.Equal(0, _cache.Count(Sliding60Namespace));
-            Assert.Equal(0, _cache.Count(Absolute60Namespace));
+        [Fact]
+        public void MissingMembers_ShouldReturnFalseOrNull_WhenEntryDoesNotExist()
+        {
+            var sut = new SlimMemoryCache();
 
-            Assert.Equal(NumberOfItemsToCache, _cache.Where(pair => pair.Value.Namespace == Dependency60Namespace).ToList().Count);
-            Assert.Equal(NumberOfItemsToCache, _cache.Where(pair => pair.Value.Namespace == Sliding60Namespace).ToList().Count);
-            Assert.Equal(NumberOfItemsToCache, _cache.Where(pair => pair.Value.Namespace == Absolute60Namespace).ToList().Count);
+            var result = sut.TryGet("missing", out var value);
 
-            Thread.Sleep(TimeSpan.FromSeconds(10));
+            Assert.False(sut.Contains("missing"));
+            Assert.Null(sut.Get("missing"));
+            Assert.Null(sut.GetCacheEntry("missing"));
+            Assert.Null(sut.Remove("missing"));
+            Assert.False(result);
+            Assert.Null(value);
+        }
 
-            Assert.Equal(0, _cache.Where(pair => pair.Value.Namespace == Dependency60Namespace).ToList().Count);
-            Assert.Equal(0, _cache.Where(pair => pair.Value.Namespace == Sliding60Namespace).ToList().Count);
-            Assert.Equal(0, _cache.Where(pair => pair.Value.Namespace == Absolute60Namespace).ToList().Count);
+        [Fact]
+        public void Set_ShouldInsertAndUpdateEntry_WhenCalled()
+        {
+            var sut = new SlimMemoryCache();
+            var invalidation = new CacheInvalidation(DateTime.UtcNow.AddMinutes(1));
+
+            sut.Set("key", "value", invalidation);
+            var beforeUpdate = sut.GetCacheEntry("key");
+            var accessed = beforeUpdate.Accessed;
+
+            Thread.Sleep(20);
+            sut.Set("key", "updated", invalidation);
+            var afterUpdate = sut.GetCacheEntry("key");
+
+            Assert.NotNull(beforeUpdate);
+            Assert.NotNull(afterUpdate);
+            Assert.Equal("updated", sut.Get("key"));
+            Assert.Equal(1, sut.Count());
+            Assert.True(afterUpdate.Accessed >= accessed);
+        }
+
+        [Fact]
+        public void RemoveAll_ShouldRemoveEntriesWithinSpecifiedNamespace()
+        {
+            var sut = new SlimMemoryCache();
+            var invalidation = new CacheInvalidation(DateTime.UtcNow.AddMinutes(1));
+
+            sut.Set("key1", "value1", invalidation, "ns1");
+            sut.Set("key2", "value2", invalidation, "ns1");
+            sut.Set("key3", "value3", invalidation, "ns2");
+
+            sut.RemoveAll("ns1");
+
+            Assert.Equal(0, sut.Count("ns1"));
+            Assert.Equal(1, sut.Count("ns2"));
+            Assert.False(sut.Contains("key1", "ns1"));
+            Assert.False(sut.Contains("key2", "ns1"));
+            Assert.True(sut.Contains("key3", "ns2"));
         }
 
         public override void ConfigureServices(IServiceCollection services)
@@ -273,6 +301,63 @@ namespace Cuemon.Runtime.Caching
                 o.SucceedingSweep = TimeSpan.FromSeconds(5);
             });
             services.AddSingleton<SlimMemoryCache>();
+        }
+
+        private static void AssertNamespaceIsPhysicallyRemoved(SlimMemoryCache cache, string ns)
+        {
+            Assert.True(SpinWait.SpinUntil(() => !cache.Any(pair => pair.Value.Namespace == ns), CleanupTimeout),
+                $"Cache entries in namespace '{ns}' were not physically removed within {CleanupTimeout}.");
+        }
+
+        private static void AssertNamespaceIsPhysicallyPresent(SlimMemoryCache cache, string ns)
+        {
+            var physicalCount = cache.Where(pair => pair.Value.Namespace == ns).Count();
+
+            Assert.True(physicalCount == NumberOfItemsToCache,
+                $"Cache entries in namespace '{ns}' should remain physically present until cleanup. Expected {NumberOfItemsToCache}, actual {physicalCount}.");
+        }
+
+        private static void AssertNamespaceIsLogicallyExpired(SlimMemoryCache cache, string ns)
+        {
+            Assert.True(SpinWait.SpinUntil(() => cache.Count(ns) == 0, CleanupTimeout),
+                $"Cache entries in namespace '{ns}' did not logically expire within {CleanupTimeout}.");
+        }
+
+        private static void VerifyBothLogicalAndActualCacheRemovalUponExpiration(string dependencyNs, string slidingNs, string absoluteNs)
+        {
+            using (var cache = CreateSlimMemoryCacheForExpirationTest())
+            {
+                var expires = TimeSpan.FromSeconds(1);
+                var keys = Generate.RangeOf(NumberOfItemsToCache, i => Guid.NewGuid().ToString("N")).ToList();
+
+                foreach (var key in keys)
+                {
+                    cache.Add(key, Generate.RandomString(5), new CountdownDependency(expires), dependencyNs);
+                    cache.Add(key, Generate.RandomString(5), expires, slidingNs);
+                    cache.Add(key, Generate.RandomString(5), DateTime.UtcNow.Add(expires), absoluteNs);
+                }
+
+                AssertNamespaceIsLogicallyExpired(cache, dependencyNs);
+                AssertNamespaceIsLogicallyExpired(cache, slidingNs);
+                AssertNamespaceIsLogicallyExpired(cache, absoluteNs);
+
+                AssertNamespaceIsPhysicallyPresent(cache, dependencyNs);
+                AssertNamespaceIsPhysicallyPresent(cache, slidingNs);
+                AssertNamespaceIsPhysicallyPresent(cache, absoluteNs);
+
+                AssertNamespaceIsPhysicallyRemoved(cache, dependencyNs);
+                AssertNamespaceIsPhysicallyRemoved(cache, slidingNs);
+                AssertNamespaceIsPhysicallyRemoved(cache, absoluteNs);
+            }
+        }
+
+        private static SlimMemoryCache CreateSlimMemoryCacheForExpirationTest()
+        {
+            return new SlimMemoryCache(o =>
+            {
+                o.FirstSweep = TimeSpan.FromSeconds(10);
+                o.SucceedingSweep = TimeSpan.FromSeconds(5);
+            });
         }
     }
 }

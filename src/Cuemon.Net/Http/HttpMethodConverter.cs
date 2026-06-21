@@ -16,7 +16,7 @@ namespace Cuemon.Net.Http
 
         private static IDictionary<string, HttpMethods> InitStringToHttpMethodLookupTable()
         {
-            var result = new Dictionary<string, HttpMethods>();
+            var result = new Dictionary<string, HttpMethods>(StringComparer.OrdinalIgnoreCase);
             foreach (var pair in new EnumReadOnlyDictionary<HttpMethods>().Select(pair => pair.Value))
             {
                 result.Add(pair, ParserFactory.FromEnum().Parse<HttpMethods>(pair));

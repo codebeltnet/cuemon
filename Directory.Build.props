@@ -5,6 +5,7 @@
     <IsSourceProject>$(MSBuildProjectDirectory.ToLower().StartsWith('$(MSBuildThisFileDirectory.ToLower())src'))</IsSourceProject>
     <IsToolingProject>$(MSBuildProjectDirectory.ToLower().StartsWith('$(MSBuildThisFileDirectory.ToLower())tooling'))</IsToolingProject>
     <IsLinux>$([MSBuild]::IsOSPlatform('Linux'))</IsLinux>
+    <IsMacOS>$([MSBuild]::IsOSPlatform('OSX'))</IsMacOS>
     <IsWindows>$([MSBuild]::IsOSPlatform('Windows'))</IsWindows>
     <IsMainAuthor Condition="'$(EMAIL)' == 'michael@geekle.io'">true</IsMainAuthor>
     <SkipSignAssembly>false</SkipSignAssembly>
@@ -56,8 +57,8 @@
     <None Include="..\..\.nuget\$(MSBuildProjectName)\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(IsTestProject)' == 'true' AND '$(IsLinux)' == 'true'">
-    <TargetFrameworks>net11.0;net10.0</TargetFrameworks>
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true' AND ('$(IsLinux)' == 'true' OR '$(IsMacOS)' == 'true')">
+    <TargetFrameworks>net10.0;net9.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsTestProject)' == 'true' AND '$(IsWindows)' == 'true'">

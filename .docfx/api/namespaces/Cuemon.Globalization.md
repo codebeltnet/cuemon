@@ -2,7 +2,7 @@
 uid: Cuemon.Globalization
 summary: *content
 ---
-The `Cuemon.Globalization` namespace contains types that focuses on culture-related information, including language, country/region and localized resources useful for writing globalized (internationalized) applications. The namespace is an addition to the `System.Globalization` namespace.
+The `Cuemon.Globalization` namespace provides types for culture-aware and region-aware application logic, extending the `System.Globalization` types with country/region classification, localized resource support, and statistical region data. Use `CountryRegion` to represent geographic entities, or `StatisticalRegion` when you need demographic, economic, or geographic data associated with a region.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]
 

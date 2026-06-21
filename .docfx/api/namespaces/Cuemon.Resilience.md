@@ -2,6 +2,6 @@
 uid: Cuemon.Resilience
 summary: *content
 ---
-The `Cuemon.Resilience` namespace contains types related to applying transient fault handling to existing code using intuitively named methods taking both Action{..} and Func{..} delegates to provide a lightweight resilience framework.
+Add retry, timeout, and transient fault handling to existing code without heavy infrastructure. Use this namespace when you need resilience patterns like retry or timeout for operations that may fail transiently. Start with the retry methods that match your operation pattern (synchronous or asynchronous) on `Action` or `Func` delegates.
 
 [!INCLUDE [availability-default](../../includes/availability-default.md)]

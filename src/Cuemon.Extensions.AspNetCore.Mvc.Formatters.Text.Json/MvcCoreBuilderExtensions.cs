@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Extensions.AspNetCore.Text.Json.Formatters;
 using Cuemon.Extensions.Text.Json.Formatters;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +20,9 @@ namespace Cuemon.Extensions.AspNetCore.Mvc.Formatters.Text.Json
         /// <param name="setup">The <see cref="JsonFormatterOptions"/> which may be configured.</param>
         /// <returns>A reference to <paramref name="builder"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="builder"/> cannot be null -or-
-        /// <paramref name="setup"/> cannot be null.
+        /// <paramref name="builder"/> cannot be null.
         /// </exception>
-        public static IMvcCoreBuilder AddJsonFormatters(this IMvcCoreBuilder builder, Action<JsonFormatterOptions> setup)
+        public static IMvcCoreBuilder AddJsonFormatters(this IMvcCoreBuilder builder, Action<JsonFormatterOptions> setup = null)
         {
             Validator.ThrowIfNull(builder);
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, JsonSerializationMvcOptionsSetup>());

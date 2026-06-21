@@ -2,7 +2,7 @@
 uid: Cuemon.AspNetCore.Configuration
 summary: *content
 ---
-The `Cuemon.AspNetCore.Configuration` namespace contains types that provides a way to support a [cache busting strategy](https://www.keycdn.com/support/what-is-cache-busting).
+Append versioned query parameters to ASP.NET Core static resources so that clients always receive the latest version of your files without manual cache invalidation. The `Cuemon.AspNetCore.Configuration` namespace implements a [cache busting strategy](https://www.keycdn.com/support/what-is-cache-busting) through types that generate versioned URLs for your static assets. Start with the cache-busting configuration types for your application.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 

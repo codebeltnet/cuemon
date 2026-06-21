@@ -48,7 +48,8 @@ namespace Cuemon.Assets
             }
             else if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                if (NativeLibrary.TryLoad("libc.so.6", GetType().Assembly, DllImportSearchPath.SafeDirectories, out _libHandle))
+                var libraryName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "libSystem.B.dylib" : "libc.so.6";
+                if (NativeLibrary.TryLoad(libraryName, GetType().Assembly, DllImportSearchPath.SafeDirectories, out _libHandle))
                 {
                     _handle = _libHandle; // i don't know of any native methods on unix
                 }

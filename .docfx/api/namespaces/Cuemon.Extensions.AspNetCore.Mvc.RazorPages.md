@@ -2,13 +2,13 @@
 uid: Cuemon.Extensions.AspNetCore.Mvc.RazorPages
 summary: *content
 ---
-The `Cuemon.Extensions.AspNetCore.Mvc.RazorPages` namespace contains extension methods tailored to accompany the types found in `Cuemon.AspNetCore.Razor.TagHelpers` while being an addition to the `Microsoft.AspNetCore.Mvc.RazorPages` namespace.
+Access application URLs and CDN URLs from your Razor Pages through convenient extension methods. Use this namespace when you need to resolve application or CDN paths in Razor Pages. Start with `GetAppUrl` on your `PageModel` for application URLs or `GetCdnUrl` for content delivery network paths.
 
 [!INCLUDE [availability-modern](../../includes/availability-modern.md)]
 
 Complements: [Microsoft.AspNetCore.Mvc.RazorPages](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.razorpages) 🔗
 
-### Extension Methods
+### Extension Members
 
 |Type|Ext|Methods|
 |--:|:-:|---|

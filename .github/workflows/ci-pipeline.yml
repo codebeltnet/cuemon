@@ -387,21 +387,22 @@ jobs:
       repository: codebeltnet/cuemon
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  codeql:
-    if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}
-    name: call-codeql
-    needs: [init, build, test_qualitygate]
-    uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
-    with:
-      timeout-minutes: 30
-    permissions:
-      security-events: write
+  
+  # It is really a joke that a Microsoft backed tool does not support latest-and-greatest .NET versions
+  # codeql:
+  #   if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}
+  #   name: call-codeql
+  #   needs: [init, build, test_qualitygate]
+  #   uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
+  #   with:
+  #     timeout-minutes: 30
+  #   permissions:
+  #     security-events: write
 
   deploy:
-    if: ${{ always() && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.pack.result == 'success' && needs.test_qualitygate.result == 'success' && needs.sonarcloud.result == 'success' && needs.codecov.result == 'success' && needs.codeql.result == 'success' }}
+    if: ${{ always() && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.pack.result == 'success' && needs.test_qualitygate.result == 'success' && needs.sonarcloud.result == 'success' && needs.codecov.result == 'success' }}
     name: call-nuget
-    needs: [build, pack, test_qualitygate, sonarcloud, codecov, codeql]
+    needs: [build, pack, test_qualitygate, sonarcloud, codecov]
     uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3
     with:
       version: ${{ needs.build.outputs.version }}

@@ -127,12 +127,6 @@ jobs:
       restore: true # we need to restore since we disabled caching
       download-pattern: build-${{ matrix.configuration }}-${{ matrix.arch }}
       include-preview: true
-      # Temporary diagnostic workaround for:
-      # https://github.com/dotnet/runtime/issues/128490
-      #
-      # .NET 11 Preview 4 hangs in selected ASP.NET Core-related tests on linux-arm64.
-      # Disabling ReadyToRun helps verify whether the failure is related to precompiled runtime images / JIT interaction.
-      test-arguments: ${{ matrix.arch == 'ARM64' && '--environment DOTNET_ReadyToRun=0' || '' }}
 
   test_windows:
     name: call-test-windows
@@ -370,6 +364,7 @@ jobs:
           require_success "test_windows" "$TEST_WINDOWS_RESULT"
           require_success_or_skip "test_mac" "$RUN_MAC_TESTS" "$TEST_MAC_RESULT"
           require_success_or_skip "integration_test" "$RUN_PRIVILEGED_JOBS" "$INTEGRATION_TEST_RESULT"
+  
   sonarcloud:
     if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}
     name: call-sonarcloud
@@ -404,7 +399,8 @@ jobs:
       security-events: write
 
   deploy:
-    if: ${{ always() && github.event_name != 'pull_request' && needs.quality-gate.result == 'success' && (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') && (needs.codecov.result == 'success' || needs.codecov.result == 'skipped') }}
+    #if: ${{ always() && github.event_name != 'pull_request' && needs.quality-gate.result == 'success' && (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') && (needs.codecov.result == 'success' || needs.codecov.result == 'skipped') }}
+    if: ${{ always() && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.pack.result == 'success' && needs.test_qualitygate.result == 'success' && needs.sonarcloud.result == 'success' && needs.codecov.result == 'success' && needs.codeql.result == 'success' }}
     name: call-nuget
     needs: [build, pack, test_qualitygate, sonarcloud, codecov, codeql]
     uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3

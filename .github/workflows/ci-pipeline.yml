@@ -391,7 +391,8 @@ jobs:
       environment: Production
       configuration: ${{ inputs.configuration == '' && 'Release' || inputs.configuration }}
     permissions:
-      contents: write
+      actions: read
+      contents: read
       packages: write
       id-token: write
     secrets:

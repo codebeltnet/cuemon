@@ -404,6 +404,7 @@ jobs:
     name: 🔐 NuGet Login
     needs: [build, pack, test_qualitygate, sonarcloud, codecov]
     runs-on: ubuntu-24.04
+    environment: Production
     permissions:
       id-token: write
     outputs:

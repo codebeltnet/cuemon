@@ -399,33 +399,18 @@ jobs:
   #   permissions:
   #     security-events: write
 
-  nuget_login:
-    if: ${{ always() && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.pack.result == 'success' && needs.test_qualitygate.result == 'success' && needs.sonarcloud.result == 'success' && needs.codecov.result == 'success' }}
-    name: 🔐 Deploy v${{ needs.build.outputs.version }}
-    needs: [build, pack, test_qualitygate, sonarcloud, codecov]
-    runs-on: ubuntu-24.04
-    environment: Production
-    permissions:
-      id-token: write
-    outputs:
-      nuget-api-key: ${{ steps.login.outputs.NUGET_API_KEY }}
-    steps:
-      - name: NuGet login (OIDC → temp API key)
-        uses: NuGet/login@v1
-        id: login
-        with:
-          user: ${{ secrets.NUGET_USER }}
-
   deploy:
+    # Avoid skipped optional jobs (for example disabled macOS matrix runs) from suppressing deployment.
     if: ${{ always() && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.pack.result == 'success' && needs.test_qualitygate.result == 'success' && needs.sonarcloud.result == 'success' && needs.codecov.result == 'success' }}
     name: call-nuget
-    needs: [build, pack, test_qualitygate, sonarcloud, codecov, nuget_login]
+    needs: [build, pack, test_qualitygate, sonarcloud, codecov]
     uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3
     with:
       version: ${{ needs.build.outputs.version }}
+      environment: Production
       configuration: ${{ inputs.configuration == '' && 'Release' || inputs.configuration }}
     permissions:
       contents: write
       packages: write
     secrets:
-      NUGET_TOKEN: ${{ needs.nuget_login.outputs.nuget-api-key }}
+      NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}

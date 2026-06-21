@@ -393,5 +393,6 @@ jobs:
     permissions:
       contents: write
       packages: write
+      id-token: write
     secrets:
-      NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+      NUGET_USER: ${{ secrets.NUGET_USER }}

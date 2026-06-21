@@ -423,7 +423,6 @@ jobs:
     uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3
     with:
       version: ${{ needs.build.outputs.version }}
-      environment: Production
       configuration: ${{ inputs.configuration == '' && 'Release' || inputs.configuration }}
     permissions:
       contents: write

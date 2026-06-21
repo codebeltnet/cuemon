@@ -399,7 +399,6 @@ jobs:
       security-events: write
 
   deploy:
-    #if: ${{ always() && github.event_name != 'pull_request' && needs.quality-gate.result == 'success' && (needs.sonarcloud.result == 'success' || needs.sonarcloud.result == 'skipped') && (needs.codecov.result == 'success' || needs.codecov.result == 'skipped') }}
     if: ${{ always() && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.pack.result == 'success' && needs.test_qualitygate.result == 'success' && needs.sonarcloud.result == 'success' && needs.codecov.result == 'success' && needs.codeql.result == 'success' }}
     name: call-nuget
     needs: [build, pack, test_qualitygate, sonarcloud, codecov, codeql]
@@ -411,5 +410,6 @@ jobs:
     permissions:
       contents: write
       packages: write
+      id-token: write
     secrets:
-      NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+      NUGET_USER: ${{ secrets.NUGET_USER }}

@@ -92,6 +92,7 @@
   </Folder>
   <Folder Name="/tuning/">
     <Project Path="tuning/Cuemon.Core.Benchmarks/Cuemon.Core.Benchmarks.csproj" />
+    <Project Path="tuning/Cuemon.Kernel.Benchmarks/Cuemon.Kernel.Benchmarks.csproj" Id="966ec349-0b15-4108-9149-d995edfdc5ff" />
     <Project Path="tuning/Cuemon.Security.Cryptography.Benchmarks/Cuemon.Security.Cryptography.Benchmarks.csproj" />
   </Folder>
 </Solution>

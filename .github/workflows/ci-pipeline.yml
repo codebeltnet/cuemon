@@ -381,7 +381,8 @@ jobs:
       security-events: write
 
   deploy:
-    if: github.event_name != 'pull_request'
+    # Avoid skipped optional jobs (for example disabled macOS matrix runs) from suppressing deployment.
+    if: ${{ always() && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.pack.result == 'success' && needs.test_qualitygate.result == 'success' && needs.sonarcloud.result == 'success' && needs.codecov.result == 'success' && needs.codeql.result == 'success' }}
     name: call-nuget
     needs: [build, pack, test_qualitygate, sonarcloud, codecov, codeql]
     uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3
@@ -390,7 +391,7 @@ jobs:
       environment: Production
       configuration: ${{ inputs.configuration == '' && 'Release' || inputs.configuration }}
     permissions:
-      contents: write
+      contents: read
       packages: write
     secrets:
       NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}

@@ -653,7 +653,10 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfContainsInterface<T>(string typeParamName, params Type[] types)
         {
-            ThrowIfContainsInterface<T>(typeParamName, FormattableString.Invariant($"Specified argument is contained within at least one of {nameof(types)}."), types);
+            if (ContainsInterfaceCore(typeof(T), types))
+            {
+                throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), FormattableString.Invariant($"Specified argument is contained within at least one of {nameof(types)}."));
+            }
         }
 
         /// <summary>
@@ -673,9 +676,10 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfContainsInterface<T>(string typeParamName, string message, params Type[] types)
         {
-            ThrowIfNull(types);
-            ThrowIfFalse(types.All(type => type.IsInterface), nameof(types), $"At least one of the specified {nameof(types)} is not an interface.");
-            if (HasInterfaces(typeof(T), types)) { throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message); }
+            if (ContainsInterfaceCore(typeof(T), types))
+            {
+                throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message);
+            }
         }
 
         /// <summary>
@@ -698,9 +702,10 @@ namespace Cuemon
         public static void ThrowIfContainsInterface(Type argument, Type[] types, string message = "Specified argument is contained within at least one of the specified types.", [CallerArgumentExpression(nameof(argument))] string paramName = null)
         {
             ThrowIfNull(argument);
-            ThrowIfNull(types);
-            ThrowIfFalse(types.All(type => type.IsInterface), nameof(types), $"At least one of the specified {nameof(types)} is not an interface.");
-            if (HasInterfaces(argument, types)) { throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message); }
+            if (ContainsInterfaceCore(argument, types))
+            {
+                throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message);
+            }
         }
 
         /// <summary>
@@ -719,7 +724,10 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfNotContainsInterface<T>(string typeParamName, params Type[] types)
         {
-            ThrowIfNotContainsInterface<T>(typeParamName, FormattableString.Invariant($"Specified argument is not contained within at least one of {nameof(types)}."), types);
+            if (!ContainsInterfaceCore(typeof(T), types))
+            {
+                throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), FormattableString.Invariant($"Specified argument is not contained within at least one of {nameof(types)}."));
+            }
         }
 
         /// <summary>
@@ -739,9 +747,10 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfNotContainsInterface<T>(string typeParamName, string message, params Type[] types)
         {
-            ThrowIfNull(types);
-            ThrowIfFalse(types.All(type => type.IsInterface), nameof(types), $"At least one of the specified {nameof(types)} is not an interface.");
-            if (!HasInterfaces(typeof(T), types)) { throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message); }
+            if (!ContainsInterfaceCore(typeof(T), types))
+            {
+                throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message);
+            }
         }
 
         /// <summary>
@@ -764,9 +773,10 @@ namespace Cuemon
         public static void ThrowIfNotContainsInterface(Type argument, Type[] types, string message = "Specified argument is not contained within at least one of the specified types.", [CallerArgumentExpression(nameof(argument))] string paramName = null)
         {
             ThrowIfNull(argument);
-            ThrowIfNull(types);
-            ThrowIfFalse(types.All(type => type.IsInterface), nameof(types), $"At least one of the specified {nameof(types)} is not an interface.");
-            if (!HasInterfaces(argument, types)) { throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message); }
+            if (!ContainsInterfaceCore(argument, types))
+            {
+                throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message);
+            }
         }
 
         /// <summary>
@@ -805,8 +815,10 @@ namespace Cuemon
         public static void ThrowIfContainsType(Type argument, Type[] types, string message = "Specified argument is contained within at least one of the specified types.", [CallerArgumentExpression(nameof(argument))] string paramName = null)
         {
             ThrowIfNull(argument);
-            ThrowIfNull(types);
-            if (HasTypes(argument, types)) { throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message); }
+            if (ContainsTypeCore(argument, types))
+            {
+                throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message);
+            }
         }
 
         /// <summary>
@@ -822,7 +834,10 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfContainsType<T>(string typeParamName, params Type[] types)
         {
-            ThrowIfContainsType<T>(typeParamName, FormattableString.Invariant($"Specified argument is contained within at least one of {nameof(types)}."), types);
+            if (ContainsTypeCore(typeof(T), types))
+            {
+                throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), FormattableString.Invariant($"Specified argument is contained within at least one of {nameof(types)}."));
+            }
         }
 
         /// <summary>
@@ -839,8 +854,10 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfContainsType<T>(string typeParamName, string message, params Type[] types)
         {
-            ThrowIfNull(types);
-            if (HasTypes(typeof(T), types)) { throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message); }
+            if (ContainsTypeCore(typeof(T), types))
+            {
+                throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message);
+            }
         }
 
         /// <summary>
@@ -860,8 +877,10 @@ namespace Cuemon
         public static void ThrowIfNotContainsType(Type argument, Type[] types, string message = "Specified argument is not contained within at least one of the specified types.", [CallerArgumentExpression(nameof(argument))] string paramName = null)
         {
             ThrowIfNull(argument);
-            ThrowIfNull(types);
-            if (!HasTypes(argument, types)) { throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message); }
+            if (!ContainsTypeCore(argument, types))
+            {
+                throw new ArgumentOutOfRangeException(paramName, CreateTypeList(types), message);
+            }
         }
 
         /// <summary>
@@ -896,7 +915,10 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfNotContainsType<T>(string typeParamName, params Type[] types)
         {
-            ThrowIfNotContainsType<T>(typeParamName, FormattableString.Invariant($"Specified argument is not contained within at least one of {nameof(types)}."), types);
+            if (!ContainsTypeCore(typeof(T), types))
+            {
+                throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), FormattableString.Invariant($"Specified argument is not contained within at least one of {nameof(types)}."));
+            }
         }
 
         /// <summary>
@@ -913,8 +935,10 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfNotContainsType<T>(string typeParamName, string message, params Type[] types)
         {
-            ThrowIfNull(types);
-            if (!HasTypes(typeof(T), types)) { throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message); }
+            if (!ContainsTypeCore(typeof(T), types))
+            {
+                throw new TypeArgumentOutOfRangeException(typeParamName, CreateTypeList(types), message);
+            }
         }
 
         /// <summary>
@@ -1078,8 +1102,11 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfDifferent(string first, string second, string paramName, string message = null)
         {
-            message ??= FormattableString.Invariant($"Specified arguments has a difference between {nameof(second)} and {nameof(first)}.");
-            if (Condition.HasDifference(first, second, out var invalidCharacters)) { throw new ArgumentOutOfRangeException(paramName, invalidCharacters, message); }
+            if (Condition.HasDifference(first, second, out var invalidCharacters))
+            {
+                message ??= FormattableString.Invariant($"Specified arguments has a difference between {nameof(second)} and {nameof(first)}.");
+                throw new ArgumentOutOfRangeException(paramName, invalidCharacters, message);
+            }
         }
 
         /// <summary>
@@ -1094,8 +1121,11 @@ namespace Cuemon
         /// </exception>
         public static void ThrowIfNotDifferent(string first, string second, string paramName, string message = null)
         {
-            message ??= FormattableString.Invariant($"Specified arguments does not have a difference between {nameof(second)} and {nameof(first)}.");
-            if (!Condition.HasDifference(first, second, out _)) { throw new ArgumentOutOfRangeException(paramName, message); }
+            if (!Condition.HasDifference(first, second, out _))
+            {
+                message ??= FormattableString.Invariant($"Specified arguments does not have a difference between {nameof(second)} and {nameof(first)}.");
+                throw new ArgumentOutOfRangeException(paramName, message);
+            }
         }
 
         /// <summary>
@@ -1114,7 +1144,7 @@ namespace Cuemon
             ThrowIfNull(characters);
             if (ContainsAny(argument, characters, comparison))
             {
-                throw new ArgumentOutOfRangeException(paramName, CreateCharacterList(argument.Where(c => characters.Any(find => string.Equals(c.ToString(), find.ToString(), comparison))).Distinct()), message);
+                throw new ArgumentOutOfRangeException(paramName, CreateMatchingCharacterList(argument, characters, comparison), message);
             }
         }
 
@@ -1151,14 +1181,41 @@ namespace Cuemon
             Patterns.CreateInstance(condition);
         }
 
-        private static bool ContainsAny(string argument, IEnumerable<char> characters, StringComparison comparison)
+        private static bool ContainsAny(string argument, char[] characters, StringComparison comparison)
         {
             if (argument == null) { return false; }
-            foreach (var character in characters)
+#if NET9_0_OR_GREATER
+            var span = argument.AsSpan();
+            Span<char> candidate = stackalloc char[1];
+            for (var j = 0; j < characters.Length; j++)
             {
-                if (argument.IndexOf(character.ToString(), comparison) >= 0) { return true; }
+                var character = characters[j];
+                if (comparison == StringComparison.Ordinal)
+                {
+                    if (span.IndexOf(character) >= 0) { return true; }
+                }
+                else
+                {
+                    candidate[0] = character;
+                    if (span.IndexOf(candidate, comparison) >= 0) { return true; }
+                }
             }
             return false;
+#else
+            for (var j = 0; j < characters.Length; j++)
+            {
+                var character = characters[j];
+                if (comparison == StringComparison.Ordinal)
+                {
+                    if (argument.IndexOf(character) >= 0) { return true; }
+                }
+                else if (argument.IndexOf(character.ToString(), comparison) >= 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+#endif
         }
 
         private static string CreateCharacterList(IEnumerable<char> characters)
@@ -1166,29 +1223,56 @@ namespace Cuemon
             return string.Join(",", characters.Select(c => $"'{c}'"));
         }
 
+        private static string CreateMatchingCharacterList(string argument, char[] characters, StringComparison comparison)
+        {
+            return CreateCharacterList(argument.Where(c => characters.Any(find => string.Equals(c.ToString(), find.ToString(), comparison))).Distinct());
+        }
+
         private static string CreateTypeList(IEnumerable<Type> types)
         {
             return string.Join(", ", types.Select(type => ToFriendlyTypeName(type, true)));
         }
 
-        private static bool HasInterfaces(Type source, IEnumerable<Type> interfaceTypes)
+        private static bool ContainsInterfaceCore(Type source, Type[] types)
         {
-            var implementedInterfaces = source.IsInterface ? Enumerable.Repeat(source, 1).Concat(source.GetInterfaces()).ToList() : source.GetInterfaces().ToList();
-            foreach (var interfaceType in interfaceTypes.Where(type => type.IsInterface))
+            ThrowIfNull(types);
+            ThrowIfFalse(types.All(type => type.IsInterface), nameof(types), $"At least one of the specified {nameof(types)} is not an interface.");
+            return HasInterfaces(source, types);
+        }
+
+        private static bool ContainsTypeCore(Type source, Type[] types)
+        {
+            ThrowIfNull(types);
+            return HasTypes(source, types);
+        }
+
+        private static bool HasInterfaces(Type source, Type[] interfaceTypes)
+        {
+            var implementedInterfaces = source.GetInterfaces();
+            for (var i = 0; i < interfaceTypes.Length; i++)
             {
-                foreach (var implementedInterface in implementedInterfaces)
+                var interfaceType = interfaceTypes[i];
+                if (!interfaceType.IsInterface) { continue; }
+                if (source.IsInterface && MatchesInterface(source, interfaceType)) { return true; }
+                for (var j = 0; j < implementedInterfaces.Length; j++)
                 {
-                    if (implementedInterface.IsGenericType && interfaceType == implementedInterface.GetGenericTypeDefinition()) { return true; }
-                    if (interfaceType == implementedInterface) { return true; }
+                    if (MatchesInterface(implementedInterfaces[j], interfaceType)) { return true; }
                 }
             }
             return false;
         }
 
-        private static bool HasTypes(Type source, IEnumerable<Type> types)
+        private static bool MatchesInterface(Type implementedInterface, Type interfaceType)
         {
-            foreach (var type in types)
+            if (implementedInterface.IsGenericType && interfaceType == implementedInterface.GetGenericTypeDefinition()) { return true; }
+            return interfaceType == implementedInterface;
+        }
+
+        private static bool HasTypes(Type source, Type[] types)
+        {
+            for (var i = 0; i < types.Length; i++)
             {
+                var type = types[i];
                 var current = source;
                 while (current != null)
                 {

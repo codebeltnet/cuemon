@@ -1,3 +1,20 @@
+Version: 10.5.5
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+# Improvements
+- OPTIMIZED Condition.IsBase64 to use System.Buffers.Text.Base64 for net9.0+ while maintaining netstandard2.0 compatibility
+- OPTIMIZED Condition.IsBinaryDigits, IsHexadecimal, and IsWhiteSpace by replacing LINQ calls with direct character iteration to eliminate allocations in hot paths
+- OPTIMIZED Condition.HasDifference with bitmap-based character tracking for net9.0+ for improved performance on modern runtimes
+- OPTIMIZED Validator through refactored helper methods (ContainsInterfaceCore, ContainsTypeCore) to reduce method overhead and inline null validation checks
+- OPTIMIZED Validator.ContainsAny with net9.0+ Span-based optimizations for case-insensitive string searching
+- REFACTORED Validator error-handling deferred-evaluation patterns to compute error messages only when exceptions are thrown
+
+# New Features
+- ADDED Cuemon.Kernel.Benchmarks project with comprehensive performance measurement suites for core validation and condition utilities: HasDifferenceBenchmark, ValidatorCoreBenchmark, ValidatorFormatBenchmark, ValidatorMiscBenchmark, ValidatorStringBenchmark, and ValidatorTypeBenchmark
+
 Version: 10.5.4
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

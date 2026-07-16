@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.5.5] - 2026-07-16
+
+This patch release provides systematic dependency updates across all supported target frameworks, alongside new benchmarking infrastructure for the Kernel module.
+
+> [!NOTE]
+> Although primarily a service update, this release also delivers substantial performance improvements across several core validation and condition methods. Common Base64, enum, hexadecimal, string, type, and interface checks now execute faster and with significantly fewer allocations, while preserving existing behavior and public APIs.
+
+### Added
+
+- **`Cuemon.Kernel.Benchmarks`** project with dedicated performance measurement suites: `HasDifferenceBenchmark`, `ValidatorCoreBenchmark`, `ValidatorFormatBenchmark`, `ValidatorMiscBenchmark`, `ValidatorStringBenchmark`, `ValidatorTypeBenchmark`,
+- Comprehensive enum parsing matrix tests in `ConditionTest` covering diverse enum types (negative values, [Flags] attributes, non-enum comparisons),
+- Benchmark warmup tuning across all Kernel module performance suites for improved measurement accuracy and reduced noise in micro-benchmark results.
+
+### Changed
+
+- `Condition` class performance optimizations: `IsBase64` now uses `System.Buffers.Text.Base64` for net9.0+, `IsBinaryDigits`, `IsHexadecimal`, `IsWhiteSpace` now use direct character iteration eliminating LINQ allocations, `HasDifference` optimized with bitmap-based character tracking for net9.0+,
+- `Validator` class refactored with dedicated helper methods (`ContainsInterfaceCore`, `ContainsTypeCore`) to reduce method overhead, optimized `ContainsAny` with net9.0+ Span-based string searching, restructured error-handling patterns to defer error message evaluation until exceptions are thrown,
+- All package dependencies upgraded to latest compatible versions: `Codebelt.Extensions.Xunit` (11.0.9 → 11.1.1), `Codebelt.Extensions.BenchmarkDotNet.Console` (1.2.6 → 1.3.1), `Microsoft.NET.Test.Sdk` (18.5.1 → 18.8.1), Microsoft.Data.Sqlite (10.0.8 → 10.0.10, 9.0.16 → 9.0.18 for net9), Microsoft.Extensions.* packages (10.0.8 → 10.0.10, 9.0.16 → 9.0.18 for net9), `System.Text.Json` (10.0.8 → 10.0.10), `Microsoft.Data.SqlClient` (7.0.1 → 7.0.2),
+- DocFX build infrastructure updated to align with latest tooling requirements,
+- CI/CD pipeline permissions refined for improved security posture.
+
+### Fixed
+
+- Deploy job gating logic to explicitly depend on direct job dependencies only, ensuring deployment proceeds correctly when optional test matrices are skipped in workflow_dispatch runs.
+
 ## [10.5.4] - 2026-06-20
 
 This is a patch release focused on dependency maintenance and comprehensive API documentation improvements. The release significantly expands published type-level and namespace-level guidance with concrete consumer-oriented examples, establishes DocFX documentation standards, and refactors test infrastructure for improved efficiency.
@@ -1798,6 +1823,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.5.5]: https://github.com/codebeltnet/cuemon/compare/v10.5.4...v10.5.5
 [10.5.4]: https://github.com/codebeltnet/cuemon/compare/v10.5.3...v10.5.4
 [10.5.3]: https://github.com/codebeltnet/cuemon/compare/v10.5.2...v10.5.3
 [10.5.2]: https://github.com/codebeltnet/cuemon/compare/v10.5.1...v10.5.2

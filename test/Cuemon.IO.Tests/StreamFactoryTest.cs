@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
 using System.Buffers;
 #endif
 using System.Text;
@@ -107,7 +107,7 @@ namespace Cuemon.IO
             Assert.Equal("boom", ex.InnerException.Message);
         }
 
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
 
         [Fact]
         public void Create_ShouldWriteContent_WhenUsingActionOfBufferWriter()

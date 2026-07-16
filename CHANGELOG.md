@@ -24,8 +24,7 @@ This patch release provides systematic dependency updates across all supported t
 - `Condition` class performance optimizations: `IsBase64` now uses `System.Buffers.Text.Base64` for net9.0+, `IsBinaryDigits`, `IsHexadecimal`, `IsWhiteSpace` now use direct character iteration eliminating LINQ allocations, `HasDifference` optimized with bitmap-based character tracking for net9.0+,
 - `Validator` class refactored with dedicated helper methods (`ContainsInterfaceCore`, `ContainsTypeCore`) to reduce method overhead, optimized `ContainsAny` with net9.0+ Span-based string searching, restructured error-handling patterns to defer error message evaluation until exceptions are thrown,
 - All package dependencies upgraded to latest compatible versions: `Codebelt.Extensions.Xunit` (11.0.9 → 11.1.1), `Codebelt.Extensions.BenchmarkDotNet.Console` (1.2.6 → 1.3.1), `Microsoft.NET.Test.Sdk` (18.5.1 → 18.8.1), Microsoft.Data.Sqlite (10.0.8 → 10.0.10, 9.0.16 → 9.0.18 for net9), Microsoft.Extensions.* packages (10.0.8 → 10.0.10, 9.0.16 → 9.0.18 for net9), `System.Text.Json` (10.0.8 → 10.0.10), `Microsoft.Data.SqlClient` (7.0.1 → 7.0.2),
-- DocFX build infrastructure updated to align with latest tooling requirements,
-- CI/CD pipeline permissions refined for improved security posture.
+- DocFX build infrastructure updated to align with latest tooling requirements.
 
 ### Fixed
 

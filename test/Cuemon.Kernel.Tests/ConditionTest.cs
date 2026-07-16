@@ -538,8 +538,14 @@ namespace Cuemon
             Assert.False(Condition.HasDifference("ÆØÅ", "ÅØÆ", out var noDifference));
             Assert.Equal(string.Empty, noDifference);
 
+            Assert.True(Condition.HasDifference("abc", "abc本本", out var asciiFirstDifference));
+            Assert.Equal("本", asciiFirstDifference);
+
             Assert.True(Condition.HasDifference("ÆØ", "ÆØÅÅ", out var difference));
             Assert.Equal("Å", difference);
+
+            Assert.True(Condition.HasDifference("AĀ", "ĀA本本", out var mixedFirstDifference));
+            Assert.Equal("本", mixedFirstDifference);
 
             // characters outside the Latin-1 range (>= U+0100)
             Assert.False(Condition.HasDifference("Ā日本", "本日Ā", out var noDifferenceBmp));

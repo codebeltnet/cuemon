@@ -6,12 +6,12 @@
     <PackageVersion Include="AutoFixture" Version="4.18.1" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.8" />
-    <PackageVersion Include="Codebelt.Extensions.BenchmarkDotNet.Console" Version="1.3.0" />
-    <PackageVersion Include="Codebelt.Extensions.Xunit" Version="11.1.0" />
-    <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting" Version="11.1.0" />
-    <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting.AspNetCore" Version="11.1.0" />
+    <PackageVersion Include="Codebelt.Extensions.BenchmarkDotNet.Console" Version="1.3.1" />
+    <PackageVersion Include="Codebelt.Extensions.Xunit" Version="11.1.1" />
+    <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting" Version="11.1.1" />
+    <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting.AspNetCore" Version="11.1.1" />
     <PackageVersion Include="Meziantou.Xunit.v3.ParallelTestFramework" Version="1.0.6" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageVersion Include="MinVer" Version="7.0.0" />
     <PackageVersion Include="NativeLibraryLoader" Version="1.0.13" />
     <PackageVersion Include="Xunit.v3.Priority" Version="1.1.18" />

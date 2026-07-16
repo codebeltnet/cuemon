@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -279,7 +278,11 @@ namespace Cuemon
         public static bool IsBase64(string value)
         {
             if (string.IsNullOrEmpty(value)) { return false; }
+#if NET9_0_OR_GREATER
+            return System.Buffers.Text.Base64.IsValid(value.AsSpan());
+#else
             return Patterns.TryInvoke(() => Convert.FromBase64String(value), out _);
+#endif
         }
 
         /// <summary>
@@ -290,7 +293,12 @@ namespace Cuemon
         public static bool IsBinaryDigits(string value)
         {
             if (string.IsNullOrWhiteSpace(value)) { return false; }
-            return !value.Any(ch => ch < '0' || ch > '1');
+            for (var i = 0; i < value.Length; i++)
+            {
+                var character = value[i];
+                if (character < '0' || character > '1') { return false; }
+            }
+            return true;
         }
 
         /// <summary>
@@ -360,7 +368,7 @@ namespace Cuemon
         public static bool IsEmailAddress(string value)
         {
             if (string.IsNullOrWhiteSpace(value)) { return false; }
-            return (RegExEmailAddressValidator.Match(value).Length > 0);
+            return RegExEmailAddressValidator.IsMatch(value);
         }
 
         /// <summary>
@@ -389,8 +397,8 @@ namespace Cuemon
             try
             {
                 var options = Patterns.Configure(setup);
+                if (!Enum.TryParse<T>(value, options.IgnoreCase, out var result)) { return false; }
                 var hasFlags = enumType.GetTypeInfo().IsDefined(typeof(FlagsAttribute), false);
-                var result = Enum.Parse(enumType, value, options.IgnoreCase);
                 if (hasFlags && value.IndexOf(',') != -1) { return true; }
                 return Enum.IsDefined(enumType, result);
             }
@@ -490,15 +498,9 @@ namespace Cuemon
         {
             if (string.IsNullOrEmpty(value)) { return false; }
             if (!IsEven(value.Length)) { return false; }
-            using (var reader = new StringReader(value))
+            for (var i = 0; i < value.Length; i++)
             {
-                var even = value.Length / 2;
-                for (var i = 0; i < even; ++i)
-                {
-                    var char1 = (char)reader.Read();
-                    var char2 = (char)reader.Read();
-                    if (!IsHexDigit(char1) || !IsHexDigit(char2)) { return false; }
-                }
+                if (!IsHexDigit(value[i])) { return false; }
             }
             return true;
         }
@@ -730,7 +732,11 @@ namespace Cuemon
         public static bool IsWhiteSpace(string value)
         {
             if (value is null) { return false; }
-            return value.All(char.IsWhiteSpace);
+            for (var i = 0; i < value.Length; i++)
+            {
+                if (!char.IsWhiteSpace(value[i])) { return false; }
+            }
+            return true;
         }
 
         /// <summary>
@@ -879,9 +885,77 @@ namespace Cuemon
         {
             first ??= string.Empty;
             second ??= string.Empty;
+#if NET9_0_OR_GREATER
+            return HasDifferenceCore(first, second, out difference);
+#else
             difference = string.Concat(second.Except(first));
             return difference.Length != 0;
+#endif
         }
+
+#if NET9_0_OR_GREATER
+        private static bool HasDifferenceCore(string first, string second, out string difference)
+        {
+            if (second.Length == 0)
+            {
+                difference = string.Empty;
+                return false;
+            }
+
+            Span<ulong> firstAscii = stackalloc ulong[4]; // presence bitmap for characters below 256
+            firstAscii.Clear();
+            var firstHasNonAscii = false;
+            foreach (var character in first)
+            {
+                if (character < 256) { firstAscii[character >> 6] |= 1UL << (character & 63); }
+                else { firstHasNonAscii = true; }
+            }
+
+            HashSet<char> firstNonAscii = null;
+            System.Text.StringBuilder builder = null;
+            HashSet<char> emitted = null;
+            foreach (var character in second)
+            {
+                bool present;
+                if (character < 256)
+                {
+                    present = (firstAscii[character >> 6] & (1UL << (character & 63))) != 0;
+                }
+                else if (!firstHasNonAscii)
+                {
+                    present = false;
+                }
+                else
+                {
+                    firstNonAscii ??= CreateNonAsciiSet(first);
+                    present = firstNonAscii.Contains(character);
+                }
+                if (present) { continue; }
+
+                builder ??= new System.Text.StringBuilder();
+                emitted ??= new HashSet<char>();
+                if (emitted.Add(character)) { builder.Append(character); }
+            }
+
+            if (builder == null)
+            {
+                difference = string.Empty;
+                return false;
+            }
+            difference = builder.ToString();
+            return true;
+        }
+
+        private static HashSet<char> CreateNonAsciiSet(string value)
+        {
+            var set = new HashSet<char>();
+            foreach (var character in value)
+            {
+                if (character >= 256) { set.Add(character); }
+            }
+            return set;
+        }
+#endif
 
         private static bool IsHexDigit(char character)
         {

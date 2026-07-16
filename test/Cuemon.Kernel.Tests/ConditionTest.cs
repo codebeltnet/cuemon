@@ -235,6 +235,161 @@ namespace Cuemon
         }
 
         [Fact]
+        public void IsEnum_ShouldPreserveParsingSemantics()
+        {
+            // named values
+            Assert.True(Condition.IsEnum<DayOfWeek>("Monday"));
+            Assert.False(Condition.IsEnum<DayOfWeek>("NotADay"));
+
+            // case-insensitive names (default) vs case-sensitive
+            Assert.True(Condition.IsEnum<DayOfWeek>("monday"));
+            Assert.False(Condition.IsEnum<DayOfWeek>("monday", o => o.IgnoreCase = false));
+            Assert.True(Condition.IsEnum<DayOfWeek>("Monday", o => o.IgnoreCase = false));
+
+            // numeric values: defined vs undefined
+            Assert.True(Condition.IsEnum<DayOfWeek>("1"));
+            Assert.False(Condition.IsEnum<DayOfWeek>("42"));
+
+            // flags and combined flags
+            Assert.True(Condition.IsEnum<AttributeTargets>("Assembly"));
+            Assert.True(Condition.IsEnum<AttributeTargets>("Assembly, Module"));
+            Assert.True(Condition.IsEnum<AttributeTargets>("All"));
+
+            // non-enum generic argument
+            Assert.False(Condition.IsEnum<int>("1"));
+
+            // null, empty, and whitespace
+            Assert.False(Condition.IsEnum<DayOfWeek>(null));
+            Assert.False(Condition.IsEnum<DayOfWeek>(string.Empty));
+            Assert.False(Condition.IsEnum<DayOfWeek>(" "));
+        }
+
+        // Enums covering diverse underlying types, negative values, and [Flags] used by the
+        // legacy-equivalence matrix below.
+        private enum RegularMatrixEnum { Zero = 0, One = 1, Two = 2, Three = 3 }
+
+        private enum SignedMatrixEnum { Neg = -2, MinusOne = -1, Zero = 0, Pos = 2 }
+
+        private enum ByteMatrixEnum : byte { A = 0, B = 1, C = 200 }
+
+        private enum LongMatrixEnum : long { One = 1, Big = 5000000000 }
+
+        [Flags]
+        private enum FlagsMatrixEnum { None = 0, Alpha = 1, Beta = 2, Gamma = 4, All = 7 }
+
+        // Faithful reconstruction of the pre-optimization Condition.IsEnum (Enum.Parse based),
+        // used to prove the optimized Enum.TryParse implementation is behaviorally equivalent.
+        private static bool LegacyIsEnum<T>(string value, bool ignoreCase) where T : struct, IConvertible
+        {
+            if (string.IsNullOrWhiteSpace(value)) { return false; }
+            var enumType = typeof(T);
+            if (!enumType.IsEnum) { return false; }
+            try
+            {
+                var hasFlags = enumType.IsDefined(typeof(FlagsAttribute), false);
+                var result = Enum.Parse(enumType, value, ignoreCase);
+                if (hasFlags && value.IndexOf(',') != -1) { return true; }
+                return Enum.IsDefined(enumType, result);
+            }
+            catch (Exception e) when (Patterns.IsRecoverableException(e))
+            {
+                return false;
+            }
+        }
+
+        private List<string> CollectEnumMismatches<T>(string label, IEnumerable<string> values) where T : struct, IConvertible
+        {
+            var mismatches = new List<string>();
+            foreach (var value in values)
+            {
+                foreach (var ignoreCase in new[] { true, false })
+                {
+                    var legacy = LegacyIsEnum<T>(value, ignoreCase);
+                    var current = Condition.IsEnum<T>(value, o => o.IgnoreCase = ignoreCase);
+                    if (legacy != current)
+                    {
+                        mismatches.Add($"{label}: value={(value ?? "<null>")}, ignoreCase={ignoreCase} -> legacy={legacy}, current={current}");
+                    }
+                }
+            }
+            return mismatches;
+        }
+
+        [Fact]
+        public void IsEnum_ShouldMatchLegacyEnumParseSemantics_AcrossGeneratedMatrix()
+        {
+            var values = new[]
+            {
+                null, "", " ", "\t", "   ",
+                "0", "1", "2", "3", "4", "7", "8", "42", "200", "255", "256",
+                "-1", "-2", "-3", "5000000000", "99999999999999999999999",
+                "One", "one", "ONE", "Two", "Alpha", "alpha", "Beta", "Gamma", "All", "None",
+                "Bogus", "NotADay", "Zero",
+                "1,2", "1, 2", "Alpha,Beta", "Alpha, Beta", "Alpha, Bogus", "Read, Write",
+                ",", "1,", ",1", " 1 ", " One ", "Monday", "monday", "Assembly", "Assembly, Module"
+            };
+
+            var mismatches = new List<string>();
+            mismatches.AddRange(CollectEnumMismatches<RegularMatrixEnum>("RegularMatrixEnum(int)", values));
+            mismatches.AddRange(CollectEnumMismatches<SignedMatrixEnum>("SignedMatrixEnum(int,negative)", values));
+            mismatches.AddRange(CollectEnumMismatches<ByteMatrixEnum>("ByteMatrixEnum(byte)", values));
+            mismatches.AddRange(CollectEnumMismatches<LongMatrixEnum>("LongMatrixEnum(long)", values));
+            mismatches.AddRange(CollectEnumMismatches<FlagsMatrixEnum>("FlagsMatrixEnum([Flags])", values));
+            mismatches.AddRange(CollectEnumMismatches<DayOfWeek>("DayOfWeek", values));
+            mismatches.AddRange(CollectEnumMismatches<AttributeTargets>("AttributeTargets([Flags])", values));
+            mismatches.AddRange(CollectEnumMismatches<ConsoleColor>("ConsoleColor", values));
+            mismatches.AddRange(CollectEnumMismatches<int>("int(non-enum)", values));
+            mismatches.AddRange(CollectEnumMismatches<bool>("bool(non-enum)", values));
+            mismatches.AddRange(CollectEnumMismatches<char>("char(non-enum)", values));
+
+            foreach (var mismatch in mismatches) { TestOutput.WriteLine(mismatch); }
+            Assert.Empty(mismatches);
+        }
+
+        [Theory]
+        [InlineData("-2", true)]   // defined negative value
+        [InlineData("-1", true)]   // defined negative value
+        [InlineData("0", true)]    // defined
+        [InlineData("2", true)]    // defined
+        [InlineData("-3", false)]  // undefined negative value
+        [InlineData("1", false)]   // in range but undefined
+        public void IsEnum_ShouldHandleNegativeAndUndefinedNumericValues(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsEnum<SignedMatrixEnum>(value));
+        }
+
+        [Theory]
+        [InlineData("200", true)]   // defined
+        [InlineData("255", false)]  // within byte range but undefined
+        [InlineData("256", false)]  // overflows the byte underlying type
+        [InlineData("-1", false)]   // negative cannot fit an unsigned byte enum
+        public void IsEnum_ShouldHandleByteBackedOverflowAndUndefined(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsEnum<ByteMatrixEnum>(value));
+        }
+
+        [Theory]
+        [InlineData("99999999999999999999999", false)] // overflows int
+        [InlineData("5000000000", false)]              // overflows int (fits long)
+        public void IsEnum_ShouldReturnFalse_OnNumericOverflow(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsEnum<RegularMatrixEnum>(value));
+        }
+
+        [Theory]
+        [InlineData("All", true)]         // single defined combined member
+        [InlineData("7", true)]           // numeric value equal to a defined member (All)
+        [InlineData("3", false)]          // combined numeric without comma, not a single defined member
+        [InlineData("1,2", false)]        // comma-separated NUMERIC flags are not parsed (names only)
+        [InlineData("Alpha, Beta", true)] // comma-separated flag names
+        [InlineData("Alpha,Gamma", true)] // comma-separated flag names (no spaces)
+        [InlineData("Alpha, Bogus", false)] // one name is not defined
+        public void IsEnum_ShouldHandleCombinedFlagValues(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsEnum<FlagsMatrixEnum>(value));
+        }
+
+        [Fact]
         public void NumericAndRangeChecks_ShouldReturnExpectedResults()
         {
             Assert.True(Condition.IsEven(4));
@@ -326,6 +481,184 @@ namespace Cuemon
             Assert.False(sut6);
             Assert.Equal("XYZÆØÅ", sut7);
             Assert.True(sut8);
+        }
+
+        [Fact]
+        public void HasDifference_ShouldTreatNullAsEmptyString()
+        {
+            Assert.False(Condition.HasDifference(null, null, out var bothNull));
+            Assert.Equal(string.Empty, bothNull);
+
+            Assert.False(Condition.HasDifference("abc", null, out var secondNull));
+            Assert.Equal(string.Empty, secondNull);
+
+            Assert.True(Condition.HasDifference(null, "abc", out var firstNull));
+            Assert.Equal("abc", firstNull);
+        }
+
+        [Fact]
+        public void HasDifference_ShouldEmitEachDifferenceCharacterOnceInOrderOfSecond()
+        {
+            Assert.True(Condition.HasDifference("a", "zzbzbcz", out var difference));
+            Assert.Equal("zbc", difference); // duplicates removed, first-occurrence order from second
+        }
+
+        [Fact]
+        public void HasDifference_ShouldReportNoDifference_WhenSecondIsSubsetOrReorderedFirst()
+        {
+            Assert.False(Condition.HasDifference("abc", "abc", out var equivalent));
+            Assert.Equal(string.Empty, equivalent);
+
+            Assert.False(Condition.HasDifference("abc", "cba", out var reordered));
+            Assert.Equal(string.Empty, reordered);
+
+            Assert.False(Condition.HasDifference("abc", "aaabbbccc", out var duplicateHeavy));
+            Assert.Equal(string.Empty, duplicateHeavy);
+
+            Assert.False(Condition.HasDifference("abc", string.Empty, out var emptySecond));
+            Assert.Equal(string.Empty, emptySecond);
+        }
+
+        [Fact]
+        public void HasDifference_ShouldDetectDifferenceAtStartMiddleAndEnd()
+        {
+            Assert.True(Condition.HasDifference("a", "Zaaaa", out var atStart));
+            Assert.Equal("Z", atStart);
+
+            Assert.True(Condition.HasDifference("a", "aaZaa", out var atMiddle));
+            Assert.Equal("Z", atMiddle);
+
+            Assert.True(Condition.HasDifference("a", "aaaaZ", out var atEnd));
+            Assert.Equal("Z", atEnd);
+        }
+
+        [Fact]
+        public void HasDifference_ShouldHandleNonAsciiCharacters()
+        {
+            Assert.False(Condition.HasDifference("ÆØÅ", "ÅØÆ", out var noDifference));
+            Assert.Equal(string.Empty, noDifference);
+
+            Assert.True(Condition.HasDifference("abc", "abc本本", out var asciiFirstDifference));
+            Assert.Equal("本", asciiFirstDifference);
+
+            Assert.True(Condition.HasDifference("ÆØ", "ÆØÅÅ", out var difference));
+            Assert.Equal("Å", difference);
+
+            Assert.True(Condition.HasDifference("AĀ", "ĀA本本", out var mixedFirstDifference));
+            Assert.Equal("本", mixedFirstDifference);
+
+            // characters outside the Latin-1 range (>= U+0100)
+            Assert.False(Condition.HasDifference("Ā日本", "本日Ā", out var noDifferenceBmp));
+            Assert.Equal(string.Empty, noDifferenceBmp);
+
+            Assert.True(Condition.HasDifference("Ā日", "日Ā本本", out var differenceBmp));
+            Assert.Equal("本", differenceBmp);
+        }
+
+        [Theory]
+        [InlineData("0AFF", true)]
+        [InlineData("0aff", true)]
+        [InlineData("aAbB", true)]
+        [InlineData("00", true)]
+        [InlineData("1234567890", true)]
+        [InlineData("abcdefABCDEF", true)]
+        [InlineData("0AF", false)]  // odd length
+        [InlineData("0", false)]    // odd length
+        [InlineData("0AGG", false)] // G is not hexadecimal
+        [InlineData(" 0", false)]   // space is not hexadecimal
+        [InlineData("", false)]     // empty
+        public void IsHex_ShouldPreserveEvenLengthAndDigitSemantics(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsHex(value));
+        }
+
+        [Theory]
+        [InlineData("", true)]        // empty is treated as consisting only of white-space
+        [InlineData(" ", true)]
+        [InlineData(" \t", true)]
+        [InlineData("\r\n", true)]
+        [InlineData("\u00A0", true)]  // non-breaking space is white-space
+        [InlineData(" value ", false)]
+        [InlineData("value", false)]
+        public void IsWhiteSpace_ShouldPreserveEmptyAndDetectNonWhitespace(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsWhiteSpace(value));
+        }
+
+        [Fact]
+        public void IsWhiteSpace_ShouldReturnFalse_WhenNull()
+        {
+            Assert.False(Condition.IsWhiteSpace(null));
+        }
+
+        [Theory]
+        [InlineData("0", true)]
+        [InlineData("1", true)]
+        [InlineData("101010", true)]
+        [InlineData("102010", false)]
+        [InlineData("2", false)]
+        [InlineData("01 01", false)] // interior space
+        [InlineData(" ", false)]
+        [InlineData("", false)]
+        public void IsBinaryDigits_ShouldValidateOnlyZeroAndOne(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsBinaryDigits(value));
+        }
+
+        [Fact]
+        public void IsBinaryDigits_ShouldReturnFalse_WhenNull()
+        {
+            Assert.False(Condition.IsBinaryDigits(null));
+        }
+
+        [Theory]
+        [InlineData("user@example.com", true)]
+        [InlineData("benchmark@cuemon.net", true)]
+        [InlineData("a@b.co", true)]
+        [InlineData("MiXeD@CaSe.CoM", true)]           // case-insensitive
+        [InlineData("x@[192.168.0.1]", true)]          // IP literal
+        [InlineData("Ünïcode@example.com", true)]      // unanchored: matches embedded ASCII substring
+        [InlineData("invalid-email", false)]
+        [InlineData("plain", false)]
+        [InlineData("café@example.com", false)]        // no valid ASCII local part before '@'
+        [InlineData("Ünïcöde", false)]
+        [InlineData(" ", false)]
+        [InlineData("", false)]
+        public void IsEmailAddress_ShouldValidateAcrossRepresentativeInputs(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsEmailAddress(value));
+        }
+
+        [Fact]
+        public void IsEmailAddress_ShouldValidateBoundaryLengthAndNull()
+        {
+            Assert.False(Condition.IsEmailAddress(null));
+            Assert.True(Condition.IsEmailAddress(new string('a', 240) + "@example.com"));
+        }
+
+        [Theory]
+        [InlineData("QQ==", true)]
+        [InlineData("Q3VlbW9u", true)]
+        [InlineData("QUJD", true)]
+        [InlineData("YWJjZA==", true)]
+        [InlineData("abcd", true)]         // unpadded multiple of four
+        [InlineData(" QQ== ", true)]       // surrounding white-space is ignored
+        [InlineData("Q3Vl\nbW9u", true)]   // interior white-space is ignored
+        [InlineData("QQ=", false)]         // malformed length
+        [InlineData("QQ", false)]          // malformed length
+        [InlineData("QQ=Q", false)]        // padding in the middle
+        [InlineData("****", false)]        // invalid characters
+        [InlineData("DJ BOBO", false)]
+        [InlineData("", false)]            // empty
+        public void IsBase64_ShouldValidateWhitespacePaddingAndInvalidInputs(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsBase64(value));
+        }
+
+        [Fact]
+        public void IsBase64_ShouldReturnFalse_WhenNull()
+        {
+            Assert.False(Condition.IsBase64(null));
         }
     }
 }

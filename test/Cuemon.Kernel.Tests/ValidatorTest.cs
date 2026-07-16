@@ -1344,5 +1344,63 @@ namespace Cuemon
             Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfUri("https://www.cuemon.net/", UriKind.Absolute, "custom", "paramName")).Message);
             Assert.StartsWith("custom", Assert.Throws<ArgumentException>(() => Validator.ThrowIfNotUri("www.cuemon.net", UriKind.Absolute, "custom", "paramName")).Message);
         }
+
+        [Theory]
+        [InlineData("Cuemon", "C", StringComparison.Ordinal, true)]                        // match at beginning
+        [InlineData("Cuemon", "o", StringComparison.Ordinal, true)]                        // match in middle
+        [InlineData("Cuemon", "n", StringComparison.Ordinal, true)]                        // match at end
+        [InlineData("Cuemon", "c", StringComparison.Ordinal, false)]                       // ordinal is case-sensitive
+        [InlineData("Cuemon", "xyz", StringComparison.Ordinal, false)]                     // no match
+        [InlineData("Cuemon", "oo", StringComparison.Ordinal, true)]                       // duplicate candidates
+        [InlineData("Cuemon", "", StringComparison.Ordinal, false)]                        // empty candidate set
+        [InlineData(null, "a", StringComparison.Ordinal, false)]                           // null argument
+        [InlineData("Cuemon", "c", StringComparison.OrdinalIgnoreCase, true)]              // case-insensitive hit
+        [InlineData("Cuemon", "C", StringComparison.OrdinalIgnoreCase, true)]
+        [InlineData("Cuemon", "xyz", StringComparison.OrdinalIgnoreCase, false)]
+        [InlineData("Cuemon", "u", StringComparison.CurrentCulture, true)]
+        [InlineData("Cuemon", "c", StringComparison.CurrentCultureIgnoreCase, true)]
+        [InlineData("Cuemon", "C", StringComparison.InvariantCulture, true)]
+        [InlineData("Cuemon", "c", StringComparison.InvariantCultureIgnoreCase, true)]
+        [InlineData("Ærø", "Æ", StringComparison.Ordinal, true)]                           // non-ASCII exact
+        [InlineData("Ærø", "æ", StringComparison.Ordinal, false)]                          // non-ASCII case-sensitive miss
+        [InlineData("Ærø", "æ", StringComparison.OrdinalIgnoreCase, true)]                 // non-ASCII case-insensitive hit
+        public void ThrowIfContainsAny_ShouldDetectMatchesAcrossPositionsAndComparisons(string argument, string candidates, StringComparison comparison, bool shouldThrow)
+        {
+            var characters = candidates.ToCharArray();
+            if (shouldThrow)
+            {
+                Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfContainsAny(argument, characters, comparison));
+            }
+            else
+            {
+                Validator.ThrowIfContainsAny(argument, characters, comparison);
+            }
+        }
+
+        [Fact]
+        public void ThrowIfContainsAny_ShouldReportDistinctMatchedCharactersFromArgument()
+        {
+            var argument = "Cuemon";
+            var duplicates = Assert.Throws<ArgumentOutOfRangeException>(() =>
+                Validator.ThrowIfContainsAny(argument, new[] { 'o', 'o' }, StringComparison.Ordinal));
+            Assert.Equal("argument", duplicates.ParamName);
+            Assert.Equal("'o'", duplicates.ActualValue);
+
+            var caseInsensitive = Assert.Throws<ArgumentOutOfRangeException>(() =>
+                Validator.ThrowIfContainsAny(argument, new[] { 'c' }, StringComparison.OrdinalIgnoreCase));
+            Assert.Equal("'C'", caseInsensitive.ActualValue);
+        }
+
+        [Fact]
+        public void ThrowIfContainsAny_ShouldNotThrow_WhenCandidateSetEmpty()
+        {
+            Validator.ThrowIfContainsAny("Cuemon", Array.Empty<char>());
+        }
+
+        [Fact]
+        public void ThrowIfNotContainsAny_ShouldThrow_WhenCandidateSetEmpty()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Validator.ThrowIfNotContainsAny("Cuemon", Array.Empty<char>()));
+        }
     }
 }

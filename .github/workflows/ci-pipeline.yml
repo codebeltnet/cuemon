@@ -391,9 +391,7 @@ jobs:
       environment: Production
       configuration: ${{ inputs.configuration == '' && 'Release' || inputs.configuration }}
     permissions:
-      actions: read
       contents: read
       packages: write
-      id-token: write
     secrets:
-      NUGET_USER: ${{ secrets.NUGET_USER }}
+      NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}

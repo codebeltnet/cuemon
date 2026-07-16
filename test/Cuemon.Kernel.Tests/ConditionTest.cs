@@ -264,6 +264,131 @@ namespace Cuemon
             Assert.False(Condition.IsEnum<DayOfWeek>(" "));
         }
 
+        // Enums covering diverse underlying types, negative values, and [Flags] used by the
+        // legacy-equivalence matrix below.
+        private enum RegularMatrixEnum { Zero = 0, One = 1, Two = 2, Three = 3 }
+
+        private enum SignedMatrixEnum { Neg = -2, MinusOne = -1, Zero = 0, Pos = 2 }
+
+        private enum ByteMatrixEnum : byte { A = 0, B = 1, C = 200 }
+
+        private enum LongMatrixEnum : long { One = 1, Big = 5000000000 }
+
+        [Flags]
+        private enum FlagsMatrixEnum { None = 0, Alpha = 1, Beta = 2, Gamma = 4, All = 7 }
+
+        // Faithful reconstruction of the pre-optimization Condition.IsEnum (Enum.Parse based),
+        // used to prove the optimized Enum.TryParse implementation is behaviorally equivalent.
+        private static bool LegacyIsEnum<T>(string value, bool ignoreCase) where T : struct, IConvertible
+        {
+            if (string.IsNullOrWhiteSpace(value)) { return false; }
+            var enumType = typeof(T);
+            if (!enumType.IsEnum) { return false; }
+            try
+            {
+                var hasFlags = enumType.IsDefined(typeof(FlagsAttribute), false);
+                var result = Enum.Parse(enumType, value, ignoreCase);
+                if (hasFlags && value.IndexOf(',') != -1) { return true; }
+                return Enum.IsDefined(enumType, result);
+            }
+            catch (Exception e) when (Patterns.IsRecoverableException(e))
+            {
+                return false;
+            }
+        }
+
+        private List<string> CollectEnumMismatches<T>(string label, IEnumerable<string> values) where T : struct, IConvertible
+        {
+            var mismatches = new List<string>();
+            foreach (var value in values)
+            {
+                foreach (var ignoreCase in new[] { true, false })
+                {
+                    var legacy = LegacyIsEnum<T>(value, ignoreCase);
+                    var current = Condition.IsEnum<T>(value, o => o.IgnoreCase = ignoreCase);
+                    if (legacy != current)
+                    {
+                        mismatches.Add($"{label}: value={(value ?? "<null>")}, ignoreCase={ignoreCase} -> legacy={legacy}, current={current}");
+                    }
+                }
+            }
+            return mismatches;
+        }
+
+        [Fact]
+        public void IsEnum_ShouldMatchLegacyEnumParseSemantics_AcrossGeneratedMatrix()
+        {
+            var values = new[]
+            {
+                null, "", " ", "\t", "   ",
+                "0", "1", "2", "3", "4", "7", "8", "42", "200", "255", "256",
+                "-1", "-2", "-3", "5000000000", "99999999999999999999999",
+                "One", "one", "ONE", "Two", "Alpha", "alpha", "Beta", "Gamma", "All", "None",
+                "Bogus", "NotADay", "Zero",
+                "1,2", "1, 2", "Alpha,Beta", "Alpha, Beta", "Alpha, Bogus", "Read, Write",
+                ",", "1,", ",1", " 1 ", " One ", "Monday", "monday", "Assembly", "Assembly, Module"
+            };
+
+            var mismatches = new List<string>();
+            mismatches.AddRange(CollectEnumMismatches<RegularMatrixEnum>("RegularMatrixEnum(int)", values));
+            mismatches.AddRange(CollectEnumMismatches<SignedMatrixEnum>("SignedMatrixEnum(int,negative)", values));
+            mismatches.AddRange(CollectEnumMismatches<ByteMatrixEnum>("ByteMatrixEnum(byte)", values));
+            mismatches.AddRange(CollectEnumMismatches<LongMatrixEnum>("LongMatrixEnum(long)", values));
+            mismatches.AddRange(CollectEnumMismatches<FlagsMatrixEnum>("FlagsMatrixEnum([Flags])", values));
+            mismatches.AddRange(CollectEnumMismatches<DayOfWeek>("DayOfWeek", values));
+            mismatches.AddRange(CollectEnumMismatches<AttributeTargets>("AttributeTargets([Flags])", values));
+            mismatches.AddRange(CollectEnumMismatches<ConsoleColor>("ConsoleColor", values));
+            mismatches.AddRange(CollectEnumMismatches<int>("int(non-enum)", values));
+            mismatches.AddRange(CollectEnumMismatches<bool>("bool(non-enum)", values));
+            mismatches.AddRange(CollectEnumMismatches<char>("char(non-enum)", values));
+
+            foreach (var mismatch in mismatches) { TestOutput.WriteLine(mismatch); }
+            Assert.Empty(mismatches);
+        }
+
+        [Theory]
+        [InlineData("-2", true)]   // defined negative value
+        [InlineData("-1", true)]   // defined negative value
+        [InlineData("0", true)]    // defined
+        [InlineData("2", true)]    // defined
+        [InlineData("-3", false)]  // undefined negative value
+        [InlineData("1", false)]   // in range but undefined
+        public void IsEnum_ShouldHandleNegativeAndUndefinedNumericValues(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsEnum<SignedMatrixEnum>(value));
+        }
+
+        [Theory]
+        [InlineData("200", true)]   // defined
+        [InlineData("255", false)]  // within byte range but undefined
+        [InlineData("256", false)]  // overflows the byte underlying type
+        [InlineData("-1", false)]   // negative cannot fit an unsigned byte enum
+        public void IsEnum_ShouldHandleByteBackedOverflowAndUndefined(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsEnum<ByteMatrixEnum>(value));
+        }
+
+        [Theory]
+        [InlineData("99999999999999999999999", false)] // overflows int
+        [InlineData("5000000000", false)]              // overflows int (fits long)
+        public void IsEnum_ShouldReturnFalse_OnNumericOverflow(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsEnum<RegularMatrixEnum>(value));
+        }
+
+        [Theory]
+        [InlineData("All", true)]         // single defined combined member
+        [InlineData("7", true)]           // numeric value equal to a defined member (All)
+        [InlineData("3", false)]          // combined numeric without comma, not a single defined member
+        [InlineData("1,2", false)]        // comma-separated NUMERIC flags are not parsed (names only)
+        [InlineData("Alpha, Beta", true)] // comma-separated flag names
+        [InlineData("Alpha,Gamma", true)] // comma-separated flag names (no spaces)
+        [InlineData("Alpha, Bogus", false)] // one name is not defined
+        public void IsEnum_ShouldHandleCombinedFlagValues(string value, bool expected)
+        {
+            Assert.Equal(expected, Condition.IsEnum<FlagsMatrixEnum>(value));
+        }
+
         [Fact]
         public void NumericAndRangeChecks_ShouldReturnExpectedResults()
         {

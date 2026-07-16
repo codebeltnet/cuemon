@@ -580,6 +580,68 @@ namespace Cuemon
             });
         }
 
+        [Theory]
+        [InlineData("Up", true)]                          // defined name represents the enum
+        [InlineData("Down", true)]                        // defined name
+        [InlineData("1", true)]                           // defined numeric value (Up)
+        [InlineData("0", true)]                           // defined numeric value (Down)
+        [InlineData("42", false)]                         // in-range but undefined numeric value
+        [InlineData("Sideways", false)]                   // undefined name
+        [InlineData("99999999999999999999999", false)]   // numeric overflow
+        [InlineData("", false)]                           // empty
+        [InlineData("   ", false)]                        // whitespace
+        public void ThrowIfEnum_ShouldThrowOnlyWhenValueRepresentsEnum(string value, bool represents)
+        {
+            if (represents)
+            {
+                var ex = Assert.Throws<ArgumentException>(() => Validator.ThrowIfEnum<VerticalDirection>(value, paramName: "arg"));
+                Assert.Equal("arg", ex.ParamName);
+                Assert.StartsWith("Value represents an enumeration.", ex.Message);
+            }
+            else
+            {
+                Validator.ThrowIfEnum<VerticalDirection>(value, paramName: "arg");
+            }
+        }
+
+        [Theory]
+        [InlineData("Up", false)]                         // valid value -> no throw
+        [InlineData("1", false)]                          // defined numeric value -> no throw
+        [InlineData("42", true)]                          // undefined numeric value -> throws
+        [InlineData("Sideways", true)]                    // undefined name -> throws
+        [InlineData("99999999999999999999999", true)]     // numeric overflow -> throws
+        [InlineData("", true)]                            // empty does not represent the enum -> throws
+        public void ThrowIfNotEnum_ShouldThrowOnlyWhenValueDoesNotRepresentEnum(string value, bool throws)
+        {
+            if (throws)
+            {
+                var ex = Assert.Throws<ArgumentException>(() => Validator.ThrowIfNotEnum<VerticalDirection>(value, paramName: "arg"));
+                Assert.Equal("arg", ex.ParamName);
+                Assert.StartsWith("Value does not represents an enumeration.", ex.Message);
+            }
+            else
+            {
+                Validator.ThrowIfNotEnum<VerticalDirection>(value, paramName: "arg");
+            }
+        }
+
+        [Fact]
+        public void ThrowIfEnum_ShouldThrow_ForCommaSeparatedFlagNames()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => Validator.ThrowIfEnum<AttributeTargets>("Assembly, Module", paramName: "arg"));
+            Assert.Equal("arg", ex.ParamName);
+            Assert.StartsWith("Value represents an enumeration.", ex.Message);
+        }
+
+        [Fact]
+        public void ThrowIfEnum_ShouldRespectCaseSensitivity()
+        {
+            // case-insensitive (default): "up" matches Up -> throws
+            Assert.Throws<ArgumentException>(() => Validator.ThrowIfEnum<VerticalDirection>("up"));
+            // case-sensitive: "up" does not match Up -> no throw
+            Validator.ThrowIfEnum<VerticalDirection>("up", ignoreCase: false);
+        }
+
         [Fact]
         public void ThrowIfEqual_ShouldThrowArgumentOutOfRangeException()
         {

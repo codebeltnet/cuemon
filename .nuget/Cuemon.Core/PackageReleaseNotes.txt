@@ -39,6 +39,8 @@ Availability: .NET 11, .NET 10 and .NET Standard 2.0
 - REMOVED ConvertibleOptions class from the Cuemon namespace
 - REMOVED DateSpan struct from the Cuemon namespace
 - REMOVED DateTimeRange class from the Cuemon namespace
+- REMOVED DelimitedString struct from the Cuemon namespace
+- REMOVED DelimitedStringOptions class from the Cuemon namespace
 - REMOVED Decorator class from the Cuemon namespace
 - REMOVED Disposable class from the Cuemon namespace
 - REMOVED DisposableOptions class from the Cuemon namespace
@@ -46,6 +48,7 @@ Availability: .NET 11, .NET 10 and .NET Standard 2.0
 - REMOVED EndianOptions class from the Cuemon namespace
 - REMOVED ExceptionCondition class from the Cuemon namespace
 - REMOVED FinalizeDisposable class from the Cuemon namespace
+- REMOVED FormattingOptions class from the Cuemon namespace
 - REMOVED GuidFormats enum from the Cuemon namespace
 - REMOVED IDecorator interface from the Cuemon namespace
 - REMOVED Patterns class from the Cuemon namespace

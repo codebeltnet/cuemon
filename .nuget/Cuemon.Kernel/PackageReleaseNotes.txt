@@ -39,6 +39,8 @@ Availability: .NET 11, .NET 10 and .NET Standard 2.0
 - ADDED ConvertibleOptions class to the Cuemon namespace
 - ADDED DateSpan struct to the Cuemon namespace
 - ADDED DateTimeRange class to the Cuemon namespace
+- ADDED DelimitedString struct to the Cuemon namespace
+- ADDED DelimitedStringOptions class to the Cuemon namespace
 - ADDED Decorator class to the Cuemon namespace
 - ADDED Disposable class to the Cuemon namespace
 - ADDED DisposableOptions class to the Cuemon namespace
@@ -46,6 +48,7 @@ Availability: .NET 11, .NET 10 and .NET Standard 2.0
 - ADDED EndianOptions class to the Cuemon namespace
 - ADDED ExceptionCondition class to the Cuemon namespace
 - ADDED FinalizeDisposable class to the Cuemon namespace
+- ADDED FormattingOptions class to the Cuemon namespace
 - ADDED GuidFormats enum to the Cuemon namespace
 - ADDED IDecorator interface to the Cuemon namespace
 - ADDED Patterns class to the Cuemon namespace

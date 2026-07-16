@@ -10,6 +10,7 @@ namespace Cuemon
     /// expected <see cref="ArgumentException"/> so the run is not invalidated.
     /// </summary>
     [MemoryDiagnoser]
+    [WarmupCount(3)]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class ValidatorMiscBenchmark
     {

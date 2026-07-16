@@ -10,6 +10,7 @@ namespace Cuemon
     /// Measures the common guard, state, and comparison members of <see cref="Validator"/>.
     /// </summary>
     [MemoryDiagnoser]
+    [WarmupCount(3)]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class ValidatorCoreBenchmark
     {

@@ -35,6 +35,7 @@ namespace Cuemon
     /// <see cref="Validator.ThrowIfDifferent"/>) across representative set-difference scenarios and lengths.
     /// </summary>
     [MemoryDiagnoser]
+    [WarmupCount(3)]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class HasDifferenceBenchmark
     {

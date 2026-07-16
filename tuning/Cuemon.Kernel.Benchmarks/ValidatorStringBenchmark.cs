@@ -10,6 +10,7 @@ namespace Cuemon
     /// the guards away as compile-time constants.
     /// </summary>
     [MemoryDiagnoser]
+    [WarmupCount(3)]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class ValidatorStringBenchmark
     {

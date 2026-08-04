@@ -1,0 +1,8 @@
+Version: 10.6.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- ADDED New package: Cuemon.Extensions.FileProviders.Physical
+
+# New Features
+- ADDED PortablePhysicalFileProvider class for case-insensitive file path resolution within the physical file system

@@ -24,6 +24,7 @@
     <ProjectReference Include="..\Cuemon.Extensions.Data\Cuemon.Extensions.Data.csproj" />
     <ProjectReference Include="..\Cuemon.Extensions.DependencyInjection\Cuemon.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Cuemon.Extensions.Diagnostics\Cuemon.Extensions.Diagnostics.csproj" />
+    <ProjectReference Include="..\Cuemon.Extensions.FileProviders.Physical\Cuemon.Extensions.FileProviders.Physical.csproj" />
     <ProjectReference Include="..\Cuemon.Extensions.Hosting\Cuemon.Extensions.Hosting.csproj" />
     <ProjectReference Include="..\Cuemon.Extensions.IO\Cuemon.Extensions.IO.csproj" />
     <ProjectReference Include="..\Cuemon.Extensions.Net\Cuemon.Extensions.Net.csproj" />

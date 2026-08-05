@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example retries an asynchronous operation until it succeeds or the retry window closes. The delegate receives the configured cancellation token, returns `UnsuccessfulValue` twice before returning `SuccessfulValue`, and the output confirms the operation succeeded after three attempts.
+The following example retries an asynchronous operation until it succeeds or the retry window closes. The delegate returns `UnsuccessfulValue` twice before returning `SuccessfulValue`, and the configured cancellation token is observed between attempts.
 
 ```csharp
 using System;
@@ -21,12 +21,12 @@ public class AwaiterExample
         var attempt = 0;
         var cancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var result = await Awaiter.RunUntilSuccessfulOrTimeoutAsync(async cancellationToken =>
+        var result = await Awaiter.RunUntilSuccessfulOrTimeoutAsync(async () =>
         {
             attempt++;
             if (attempt < 3)
             {
-                await Task.Delay(50, cancellationToken);
+                await Task.Delay(50);
                 return new UnsuccessfulValue();
             }
             return new SuccessfulValue();

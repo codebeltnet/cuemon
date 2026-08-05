@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use <see cref="AsyncRunOptions"/> to configure timeout, retry delay, the optional zero-delay safeguard, and the time provider used by an asynchronous operation.
+The following example demonstrates how to use <see cref="AsyncRunOptions"/> to configure timeout, retry delay, maximum attempts, and inherited cancellation for an asynchronous operation.
 
 ```csharp
 using System;
@@ -21,11 +21,11 @@ public class AsyncRunOptionsExample
         {
             Timeout = TimeSpan.FromSeconds(30),
             Delay = TimeSpan.FromMilliseconds(500),
-            TimeProvider = TimeProvider.System
+            MaximumAttempts = 3
         };
         Console.WriteLine(options.Timeout); // 00:00:30
         Console.WriteLine(options.Delay);   // 00:00:00.5000000
-        Console.WriteLine(options.TimeProvider == TimeProvider.System); // True
+        Console.WriteLine(options.MaximumAttempts); // 3
 
         // Use with cancellation support
         var withCancellation = new AsyncRunOptions
@@ -47,8 +47,7 @@ public class AsyncRunOptionsExample
         var defaults = new AsyncRunOptions();
         Console.WriteLine(defaults.Timeout); // 00:00:05
         Console.WriteLine(defaults.Delay);   // 00:00:00.1000000
-        Console.WriteLine(defaults.MaximumAttempts == null); // True
-        Console.WriteLine(defaults.TimeProvider == TimeProvider.System); // True
+        Console.WriteLine(defaults.MaximumAttempts); // 0
         Console.WriteLine(withCancellation.CancellationToken.CanBeCanceled); // True
     }
 }

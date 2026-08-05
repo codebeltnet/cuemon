@@ -30,11 +30,7 @@ namespace Cuemon.Threading
         ///     </item>
         ///     <item>
         ///         <term><see cref="MaximumAttempts"/></term>
-        ///         <description><c>null</c> (no explicit attempt limit)</description>
-        ///     </item>
-        ///     <item>
-        ///         <term><see cref="TimeProvider"/></term>
-        ///         <description><see cref="TimeProvider.System"/></description>
+        ///         <description><c>0</c> (no explicit attempt limit)</description>
         ///     </item>
         /// </list>
         /// </remarks>
@@ -42,7 +38,6 @@ namespace Cuemon.Threading
         {
             Timeout = TimeSpan.FromSeconds(5);
             Delay = TimeSpan.FromMilliseconds(100);
-            TimeProvider = TimeProvider.System;
         }
 
         /// <summary>
@@ -61,7 +56,6 @@ namespace Cuemon.Threading
         /// <value>The configured delay between unsuccessful asynchronous operation attempts. The default is 100 milliseconds.</value>
         /// <remarks>
         /// The effective delay is capped to the remaining <see cref="Timeout"/> window. The value must not be negative.
-        /// When set to <see cref="TimeSpan.Zero"/>, <see cref="MaximumAttempts"/> must be configured with a positive value to prevent an unbounded tight retry loop.
         /// </remarks>
         public TimeSpan Delay { get; set; }
 
@@ -76,31 +70,22 @@ namespace Cuemon.Threading
         public int MaximumAttempts { get; set; }
 
         /// <summary>
-        /// Gets or sets the time provider used to measure elapsed time and schedule retry delays.
-        /// </summary>
-        /// <value>The time provider used to measure elapsed time and schedule retry delays. The default is <see cref="TimeProvider.System"/>.</value>
-        public TimeProvider TimeProvider { get; set; }
-
-        /// <summary>
         /// Determines whether the public read-write properties of this instance are in a valid state.
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// <see cref="Timeout"/> or <see cref="Delay"/> is negative.
         /// -or-
-        /// <see cref="MaximumAttempts"/> is less than or equal to zero.
+        /// <see cref="MaximumAttempts"/> is negative.
         /// -or-
-        /// <see cref="Delay"/> is <see cref="TimeSpan.Zero"/> and <see cref="MaximumAttempts"/> is <c>null</c>.
-        /// -or-
-        /// <see cref="TimeProvider"/> is <c>null</c>.
+        /// <see cref="Delay"/> is <see cref="TimeSpan.Zero"/> and <see cref="MaximumAttempts"/> is not configured with a positive value.
         /// </exception>
         /// <remarks>This method is expected to throw exceptions when one or more conditions fails to be in a valid state.</remarks>
         public void ValidateOptions()
         {
             Validator.ThrowIfInvalidState(Timeout < TimeSpan.Zero, $"{nameof(Timeout)} cannot be negative.");
             Validator.ThrowIfInvalidState(Delay < TimeSpan.Zero, $"{nameof(Delay)} cannot be negative.");
-            Validator.ThrowIfInvalidState(TimeProvider == null, $"{nameof(TimeProvider)} cannot be null.");
-            Validator.ThrowIfInvalidState(MaximumAttempts < 0, $"{nameof(MaximumAttempts)} must be greater than zero when specified.");
-            if (Delay == TimeSpan.Zero) { Validator.ThrowIfInvalidState(MaximumAttempts <= 0, $"{nameof(MaximumAttempts)} must be specified when {nameof(Delay)} is {nameof(TimeSpan)}.{nameof(TimeSpan.Zero)} to prevent an unbounded retry loop."); }
+            Validator.ThrowIfInvalidState(MaximumAttempts < 0, $"{nameof(MaximumAttempts)} cannot be negative.");
+            Validator.ThrowIfInvalidState(Delay == TimeSpan.Zero && MaximumAttempts <= 0, $"{nameof(MaximumAttempts)} must be configured with a positive value when {nameof(Delay)} is {nameof(TimeSpan)}.{nameof(TimeSpan.Zero)} to prevent an unbounded retry loop.");
         }
     }
 }

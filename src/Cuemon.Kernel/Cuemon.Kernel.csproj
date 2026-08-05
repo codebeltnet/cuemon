@@ -10,8 +10,4 @@
     <PackageId>Cuemon.Kernel</PackageId>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard2'))">
-    <PackageReference Include="Microsoft.Bcl.TimeProvider" />
-  </ItemGroup>
-
 </Project>

@@ -203,6 +203,8 @@ namespace Cuemon.Threading
 
             var result = await Run(Method, TimeSpan.FromMilliseconds(80), RetryDelay);
 
+            TestOutput.WriteLine("Call-count: " + callCount);
+
             Assert.IsType<UnsuccessfulValue>(result);
             Assert.False(result.Succeeded);
             Assert.Null(result.Failure);

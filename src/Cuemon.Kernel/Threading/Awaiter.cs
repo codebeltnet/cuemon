@@ -32,7 +32,7 @@ namespace Cuemon.Threading
         /// </exception>
         /// <remarks>
         /// The retry window begins immediately before the initial invocation. The initial invocation always occurs, even when <see cref="AsyncRunOptions.Timeout"/> is <see cref="TimeSpan.Zero"/>.
-        /// No new invocation begins after the timeout deadline or once <see cref="AsyncRunOptions.MaximumAttempts"/> is reached. After an unsuccessful attempt or a caught exception, the next delay is capped to the smaller of <see cref="AsyncRunOptions.Delay"/> and the remaining timeout window.
+        /// No new invocation begins after the timeout deadline or once <see cref="AsyncRunOptions.MaximumAttempts"/> is reached. After an unsuccessful attempt or a caught exception, the next delay is capped to the smaller of <see cref="AsyncRunOptions.Delay"/> and the remaining timeout window. Positive fractional-millisecond retry delays are rounded up to the next whole millisecond when the delay is scheduled.
         /// When <see cref="AsyncRunOptions.Delay"/> is <see cref="TimeSpan.Zero"/>, <see cref="AsyncRunOptions.MaximumAttempts"/> must be configured with a positive value.
         /// <para>
         /// Cancellation is resolved from <see cref="AsyncOptions.CancellationToken"/> immediately before each attempt and immediately before each retry delay.
@@ -65,7 +65,7 @@ namespace Cuemon.Threading
             Exception firstException = null;
             List<Exception> exceptions = null;
 
-            while (initialAttempt || !HasReachedTimeout(startedAt , options.Timeout))
+            while (initialAttempt || !HasReachedTimeout(startedAt, options.Timeout))
             {
                 initialAttempt = false;
 
@@ -82,7 +82,7 @@ namespace Cuemon.Threading
                 catch (Exception ex) when (ex is not OperationCanceledException && Patterns.IsRecoverableException(ex))
                 {
                     CaptureException(ref firstException, ref exceptions, ex);
-                    if (!TryGetRetryDelay(startedAt , options, attemptCount, out retryDelay)) { break; }
+                    if (!TryGetRetryDelay(startedAt, options, attemptCount, out retryDelay)) { break; }
                     await DelayAsync(options, retryDelay).ConfigureAwait(false);
                     continue;
                 }
@@ -90,7 +90,7 @@ namespace Cuemon.Threading
                 if (conditionalValue == null) { throw new InvalidOperationException("The specified delegate returned a null ConditionalValue."); }
                 if (conditionalValue.Succeeded) { return conditionalValue; }
 
-                if (!TryGetRetryDelay(startedAt , options, attemptCount, out retryDelay)) { break; }
+                if (!TryGetRetryDelay(startedAt, options, attemptCount, out retryDelay)) { break; }
                 await DelayAsync(options, retryDelay).ConfigureAwait(false);
             }
 
@@ -149,7 +149,19 @@ namespace Cuemon.Threading
 
             var delayToken = options.CancellationToken;
             delayToken.ThrowIfCancellationRequested();
-            return Task.Delay(delay, delayToken);
+            return Task.Delay(NormalizeDelay(delay), delayToken);
+        }
+
+        private static TimeSpan NormalizeDelay(TimeSpan delay)
+        {
+            var remainder = delay.Ticks % TimeSpan.TicksPerMillisecond;
+            if (remainder == 0) { return delay; }
+
+            // Task.Delay uses whole-millisecond resolution; round up so capped retry windows do not collapse into zero-length delays.
+            var adjustment = TimeSpan.TicksPerMillisecond - remainder;
+            return delay.Ticks > TimeSpan.MaxValue.Ticks - adjustment
+                ? TimeSpan.MaxValue
+                : TimeSpan.FromTicks(delay.Ticks + adjustment);
         }
 
         private static void CaptureException(ref Exception firstException, ref List<Exception> exceptions, Exception exception)

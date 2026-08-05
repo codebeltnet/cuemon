@@ -55,7 +55,7 @@ namespace Cuemon.Threading
         /// </summary>
         /// <value>The configured delay between unsuccessful asynchronous operation attempts. The default is 100 milliseconds.</value>
         /// <remarks>
-        /// The effective delay is capped to the remaining <see cref="Timeout"/> window. The value must not be negative.
+        /// The effective delay is capped to the remaining <see cref="Timeout"/> window. Positive fractional-millisecond delays are rounded up to the next whole millisecond when the retry delay is scheduled. The value must not be negative.
         /// </remarks>
         public TimeSpan Delay { get; set; }
 

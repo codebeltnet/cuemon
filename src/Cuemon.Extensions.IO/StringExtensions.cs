@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
@@ -50,7 +50,11 @@ namespace Cuemon.Extensions.IO
             {
                 var bytes = Convertible.GetBytes(value, Patterns.ConfigureExchange<AsyncEncodingOptions, EncodingOptions>(setup));
 #if NETSTANDARD
+#if NETSTANDARD2_0
                 await ms.WriteAsync(bytes, 0, bytes.Length, token).ConfigureAwait(false);
+#else
+                await ms.WriteAsync(bytes, token).ConfigureAwait(false);
+#endif
 #else
                 await ms.WriteAsync(bytes.AsMemory(0, bytes.Length), token).ConfigureAwait(false);
 #endif

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 using System.Text;
 
 namespace Cuemon.Extensions.Runtime.Serialization
@@ -41,7 +42,11 @@ namespace Cuemon.Extensions.Runtime.Serialization
         {
             foreach (var child in node.GetChildren())
             {
+#if NETSTANDARD
                 sb.AppendLine($"{new string(' ', child.Depth)}{child.GetPath()}"); // MemberReference.Name
+#else
+                sb.AppendLine(CultureInfo.InvariantCulture, $"{new string(' ', child.Depth)}{child.GetPath()}"); // MemberReference.Name
+#endif
                 ToString(sb, child);
             }
         }

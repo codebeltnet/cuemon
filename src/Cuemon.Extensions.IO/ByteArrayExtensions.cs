@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +40,11 @@ namespace Cuemon.Extensions.IO
             return AsyncPatterns.SafeInvokeAsync<Stream>(() => new MemoryStream(bytes.Length), async (ms, cti) =>
             {
 #if NETSTANDARD
+#if NETSTANDARD2_0
                 await ms.WriteAsync(bytes, 0, bytes.Length, cti).ConfigureAwait(false);
+#else
+                await ms.WriteAsync(bytes, cti).ConfigureAwait(false);
+#endif
 #else
                 await ms.WriteAsync(bytes.AsMemory(0, bytes.Length), cti).ConfigureAwait(false);
 #endif

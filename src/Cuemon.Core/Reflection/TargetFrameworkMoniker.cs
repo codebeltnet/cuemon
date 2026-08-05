@@ -17,7 +17,7 @@ public static class TargetFrameworkMoniker
     /// <returns>The parsed target framework moniker, or <see langword="null"/> if <paramref name="frameworkNameOrTargetFrameworkMoniker"/> could not be parsed as a supported target framework moniker.</returns>
     public static string Parse(string frameworkNameOrTargetFrameworkMoniker)
     {
-        TryParse(frameworkNameOrTargetFrameworkMoniker, out var targetFrameworkMoniker);
+        _ = TryParse(frameworkNameOrTargetFrameworkMoniker, out var targetFrameworkMoniker);
         return targetFrameworkMoniker;
     }
 
@@ -46,7 +46,7 @@ public static class TargetFrameworkMoniker
     /// <returns>The parsed target framework moniker, or <see langword="null"/> if <paramref name="frameworkName"/> could not be parsed as a supported target framework moniker.</returns>
     public static string Parse(FrameworkName frameworkName)
     {
-        TryParse(frameworkName, out var targetFrameworkMoniker);
+        _ = TryParse(frameworkName, out var targetFrameworkMoniker);
         return targetFrameworkMoniker;
     }
 

@@ -47,10 +47,13 @@ namespace Cuemon.AspNetCore.Diagnostics
                         foreach (var metric in serverTimingMetrics)
                         {
                             var logLevel = options.LogLevelSelector(metric);
-                            logger.Log(logLevel, "ServerTimingMetric {{ Name: {Name}, Duration: {Duration}ms, Description: \"{Description}\" }}",
-                                metric.Name,
-                                metric.Duration?.TotalMilliseconds.ToString("F1", CultureInfo.InvariantCulture) ?? 0.ToString("F1", CultureInfo.InvariantCulture),
-                                metric.Description ?? "N/A");
+                            if (logger.IsEnabled(logLevel))
+                            {
+                                logger.Log(logLevel, "ServerTimingMetric {{ Name: {Name}, Duration: {Duration}ms, Description: \"{Description}\" }}",
+                                    metric.Name,
+                                    metric.Duration?.TotalMilliseconds.ToString("F1", CultureInfo.InvariantCulture) ?? 0.ToString("F1", CultureInfo.InvariantCulture),
+                                    metric.Description ?? "N/A");
+                            }
                         }
                     }
                 }

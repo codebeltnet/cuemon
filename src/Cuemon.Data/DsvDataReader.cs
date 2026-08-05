@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
@@ -145,9 +145,9 @@ namespace Cuemon.Data
             if (line != null)
             {
                 var tb = new TokenBuilder(Delimiter, Qualifier, Header.Length).Append(line);
-                while (!tb.IsValid && !Reader.EndOfStream)
+                while (!tb.IsValid && await readLineAsyncCallback() is { } nextLine)
                 {
-                    tb.Append(await readLineAsyncCallback());
+                    tb.Append(nextLine);
                 }
 
                 RowCount++;

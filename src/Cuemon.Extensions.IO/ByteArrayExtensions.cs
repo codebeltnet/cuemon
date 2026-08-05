@@ -7,14 +7,14 @@ using Cuemon.Threading;
 namespace Cuemon.Extensions.IO
 {
     /// <summary>
-    /// Extension methods for the <see cref="T:byte[]"/>.
+    /// Extension methods for the <see cref="byte"/> array.
     /// </summary>
     public static class ByteArrayExtensions
     {
         /// <summary>
         /// Converts the specified <paramref name="bytes"/> to its equivalent <see cref="Stream"/> representation.
         /// </summary>
-        /// <param name="bytes">The <see cref="T:byte[]"/> to extend.</param>
+        /// <param name="bytes">The <see cref="byte"/> array to extend.</param>
         /// <returns>A <see cref="Stream"/> that is equivalent to <paramref name="bytes"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="bytes"/> cannot be null.
@@ -28,7 +28,7 @@ namespace Cuemon.Extensions.IO
         /// <summary>
         /// Converts the specified <paramref name="bytes"/> to its equivalent <see cref="Stream"/> representation.
         /// </summary>
-        /// <param name="bytes">The <see cref="T:byte[]"/> to extend.</param>
+        /// <param name="bytes">The <see cref="byte"/> array to extend.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="Stream"/> that is equivalent to <paramref name="bytes"/>.</returns>
         /// <exception cref="ArgumentNullException">

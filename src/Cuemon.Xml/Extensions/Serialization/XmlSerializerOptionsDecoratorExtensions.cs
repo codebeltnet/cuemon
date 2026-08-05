@@ -12,7 +12,7 @@ namespace Cuemon.Xml.Serialization
         /// <summary>
         /// Applies the enclosed <see cref="XmlSerializerOptions" /> of the specified <paramref name="decorator" /> to the function delegate <see cref="XmlConvert.DefaultSettings"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{XmlSerializerOptions}" /> to extend.</param>
+        /// <param name="decorator">The <see cref="IDecorator{XmlSerializerOptions}" /> to extend.</param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>

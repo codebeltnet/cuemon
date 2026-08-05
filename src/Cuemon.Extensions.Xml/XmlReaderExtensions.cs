@@ -16,7 +16,7 @@ namespace Cuemon.Extensions.Xml
         /// Converts the XML hierarchy of the <paramref name="reader"/> into an <see cref="IHierarchy{T}"/>.
         /// </summary>
         /// <param name="reader">The <see cref="XmlReader"/> to extend.</param>
-        /// <returns>An <see cref="T:IHierarchy{DataPair}"/> implementation.</returns>
+        /// <returns>An <see cref="IHierarchy{DataPair}"/> implementation.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="reader"/> cannot be null.
         /// </exception>

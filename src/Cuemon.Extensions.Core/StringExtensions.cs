@@ -25,11 +25,11 @@ namespace Cuemon.Extensions
         }
 
         /// <summary>
-        /// Converts the specified <paramref name="input"/> to its equivalent <see cref="T:byte[]"/> representation.
+        /// Converts the specified <paramref name="input"/> to its equivalent <see cref="byte"/> array representation.
         /// </summary>
-        /// <param name="input">The <see cref="string"/> to be converted into a <see cref="T:byte[]"/>.</param>
+        /// <param name="input">The <see cref="string"/> to be converted into a <see cref="byte"/> array.</param>
         /// <param name="setup">The <see cref="EncodingOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <returns>A <see cref="byte"/> array that is equivalent to <paramref name="input"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="input"/> cannot be null.
         /// </exception>
@@ -43,10 +43,10 @@ namespace Cuemon.Extensions
         }
 
         /// <summary>
-        /// Converts the specified <paramref name="input"/> of URL-safe base64 characters to its equivalent <see cref="T:byte[]"/> representation.
+        /// Converts the specified <paramref name="input"/> of URL-safe base64 characters to its equivalent <see cref="byte"/> array representation.
         /// </summary>
         /// <param name="input">The <see cref="string"/> to extend.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <returns>A <see cref="byte"/> array that is equivalent to <paramref name="input"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="input"/> cannot be null.
         /// </exception>
@@ -84,10 +84,10 @@ namespace Cuemon.Extensions
         }
 
         /// <summary>
-        /// Converts the specified <paramref name="input"/> of binary digits to its equivalent <see cref="T:byte[]"/> representation.
+        /// Converts the specified <paramref name="input"/> of binary digits to its equivalent <see cref="byte"/> array representation.
         /// </summary>
         /// <param name="input">The <see cref="string"/> to extend.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <returns>A <see cref="byte"/> array that is equivalent to <paramref name="input"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="input"/> cannot be null.
         /// </exception>
@@ -256,11 +256,11 @@ namespace Cuemon.Extensions
         }
 
         /// <summary>
-        /// Returns a <see cref="T:string[]"/> that contain the substrings of <paramref name="value"/> delimited by a <see cref="DelimitedStringOptions.Delimiter"/> that may be quoted by <see cref="DelimitedStringOptions.Qualifier"/>.
+        /// Returns a <see cref="string"/> array that contain the substrings of <paramref name="value"/> delimited by a <see cref="DelimitedStringOptions.Delimiter"/> that may be quoted by <see cref="DelimitedStringOptions.Qualifier"/>.
         /// </summary>
         /// <param name="value">The <see cref="string"/> to extend.</param>
         /// <param name="setup">The <see cref="DelimitedStringOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:string[]"/> that contain the substrings of <paramref name="value"/> delimited by a <see cref="DelimitedStringOptions.Delimiter"/> and optionally surrounded within <see cref="DelimitedStringOptions.Qualifier"/>.</returns>
+        /// <returns>A <see cref="string"/> array that contain the substrings of <paramref name="value"/> delimited by a <see cref="DelimitedStringOptions.Delimiter"/> and optionally surrounded within <see cref="DelimitedStringOptions.Qualifier"/>.</returns>
         /// <remarks>
         /// This method was inspired by two articles on StackOverflow @ http://stackoverflow.com/questions/2807536/split-string-in-c-sharp and https://stackoverflow.com/questions/3776458/split-a-comma-separated-string-with-both-quoted-and-unquoted-strings.
         /// The default implementation conforms with the RFC-4180 standard.

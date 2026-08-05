@@ -20,7 +20,7 @@ namespace Cuemon.Data.Integrity
         /// <summary>
         /// Initializes a new instance of the <see cref="ChecksumBuilder"/> class.
         /// </summary>
-        /// <param name="checksum">A <see cref="T:byte[]"/> containing a checksum of the data this instance represents.</param>
+        /// <param name="checksum">A <see cref="byte"/> array containing a checksum of the data this instance represents.</param>
         /// <param name="hashFactory">The function delegate that is invoked to produce the <see cref="HashResult"/>.</param>
         public ChecksumBuilder(byte[] checksum, Func<Hash> hashFactory)
         {
@@ -56,7 +56,7 @@ namespace Cuemon.Data.Integrity
         /// <summary>
         /// Combines the <paramref name="additionalChecksum" /> to the representation of this instance.
         /// </summary>
-        /// <param name="additionalChecksum">A <see cref="T:byte[]"/> containing a checksum of the additional data this instance must represent.</param>
+        /// <param name="additionalChecksum">A <see cref="byte"/> array containing a checksum of the additional data this instance must represent.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         public virtual ChecksumBuilder CombineWith(byte[] additionalChecksum)
         {
@@ -77,7 +77,7 @@ namespace Cuemon.Data.Integrity
         /// <summary>
         /// Determines whether the specified <see cref="object" /> is equal to this instance.
         /// </summary>
-        /// <param name="obj">The <see cref="T:System.Object" /> to compare with the current <see cref="T:System.Object" />.</param>
+        /// <param name="obj">The <see cref="System.Object" /> to compare with the current <see cref="System.Object" />.</param>
         /// <returns><c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {

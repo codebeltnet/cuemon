@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Threading.Tasks;
 using Cuemon.AspNetCore.Diagnostics;
 using Cuemon.AspNetCore.Http.Headers;
@@ -20,9 +20,9 @@ namespace Cuemon.Extensions.AspNetCore.Http.Headers
         /// <summary>
         /// Called asynchronously before the <paramref name="bodyStream" /> is conditionally written to the response.
         /// </summary>
-        /// <param name="context">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext" /> of the current request.</param>
-        /// <param name="bodyStream">The intercepted <see cref="T:System.IO.Stream" /> of the response body.</param>
-        /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> that represents the execution of this validator.</returns>
+        /// <param name="context">The <see cref="HttpContext" /> of the current request.</param>
+        /// <param name="bodyStream">The intercepted <see cref="Stream" /> of the response body.</param>
+        /// <returns>A <see cref="Task" /> that represents the execution of this validator.</returns>
         public Task ProcessAsync(HttpContext context, Stream bodyStream)
         {
             var serverTiming = context.RequestServices.GetService<IServerTiming>();

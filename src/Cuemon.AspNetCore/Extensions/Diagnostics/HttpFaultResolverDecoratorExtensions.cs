@@ -12,14 +12,14 @@ namespace Cuemon.AspNetCore.Diagnostics
     public static class HttpFaultResolverDecoratorExtensions
     {
         /// <summary>
-        /// Adds a new <see cref="HttpExceptionDescriptor"/> to the enclosed <see cref="T:IList{FaultResolver}"/> of the <paramref name="decorator"/> from the parameters provided.
+        /// Adds a new <see cref="HttpExceptionDescriptor"/> to the enclosed <see cref="IList{FaultResolver}"/> of the <paramref name="decorator"/> from the parameters provided.
         /// </summary>
         /// <typeparam name="T">The type of the <see cref="HttpStatusCodeException"/> to associate with a <see cref="HttpFaultResolver"/>.</typeparam>
         /// <param name="decorator">The <see cref="IDecorator{T}"/> to extend.</param>
         /// <param name="message">The message that explains the reason for the failure.</param>
         /// <param name="helpLink">The optional link to a help page associated with this failure.</param>
         /// <param name="exceptionValidator">The function delegate that evaluates an <see cref="Exception"/>.</param>
-        /// <returns>The <see cref="T:IDecorator{IList{FaultResolver}}"/> instance.</returns>
+        /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -42,7 +42,7 @@ namespace Cuemon.AspNetCore.Diagnostics
         }
 
         /// <summary>
-        /// Adds a new <see cref="HttpExceptionDescriptor"/> to the enclosed <see cref="T:IList{FaultResolver}"/> of the <paramref name="decorator"/> from the parameters provided.
+        /// Adds a new <see cref="HttpExceptionDescriptor"/> to the enclosed <see cref="IList{FaultResolver}"/> of the <paramref name="decorator"/> from the parameters provided.
         /// </summary>
         /// <typeparam name="T">The type of the <see cref="Exception"/> to associate with a <see cref="HttpFaultResolver"/>.</typeparam>
         /// <param name="decorator">The <see cref="IDecorator{T}"/> to extend.</param>
@@ -51,7 +51,7 @@ namespace Cuemon.AspNetCore.Diagnostics
         /// <param name="message">The message that explains the reason for the failure.</param>
         /// <param name="helpLink">The optional link to a help page associated with this failure.</param>
         /// <param name="exceptionValidator">The function delegate that evaluates an <see cref="Exception"/>.</param>
-        /// <returns>The <see cref="T:IDecorator{IList{FaultResolver}}"/> instance.</returns>
+        /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -78,13 +78,13 @@ namespace Cuemon.AspNetCore.Diagnostics
         }
 
         /// <summary>
-        /// Adds the specified function delegate <paramref name="exceptionDescriptorResolver"/> and function delegate <paramref name="exceptionValidator"/> to the enclosed <see cref="T:IList{FaultResolver}"/> of the <paramref name="decorator"/>.
+        /// Adds the specified function delegate <paramref name="exceptionDescriptorResolver"/> and function delegate <paramref name="exceptionValidator"/> to the enclosed <see cref="IList{FaultResolver}"/> of the <paramref name="decorator"/>.
         /// </summary>
         /// <typeparam name="T">The type of the <see cref="Exception"/> to associate with a <see cref="HttpFaultResolver"/>.</typeparam>
         /// <param name="decorator">The <see cref="IDecorator{T}"/> to extend.</param>
         /// <param name="exceptionDescriptorResolver">The function delegate that associates an <see cref="Exception"/> of type <typeparamref name="T"/> with an <see cref="HttpExceptionDescriptor"/>.</param>
         /// <param name="exceptionValidator">The function delegate that evaluates an <see cref="Exception"/>.</param>
-        /// <returns>The <see cref="T:IDecorator{IList{FaultResolver}}"/> instance.</returns>
+        /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>

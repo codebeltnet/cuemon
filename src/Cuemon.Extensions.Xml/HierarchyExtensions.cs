@@ -16,9 +16,9 @@ namespace Cuemon.Extensions.Xml
         /// <summary>
         /// Determines whether the <paramref name="hierarchy"/> implements <see cref="XmlIgnoreAttribute"/>.
         /// </summary>
-        /// <param name="hierarchy">The <see cref="T:IHierarchy{object}"/> to extend.</param>
+        /// <param name="hierarchy">The <see cref="IHierarchy{Object}"/> to extend.</param>
         /// <returns>
-        /// 	<c>true</c> if the <see cref="T:IHierarchy{object}"/> implements <see cref="XmlIgnoreAttribute"/>; otherwise, <c>false</c>.
+        /// 	<c>true</c> if the <see cref="IHierarchy{Object}"/> implements <see cref="XmlIgnoreAttribute"/>; otherwise, <c>false</c>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="hierarchy"/> cannot be null.
@@ -32,9 +32,9 @@ namespace Cuemon.Extensions.Xml
         /// <summary>
         /// Determines whether the <paramref name="hierarchy"/> implements either <see cref="IEnumerable"/> or <see cref="IEnumerable{T}"/> and is not a <see cref="string"/>.
         /// </summary>
-        /// <param name="hierarchy">The <see cref="T:IHierarchy{object}"/> to extend.</param>
+        /// <param name="hierarchy">The <see cref="IHierarchy{Object}"/> to extend.</param>
         /// <returns>
-        /// 	<c>true</c> if the <see cref="T:IHierarchy{object}"/> implements either <see cref="IEnumerable"/> or <see cref="IEnumerable{T}"/> and is not a <see cref="string"/>; otherwise, <c>false</c>.
+        /// 	<c>true</c> if the <see cref="IHierarchy{Object}"/> implements either <see cref="IEnumerable"/> or <see cref="IEnumerable{T}"/> and is not a <see cref="string"/>; otherwise, <c>false</c>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="hierarchy"/> cannot be null.
@@ -46,9 +46,9 @@ namespace Cuemon.Extensions.Xml
         }
 
         /// <summary>
-        /// Resolves an <see cref="XmlQualifiedEntity"/> from either the specified <paramref name="qualifiedEntity"/> or from the <see cref="T:IHierarchy{object}"/>.
+        /// Resolves an <see cref="XmlQualifiedEntity"/> from either the specified <paramref name="qualifiedEntity"/> or from the <see cref="IHierarchy{Object}"/>.
         /// </summary>
-        /// <param name="hierarchy">The <see cref="T:IHierarchy{object}"/> to extend.</param>
+        /// <param name="hierarchy">The <see cref="IHierarchy{Object}"/> to extend.</param>
         /// <param name="qualifiedEntity">The optional <see cref="XmlQualifiedEntity"/> that is part of the equation.</param>
         /// <returns>An <see cref="XmlQualifiedEntity"/> that is either from <paramref name="qualifiedEntity"/>, embedded within <paramref name="hierarchy"/>, <see cref="XmlRootAttribute"/>, <see cref="XmlElementAttribute"/>, <see cref="XmlAttributeAttribute"/> or resolved from either member name or member type (in that order).</returns>
         /// <exception cref="ArgumentNullException">
@@ -64,7 +64,7 @@ namespace Cuemon.Extensions.Xml
         /// Orders a sequence of <see cref="IHierarchy{T}"/> from <paramref name="hierarchies"/> by nodes having an <see cref="XmlAttributeAttribute"/> decoration.
         /// </summary>
         /// <typeparam name="T">The type of the node represented in the hierarchical structure.</typeparam>
-        /// <param name="hierarchies">The <see cref="T:IEnumerable{IHierarchy{object}}"/> to extend.</param>
+        /// <param name="hierarchies">The sequence of <see cref="IHierarchy{Object}"/> values to extend.</param>
         /// <returns>A sequence of <see cref="IHierarchy{T}"/> that is sorted by nodes having an <see cref="XmlAttributeAttribute"/> decoration first.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="hierarchies"/> cannot be null.

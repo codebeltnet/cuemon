@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +7,7 @@ using Microsoft.Net.Http.Headers;
 namespace Cuemon.AspNetCore.Mvc
 {
     /// <summary>
-    /// An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult" /> that returns a SeeOther (303) response with a Location header to the supplied URL.
+    /// An <see cref="ActionResult" /> that returns a SeeOther (303) response with a Location header to the supplied URL.
     /// </summary>
     public class SeeOtherResult : StatusCodeResult
     {

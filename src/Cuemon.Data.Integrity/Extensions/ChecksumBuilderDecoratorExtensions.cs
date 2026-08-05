@@ -149,7 +149,7 @@ namespace Cuemon.Data.Integrity
         /// </summary>
         /// <typeparam name="T">The type of the <see cref="ChecksumBuilder"/>.</typeparam>
         /// <param name="decorator">The <see cref="IDecorator{T}"/> to extend.</param>
-        /// <param name="additionalChecksum">A <see cref="T:byte[]"/> containing a checksum of the additional data the enclosed <see cref="ChecksumBuilder"/> of the <paramref name="decorator"/> must represent.</param>
+        /// <param name="additionalChecksum">A <see cref="byte"/> array containing a checksum of the additional data the enclosed <see cref="ChecksumBuilder"/> of the <paramref name="decorator"/> must represent.</param>
         /// <returns>An updated instance of the enclosed <see cref="ChecksumBuilder"/> of the <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.

@@ -100,7 +100,7 @@ namespace Cuemon
         /// <summary>
         /// Returns a new string array in which all the specified <paramref name="fragments"/> has been deleted from the specified <paramref name="source"/> array.
         /// </summary>
-        /// <param name="source">The <see cref="T:string[]"/> value to perform the sweep on.</param>
+        /// <param name="source">The <see cref="string"/> array value to perform the sweep on.</param>
         /// <param name="fragments">The fragments containing the characters and/or words to delete.</param>
         /// <returns>A new string array that is equivalent to <paramref name="source"/> except for the removed characters and/or words.</returns>
         /// <remarks>This method performs an ordinal (case-sensitive and culture-insensitive) comparison. The search begins at the first character position of this string and continues through the last character position.</remarks>
@@ -112,7 +112,7 @@ namespace Cuemon
         /// <summary>
         /// Returns a new string array in which all the specified <paramref name="fragments"/> has been deleted from the specified <paramref name="source"/> array.
         /// </summary>
-        /// <param name="source">The <see cref="T:string[]"/> value to perform the sweep on.</param>
+        /// <param name="source">The <see cref="string"/> array value to perform the sweep on.</param>
         /// <param name="comparison">One of the enumeration values that specifies the rules to use in the comparison.</param>
         /// <param name="fragments">The fragments containing the characters and/or words to delete.</param>
         /// <returns>A new string array that is equivalent to <paramref name="source"/> except for the removed characters and/or words.</returns>

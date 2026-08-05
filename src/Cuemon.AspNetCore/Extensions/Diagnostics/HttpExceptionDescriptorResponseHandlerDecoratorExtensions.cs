@@ -16,10 +16,10 @@ namespace Cuemon.AspNetCore.Diagnostics
         /// </summary>
         /// <param name="decorator">The <see cref="IDecorator{T}"/> to extend.</param>
         /// <param name="setup">The <see cref="HttpExceptionDescriptorResponseHandlerOptions"/> that needs to be configured.</param>
-        /// <returns>A reference to <see cref="P:IDecorator.Inner"/> of <paramref name="decorator" /> so that additional calls can be chained.</returns>
+        /// <returns>A reference to <see cref="IDecorator{T}.Inner"/> of <paramref name="decorator" /> so that additional calls can be chained.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null - or -
-        /// <see cref="P:IDecorator.Inner"/> property of <paramref name="decorator"/> cannot be null - or -
+        /// <see cref="IDecorator{T}.Inner"/> property of <paramref name="decorator"/> cannot be null - or -
         /// <paramref name="setup"/> cannot be null.
         /// </exception>
         /// <exception cref="ArgumentException">

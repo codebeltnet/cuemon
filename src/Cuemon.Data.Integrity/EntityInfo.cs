@@ -32,7 +32,7 @@ namespace Cuemon.Data.Integrity
         /// </summary>
         /// <param name="created">A <see cref="DateTime" /> value for when data this instance represents was first created.</param>
         /// <param name="modified">A <see cref="DateTime" /> value for when data this instance represents was last modified.</param>
-        /// <param name="checksum">A <see cref="T:byte[]"/> containing a checksum of the data this instance represents.</param>
+        /// <param name="checksum">A <see cref="byte"/> array containing a checksum of the data this instance represents.</param>
         /// <param name="validation">A <see cref="EntityDataIntegrityValidation"/> enumeration value that indicates the validation strength of the specified <paramref name="checksum"/>. Default is <see cref="EntityDataIntegrityValidation.Weak"/>.</param>
         public EntityInfo(DateTime created, DateTime? modified, byte[] checksum, EntityDataIntegrityValidation validation = EntityDataIntegrityValidation.Weak)
         {

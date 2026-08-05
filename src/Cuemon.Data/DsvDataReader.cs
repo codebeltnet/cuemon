@@ -86,7 +86,7 @@ namespace Cuemon.Data
         /// <summary>
         /// Advances this instance to the next record.
         /// </summary>
-        /// <returns>A <see cref="T:string[]"/> for as long as there are rows; <see cref="NullRead"/> when no more rows exists.</returns>
+        /// <returns>A <see cref="string"/> array for as long as there are rows; <see cref="NullRead"/> when no more rows exists.</returns>
         protected override string[] ReadNext(string[] columns)
         {
             if (columns != NullRead)

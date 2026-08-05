@@ -12,11 +12,11 @@ namespace Cuemon.Collections.Specialized
     public static class DictionaryDecoratorExtensions
     {
         /// <summary>
-        /// Creates a <see cref="NameValueCollection"/> from the enclosed <see cref="T:IDictionary{string,string[]}"/> of the <paramref name="decorator"/>.
+        /// Creates a <see cref="NameValueCollection"/> from the enclosed dictionary of <see cref="string"/> keys and <see cref="string"/> arrays in the specified <paramref name="decorator"/>.
         /// </summary>
         /// <param name="decorator">The <see cref="IDecorator{T}"/> to extend.</param>
-        /// <param name="setup">The <see cref="T:DelimitedStringOptions{string}"/> which may be configured.</param>
-        /// <returns>A <see cref="NameValueCollection"/> that is equivalent to the enclosed <see cref="T:IDictionary{string,string[]}"/> of the <paramref name="decorator"/>.</returns>
+        /// <param name="setup">The <see cref="DelimitedStringOptions{String}"/> which may be configured.</param>
+        /// <returns>A <see cref="NameValueCollection"/> that is equivalent to the enclosed dictionary of <see cref="string"/> keys and <see cref="string"/> arrays in the specified <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>

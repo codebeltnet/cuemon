@@ -53,7 +53,7 @@ namespace Cuemon.Extensions.Text.Json.Converters
         /// <summary>
         /// Adds a <see cref="TransientFaultException"/> JSON converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:ICollection{JsonConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="ICollection{JsonConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="converters" /> after the operation has completed.</returns>
         public static ICollection<JsonConverter> AddTransientFaultExceptionConverter(this ICollection<JsonConverter> converters)
         {
@@ -64,7 +64,7 @@ namespace Cuemon.Extensions.Text.Json.Converters
         /// <summary>
         /// Adds a configurable <see cref="DateTime" /> JSON converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:ICollection{JsonConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="ICollection{JsonConverter}" /> to extend.</param>
         /// <param name="format">A standard or custom date and time format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to <paramref name="converters" /> after the operation has completed.</returns>
@@ -79,7 +79,7 @@ namespace Cuemon.Extensions.Text.Json.Converters
         /// <summary>
         /// Adds an <see cref="Enum" /> JSON converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:ICollection{JsonConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="ICollection{JsonConverter}" /> to extend.</param>
         /// <param name="namingPolicy">The optional naming policy for writing enum values.</param>
         /// <returns>A reference to <paramref name="converters" /> after the operation has completed.</returns>
         /// <remarks>Default implementation will, just like Newtonsoft.Json variant, favor <see cref="StringEnumConverter"/> with a fallback to <see cref="JsonStringEnumConverter"/> using default naming policy from <see cref="JsonFormatterOptions"/>.</remarks>
@@ -107,7 +107,7 @@ namespace Cuemon.Extensions.Text.Json.Converters
         /// <summary>
         /// Adds a combined <see cref="Enum" /> and <see cref="FlagsAttribute" /> JSON converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:ICollection{JsonConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="ICollection{JsonConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="converters" /> after the operation has completed.</returns>
         public static ICollection<JsonConverter> AddStringFlagsEnumConverter(this ICollection<JsonConverter> converters)
         {
@@ -118,7 +118,7 @@ namespace Cuemon.Extensions.Text.Json.Converters
         /// <summary>
         /// Adds an <see cref="ExceptionDescriptor" /> JSON converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:ICollection{JsonConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="ICollection{JsonConverter}" /> to extend.</param>
         /// <param name="setup">The <see cref="ExceptionDescriptorOptions" /> which may be configured.</param>
         /// <param name="afterWriteErrorStartObject">The delegate that is invoked just after writing JSON start object (<c>Error</c>).</param>
         /// <param name="beforeWriteEndObject">The delegate that is invoked just before writing the JSON end object.</param>
@@ -164,7 +164,7 @@ namespace Cuemon.Extensions.Text.Json.Converters
         /// <summary>
         /// Adds an <see cref="Exception" /> JSON converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:ICollection{JsonConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="ICollection{JsonConverter}" /> to extend.</param>
         /// <param name="includeStackTrace">The value that determine whether the stack of an exception is included in the converted result.</param>
         /// <param name="includeData">The value that determine whether the data of an exception is included in the converted result.</param>
         /// <returns>A reference to <paramref name="converters"/> after the operation has completed.</returns>
@@ -177,7 +177,7 @@ namespace Cuemon.Extensions.Text.Json.Converters
         /// <summary>
         /// Adds a <see cref="Failure"/> JSON converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:ICollection{JsonConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="ICollection{JsonConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="converters"/> after the operation has completed.</returns>
         public static ICollection<JsonConverter> AddFailureConverter(this ICollection<JsonConverter> converters)
         {
@@ -191,7 +191,7 @@ namespace Cuemon.Extensions.Text.Json.Converters
         /// <summary>
         /// Adds an <see cref="DataPair" /> JSON converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:ICollection{JsonConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="ICollection{JsonConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="converters"/> after the operation has completed.</returns>
         public static ICollection<JsonConverter> AddDataPairConverter(this ICollection<JsonConverter> converters)
         {

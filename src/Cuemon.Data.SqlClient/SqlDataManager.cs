@@ -151,12 +151,12 @@ namespace Cuemon.Data.SqlClient
         }
 
         /// <summary>
-        /// Core method for executing methods on the <see cref="T:System.Data.Common.DbCommand" /> object resolved from the virtual <see cref="M:Cuemon.Data.DataManager.ExecuteCommandCore(Cuemon.Data.DataCommand,System.Data.Common.IDbDataParameter[])" /> method.
+        /// Core method for executing methods on the <see cref="System.Data.Common.DbCommand" /> object resolved from the virtual execute command workflow on <see cref="DataManager" />.
         /// </summary>
         /// <typeparam name="T">The type to return.</typeparam>
         /// <param name="statement">The command statement to execute.</param>
-        /// <param name="executeSelector">The function delegate that will invoke a method on the resolved <see cref="T:System.Data.Common.DbCommand" /> from the virtual <see cref="M:Cuemon.Data.DataManager.ExecuteCommandCore(Cuemon.Data.DataCommand,System.Data.Common.IDbDataParameter[])" /> method.</param>
-        /// <returns>A value of <typeparamref name="T" /> that is equal to the invoked method of the <see cref="T:System.Data.Common.DbCommand" /> object.</returns>
+        /// <param name="executeSelector">The function delegate that will invoke a method on the resolved <see cref="System.Data.Common.DbCommand" /> object.</param>
+        /// <returns>A value of <typeparamref name="T" /> that is equal to the invoked method of the <see cref="System.Data.Common.DbCommand" /> object.</returns>
         /// <remarks>
         /// If <see cref="TransientFaultHandlingOptionsCallback"/> is null, no SQL operation is wrapped inside a transient fault handling operation.
         /// Otherwise, if <see cref="TransientFaultHandlingOptionsCallback"/> has the <see cref="TransientOperationOptions.EnableRecovery"/> set to <c>true</c>, this method will, with it's default implementation, try to gracefully recover from transient faults when the following condition is met:<br/>

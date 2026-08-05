@@ -46,11 +46,11 @@ namespace Cuemon.Extensions.IO
         }
 
         /// <summary>
-        /// Converts the specified <paramref name="input"/> to its equivalent <see cref="T:char[]"/> representation.
+        /// Converts the specified <paramref name="input"/> to its equivalent <see cref="char"/> array representation.
         /// </summary>
         /// <param name="input">The <see cref="Stream"/> to be extended.</param>
         /// <param name="setup">The <see cref="EncodingOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:char[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <returns>A <see cref="char"/> array that is equivalent to <paramref name="input"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="input"/> cannot be null.
         /// </exception>
@@ -84,11 +84,11 @@ namespace Cuemon.Extensions.IO
         }
 
         /// <summary>
-        /// Converts the specified <paramref name="input"/> to its equivalent <see cref="T:byte[]"/> representation.
+        /// Converts the specified <paramref name="input"/> to its equivalent <see cref="byte"/> array representation.
         /// </summary>
         /// <param name="input">The <see cref="Stream"/> to extend.</param>
         /// <param name="setup">The <see cref="StreamCopyOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <returns>A <see cref="byte"/> array that is equivalent to <paramref name="input"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="input"/> cannot be null.
         /// </exception>
@@ -104,11 +104,11 @@ namespace Cuemon.Extensions.IO
 
 
         /// <summary>
-        /// Converts the specified <paramref name="input"/> to its equivalent <see cref="T:byte[]"/> representation.
+        /// Converts the specified <paramref name="input"/> to its equivalent <see cref="byte"/> array representation.
         /// </summary>
         /// <param name="input">The <see cref="Stream"/> to extend.</param>
         /// <param name="setup">The <see cref="AsyncStreamCopyOptions"/> which may be configured.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="T:byte[]"/> that is equivalent to <paramref name="input"/>.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="byte"/> array that is equivalent to <paramref name="input"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="input"/> cannot be null.
         /// </exception>

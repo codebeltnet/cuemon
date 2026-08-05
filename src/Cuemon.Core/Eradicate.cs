@@ -11,8 +11,8 @@ namespace Cuemon
         /// <summary>
         /// Eradicates trailing zero information (if any) from the specified set of <paramref name="bytes"/>.
         /// </summary>
-        /// <param name="bytes">The <see cref="T:byte[]"/> to process.</param>
-        /// <returns>A <see cref="T:byte[]"/> without trailing zeros.</returns>
+        /// <param name="bytes">The <see cref="byte"/> array to process.</param>
+        /// <returns>A <see cref="byte"/> array without trailing zeros.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="bytes"/> cannot be null.
         /// </exception>
@@ -27,9 +27,9 @@ namespace Cuemon
         /// <summary>
         /// Eradicates trailing byte information (if any) from the specified set of <paramref name="bytes"/>.
         /// </summary>
-        /// <param name="bytes">The <see cref="T:byte[]"/> to process.</param>
-        /// <param name="trailingBytes">The <see cref="T:byte[]"/> to form the trailing bytes.</param>
-        /// <returns>A <see cref="T:byte[]"/> without <paramref name="trailingBytes"/>.</returns>
+        /// <param name="bytes">The <see cref="byte"/> array to process.</param>
+        /// <param name="trailingBytes">The <see cref="byte"/> array to form the trailing bytes.</param>
+        /// <returns>A <see cref="byte"/> array without <paramref name="trailingBytes"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="bytes"/> cannot be null - or -
         /// <paramref name="trailingBytes"/> cannot be null.

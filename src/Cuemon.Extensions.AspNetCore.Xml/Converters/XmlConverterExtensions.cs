@@ -23,7 +23,7 @@ namespace Cuemon.Extensions.AspNetCore.Xml.Converters
         /// <summary>
         /// Adds a <see cref="ProblemDetails"/> XML converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:IList{XmlConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="converters"/> after the operation has completed.</returns>
         public static IList<XmlConverter> AddProblemDetailsConverter(this IList<XmlConverter> converters)
         {
@@ -52,7 +52,7 @@ namespace Cuemon.Extensions.AspNetCore.Xml.Converters
         /// <summary>
         /// Adds an <see cref="ExceptionDescriptor"/> XML converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:IList{XmlConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <param name="setup">The <see cref="ExceptionDescriptorOptions"/> which may be configured.</param>
         /// <returns>A reference to <paramref name="converters"/> after the operation has completed.</returns>
         public static IList<XmlConverter> AddHttpExceptionDescriptorConverter(this IList<XmlConverter> converters, Action<ExceptionDescriptorOptions> setup = null)
@@ -94,7 +94,7 @@ namespace Cuemon.Extensions.AspNetCore.Xml.Converters
         /// <summary>
         /// Adds an <see cref="StringValues"/> XML converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:IList{XmlConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="converters"/> after the operation has completed.</returns>
         public static IList<XmlConverter> AddStringValuesConverter(this IList<XmlConverter> converters)
         {
@@ -133,7 +133,7 @@ namespace Cuemon.Extensions.AspNetCore.Xml.Converters
         /// <summary>
         /// Adds an <see cref="IQueryCollection"/> XML converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:IList{XmlConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="converters"/> after the operation has completed.</returns>
         public static IList<XmlConverter> AddQueryCollectionConverter(this IList<XmlConverter> converters)
         {
@@ -152,7 +152,7 @@ namespace Cuemon.Extensions.AspNetCore.Xml.Converters
         /// <summary>
         /// Adds an <see cref="IFormCollection"/> XML converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:IList{XmlConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="converters"/> after the operation has completed.</returns>
         public static IList<XmlConverter> AddFormCollectionConverter(this IList<XmlConverter> converters)
         {
@@ -171,7 +171,7 @@ namespace Cuemon.Extensions.AspNetCore.Xml.Converters
         /// <summary>
         /// Adds an <see cref="IRequestCookieCollection"/> XML converter to the list.
         /// </summary>
-        /// <param name="converters">The <see cref="T:IList{XmlConverter}" /> to extend.</param>
+        /// <param name="converters">The <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="converters"/> after the operation has completed.</returns>
         public static IList<XmlConverter> AddCookieCollectionConverter(this IList<XmlConverter> converters)
         {

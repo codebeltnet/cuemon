@@ -91,7 +91,7 @@ namespace Cuemon.AspNetCore.Authentication.Hmac
         /// <summary>
         /// Converts the request to a standardized (canonical) format and computes a message digest.
         /// </summary>
-        /// <returns>A <see cref="T:System.String" /> representation, in hexadecimal, of the computed canonical request.</returns>
+        /// <returns>A <see cref="System.String" /> representation, in hexadecimal, of the computed canonical request.</returns>
         public override string ComputeCanonicalRequest()
         {
             ValidateData(HmacFields.UriPath, HmacFields.UriQuery, HmacFields.HttpHeaders, HmacFields.Payload);
@@ -123,7 +123,7 @@ namespace Cuemon.AspNetCore.Authentication.Hmac
         /// <summary>
         /// Computes the signature of this instance using a series of hash-based message authentication codes (HMACs).
         /// </summary>
-        /// <returns>A <see cref="T:System.String" /> representation, in hexadecimal, of the computed signature of this instance.</returns>
+        /// <returns>A <see cref="System.String" /> representation, in hexadecimal, of the computed signature of this instance.</returns>
         public override string ComputeSignature()
         {
             ValidateData(HmacFields.ServerDateTime, HmacFields.ClientSecret);

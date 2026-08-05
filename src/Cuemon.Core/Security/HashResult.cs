@@ -12,7 +12,7 @@ namespace Cuemon.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="HashResult"/> class.
         /// </summary>
-        /// <param name="input">The computed checksum represented as a <see cref="T:byte[]"/>.</param>
+        /// <param name="input">The computed checksum represented as a <see cref="byte"/> array.</param>
         public HashResult(byte[] input)
         {
             _input = input ?? Array.Empty<byte>();
@@ -84,7 +84,7 @@ namespace Cuemon.Security
         /// <summary>
         /// Determines whether the specified <see cref="object" /> is equal to this instance.
         /// </summary>
-        /// <param name="obj">The <see cref="T:System.Object" /> to compare with the current <see cref="T:System.Object" />.</param>
+        /// <param name="obj">The <see cref="System.Object" /> to compare with the current <see cref="System.Object" />.</param>
         /// <returns><c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
@@ -113,7 +113,7 @@ namespace Cuemon.Security
         }
 
         /// <summary>
-        /// Provides a generic converter of a <see cref="T:byte[]"/>.
+        /// Provides a generic converter of a <see cref="byte"/> array.
         /// </summary>
         /// <typeparam name="T">The type of the result.</typeparam>
         /// <param name="converter">The function delegate that takes the underlying value of this instance and converts it into <typeparamref name="T"/>.</param>

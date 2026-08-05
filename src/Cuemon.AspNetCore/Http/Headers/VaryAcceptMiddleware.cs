@@ -33,7 +33,7 @@ namespace Cuemon.AspNetCore.Http.Headers
         /// The returned task completes when the remaining pipeline has finished processing.
         /// </returns>
         /// <remarks>
-        /// The header is appended using <see cref="HttpResponse.OnStarting(System.Func{Task})"/>
+        /// The header is appended using <see cref="HttpResponse.OnStarting(Func{Task})"/>
         /// to ensure the header is present even if the response body is being streamed or the response
         /// was started by downstream middleware. This signals to intermediaries and clients that the
         /// response representation depends on the request's <c>Accept</c> header.

@@ -18,11 +18,11 @@ namespace Cuemon.Xml
     public static class HierarchyDecoratorExtensions
     {
         /// <summary>
-        /// Determines whether the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/> implements <see cref="XmlIgnoreAttribute"/>.
+        /// Determines whether the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/> implements <see cref="XmlIgnoreAttribute"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{object}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{Object}"/> to extend.</param>
         /// <returns>
-        /// 	<c>true</c> if the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/> implements <see cref="XmlIgnoreAttribute"/>; otherwise, <c>false</c>.
+        /// 	<c>true</c> if the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/> implements <see cref="XmlIgnoreAttribute"/>; otherwise, <c>false</c>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
@@ -34,11 +34,11 @@ namespace Cuemon.Xml
         }
 
         /// <summary>
-        /// Determines whether the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/> implements either <see cref="IEnumerable"/> or <see cref="IEnumerable{T}"/> and is not a <see cref="string"/>.
+        /// Determines whether the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/> implements either <see cref="IEnumerable"/> or <see cref="IEnumerable{T}"/> and is not a <see cref="string"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{object}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{Object}"/> to extend.</param>
         /// <returns>
-        /// 	<c>true</c> if the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/> implements either <see cref="IEnumerable"/> or <see cref="IEnumerable{T}"/> and is not a <see cref="string"/>; otherwise, <c>false</c>.
+        /// 	<c>true</c> if the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/> implements either <see cref="IEnumerable"/> or <see cref="IEnumerable{T}"/> and is not a <see cref="string"/>; otherwise, <c>false</c>.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
@@ -50,9 +50,9 @@ namespace Cuemon.Xml
         }
 
         /// <summary>
-        /// Resolves an <see cref="XmlQualifiedEntity"/> from either the specified <paramref name="qualifiedEntity"/> or from the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/>.
+        /// Resolves an <see cref="XmlQualifiedEntity"/> from either the specified <paramref name="qualifiedEntity"/> or from the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{object}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{Object}"/> to extend.</param>
         /// <param name="qualifiedEntity">The optional <see cref="XmlQualifiedEntity"/> that is part of the equation.</param>
         /// <returns>An <see cref="XmlQualifiedEntity"/> that is either from <paramref name="qualifiedEntity"/>, embedded within <paramref name="decorator"/>, <see cref="XmlRootAttribute"/>, <see cref="XmlElementAttribute"/>, <see cref="XmlAttributeAttribute"/> or resolved from either member name or member type (in that order).</returns>
         /// <exception cref="ArgumentNullException">
@@ -93,11 +93,11 @@ namespace Cuemon.Xml
         }
 
         /// <summary>
-        /// Attempts to get an <see cref="XmlTextAttribute"/> from the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/>.
+        /// Attempts to get an <see cref="XmlTextAttribute"/> from the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{object}}"/> to extend.</param>
-        /// <param name="xmlAttribute">When this method returns, contains the <see cref="XmlTextAttribute"/> associated with the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/>.</param>
-        /// <returns><c>true</c> if underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/> contains an <see cref="XmlTextAttribute"/>, <c>false</c> otherwise.</returns>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{Object}"/> to extend.</param>
+        /// <param name="xmlAttribute">When this method returns, contains the <see cref="XmlTextAttribute"/> associated with the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/>.</param>
+        /// <returns><c>true</c> if underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/> contains an <see cref="XmlTextAttribute"/>, <c>false</c> otherwise.</returns>
         public static bool TryGetXmlTextAttribute(this IDecorator<IHierarchy<object>> decorator, out XmlTextAttribute xmlAttribute)
         {
             xmlAttribute = decorator.Inner.HasMemberReference ? decorator.Inner.MemberReference.GetCustomAttribute<XmlTextAttribute>(true) : null;
@@ -105,11 +105,11 @@ namespace Cuemon.Xml
         }
 
         /// <summary>
-        /// Attempts to get an <see cref="XmlAttributeAttribute"/> from the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/>.
+        /// Attempts to get an <see cref="XmlAttributeAttribute"/> from the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{object}}"/> to extend.</param>
-        /// <param name="xmlAttribute">When this method returns, contains the <see cref="XmlAttributeAttribute"/> associated with the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/>.</param>
-        /// <returns><c>true</c> if underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/> contains an <see cref="XmlAttributeAttribute"/>, <c>false</c> otherwise.</returns>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{Object}"/> to extend.</param>
+        /// <param name="xmlAttribute">When this method returns, contains the <see cref="XmlAttributeAttribute"/> associated with the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/>.</param>
+        /// <returns><c>true</c> if underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/> contains an <see cref="XmlAttributeAttribute"/>, <c>false</c> otherwise.</returns>
         public static bool TryGetXmlAttributeAttribute(this IDecorator<IHierarchy<object>> decorator, out XmlAttributeAttribute xmlAttribute)
         {
             xmlAttribute = decorator.Inner.HasMemberReference ? decorator.Inner.MemberReference.GetCustomAttribute<XmlAttributeAttribute>(true) : null;
@@ -117,11 +117,11 @@ namespace Cuemon.Xml
         }
 
         /// <summary>
-        /// Attempts to get an <see cref="XmlRootAttribute"/> from the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/>.
+        /// Attempts to get an <see cref="XmlRootAttribute"/> from the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{object}}"/> to extend.</param>
-        /// <param name="xmlAttribute">When this method returns, contains the <see cref="XmlRootAttribute"/> associated with the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/>.</param>
-        /// <returns><c>true</c> if underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/> contains an <see cref="XmlRootAttribute"/>, <c>false</c> otherwise.</returns>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{Object}"/> to extend.</param>
+        /// <param name="xmlAttribute">When this method returns, contains the <see cref="XmlRootAttribute"/> associated with the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/>.</param>
+        /// <returns><c>true</c> if underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/> contains an <see cref="XmlRootAttribute"/>, <c>false</c> otherwise.</returns>
         public static bool TryGetXmlRootAttribute(this IDecorator<IHierarchy<object>> decorator, out XmlRootAttribute xmlAttribute)
         {
             xmlAttribute = decorator.Inner.HasMemberReference
@@ -131,11 +131,11 @@ namespace Cuemon.Xml
         }
 
         /// <summary>
-        /// Attempts to get an <see cref="XmlElementAttribute"/> from the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/>.
+        /// Attempts to get an <see cref="XmlElementAttribute"/> from the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{object}}"/> to extend.</param>
-        /// <param name="xmlAttribute">When this method returns, contains the <see cref="XmlElementAttribute"/> associated with the underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/>.</param>
-        /// <returns><c>true</c> if underlying <see cref="T:IHierarchy{object}"/> of the <paramref name="decorator"/> contains an <see cref="XmlElementAttribute"/>, <c>false</c> otherwise.</returns>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{Object}"/> to extend.</param>
+        /// <param name="xmlAttribute">When this method returns, contains the <see cref="XmlElementAttribute"/> associated with the underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/>.</param>
+        /// <returns><c>true</c> if underlying <see cref="IHierarchy{Object}"/> of the <paramref name="decorator"/> contains an <see cref="XmlElementAttribute"/>, <c>false</c> otherwise.</returns>
         public static bool TryGetXmlElementAttribute(this IDecorator<IHierarchy<object>> decorator, out XmlElementAttribute xmlAttribute)
         {
             xmlAttribute = decorator.Inner.HasMemberReference ? decorator.Inner.MemberReference.GetCustomAttribute<XmlElementAttribute>(true) : null;
@@ -143,10 +143,10 @@ namespace Cuemon.Xml
         }
 
         /// <summary>  
-        /// Orders a sequence of <see cref="IHierarchy{T}"/> from the underlying <see cref="T:IEnumerable{IHierarchy{object}}"/> of the <paramref name="decorator"/> by nodes having an <see cref="XmlAttributeAttribute"/> decoration.
+        /// Orders a sequence of <see cref="IHierarchy{T}"/> from the underlying sequence of <see cref="IHierarchy{Object}"/> values of the <paramref name="decorator"/> by nodes having an <see cref="XmlAttributeAttribute"/> decoration.
         /// </summary>
         /// <typeparam name="T">The type of the node represented in the hierarchical structure.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IEnumerable{IHierarchy{object}}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the sequence of <see cref="IHierarchy{Object}"/> values to extend.</param>
         /// <returns>A sequence of <see cref="IHierarchy{T}"/> that is sorted by nodes having an <see cref="XmlAttributeAttribute"/> decoration first.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.

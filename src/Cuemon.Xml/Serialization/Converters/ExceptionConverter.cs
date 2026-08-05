@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +41,7 @@ namespace Cuemon.Xml.Serialization.Converters
         /// <summary>
         /// Writes the XML representation of the <paramref name="value" />.
         /// </summary>
-        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> to write to.</param>
+        /// <param name="writer">The <see cref="XmlWriter" /> to write to.</param>
         /// <param name="value">The object to serialize.</param>
         /// <param name="elementName">The element name to encapsulate around <paramref name="value" />.</param>
         public override void WriteXml(XmlWriter writer, Exception value, XmlQualifiedEntity elementName = null)
@@ -56,8 +56,8 @@ namespace Cuemon.Xml.Serialization.Converters
         /// <summary>
         /// Reads the XML representation of the <paramref name="objectType" />.
         /// </summary>
-        /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> to read from.</param>
-        /// <param name="objectType">The <seealso cref="T:System.Type" /> of the object.</param>
+        /// <param name="reader">The <see cref="XmlReader" /> to read from.</param>
+        /// <param name="objectType">The <seealso cref="Type" /> of the object.</param>
         /// <returns>An object of <paramref name="objectType" />.</returns>
         public override Exception ReadXml(Type objectType, XmlReader reader)
         {

@@ -18,9 +18,9 @@ namespace Cuemon.Xml.Serialization.Converters
     public static class XmlConverterDecoratorExtensions
     {
         /// <summary>
-        /// Returns the first <see cref="XmlConverter"/> of the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/> that <see cref="XmlConverter.CanConvert"/> and <see cref="XmlConverter.CanRead"/> the specified <paramref name="objectType"/>; otherwise <c>null</c> if no <see cref="XmlConverter"/> is found.
+        /// Returns the first <see cref="XmlConverter"/> of the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/> that <see cref="XmlConverter.CanConvert"/> and <see cref="XmlConverter.CanRead"/> the specified <paramref name="objectType"/>; otherwise <c>null</c> if no <see cref="XmlConverter"/> is found.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <param name="objectType">Type of the object to deserialize.</param>
         /// <returns>An <see cref="XmlConverter"/> that can deserialize the specified <paramref name="objectType"/>; otherwise <c>null</c>.</returns>
         /// <exception cref="ArgumentNullException">
@@ -33,9 +33,9 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Returns the first <see cref="XmlConverter"/> of the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/> that <see cref="XmlConverter.CanConvert"/> and <see cref="XmlConverter.CanWrite"/> the specified <paramref name="objectType"/>; otherwise <c>null</c> if no <see cref="XmlConverter"/> is found.
+        /// Returns the first <see cref="XmlConverter"/> of the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/> that <see cref="XmlConverter.CanConvert"/> and <see cref="XmlConverter.CanWrite"/> the specified <paramref name="objectType"/>; otherwise <c>null</c> if no <see cref="XmlConverter"/> is found.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <param name="objectType">Type of the object to serialize.</param>
         /// <returns>An <see cref="XmlConverter"/> that can serialize the specified <paramref name="objectType"/>; otherwise <c>null</c>.</returns>
         /// <exception cref="ArgumentNullException">
@@ -48,10 +48,10 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Adds an XML converter to the enclosed <see cref="T:IList{XmlConverter}" /> of the specified <paramref name="decorator" />.
+        /// Adds an XML converter to the enclosed <see cref="IList{XmlConverter}" /> of the specified <paramref name="decorator" />.
         /// </summary>
         /// <typeparam name="T">The type of the object to converts to and from XML.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <param name="writer">The delegate that converts <typeparamref name="T" /> to its XML representation.</param>
         /// <param name="reader">The delegate that generates <typeparamref name="T" /> from its XML representation.</param>
         /// <param name="canConvertPredicate">The delegate that determines if an object can be converted.</param>
@@ -68,10 +68,10 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Inserts an XML converter to the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/> at the specified <paramref name="index" />.
+        /// Inserts an XML converter to the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/> at the specified <paramref name="index" />.
         /// </summary>
         /// <typeparam name="T">The type of the object to converts to and from XML.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <param name="index">The zero-based index at which an XML converter should be inserted.</param>
         /// <param name="writer">The delegate that converts <typeparamref name="T" /> to its XML representation.</param>
         /// <param name="reader">The delegate that generates <typeparamref name="T" /> from its XML representation.</param>
@@ -89,9 +89,9 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Adds an <see cref="IEnumerable"/> XML converter to the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
+        /// Adds an <see cref="IEnumerable"/> XML converter to the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <param name="flattenItems">When <c>true</c> and a qualified element name is available, each collection item is serialized as a repeated element using that name instead of being wrapped in a generic <c>Item</c> element. The default is <c>false</c>.</param>
         /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
@@ -210,9 +210,9 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Adds an <see cref="ExceptionDescriptor"/> XML converter to the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
+        /// Adds an <see cref="ExceptionDescriptor"/> XML converter to the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <param name="setup">The <see cref="ExceptionDescriptorOptions"/> which need to be configured.</param>
         /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
@@ -252,9 +252,9 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Adds a <see cref="Uri"/> XML converter to the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
+        /// Adds a <see cref="Uri"/> XML converter to the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
@@ -274,9 +274,9 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Adds an <see cref="DateTime"/> XML converter to the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
+        /// Adds an <see cref="DateTime"/> XML converter to the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
@@ -296,9 +296,9 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Adds an <see cref="TimeSpan"/> XML converter to the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
+        /// Adds an <see cref="TimeSpan"/> XML converter to the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
@@ -322,9 +322,9 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Adds an <see cref="string"/> XML converter to the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
+        /// Adds an <see cref="string"/> XML converter to the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
@@ -352,9 +352,9 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Adds an <see cref="Exception" /> XML converter to the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
+        /// Adds an <see cref="Exception" /> XML converter to the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <param name="includeStackTrace">The value that determine whether the stack of an exception is included in the converted result.</param>
         /// <param name="includeData">The value that determine whether the data of an exception is included in the converted result.</param>
         /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
@@ -369,9 +369,9 @@ namespace Cuemon.Xml.Serialization.Converters
         }
 
         /// <summary>
-        /// Adds an <see cref="Failure" /> XML converter to the enclosed <see cref="T:IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
+        /// Adds an <see cref="Failure" /> XML converter to the enclosed <see cref="IList{XmlConverter}"/> of the specified <paramref name="decorator"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IList{XmlConverter}}" /> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IList{XmlConverter}" /> to extend.</param>
         /// <returns>A reference to <paramref name="decorator"/> after the operation has completed.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.

@@ -77,9 +77,9 @@ namespace Cuemon.Text
         }
 
         /// <summary>
-        /// Creates a parser that converts a <see cref="string"/>, represented in base-64 digits, to its equivalent <see cref="T:byte[]"/>.
+        /// Creates a parser that converts a <see cref="string"/>, represented in base-64 digits, to its equivalent <see cref="byte"/> array.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{byte[]}"/> implementation.</returns>
+        /// <returns>An implementation of <see cref="IConfigurableParser{T}"/> that produces <see cref="byte"/> arrays.</returns>
         /// <exception cref="ArgumentNullException">
         /// <see cref="string"/> cannot be null.
         /// </exception>
@@ -92,9 +92,9 @@ namespace Cuemon.Text
         }
 
         /// <summary>
-        /// Creates a parser that converts a <see cref="string"/>, represented in binary digits, to its equivalent <see cref="T:byte[]"/>.
+        /// Creates a parser that converts a <see cref="string"/>, represented in binary digits, to its equivalent <see cref="byte"/> array.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{byte[]}"/> implementation.</returns>
+        /// <returns>An implementation of <see cref="IConfigurableParser{T}"/> that produces <see cref="byte"/> arrays.</returns>
         /// <exception cref="ArgumentNullException">
         /// <see cref="string"/> cannot be null.
         /// </exception>
@@ -129,7 +129,7 @@ namespace Cuemon.Text
         /// <summary>
         /// Creates a parser that converts a <see cref="string"/> to its equivalent <see cref="Guid"/>.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{Guid,GuidStringOptions}"/> implementation.</returns>
+        /// <returns>An <see cref="IConfigurableParser{Guid,GuidStringOptions}"/> implementation.</returns>
         /// <exception cref="ArgumentNullException">
         /// <see cref="string"/> cannot be null.
         /// </exception>
@@ -216,9 +216,9 @@ namespace Cuemon.Text
         }
 
         /// <summary>
-        /// Creates a parser that converts a <see cref="string"/>, represented in hexadecimal digits, to its equivalent <see cref="T:byte[]"/>.
+        /// Creates a parser that converts a <see cref="string"/>, represented in hexadecimal digits, to its equivalent <see cref="byte"/> array.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{byte[]}"/> implementation.</returns>
+        /// <returns>An implementation of <see cref="IConfigurableParser{T}"/> that produces <see cref="byte"/> arrays.</returns>
         /// <exception cref="ArgumentNullException">
         /// <see cref="string"/> cannot be null.
         /// </exception>
@@ -249,7 +249,7 @@ namespace Cuemon.Text
         /// <summary>
         /// Creates a parser that converts a <see cref="string"/>, represented as an URI scheme, to its equivalent <see cref="UriScheme"/>.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{UriScheme}"/> implementation.</returns>
+        /// <returns>An <see cref="IConfigurableParser{UriScheme}"/> implementation.</returns>
         /// <exception cref="ArgumentNullException">
         /// <see cref="string"/> cannot be null.
         /// </exception>
@@ -270,9 +270,9 @@ namespace Cuemon.Text
         }
 
         /// <summary>
-        /// Creates a parser that converts a <see cref="string"/>, represented in URL-safe base-64 digits, to its equivalent <see cref="T:byte[]"/>.
+        /// Creates a parser that converts a <see cref="string"/>, represented in URL-safe base-64 digits, to its equivalent <see cref="byte"/> array.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{byte[]}"/> implementation.</returns>
+        /// <returns>An implementation of <see cref="IConfigurableParser{T}"/> that produces <see cref="byte"/> arrays.</returns>
         /// <exception cref="ArgumentNullException">
         /// <see cref="string"/> cannot be null.
         /// </exception>
@@ -309,7 +309,7 @@ namespace Cuemon.Text
         /// <summary>
         /// Creates a parser that converts a <see cref="string"/>, represented as a simple input type, to its equivalent <see cref="bool"/>, <see cref="byte"/>, <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="float"/>, <see cref="DateTime"/> or <see cref="Guid"/>.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{object,FormattingOptions}"/> implementation.</returns>
+        /// <returns>An <see cref="IConfigurableParser{Object,FormattingOptions}"/> implementation.</returns>
         public static IConfigurableParser<object, FormattingOptions> FromValueType()
         {
             return CreateConfigurableParser<object, FormattingOptions>((input, setup) =>
@@ -330,7 +330,7 @@ namespace Cuemon.Text
         /// <summary>
         /// Creates a parser that converts a <see cref="string"/>, represented as an URL, to its equivalent <see cref="Uri"/>.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{Uri,UriStringOptions}"/> implementation.</returns>
+        /// <returns>An <see cref="IConfigurableParser{Uri,UriStringOptions}"/> implementation.</returns>
         /// <exception cref="ArgumentNullException">
         /// <see cref="string"/> cannot be null.
         /// </exception>
@@ -380,7 +380,7 @@ namespace Cuemon.Text
         /// <summary>
         /// Creates a parser that converts a <see cref="string"/>, represented as a protocol relative URL, to its equivalent <see cref="Uri"/>.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{Uri,UriStringOptions}"/> implementation.</returns>
+        /// <returns>An <see cref="IConfigurableParser{Uri,UriStringOptions}"/> implementation.</returns>
         /// <exception cref="ArgumentNullException">
         /// <see cref="string"/> cannot be null.
         /// </exception>
@@ -404,7 +404,7 @@ namespace Cuemon.Text
         /// <summary>
         /// Creates a parser that converts a <see cref="string"/> to an <see cref="object"/> of a particular type.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{ObjectFormattingOptions}"/> implementation.</returns>
+        /// <returns>An <see cref="IConfigurableParser{ObjectFormattingOptions}"/> implementation.</returns>
         /// <exception cref="NotSupportedException">
         /// <see cref="string"/> cannot be converted to the specified <see cref="Type"/>.
         /// </exception>
@@ -427,7 +427,7 @@ namespace Cuemon.Text
         /// <summary>
         /// Creates a parser that converts a <see cref="string"/> to its equivalent <see cref="Enum"/>.
         /// </summary>
-        /// <returns>An <see cref="T:IConfigurableParser{EnumStringOptions}"/> implementation.</returns>
+        /// <returns>An <see cref="IConfigurableParser{EnumStringOptions}"/> implementation.</returns>
         /// <exception cref="ArgumentNullException">
         /// <see cref="string"/> cannot be null -or-
         /// <see cref="Type"/> cannot be null.

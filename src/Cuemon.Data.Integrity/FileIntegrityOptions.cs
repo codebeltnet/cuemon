@@ -32,7 +32,7 @@ namespace Cuemon.Data.Integrity
         }
 
         /// <summary>
-        /// Gets or sets the function delegate that will convert an instance of <see cref="FileInfo"/> and a <see cref="T:byte[]"/> into an object implementing the <see cref="IDataIntegrity"/> interface.
+        /// Gets or sets the function delegate that will convert an instance of <see cref="FileInfo"/> and a <see cref="byte"/> array into an object implementing the <see cref="IDataIntegrity"/> interface.
         /// </summary>
         /// <value>The function delegate that returns an object implementing the <see cref="IDataIntegrity"/> interface.</value>
         /// <exception cref="ArgumentNullException">

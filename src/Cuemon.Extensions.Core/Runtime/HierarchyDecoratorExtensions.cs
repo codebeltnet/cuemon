@@ -20,8 +20,8 @@ namespace Cuemon.Extensions.Runtime
         /// <summary>
         /// A formatter implementation that resolves a <see cref="IConvertible"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{DataPair}}"/> to extend.</param>
-        /// <returns>A <see cref="IConvertible"/> from the enclosed <see cref="T:IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{DataPair}"/> to extend.</param>
+        /// <returns>A <see cref="IConvertible"/> from the enclosed <see cref="IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -35,8 +35,8 @@ namespace Cuemon.Extensions.Runtime
         /// <summary>
         /// A formatter implementation that resolves a <see cref="Uri"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{DataPair}}"/> to extend.</param>
-        /// <returns>A <see cref="Uri"/> from the enclosed <see cref="T:IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{DataPair}"/> to extend.</param>
+        /// <returns>A <see cref="Uri"/> from the enclosed <see cref="IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -50,8 +50,8 @@ namespace Cuemon.Extensions.Runtime
         /// <summary>
         /// A formatter implementation that resolves a <see cref="DateTime"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{DataPair}}"/> to extend.</param>
-        /// <returns>A <see cref="DateTime"/> from the enclosed <see cref="T:IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{DataPair}"/> to extend.</param>
+        /// <returns>A <see cref="DateTime"/> from the enclosed <see cref="IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
         public static DateTime UseDateTimeFormatter(this IDecorator<IHierarchy<DataPair>> decorator)
         {
             Validator.ThrowIfNull(decorator);
@@ -61,8 +61,8 @@ namespace Cuemon.Extensions.Runtime
         /// <summary>
         /// A formatter implementation that resolves a <see cref="Guid"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{DataPair}}"/> to extend.</param>
-        /// <returns>A <see cref="Guid"/> from the enclosed <see cref="T:IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{DataPair}"/> to extend.</param>
+        /// <returns>A <see cref="Guid"/> from the enclosed <see cref="IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -75,8 +75,8 @@ namespace Cuemon.Extensions.Runtime
         /// <summary>
         /// A formatter implementation that resolves a <see cref="string"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{DataPair}}"/> to extend.</param>
-        /// <returns>A <see cref="string"/> from the enclosed <see cref="T:IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{DataPair}"/> to extend.</param>
+        /// <returns>A <see cref="string"/> from the enclosed <see cref="IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -89,8 +89,8 @@ namespace Cuemon.Extensions.Runtime
         /// <summary>
         /// A formatter implementation that resolves a <see cref="decimal"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{DataPair}}"/> to extend.</param>
-        /// <returns>A <see cref="decimal"/> from the enclosed <see cref="T:IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{DataPair}"/> to extend.</param>
+        /// <returns>A <see cref="decimal"/> from the enclosed <see cref="IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -103,9 +103,9 @@ namespace Cuemon.Extensions.Runtime
         /// <summary>
         /// A formatter implementation that resolves a <see cref="ICollection"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{DataPair}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{DataPair}"/> to extend.</param>
         /// <param name="valueType">The type of the objects in the collection.</param>
-        /// <returns>A <see cref="ICollection"/> of <paramref name="valueType"/> from the enclosed <see cref="T:IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
+        /// <returns>A <see cref="ICollection"/> of <paramref name="valueType"/> from the enclosed <see cref="IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -126,9 +126,9 @@ namespace Cuemon.Extensions.Runtime
         /// <summary>
         /// A formatter implementation that resolves a <see cref="IDictionary"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{DataPair}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{DataPair}"/> to extend.</param>
         /// <param name="valueTypes">The value types that forms a <see cref="KeyValuePair{TKey,TValue}"/>.</param>
-        /// <returns>A <see cref="IDictionary"/> with <see cref="KeyValuePair{TKey,TValue}"/> of <paramref name="valueTypes"/> from the enclosed <see cref="T:IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
+        /// <returns>A <see cref="IDictionary"/> with <see cref="KeyValuePair{TKey,TValue}"/> of <paramref name="valueTypes"/> from the enclosed <see cref="IHierarchy{DataPair}"/> of the <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -150,7 +150,7 @@ namespace Cuemon.Extensions.Runtime
         /// Returns the first node instance that match the conditions defined by the function delegate <paramref name="match"/>, or a default value if no node is found.
         /// </summary>
         /// <typeparam name="T">The type of the instance that this node represents.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <param name="match">The function delegate that defines the conditions of the nodes to search for.</param>
         /// <returns>An <see cref="IWrapper{T}.Instance"/>  that match the conditions defined by the function delegate <paramref name="match"/>, or a default value if no node is found.</returns>
         public static T FindFirstInstance<T>(this IDecorator<IHierarchy<T>> decorator, Func<IHierarchy<T>, bool> match)
@@ -162,7 +162,7 @@ namespace Cuemon.Extensions.Runtime
         /// Returns the only node that match the conditions defined by the function delegate <paramref name="match"/>, or a default value if no node instance is found; this method throws an exception if more than one node is found.
         /// </summary>
         /// <typeparam name="T">The type of the instance that this node represents.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <param name="match">The function delegate that defines the conditions of the nodes to search for.</param>
         /// <returns>An <see cref="IWrapper{T}.Instance"/> node that match the conditions defined by the function delegate <paramref name="match"/>, or a default value if no node instance is found.</returns>
         public static T FindSingleInstance<T>(this IDecorator<IHierarchy<T>> decorator, Func<IHierarchy<T>, bool> match)
@@ -174,7 +174,7 @@ namespace Cuemon.Extensions.Runtime
         /// Retrieves all node instances that match the conditions defined by the function delegate <paramref name="match"/>.
         /// </summary>
         /// <typeparam name="T">The type of the instance that this node represents.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <param name="match">The function delegate that defines the conditions of the nodes to search for.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> sequence containing all node instances that match the conditions defined by the specified predicate, if found.</returns>
         public static IEnumerable<T> FindInstance<T>(this IDecorator<IHierarchy<T>> decorator, Func<IHierarchy<T>, bool> match)
@@ -186,7 +186,7 @@ namespace Cuemon.Extensions.Runtime
         /// Returns the first node that match the conditions defined by the function delegate <paramref name="match"/>, or a default value if no node is found.
         /// </summary>
         /// <typeparam name="T">The type of the instance that this node represents.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <param name="match">The function delegate that defines the conditions of the nodes to search for.</param>
         /// <returns>An <see cref="IHierarchy{T}"/> node that match the conditions defined by the function delegate <paramref name="match"/>, or a default value if no node is found.</returns>
         public static IHierarchy<T> FindFirst<T>(this IDecorator<IHierarchy<T>> decorator, Func<IHierarchy<T>, bool> match)
@@ -198,7 +198,7 @@ namespace Cuemon.Extensions.Runtime
         /// Returns the only node that match the conditions defined by the function delegate <paramref name="match"/>, or a default value if no node is found; this method throws an exception if more than one node is found.
         /// </summary>
         /// <typeparam name="T">The type of the instance that this node represents.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <param name="match">The function delegate that defines the conditions of the nodes to search for.</param>
         /// <returns>An <see cref="IHierarchy{T}"/> node that match the conditions defined by the function delegate <paramref name="match"/>, or a default value if no node is found.</returns>
         public static IHierarchy<T> FindSingle<T>(this IDecorator<IHierarchy<T>> decorator, Func<IHierarchy<T>, bool> match)
@@ -210,7 +210,7 @@ namespace Cuemon.Extensions.Runtime
         /// Retrieves all nodes that match the conditions defined by the function delegate <paramref name="match"/>.
         /// </summary>
         /// <typeparam name="T">The type of the instance that this node represents.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <param name="match">The function delegate that defines the conditions of the nodes to search for.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> sequence containing all nodes that match the conditions defined by the specified predicate, if found.</returns>
         public static IEnumerable<IHierarchy<T>> Find<T>(this IDecorator<IHierarchy<T>> decorator, Func<IHierarchy<T>, bool> match)
@@ -224,7 +224,7 @@ namespace Cuemon.Extensions.Runtime
         /// Replace the instance of the <paramref name="decorator"/> with a <paramref name="replacer"/> delegate.
         /// </summary>
         /// <typeparam name="T">The type of the instance that this node represents.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <param name="replacer">The delegate that will replace the wrapped instance of the <paramref name="decorator"/>.</param>
         public static void Replace<T>(this IDecorator<IHierarchy<T>> decorator, Action<IHierarchy<T>, T> replacer)
         {
@@ -237,7 +237,7 @@ namespace Cuemon.Extensions.Runtime
         /// Replace all instances of the <paramref name="decorator"/> with a <paramref name="replacer"/> delegate.
         /// </summary>
         /// <typeparam name="T">The type of the instance that these nodes represents.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IEnumerable{IHierarchy{T}}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the sequence of <see cref="IHierarchy{T}"/> values to extend.</param>
         /// <param name="replacer">The delegate that will replace all wrapped instances of the <paramref name="decorator"/>.</param>
         public static void ReplaceAll<T>(this IDecorator<IEnumerable<IHierarchy<T>>> decorator, Action<IHierarchy<T>, T> replacer)
         {
@@ -253,7 +253,7 @@ namespace Cuemon.Extensions.Runtime
         /// Returns the root node of the specified <paramref name="decorator"/> in the hierarchical structure.
         /// </summary>
         /// <typeparam name="T">The type of the instance represented by the specified <paramref name="decorator"/> in the hierarchical structure.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <returns>An <see cref="IHierarchy{T}"/> node that represents the root of the specified <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> is null.
@@ -268,7 +268,7 @@ namespace Cuemon.Extensions.Runtime
         /// Gets all ancestors (parent, grandparent, etc.) and self of the specified <paramref name="decorator"/> in the hierarchical structure.
         /// </summary>
         /// <typeparam name="T">The type of the instance represented by the specified <paramref name="decorator"/> in the hierarchical structure.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> sequence equal to ancestors and self of the specified <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> is null.
@@ -284,7 +284,7 @@ namespace Cuemon.Extensions.Runtime
         /// Gets all descendants (children, grandchildren, etc.) anf self of the current <paramref name="decorator"/> in the hierarchical structure.
         /// </summary>
         /// <typeparam name="T">The type of the instance represented by the specified <paramref name="decorator"/> in the hierarchical structure.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> sequence equal to the descendants and self of the specified <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> is null.
@@ -299,7 +299,7 @@ namespace Cuemon.Extensions.Runtime
         /// Gets all siblings and self after the current <paramref name="decorator"/> in the hierarchical structure.
         /// </summary>
         /// <typeparam name="T">The type of the instance represented by the specified <paramref name="decorator"/> in the hierarchical structure.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> sequence equal to the siblings and self of the specified <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> is null.
@@ -314,7 +314,7 @@ namespace Cuemon.Extensions.Runtime
         /// Gets all siblings and self after the current <paramref name="decorator"/> in the hierarchical structure.
         /// </summary>
         /// <typeparam name="T">The type of the instance represented by the specified <paramref name="decorator"/> in the hierarchical structure.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <param name="depth">The depth in the hierarchical structure from where to locate the siblings and self nodes.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> sequence equal to the siblings and self of the specified <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
@@ -339,7 +339,7 @@ namespace Cuemon.Extensions.Runtime
         /// Returns the node at the specified index of a hierarchical structure.
         /// </summary>
         /// <typeparam name="T">The type of the instance represented by the specified <paramref name="decorator"/> in the hierarchical structure.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <param name="index">The zero-based index at which a node should be retrieved in the hierarchical structure.</param>
         /// <returns>The node at the specified <paramref name="index"/> in the hierarchical structure.</returns>
         /// <exception cref="ArgumentNullException">
@@ -365,7 +365,7 @@ namespace Cuemon.Extensions.Runtime
         /// Flattens the entirety of a hierarchical structure representation into an <see cref="IEnumerable{T}"/> sequence of nodes.
         /// </summary>
         /// <typeparam name="T">The type of the instance represented by the specified <paramref name="decorator"/> in the hierarchical structure.</typeparam>
-        /// <param name="decorator">The <see cref="T:IDecorator{IHierarchy{T}}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="IHierarchy{T}"/> to extend.</param>
         /// <returns>An <see cref="IEnumerable{T}"/> sequence of <see cref="IHierarchy{T}"/> all nodes represented by the hierarchical structure.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> is null.

@@ -71,7 +71,7 @@ namespace Cuemon
         /// <summary>
         /// Returns a hash code for this instance.
         /// </summary>
-        /// <param name="obj">The <see cref="T:System.Object" /> for which a hash code is to be returned.</param>
+        /// <param name="obj">The <see cref="System.Object" /> for which a hash code is to be returned.</param>
         /// <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
         public int GetHashCode(Range<T> obj)
         {

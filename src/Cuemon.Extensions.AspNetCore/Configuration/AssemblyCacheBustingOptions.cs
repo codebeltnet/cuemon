@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Cuemon.AspNetCore.Configuration;
 using Cuemon.Security.Cryptography;
 
@@ -22,7 +22,7 @@ namespace Cuemon.Extensions.AspNetCore.Configuration
         ///     </listheader>
         ///     <item>
         ///         <term><see cref="Assembly"/></term>
-        ///         <description><see cref="System.Reflection.Assembly.GetEntryAssembly"/></description>
+        ///         <description><see cref="Assembly.GetEntryAssembly"/></description>
         ///     </item>
         ///     <item>
         ///         <term><see cref="Algorithm"/></term>

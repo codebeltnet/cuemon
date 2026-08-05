@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -14,8 +14,8 @@ namespace Cuemon.Xml.Serialization.Converters
         /// <summary>
         /// Reads the XML representation of the <paramref name="objectType" />.
         /// </summary>
-        /// <param name="objectType">The <seealso cref="T:System.Type" /> of the object.</param>
-        /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> to read from.</param>
+        /// <param name="objectType">The <seealso cref="Type" /> of the object.</param>
+        /// <param name="reader">The <see cref="XmlReader" /> to read from.</param>
         /// <returns>An object of <see cref="Failure"/>.</returns>
         /// <exception cref="NotImplementedException"></exception>
         public override Failure ReadXml(Type objectType, XmlReader reader)
@@ -26,7 +26,7 @@ namespace Cuemon.Xml.Serialization.Converters
         /// <summary>
         /// Writes the XML representation of <see cref="Failure"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> to write to.</param>
+        /// <param name="writer">The <see cref="XmlWriter" /> to write to.</param>
         /// <param name="value">The object to serialize.</param>
         /// <param name="elementName">The element name to encapsulate around <paramref name="value" />.</param>
         public override void WriteXml(XmlWriter writer, Failure value, XmlQualifiedEntity elementName = null)

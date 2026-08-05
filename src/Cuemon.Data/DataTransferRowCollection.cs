@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -66,27 +66,27 @@ namespace Cuemon.Data
         public DataTransferRow this[int index] => DataTransferRows[index];
 
         /// <summary>
-        /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1" /> contains a specific value.
+        /// Determines whether the <see cref="ICollection{T}" /> contains a specific value.
         /// </summary>
-        /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-        /// <returns>true if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, false.</returns>
+        /// <param name="item">The object to locate in the <see cref="ICollection{T}" />.</param>
+        /// <returns>true if <paramref name="item" /> is found in the <see cref="ICollection{T}" />; otherwise, false.</returns>
         public bool Contains(DataTransferRow item)
         {
             return DataTransferRows.Contains(item);
         }
 
         /// <summary>
-        /// Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.
+        /// Gets the number of elements contained in the <see cref="ICollection{T}" />.
         /// </summary>
         /// <value>The count.</value>
-        /// <returns>The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1" />.</returns>
+        /// <returns>The number of elements contained in the <see cref="ICollection{T}" />.</returns>
         public int Count => DataTransferRows.Count;
 
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
-        /// <returns>A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.</returns>
+        /// <returns>A <see cref="IEnumerator{T}" /> that can be used to iterate through the collection.</returns>
         public IEnumerator<DataTransferRow> GetEnumerator()
         {
             return DataTransferRows.GetEnumerator();
@@ -94,9 +94,9 @@ namespace Cuemon.Data
 
 
         /// <summary>
-        /// Determines the index of a specific item in the <see cref="T:System.Collections.Generic.IList`1" />.
+        /// Determines the index of a specific item in the <see cref="IList{T}" />.
         /// </summary>
-        /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1" />.</param>
+        /// <param name="item">The object to locate in the <see cref="IList{T}" />.</param>
         /// <returns>The index of <paramref name="item" /> if found in the list; otherwise, -1.</returns>
         public int IndexOf(DataTransferRow item)
         {

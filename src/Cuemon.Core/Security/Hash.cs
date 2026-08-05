@@ -228,9 +228,9 @@ namespace Cuemon.Security
         }
 
         /// <summary>
-        /// Computes the hash value for the specified <see cref="T:IConvertible[]"/>.
+        /// Computes the hash value for the specified <see cref="IConvertible"/> array.
         /// </summary>
-        /// <param name="input">The <see cref="T:IConvertible[]"/> to compute the hash code for.</param>
+        /// <param name="input">The <see cref="IConvertible"/> array to compute the hash code for.</param>
         /// <returns>A <see cref="HashResult"/> containing the computed hash code of the specified <paramref name="input"/>.</returns>
         public virtual HashResult ComputeHash(params IConvertible[] input)
         {
@@ -248,9 +248,9 @@ namespace Cuemon.Security
         }
 
         /// <summary>
-        /// Computes the hash value for the specified <see cref="T:byte[]"/>.
+        /// Computes the hash value for the specified <see cref="byte"/> array.
         /// </summary>
-        /// <param name="input">The <see cref="T:byte[]"/> to compute the hash code for.</param>
+        /// <param name="input">The <see cref="byte"/> array to compute the hash code for.</param>
         /// <returns>A <see cref="HashResult"/> containing the computed hash code of the specified <paramref name="input"/>.</returns>
         public abstract HashResult ComputeHash(byte[] input);
 

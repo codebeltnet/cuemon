@@ -12,10 +12,10 @@ namespace Cuemon
     public static class CharDecoratorExtensions
     {
         /// <summary>
-        /// Converts the enclosed <see cref="T:IEnumerable{char}"/> of the <paramref name="decorator"/> to its equivalent <see cref="T:IEnumerable{string}"/>.
+        /// Converts the enclosed <see cref="IEnumerable{Char}"/> of the <paramref name="decorator"/> to its equivalent <see cref="IEnumerable{String}"/>.
         /// </summary>
         /// <param name="decorator">The <see cref="IDecorator{T}"/> to extend.</param>
-        /// <returns>An <see cref="T:IEnumerable{string}"/> equivalent to the enclosed <see cref="T:IEnumerable{char}"/> of the <paramref name="decorator"/>.</returns>
+        /// <returns>An <see cref="IEnumerable{String}"/> equivalent to the enclosed <see cref="IEnumerable{Char}"/> of the <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -26,10 +26,10 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Converts the enclosed <see cref="T:IEnumerable{char}"/> of the <paramref name="decorator"/> to its equivalent <see cref="string"/> representation.
+        /// Converts the enclosed <see cref="IEnumerable{Char}"/> of the <paramref name="decorator"/> to its equivalent <see cref="string"/> representation.
         /// </summary>
         /// <param name="decorator">The <see cref="IDecorator{T}"/> to extend.</param>
-        /// <returns>A <see cref="string"/> equivalent to the enclosed <see cref="T:IEnumerable{char}"/> of the <paramref name="decorator"/>.</returns>
+        /// <returns>A <see cref="string"/> equivalent to the enclosed <see cref="IEnumerable{Char}"/> of the <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>

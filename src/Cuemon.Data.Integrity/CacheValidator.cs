@@ -136,7 +136,7 @@ namespace Cuemon.Data.Integrity
         /// <summary>
         /// Combines the <paramref name="additionalChecksum" /> to the representation of this instance.
         /// </summary>
-        /// <param name="additionalChecksum">A <see cref="T:byte[]" /> containing a checksum of the additional data this instance must represent.</param>
+        /// <param name="additionalChecksum">A <see cref="byte"/> array containing a checksum of the additional data this instance must represent.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
         public override ChecksumBuilder CombineWith(byte[] additionalChecksum)
         {

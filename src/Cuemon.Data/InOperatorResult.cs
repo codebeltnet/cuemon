@@ -33,7 +33,7 @@ namespace Cuemon.Data
         public IEnumerable<IDataParameter> Parameters { get; }
 
         /// <summary>
-        /// Converts the parameters for the IN operator to an <see cref="T:IDbDataParameter[]"/>.
+        /// Converts the parameters for the IN operator to an <see cref="IDbDataParameter"/> array.
         /// </summary>
         /// <returns>An array of <see cref="IDbDataParameter"/>.</returns>
         public IDataParameter[] ToParametersArray()

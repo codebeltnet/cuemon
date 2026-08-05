@@ -6,7 +6,7 @@ using Cuemon.Text;
 namespace Cuemon.Net
 {
     /// <summary>
-    /// Extension methods for the <see cref="T:byte[]"/> hidden behind the <see cref="IDecorator{T}"/> interface.
+    /// Extension methods for the <see cref="byte"/> array hidden behind the <see cref="IDecorator{T}"/> interface.
     /// </summary>
     /// <seealso cref="IDecorator{T}"/>
     /// <seealso cref="Decorator{T}"/>
@@ -15,21 +15,21 @@ namespace Cuemon.Net
         private static readonly char[] HexadecimalCharactersLowerCase = Alphanumeric.Hexadecimal.ToLowerInvariant().ToCharArray();
 
         /// <summary>
-        /// Converts the enclosed <see cref="T:byte[]"/> of the specified <paramref name="decorator"/> into a URL-encoded array of bytes, starting at the specified <paramref name="position"/> in the array and continuing for the specified number of <paramref name="bytesToRead"/>.
+        /// Converts the enclosed <see cref="byte"/> array of the specified <paramref name="decorator"/> into a URL-encoded array of bytes, starting at the specified <paramref name="position"/> in the array and continuing for the specified number of <paramref name="bytesToRead"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{byte[]}"/> to extend.</param>
+        /// <param name="decorator">The decorator that wraps the <see cref="byte"/> array to extend.</param>
         /// <param name="position">The position in the byte array at which to begin encoding.</param>
         /// <param name="bytesToRead">The number of bytes to encode.</param>
         /// <param name="setup">The <see cref="EncodingOptions"/> which may be configured.</param>
-        /// <returns>An encoded <see cref="T:byte[]"/>.</returns>
+        /// <returns>An encoded <see cref="byte"/> array.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="position" /> is lower than 0 - or -
         /// <paramref name="bytesToRead" /> is lower than 0 - or -
-        /// <paramref name="position" /> is greater than or equal to the length of the enclosed <see cref="T:byte[]"/> of the specified <paramref name="decorator"/> - or -
-        /// <paramref name="bytesToRead" /> is greater than (the length of the enclosed <see cref="T:byte[]"/> of the specified <paramref name="decorator"/> minus <paramref name="position"/>).
+        /// <paramref name="position" /> is greater than or equal to the length of the enclosed <see cref="byte"/> array of the specified <paramref name="decorator"/> - or -
+        /// <paramref name="bytesToRead" /> is greater than (the length of the enclosed <see cref="byte"/> array of the specified <paramref name="decorator"/> minus <paramref name="position"/>).
         /// </exception>
         public static byte[] UrlEncode(this IDecorator<byte[]> decorator, int position = 0, int bytesToRead = -1, Action<EncodingOptions> setup = null)
         {

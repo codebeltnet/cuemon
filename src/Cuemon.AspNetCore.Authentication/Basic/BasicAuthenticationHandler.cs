@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -21,8 +21,8 @@ namespace Cuemon.AspNetCore.Authentication.Basic
         /// Initializes a new instance of the <see cref="BasicAuthenticationHandler"/> class.
         /// </summary>
         /// <param name="options">The monitor for the options instance.</param>
-        /// <param name="logger">The <see cref="T:Microsoft.Extensions.Logging.ILoggerFactory" />.</param>
-        /// <param name="encoder">The <see cref="T:System.Text.Encodings.Web.UrlEncoder" />.</param>
+        /// <param name="logger">The <see cref="ILoggerFactory" />.</param>
+        /// <param name="encoder">The <see cref="UrlEncoder" />.</param>
         public BasicAuthenticationHandler(IOptionsMonitor<BasicAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder) : base(options, logger, encoder)
         {
         }

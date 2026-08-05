@@ -35,7 +35,7 @@ namespace Cuemon.Extensions.IO
         /// Reads all lines of characters from the <paramref name="reader"/> and returns the data as a sequence of strings.
         /// </summary>
         /// <param name="reader">The <see cref="TextReader"/> to extend.</param>
-        /// <returns>An <see cref="T:IEnumerable{string}"/> that contains all lines of characters from the <paramref name="reader"/>.</returns>
+        /// <returns>An <see cref="IEnumerable{String}"/> that contains all lines of characters from the <paramref name="reader"/>.</returns>
         public static IEnumerable<string> ReadAllLines(this TextReader reader)
         {
             Validator.ThrowIfNull(reader);
@@ -50,7 +50,7 @@ namespace Cuemon.Extensions.IO
         /// Asynchronously reads all lines of characters from the <paramref name="reader"/> and returns the data as a sequence of strings.
         /// </summary>
         /// <param name="reader">The <see cref="TextReader"/> to extend.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="T:IReadOnlyList{string}"/> that contains all lines of characters from the <paramref name="reader"/> that contains elements from the input sequence.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="IReadOnlyList{String}"/> that contains all lines of characters from the <paramref name="reader"/> that contains elements from the input sequence.</returns>
         public static async Task<IReadOnlyList<string>> ReadAllLinesAsync(this TextReader reader)
         {
             Validator.ThrowIfNull(reader);

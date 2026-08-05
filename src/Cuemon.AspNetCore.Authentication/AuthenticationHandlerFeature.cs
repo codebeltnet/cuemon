@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Features.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
@@ -38,7 +38,7 @@ namespace Cuemon.AspNetCore.Authentication
         }
 
         /// <summary>
-        /// The <see cref="P:Microsoft.AspNetCore.Authentication.IAuthenticateResultFeature.AuthenticateResult" /> from the authorization middleware.
+        /// The <see cref="IAuthenticateResultFeature.AuthenticateResult" /> from the authorization middleware.
         /// </summary>
         /// <value>The <see cref="Microsoft.AspNetCore.Authentication.AuthenticateResult"/> to propagate.</value>
         public AuthenticateResult AuthenticateResult

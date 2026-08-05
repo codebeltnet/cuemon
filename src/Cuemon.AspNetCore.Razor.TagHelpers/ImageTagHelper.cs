@@ -52,11 +52,11 @@ namespace Cuemon.AspNetCore.Razor.TagHelpers
         public string Title { get; set; }
 
         /// <summary>
-        /// Asynchronously executes the <see cref="T:TagHelper" /> with the given <paramref name="context" /> and <paramref name="output" />.
+        /// Asynchronously executes the <see cref="TagHelper" /> with the given <paramref name="context" /> and <paramref name="output" />.
         /// </summary>
         /// <param name="context">Contains information associated with the current HTML tag.</param>
         /// <param name="output">A stateful HTML element used to generate an HTML tag.</param>
-        /// <returns>A <see cref="T:Task" /> that on completion updates the <paramref name="output" />.</returns>
+        /// <returns>A <see cref="Task" /> that on completion updates the <paramref name="output" />.</returns>
         public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             output.TagMode = TagMode.StartTagOnly;

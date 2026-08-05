@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Extensions.AspNetCore.Text.Json.Formatters;
 using Cuemon.Extensions.Text.Json.Formatters;
 using Microsoft.AspNetCore.Http.Json;
@@ -21,7 +21,7 @@ namespace Cuemon.Extensions.AspNetCore.Text.Json
         /// <returns>An <see cref="IServiceCollection"/> that can be used to further configure other services.</returns>
         /// <remarks>
         /// This method registers a <see cref="MinimalJsonOptions"/> configuration as a singleton <see cref="IConfigureOptions{TOptions}"/> for <see cref="JsonOptions"/>
-        /// and delegates to <see cref="Cuemon.Extensions.AspNetCore.Text.Json.Formatters.ServiceCollectionExtensions.AddJsonExceptionResponseFormatter"/> to configure the JSON exception response formatter.
+        /// and delegates to <see cref="Formatters.ServiceCollectionExtensions.AddJsonExceptionResponseFormatter"/> to configure the JSON exception response formatter.
         /// </remarks>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="services"/> cannot be null.

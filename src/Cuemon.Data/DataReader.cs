@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Data;
 using System.Globalization;
@@ -82,7 +82,7 @@ namespace Cuemon.Data
         protected abstract TRead NullRead { get; }
 
         /// <summary>
-        /// Advances the <see cref="T:IDataReader" /> to the next record.
+        /// Advances the <see cref="IDataReader" /> to the next record.
         /// </summary>
         /// <returns><typeparamref name="TRead"/> for as long as there are rows; <see cref="NullRead"/> when no more rows exists.</returns>
         protected abstract TRead ReadNext(TRead columns);
@@ -171,10 +171,10 @@ namespace Cuemon.Data
         }
 
         /// <summary>
-        /// Gets the <see cref="T:System.Type" /> information corresponding to the type of <see cref="T:System.Object" /> that would be returned from <see cref="M:System.Data.IDataRecord.GetValue(System.Int32)" />.
+        /// Gets the <see cref="Type" /> information corresponding to the type of <see cref="System.Object" /> that would be returned from <see cref="IDataRecord.GetValue(System.Int32)" />.
         /// </summary>
         /// <param name="i">The index of the field to find.</param>
-        /// <returns>The <see cref="T:System.Type" /> information corresponding to the type of <see cref="T:System.Object" /> that would be returned from <see cref="M:System.Data.IDataRecord.GetValue(System.Int32)" />.</returns>
+        /// <returns>The <see cref="Type" /> information corresponding to the type of <see cref="System.Object" /> that would be returned from <see cref="IDataRecord.GetValue(System.Int32)" />.</returns>
         public Type GetFieldType(int i)
         {
             return GetValue(i).GetType();
@@ -283,7 +283,7 @@ namespace Cuemon.Data
         /// Return the value of the specified field.
         /// </summary>
         /// <param name="i">The index of the field to find.</param>
-        /// <returns>The <see cref="T:System.Object" /> which will contain the field value upon return.</returns>
+        /// <returns>The <see cref="System.Object" /> which will contain the field value upon return.</returns>
         public object GetValue(int i)
         {
             return Fields[i];
@@ -300,7 +300,7 @@ namespace Cuemon.Data
         }
 
         /// <summary>
-        /// Advances the <see cref="T:System.Data.IDataReader" /> to the next record.
+        /// Advances the <see cref="IDataReader" /> to the next record.
         /// </summary>
         /// <returns><see langword="true" /> if there are more rows; otherwise, <see langword="false" />.</returns>
         public abstract bool Read();
@@ -314,8 +314,8 @@ namespace Cuemon.Data
         /// <summary>
         /// Populates an array of objects with the column values of the current record.
         /// </summary>
-        /// <param name="values">An array of <see cref="T:System.Object" /> to copy the attribute fields into.</param>
-        /// <returns>The number of instances of <see cref="T:System.Object" /> in the array.</returns>
+        /// <param name="values">An array of <see cref="System.Object" /> to copy the attribute fields into.</param>
+        /// <returns>The number of instances of <see cref="System.Object" /> in the array.</returns>
         public int GetValues(object[] values)
         {
             Validator.ThrowIfNull(values);

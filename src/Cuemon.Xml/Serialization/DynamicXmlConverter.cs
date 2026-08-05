@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml;
 using Cuemon.Xml.Serialization.Converters;
 
@@ -74,8 +74,8 @@ namespace Cuemon.Xml.Serialization
         /// <summary>
         /// Reads the XML representation of the <paramref name="objectType" />.
         /// </summary>
-        /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> to read from.</param>
-        /// <param name="objectType">The <seealso cref="T:System.Type" /> of the object.</param>
+        /// <param name="reader">The <see cref="XmlReader" /> to read from.</param>
+        /// <param name="objectType">The <seealso cref="Type" /> of the object.</param>
         /// <returns>An object of <paramref name="objectType" />.</returns>
         /// <exception cref="InvalidOperationException">Delegate reader is null.</exception>
         public override object ReadXml(XmlReader reader, Type objectType)
@@ -87,7 +87,7 @@ namespace Cuemon.Xml.Serialization
         /// <summary>
         /// Determines whether this instance can convert the specified object type.
         /// </summary>
-        /// <param name="objectType">The <seealso cref="T:System.Type" /> of the object.</param>
+        /// <param name="objectType">The <seealso cref="Type" /> of the object.</param>
         /// <returns><c>true</c> if this instance can convert the specified object type; otherwise, <c>false</c>.</returns>
         public override bool CanConvert(Type objectType)
         {
@@ -101,7 +101,7 @@ namespace Cuemon.Xml.Serialization
         /// <summary>
         /// Writes the XML representation of the <paramref name="value" />.
         /// </summary>
-        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> to write to.</param>
+        /// <param name="writer">The <see cref="XmlWriter" /> to write to.</param>
         /// <param name="value">The object to serialize.</param>
         /// <param name="elementName">The element name to encapsulate around <paramref name="value" />.</param>
         /// <exception cref="InvalidOperationException">Delegate writer is null.</exception>
@@ -112,15 +112,15 @@ namespace Cuemon.Xml.Serialization
         }
 
         /// <summary>
-        /// Gets a value indicating whether this <seealso cref="T:Cuemon.Extensions.Xml.Serialization.Converters.XmlConverter" /> can XML.
+        /// Gets a value indicating whether this <seealso cref="XmlConverter" /> can XML.
         /// </summary>
-        /// <value><c>true</c> if this <seealso cref="T:Cuemon.Extensions.Xml.Serialization.Converters.XmlConverter" /> can read XML; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if this <seealso cref="XmlConverter" /> can read XML; otherwise, <c>false</c>.</value>
         public override bool CanRead => Reader != null;
 
         /// <summary>
-        /// Gets a value indicating whether this <seealso cref="T:Cuemon.Extensions.Xml.Serialization.Converters.XmlConverter" /> can write XML.
+        /// Gets a value indicating whether this <seealso cref="XmlConverter" /> can write XML.
         /// </summary>
-        /// <value><c>true</c> if this <seealso cref="T:Cuemon.Extensions.Xml.Serialization.Converters.XmlConverter" /> can write XML; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if this <seealso cref="XmlConverter" /> can write XML; otherwise, <c>false</c>.</value>
         public override bool CanWrite => Writer != null;
     }
 }

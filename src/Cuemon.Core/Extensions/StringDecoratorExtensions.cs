@@ -62,11 +62,11 @@ namespace Cuemon
         }
 
         /// <summary>
-        /// Converts the enclosed <see cref="string"/> of the specified <paramref name="decorator"/> to its equivalent <see cref="T:byte[]"/> representation.
+        /// Converts the enclosed <see cref="string"/> of the specified <paramref name="decorator"/> to its equivalent <see cref="byte"/> array representation.
         /// </summary>
         /// <param name="decorator">The <see cref="IDecorator{String}"/> to extend.</param>
         /// <param name="setup">The <see cref="EncodingOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> containing the result of the enclosed <see cref="string"/> of the specified <paramref name="decorator"/>.</returns>
+        /// <returns>A <see cref="byte"/> array containing the result of the enclosed <see cref="string"/> of the specified <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>

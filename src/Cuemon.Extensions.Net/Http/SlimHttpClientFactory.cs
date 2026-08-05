@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net.Http;
@@ -51,10 +51,10 @@ namespace Cuemon.Extensions.Net.Http
         }
 
         /// <summary>
-        /// Creates and configures an <see cref="T:System.Net.Http.HttpClient" /> instance using the configuration that corresponds to the logical name specified by <paramref name="name" />.
+        /// Creates and configures an <see cref="HttpClient" /> instance using the configuration that corresponds to the logical name specified by <paramref name="name" />.
         /// </summary>
         /// <param name="name">The logical name of the client to create.</param>
-        /// <returns>A new <see cref="T:System.Net.Http.HttpClient" /> instance.</returns>
+        /// <returns>A new <see cref="HttpClient" /> instance.</returns>
         public HttpClient CreateClient(string name)
         {
             var handler = CreateHandler(name);
@@ -62,10 +62,10 @@ namespace Cuemon.Extensions.Net.Http
         }
 
         /// <summary>
-        /// Creates and configures an <see cref="T:System.Net.Http.HttpMessageHandler" /> instance using the configuration that corresponds to the logical name specified by <paramref name="name" />.
+        /// Creates and configures an <see cref="HttpMessageHandler" /> instance using the configuration that corresponds to the logical name specified by <paramref name="name" />.
         /// </summary>
         /// <param name="name">The logical name of the message handler to create.</param>
-        /// <returns>A new <see cref="T:System.Net.Http.HttpMessageHandler" /> instance.</returns>
+        /// <returns>A new <see cref="HttpMessageHandler" /> instance.</returns>
         public HttpMessageHandler CreateHandler(string name)
         {
             StartExpirationTimer(name);

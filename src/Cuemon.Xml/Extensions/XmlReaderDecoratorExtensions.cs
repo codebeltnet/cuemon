@@ -20,7 +20,7 @@ namespace Cuemon.Xml
         /// <summary>
         /// Creates and returns a sequence of chunked <see cref="XmlReader"/> instances from the enclosed <see cref="XmlReader"/> of the specified <paramref name="decorator"/> with a maximum of the specified <paramref name="size"/> of XML node elements located on a depth of 1.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{XmlReader}"/> to extend.</param>
+        /// <param name="decorator">The <see cref="IDecorator{XmlReader}"/> to extend.</param>
         /// <param name="size">The amount of XML node elements allowed per <see cref="XmlReader"/> object. Default is 128 XML node element.</param>
         /// <param name="setup">The <see cref="XmlWriterSettings"/> which may be configured.</param>
         /// <returns>An sequence of <see cref="XmlReader"/> instances that contains no more than the specified <paramref name="size"/> of XML node elements from the enclosed <see cref="XmlReader"/> of the specified <paramref name="decorator"/>.</returns>
@@ -93,7 +93,7 @@ namespace Cuemon.Xml
         /// <summary>
         /// Moves the enclosed <see cref="XmlReader"/> of the specified <paramref name="decorator"/> to the first element.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{XmlReader}"/> to extend.</param>
+        /// <param name="decorator">The <see cref="IDecorator{XmlReader}"/> to extend.</param>
         /// <returns><c>true</c> if an element exists (the reader moves to the first element), otherwise, <c>false</c> (the reader has reached <see cref="XmlReader.EOF"/>).</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> is null.
@@ -120,8 +120,8 @@ namespace Cuemon.Xml
         /// <summary>
         /// Converts the XML hierarchy of the enclosed <see cref="XmlReader"/> of the specified <paramref name="decorator"/> into an <see cref="IHierarchy{T}"/>.
         /// </summary>
-        /// <param name="decorator">The <see cref="T:IDecorator{XmlReader}" /> to extend.</param>
-        /// <returns>An <see cref="T:IHierarchy{DataPair}"/> implementation.</returns>
+        /// <param name="decorator">The <see cref="IDecorator{XmlReader}" /> to extend.</param>
+        /// <returns>An <see cref="IHierarchy{DataPair}"/> implementation.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>

@@ -46,11 +46,11 @@ namespace Cuemon.IO
         }
 
         /// <summary>
-        /// Converts the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/> to its equivalent <see cref="T:byte[]"/> representation.
+        /// Converts the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/> to its equivalent <see cref="byte"/> array representation.
         /// </summary>
         /// <param name="decorator">The <see cref="IDecorator{Stream}"/> to extend.</param>
         /// <param name="setup">The <see cref="StreamCopyOptions"/> which may be configured.</param>
-        /// <returns>A <see cref="T:byte[]"/> that is equivalent to the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/>.</returns>
+        /// <returns>A <see cref="byte"/> array that is equivalent to the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>
@@ -66,11 +66,11 @@ namespace Cuemon.IO
         }
 
         /// <summary>
-        /// Converts the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/> to its equivalent <see cref="T:byte[]"/> representation.
+        /// Converts the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/> to its equivalent <see cref="byte"/> array representation.
         /// </summary>
         /// <param name="decorator">The <see cref="IDecorator{Stream}"/> to extend.</param>
         /// <param name="setup">The <see cref="AsyncStreamCopyOptions"/> which may be configured.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="T:byte[]"/> that is equivalent to the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/>.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="byte"/> array that is equivalent to the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="decorator"/> cannot be null.
         /// </exception>

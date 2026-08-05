@@ -103,7 +103,7 @@ namespace Cuemon.Runtime
         }
 
         /// <summary>
-        /// Called when this object is being disposed by either <see cref="Disposable.Dispose" /> or <see cref="Disposable.Dispose(System.Boolean)" /> having <c>disposing</c> set to <c>true</c> and <see cref="Disposable.Disposed" /> is <c>false</c>.
+        /// Called when this object is being disposed by either <see cref="Disposable.Dispose()" /> or <see cref="Disposable.Dispose(System.Boolean)" /> having <c>disposing</c> set to <c>true</c> and <see cref="Disposable.Disposed" /> is <c>false</c>.
         /// </summary>
         protected override void OnDisposeManagedResources()
         {
@@ -112,7 +112,7 @@ namespace Cuemon.Runtime
         }
 
         /// <summary>
-        /// Called when this object is being disposed by either <see cref="Disposable.Dispose" /> or <see cref="Disposable.Dispose(System.Boolean)" /> and <see cref="Disposable.Disposed" /> is <c>false</c>.
+        /// Called when this object is being disposed by either <see cref="Disposable.Dispose()" /> or <see cref="Disposable.Dispose(System.Boolean)" /> and <see cref="Disposable.Disposed" /> is <c>false</c>.
         /// </summary>
         protected override void OnDisposeUnmanagedResources()
         {

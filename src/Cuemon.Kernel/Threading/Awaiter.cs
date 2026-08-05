@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -42,12 +42,16 @@ namespace Cuemon.Threading
                     conditionalValue = await method().ConfigureAwait(false);
                     if (conditionalValue.Succeeded) { break; }
                 }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     exceptions.Add(ex);
                 }
 
-                await Task.Delay(options.Delay).ConfigureAwait(false);
+                await Task.Delay(options.Delay, options.CancellationToken).ConfigureAwait(false);
             }
 
             return (conditionalValue?.Succeeded ?? false)

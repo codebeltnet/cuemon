@@ -761,14 +761,18 @@ public class PortablePhysicalFileProviderTest : Test
         using var scope = new TemporaryFileSystemScope();
         var physicalPath = scope.CreateFile("Assets/Images/Logo.svg", "watch");
 
+        using var expected = new PhysicalFileProvider(scope.RootPath);
         using var sut = new PortablePhysicalFileProvider(scope.RootPath);
+        SetPolling(expected);
         SetPolling(sut);
 
+        var baseline = expected.Watch("Assets/Images/Logo.svg");
         var token = sut.Watch("assets/images/logo.svg");
 
+        AssertEquivalentChangeToken(baseline, token);
         Assert.False(ReferenceEquals(NullChangeToken.Singleton, token));
 
-        await AwaitChangeAsync(token, () => File.AppendAllText(physicalPath, Guid.NewGuid().ToString("N")));
+        await AssertEquivalentChangeNotificationAsync(baseline, token, () => File.AppendAllText(physicalPath, Guid.NewGuid().ToString("N")));
     }
 
     [Fact]
@@ -777,14 +781,18 @@ public class PortablePhysicalFileProviderTest : Test
         using var scope = new TemporaryFileSystemScope();
         var directoryPath = scope.CreateDirectory("Assets");
 
+        using var expected = new PhysicalFileProvider(scope.RootPath);
         using var sut = new PortablePhysicalFileProvider(scope.RootPath);
+        SetPolling(expected);
         SetPolling(sut);
 
+        var baseline = expected.Watch("Assets/");
         var token = sut.Watch("assets/");
 
+        AssertEquivalentChangeToken(baseline, token);
         Assert.False(ReferenceEquals(NullChangeToken.Singleton, token));
 
-        await AwaitChangeAsync(token, () => File.WriteAllText(Path.Combine(directoryPath, "new.txt"), Guid.NewGuid().ToString("N")));
+        await AssertEquivalentChangeNotificationAsync(baseline, token, () => File.WriteAllText(Path.Combine(directoryPath, "new.txt"), Guid.NewGuid().ToString("N")));
     }
 
     [Fact]
@@ -1095,9 +1103,15 @@ public class PortablePhysicalFileProviderTest : Test
     {
         Assert.Equal(expected.Exists, actual.Exists);
         Assert.Equal(expected.IsDirectory, actual.IsDirectory);
-        Assert.Equal(expected.Length, actual.Length);
         Assert.Equal(expected.Name, actual.Name);
         Assert.Equal(expected.PhysicalPath, actual.PhysicalPath);
+
+        if (!expected.Exists || !actual.Exists)
+        {
+            return;
+        }
+
+        Assert.Equal(expected.Length, actual.Length);
     }
 
     private static void AssertEquivalentDirectoryContents(IDirectoryContents expected, IDirectoryContents actual)
@@ -1138,18 +1152,24 @@ public class PortablePhysicalFileProviderTest : Test
         provider.UseActivePolling = true;
     }
 
-    private static async Task AwaitChangeAsync(IChangeToken token, Action changeAction)
+    private static async Task AssertEquivalentChangeNotificationAsync(IChangeToken expected, IChangeToken actual, Action changeAction)
+    {
+        var expectedChanged = WaitForChangeAsync(expected);
+        var actualChanged = WaitForChangeAsync(actual);
+
+        changeAction();
+
+        Assert.Equal(await expectedChanged.ConfigureAwait(false), await actualChanged.ConfigureAwait(false));
+    }
+
+    private static async Task<bool> WaitForChangeAsync(IChangeToken token)
     {
         var changed = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         using (token.RegisterChangeCallback(_ => changed.TrySetResult(null), null))
         {
-            changeAction();
-
-            var completed = await Task.WhenAny(changed.Task, Task.Delay(ChangeNotificationTimeout));
-
-            Assert.Same(changed.Task, completed);
-            await changed.Task;
+            var completed = await Task.WhenAny(changed.Task, Task.Delay(ChangeNotificationTimeout)).ConfigureAwait(false);
+            return ReferenceEquals(completed, changed.Task);
         }
     }
 
@@ -1316,7 +1336,7 @@ public class PortablePhysicalFileProviderTest : Test
 
         public static bool SupportsDistinctCaseEntries => CaseDistinctEntries.Value.Supported;
 
-        public static string DistinctCaseEntriesUnsupportedReason => CaseDistinctEntries.Value.UnsupportedReason;
+        public static string DistinctCaseEntriesUnsupportedReason => CaseDistinctEntries.Value.UnsupportedReason ?? "The temporary filesystem supports distinct entries whose names differ only by casing.";
 
         private static CaseDistinctCapability DetectCaseDistinctEntries()
         {

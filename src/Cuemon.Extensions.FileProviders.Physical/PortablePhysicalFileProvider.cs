@@ -35,14 +35,22 @@ namespace Cuemon.Extensions.FileProviders;
 /// Successfully resolved paths are cached using ordinal, case-insensitive keys for the lifetime of this provider. Misses and collisions are not cached and are re-evaluated on each call. The root should therefore have a stable naming topology for previously successful logical paths. After a case-only rename, or after introducing or removing a casing collision for a previously successful logical path, create a new provider instance to guarantee that the path is resolved again.
 /// </para>
 /// </remarks>
-/// <param name="root">The absolute directory to use as the provider root.</param>
-/// <param name="filters">A bitwise combination of values that specifies which files or directories are excluded.</param>
-public sealed class PortablePhysicalFileProvider(string root, ExclusionFilters filters = ExclusionFilters.Sensitive) : Disposable, IFileProvider
+public sealed class PortablePhysicalFileProvider : Disposable, IFileProvider
 {
-    private readonly PhysicalFileProvider _provider = new(root, filters);
+    private readonly PhysicalFileProvider _provider;
     private readonly ConcurrentDictionary<string, string> _files = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, string> _directories = new(StringComparer.OrdinalIgnoreCase);
     private static readonly char[] PathSeparators = { '/' };
+
+    /// <summary>
+    /// Initializes a new instance of a PhysicalFileProvider at the given root directory.
+    /// </summary>
+    /// <param name="root">The absolute directory to use as the provider root.</param>
+    /// <param name="filters">A bitwise combination of values that specifies which files or directories are excluded.</param>
+    public PortablePhysicalFileProvider(string root, ExclusionFilters filters = ExclusionFilters.Sensitive)
+    {
+        _provider= new PhysicalFileProvider(root, filters);
+    }
 
     /// <inheritdoc cref="PhysicalFileProvider.Root"/>
     public string Root => _provider.Root;

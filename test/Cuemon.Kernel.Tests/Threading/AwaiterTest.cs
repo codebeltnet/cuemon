@@ -20,7 +20,7 @@ namespace Cuemon.Threading
 
             Assert.Equal(TimeSpan.FromSeconds(5), sut.Timeout);
             Assert.Equal(TimeSpan.FromMilliseconds(100), sut.Delay);
-            Assert.Null(sut.MaximumAttempts);
+            Assert.Equal(0, sut.MaximumAttempts);
             Assert.Same(TimeProvider.System, sut.TimeProvider);
             Assert.False(sut.CancellationToken.CanBeCanceled);
         }
@@ -98,14 +98,13 @@ namespace Cuemon.Threading
             Assert.Contains("TimeProvider cannot be null.", ex.InnerException.Message);
         }
 
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        public void ValidateOptions_ShouldThrowArgumentException_WhenMaximumAttemptsIsNotPositive(int maximumAttempts)
+
+        [Fact]
+        public void ValidateOptions_ShouldThrowArgumentException_WhenMaximumAttemptsIsNotPositive()
         {
             var sut = new AsyncRunOptions
             {
-                MaximumAttempts = maximumAttempts
+                MaximumAttempts = -1
             };
 
             var ex = Assert.Throws<ArgumentException>(() => Validator.ThrowIfInvalidOptions(sut));
@@ -1022,7 +1021,7 @@ namespace Cuemon.Threading
                 o.TimeProvider = timeProvider;
                 o.Timeout = timeout;
                 o.Delay = delay;
-                o.MaximumAttempts = maximumAttempts;
+                o.MaximumAttempts = maximumAttempts ?? 0;
                 if (cancellationToken.HasValue) { o.CancellationToken = cancellationToken.Value; }
                 if (cancellationTokenProvider != null) { o.CancellationTokenProvider = cancellationTokenProvider; }
             };

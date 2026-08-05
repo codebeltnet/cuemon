@@ -152,7 +152,7 @@ namespace Cuemon.Threading
         private static bool TryGetRetryDelay(AsyncRunOptions options, DateTimeOffset deadline, int attemptCount, out TimeSpan delay)
         {
             delay = TimeSpan.Zero;
-            if (options.MaximumAttempts.HasValue && attemptCount >= options.MaximumAttempts.Value) { return false; }
+            if (options.MaximumAttempts > 0 && attemptCount >= options.MaximumAttempts) { return false; }
             var remaining = deadline - options.TimeProvider.GetUtcNow();
             if (remaining <= TimeSpan.Zero) { return false; }
             delay = options.Delay <= remaining ? options.Delay : remaining;

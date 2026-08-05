@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Configuration;
 
 namespace Cuemon.Threading
@@ -66,14 +66,14 @@ namespace Cuemon.Threading
         public TimeSpan Delay { get; set; }
 
         /// <summary>
-        /// Gets or sets the optional maximum number of total invocations, including the initial invocation.
+        /// Gets or sets the maximum number of total invocations, including the initial invocation.
         /// </summary>
-        /// <value>The optional maximum number of total invocations. The default is <c>null</c>.</value>
+        /// <value>The maximum number of total invocations. The default is 0.</value>
         /// <remarks>
-        /// When this property is <c>null</c>, retries continue until the operation succeeds, the <see cref="Timeout"/> window closes, or cancellation is requested.
+        /// When this property is 0, retries continue until the operation succeeds, the <see cref="Timeout"/> window closes, or cancellation is requested.
         /// When <see cref="Delay"/> is <see cref="TimeSpan.Zero"/>, this property must be configured with a positive value.
         /// </remarks>
-        public int? MaximumAttempts { get; set; }
+        public int MaximumAttempts { get; set; }
 
         /// <summary>
         /// Gets or sets the time provider used to measure elapsed time and schedule retry delays.
@@ -99,8 +99,8 @@ namespace Cuemon.Threading
             Validator.ThrowIfInvalidState(Timeout < TimeSpan.Zero, $"{nameof(Timeout)} cannot be negative.");
             Validator.ThrowIfInvalidState(Delay < TimeSpan.Zero, $"{nameof(Delay)} cannot be negative.");
             Validator.ThrowIfInvalidState(TimeProvider == null, $"{nameof(TimeProvider)} cannot be null.");
-            if (MaximumAttempts.HasValue) { Validator.ThrowIfInvalidState(MaximumAttempts.Value <= 0, $"{nameof(MaximumAttempts)} must be greater than zero when specified."); }
-            if (Delay == TimeSpan.Zero) { Validator.ThrowIfInvalidState(!MaximumAttempts.HasValue, $"{nameof(MaximumAttempts)} must be specified when {nameof(Delay)} is {nameof(TimeSpan)}.{nameof(TimeSpan.Zero)} to prevent an unbounded retry loop."); }
+            Validator.ThrowIfInvalidState(MaximumAttempts < 0, $"{nameof(MaximumAttempts)} must be greater than zero when specified.");
+            if (Delay == TimeSpan.Zero) { Validator.ThrowIfInvalidState(MaximumAttempts <= 0, $"{nameof(MaximumAttempts)} must be specified when {nameof(Delay)} is {nameof(TimeSpan)}.{nameof(TimeSpan.Zero)} to prevent an unbounded retry loop."); }
         }
     }
 }

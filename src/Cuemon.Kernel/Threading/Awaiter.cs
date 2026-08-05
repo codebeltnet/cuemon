@@ -32,7 +32,7 @@ namespace Cuemon.Threading
         /// </exception>
         /// <remarks>
         /// The retry window begins immediately before the initial invocation. The initial invocation always occurs, even when <see cref="AsyncRunOptions.Timeout"/> is <see cref="TimeSpan.Zero"/>.
-        /// No new invocation begins after the timeout deadline or once <see cref="AsyncRunOptions.MaximumAttempts"/> is reached. After an unsuccessful attempt or a caught exception, the next delay is capped to the smaller of <see cref="AsyncRunOptions.Delay"/> and the remaining timeout window. Positive fractional-millisecond retry delays are rounded up to the next whole millisecond when the delay is scheduled.
+        /// No new invocation begins after the timeout deadline or once <see cref="AsyncRunOptions.MaximumAttempts"/> is reached. After an unsuccessful attempt or a caught exception, the next delay is capped to the smaller of <see cref="AsyncRunOptions.Delay"/> and the remaining timeout window. When the configured delay exceeds the remaining timeout window, the operation waits out the remainder of the window and completes without starting another invocation. Positive fractional-millisecond retry delays are rounded up to the next whole millisecond when the delay is scheduled.
         /// When <see cref="AsyncRunOptions.Delay"/> is <see cref="TimeSpan.Zero"/>, <see cref="AsyncRunOptions.MaximumAttempts"/> must be configured with a positive value.
         /// <para>
         /// Cancellation is resolved from <see cref="AsyncOptions.CancellationToken"/> immediately before each attempt and immediately before each retry delay.
@@ -73,6 +73,7 @@ namespace Cuemon.Threading
                 attemptToken.ThrowIfCancellationRequested();
                 attemptCount++;
                 TimeSpan retryDelay;
+                var stopAfterDelay = false;
 
                 ConditionalValue conditionalValue;
                 try
@@ -82,16 +83,18 @@ namespace Cuemon.Threading
                 catch (Exception ex) when (ex is not OperationCanceledException && Patterns.IsRecoverableException(ex))
                 {
                     CaptureException(ref firstException, ref exceptions, ex);
-                    if (!TryGetRetryDelay(startedAt, options, attemptCount, out retryDelay)) { break; }
+                    if (!TryGetRetryDelay(startedAt, options, attemptCount, out retryDelay, out stopAfterDelay)) { break; }
                     await DelayAsync(options, retryDelay).ConfigureAwait(false);
+                    if (stopAfterDelay) { break; }
                     continue;
                 }
 
                 if (conditionalValue == null) { throw new InvalidOperationException("The specified delegate returned a null ConditionalValue."); }
                 if (conditionalValue.Succeeded) { return conditionalValue; }
 
-                if (!TryGetRetryDelay(startedAt, options, attemptCount, out retryDelay)) { break; }
+                if (!TryGetRetryDelay(startedAt, options, attemptCount, out retryDelay, out stopAfterDelay)) { break; }
                 await DelayAsync(options, retryDelay).ConfigureAwait(false);
+                if (stopAfterDelay) { break; }
             }
 
             return GetUnsuccessfulValue(firstException, exceptions);
@@ -102,8 +105,10 @@ namespace Cuemon.Threading
             return GetElapsedTime(startedAt) >= timeout;
         }
 
-        private static bool TryGetRetryDelay(long startedAt, AsyncRunOptions options, int attemptCount, out TimeSpan delay)
+        private static bool TryGetRetryDelay(long startedAt, AsyncRunOptions options, int attemptCount, out TimeSpan delay, out bool stopAfterDelay)
         {
+            stopAfterDelay = false;
+
             if (options.MaximumAttempts > 0 && attemptCount >= options.MaximumAttempts)
             {
                 delay = TimeSpan.Zero;
@@ -117,9 +122,14 @@ namespace Cuemon.Threading
                 return false;
             }
 
-            delay = options.Delay <= remaining
-                ? options.Delay
-                : remaining;
+            if (options.Delay > remaining)
+            {
+                delay = remaining;
+                stopAfterDelay = true;
+                return true;
+            }
+
+            delay = options.Delay;
             return true;
         }
 

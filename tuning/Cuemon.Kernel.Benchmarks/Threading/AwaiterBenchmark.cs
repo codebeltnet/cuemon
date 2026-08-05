@@ -9,97 +9,122 @@ namespace Cuemon.Threading
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class AwaiterBenchmark
     {
-        // Fast-path comparison: direct await vs Awaiter wrapper
+        private static readonly Task<ConditionalValue> SuccessfulTask = Task.FromResult<ConditionalValue>(new SuccessfulValue());
+        private static readonly Task<ConditionalValue> UnsuccessfulTask = Task.FromResult<ConditionalValue>(new UnsuccessfulValue());
+        private static readonly Task<ConditionalValue> InvalidOperationTask = Task.FromException<ConditionalValue>(new InvalidOperationException("fail1"));
+        private static readonly Task<ConditionalValue> ArgumentTask = Task.FromException<ConditionalValue>(new ArgumentException("fail2"));
+        private static readonly Task<ConditionalValue>[] OneExceptionSequence = { InvalidOperationTask };
+        private static readonly Task<ConditionalValue>[] TwoExceptionSequence = { InvalidOperationTask, ArgumentTask };
+        private static readonly Task<ConditionalValue>[] TenExceptionSequence =
+        {
+            InvalidOperationTask,
+            ArgumentTask,
+            InvalidOperationTask,
+            ArgumentTask,
+            InvalidOperationTask,
+            ArgumentTask,
+            InvalidOperationTask,
+            ArgumentTask,
+            InvalidOperationTask,
+            ArgumentTask
+        };
+        private static readonly Action<AsyncRunOptions> ImmediateSuccessSetup = CreateSetup(1);
+        private static readonly Action<AsyncRunOptions> OneRetrySetup = CreateSetup(2);
+        private static readonly Action<AsyncRunOptions> TwoRetrySetup = CreateSetup(3);
+        private static readonly Action<AsyncRunOptions> TenRetrySetup = CreateSetup(11);
+
+        private readonly Func<Task<ConditionalValue>> _immediateSuccessMethod;
+        private readonly Func<Task<ConditionalValue>> _unsuccessfulThenSuccessMethod;
+        private readonly Func<Task<ConditionalValue>> _exceptionsThenSuccessMethod;
+
+        private int _attempt;
+        private int _unsuccessfulAttemptsBeforeSuccess;
+        private Task<ConditionalValue>[] _exceptionSequence;
+
+        public AwaiterBenchmark()
+        {
+            _immediateSuccessMethod = ImmediateSuccessAsync;
+            _unsuccessfulThenSuccessMethod = UnsuccessfulThenSuccessAsync;
+            _exceptionsThenSuccessMethod = ExceptionsThenSuccessAsync;
+        }
+
         [Benchmark(Baseline = true, Description = "Direct await - immediate success")]
-        public Task<ConditionalValue> DirectAwait_ImmediateSuccess() => Task.FromResult<ConditionalValue>(new SuccessfulValue());
+        public Task<ConditionalValue> DirectAwait_ImmediateSuccess()
+        {
+            return SuccessfulTask;
+        }
 
         [Benchmark(Description = "Awaiter - immediate success")]
-        public Task<ConditionalValue> Awaiter_ImmediateSuccess() => Awaiter.RunUntilSuccessfulOrTimeoutAsync(() => Task.FromResult<ConditionalValue>(new SuccessfulValue()), o =>
+        public Task<ConditionalValue> Awaiter_ImmediateSuccess()
         {
-            o.Timeout = TimeSpan.Zero; // force single iteration
-            o.Delay = TimeSpan.Zero;
-        });
+            return Awaiter.RunUntilSuccessfulOrTimeoutAsync(_immediateSuccessMethod, ImmediateSuccessSetup);
+        }
 
-        // Retry scenarios: fail N times then succeed
-        [Benchmark(Description = "Awaiter - fail 1 then success")]
-        public Task<ConditionalValue> Awaiter_Fail1_ThenSuccess()
+        [Benchmark(Description = "Awaiter - 1 unsuccessful result then success")]
+        public Task<ConditionalValue> Awaiter_Unsuccessful1_ThenSuccess()
         {
-            int call = 0;
-            Task<ConditionalValue> Method()
-            {
-                call++;
-                if (call <= 1) return Task.FromResult<ConditionalValue>(new UnsuccessfulValue());
-                return Task.FromResult<ConditionalValue>(new SuccessfulValue());
-            }
+            _attempt = 0;
+            _unsuccessfulAttemptsBeforeSuccess = 1;
+            return Awaiter.RunUntilSuccessfulOrTimeoutAsync(_unsuccessfulThenSuccessMethod, OneRetrySetup);
+        }
 
-            return Awaiter.RunUntilSuccessfulOrTimeoutAsync(Method, o =>
+        [Benchmark(Description = "Awaiter - 10 unsuccessful results then success")]
+        public Task<ConditionalValue> Awaiter_Unsuccessful10_ThenSuccess()
+        {
+            _attempt = 0;
+            _unsuccessfulAttemptsBeforeSuccess = 10;
+            return Awaiter.RunUntilSuccessfulOrTimeoutAsync(_unsuccessfulThenSuccessMethod, TenRetrySetup);
+        }
+
+        [Benchmark(Description = "Awaiter - 1 exception then success")]
+        public Task<ConditionalValue> Awaiter_Exception1_ThenSuccess()
+        {
+            _attempt = 0;
+            _exceptionSequence = OneExceptionSequence;
+            return Awaiter.RunUntilSuccessfulOrTimeoutAsync(_exceptionsThenSuccessMethod, OneRetrySetup);
+        }
+
+        [Benchmark(Description = "Awaiter - 2 exceptions then success")]
+        public Task<ConditionalValue> Awaiter_Exception2_ThenSuccess()
+        {
+            _attempt = 0;
+            _exceptionSequence = TwoExceptionSequence;
+            return Awaiter.RunUntilSuccessfulOrTimeoutAsync(_exceptionsThenSuccessMethod, TwoRetrySetup);
+        }
+
+        [Benchmark(Description = "Awaiter - 10 exceptions then success")]
+        public Task<ConditionalValue> Awaiter_Exception10_ThenSuccess()
+        {
+            _attempt = 0;
+            _exceptionSequence = TenExceptionSequence;
+            return Awaiter.RunUntilSuccessfulOrTimeoutAsync(_exceptionsThenSuccessMethod, TenRetrySetup);
+        }
+
+        private static Action<AsyncRunOptions> CreateSetup(int maximumAttempts)
+        {
+            return o =>
             {
                 o.Timeout = TimeSpan.FromSeconds(1);
                 o.Delay = TimeSpan.Zero;
-            });
+                o.MaximumAttempts = maximumAttempts;
+            };
         }
 
-        [Benchmark(Description = "Awaiter - fail 10 then success")]
-        public Task<ConditionalValue> Awaiter_Fail10_ThenSuccess()
+        private Task<ConditionalValue> ImmediateSuccessAsync()
         {
-            int call = 0;
-            Task<ConditionalValue> Method()
-            {
-                call++;
-                if (call <= 10) return Task.FromResult<ConditionalValue>(new UnsuccessfulValue());
-                return Task.FromResult<ConditionalValue>(new SuccessfulValue());
-            }
-
-            return Awaiter.RunUntilSuccessfulOrTimeoutAsync(Method, o =>
-            {
-                o.Timeout = TimeSpan.FromSeconds(5);
-                o.Delay = TimeSpan.Zero;
-            });
+            return SuccessfulTask;
         }
 
-        // Exception collection scenarios
-        [Benchmark(Description = "Awaiter - 1 thrown exception then unsuccessful")]
-        public Task<ConditionalValue> Awaiter_Throw1_ThenUnsuccessful()
+        private Task<ConditionalValue> UnsuccessfulThenSuccessAsync()
         {
-            var exceptions = new Exception[] { new InvalidOperationException("fail1") };
-            int call = 0;
-            Task<ConditionalValue> Method()
-            {
-                if (call < exceptions.Length)
-                {
-                    throw exceptions[call++];
-                }
-                // After throwing, return unsuccessful immediately
-                return Task.FromResult<ConditionalValue>(new UnsuccessfulValue());
-            }
-
-            return Awaiter.RunUntilSuccessfulOrTimeoutAsync(Method, o =>
-            {
-                o.Timeout = TimeSpan.FromSeconds(1);
-                o.Delay = TimeSpan.Zero;
-            });
+            var currentAttempt = ++_attempt;
+            return currentAttempt <= _unsuccessfulAttemptsBeforeSuccess ? UnsuccessfulTask : SuccessfulTask;
         }
 
-        [Benchmark(Description = "Awaiter - 2 thrown exceptions then unsuccessful")]
-        public Task<ConditionalValue> Awaiter_Throw2_ThenUnsuccessful()
+        private Task<ConditionalValue> ExceptionsThenSuccessAsync()
         {
-            var exceptions = new Exception[] { new InvalidOperationException("fail1"), new ArgumentException("fail2") };
-            int call = 0;
-            Task<ConditionalValue> Method()
-            {
-                if (call < exceptions.Length)
-                {
-                    throw exceptions[call++];
-                }
-                // After throwing, return unsuccessful immediately
-                return Task.FromResult<ConditionalValue>(new UnsuccessfulValue());
-            }
-
-            return Awaiter.RunUntilSuccessfulOrTimeoutAsync(Method, o =>
-            {
-                o.Timeout = TimeSpan.FromSeconds(1);
-                o.Delay = TimeSpan.Zero;
-            });
+            var currentAttempt = _attempt++;
+            return currentAttempt < _exceptionSequence.Length ? _exceptionSequence[currentAttempt] : SuccessfulTask;
         }
     }
 }

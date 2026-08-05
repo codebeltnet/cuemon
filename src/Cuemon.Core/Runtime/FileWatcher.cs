@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Cuemon.Security;
@@ -28,7 +28,7 @@ namespace Cuemon.Runtime
             Validator.ThrowIfNullOrWhitespace(path);
             Path = path;
             ReadFile = readFile;
-            UtcCreated = DateTime.UtcNow;
+            UtcCreated = UtcLastModified;
             Checksum = null;
         }
 
@@ -81,7 +81,7 @@ namespace Cuemon.Runtime
                         Checksum = currentChecksum;
                     }
                 }
-                else if (utcLastModified > UtcCreated)
+                else if (utcLastModified > UtcLastModified)
                 {
                     SetUtcLastModified(utcLastModified);
                     OnChangedRaised();

@@ -4,13 +4,15 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use StackDecoratorExtensions.TryPop to safely pop items from a Stack without throwing exceptions when the stack is empty, by wrapping the Stack in an IDecorator and calling the TryPop extension method.
+The following example demonstrates how to use `StackDecoratorExtensions.TryPop` to safely pop items from a `Stack` without throwing when it is empty. The decorator extension is present in the `netstandard2.0` asset, so the conditional branch calls it for .NET Framework consumers that select that asset; modern Cuemon.Core assets use the equivalent direct stack operation because the conditional extension type is not exposed there.
 
 ```csharp
 using System;
 using System.Collections.Generic;
 using Cuemon;
+#if NETFRAMEWORK || NETSTANDARD2_0_OR_GREATER
 using Cuemon.Collections.Generic;
+#endif
 
 namespace MyApp.Examples;
 
@@ -23,27 +25,20 @@ public class StackDecoratorExtensionsExample
         stack.Push("second");
         stack.Push("third");
 
+#if NETFRAMEWORK || NETSTANDARD2_0_OR_GREATER
         var decorator = Decorator.Enclose(stack);
-
-        if (StackDecoratorExtensions.TryPop(decorator, out string result1))
+        while (decorator.TryPop(out string result))
         {
-            Console.WriteLine("Popped: " + result1);
+            Console.WriteLine("Popped: " + result);
         }
-
-        if (StackDecoratorExtensions.TryPop(decorator, out string result2))
+        Console.WriteLine("Stack is now empty");
+#else
+        while (stack.Count > 0)
         {
-            Console.WriteLine("Popped: " + result2);
+            Console.WriteLine("Popped: " + stack.Pop());
         }
-
-        if (StackDecoratorExtensions.TryPop(decorator, out string result3))
-        {
-            Console.WriteLine("Popped: " + result3);
-        }
-
-        if (!StackDecoratorExtensions.TryPop(decorator, out string _))
-        {
-            Console.WriteLine("Stack is now empty");
-        }
+        Console.WriteLine("Stack is now empty");
+#endif
     }
 }
 ```

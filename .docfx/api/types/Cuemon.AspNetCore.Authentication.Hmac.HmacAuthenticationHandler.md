@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register `HmacAuthenticationHandler` with ASP.NET Core authentication services. It creates a `ServiceCollection`, registers the handler under a custom HMAC scheme with a client ID/secret authenticator callback, and builds the service provider. The handler is resolved from DI and its type name is written to the console, confirming that HMAC authentication configuration works end-to-end.
+The following example demonstrates how to register `HmacAuthenticationHandler` with ASP.NET Core authentication services. It creates a `ServiceCollection`, registers the handler under a custom HMAC scheme with a client ID/secret authenticator callback, and builds the service provider. The handler is resolved from DI and its configured scheme is written to the console, confirming that HMAC authentication configuration works end-to-end.
 
 ```csharp
 using System;
@@ -40,7 +40,7 @@ public static class HmacAuthenticationHandlerExample
         using var provider = services.BuildServiceProvider();
         var handler = provider.GetRequiredService<HmacAuthenticationHandler>();
 
-        Console.WriteLine(handler.GetType().Name);
+        Console.WriteLine($"Authentication scheme: {handler.Options.AuthenticationScheme}");
     }
 }
 

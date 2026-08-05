@@ -18,14 +18,14 @@ public class MvcBuilderExtensionsExample
     public void ConfigureMvc(IMvcBuilder builder)
     {
         // Invoke the AddJsonFormatters extension method
-        MvcBuilderExtensions.AddJsonFormatters(builder, options =>
+        builder.AddJsonFormatters(options =>
         {
             options.SensitivityDetails = FaultSensitivityDetails.All;
             options.Settings.WriteIndented = true;
         });
 
         // Invoke the AddJsonFormattersOptions extension method
-        MvcBuilderExtensions.AddJsonFormattersOptions(builder, options =>
+        builder.AddJsonFormattersOptions(options =>
         {
             options.Settings.WriteIndented = true;
         });

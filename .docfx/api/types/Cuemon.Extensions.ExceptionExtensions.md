@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`ExceptionExtensions.Flatten` unwinds deeply nested exception hierarchies into a flat `IEnumerable<Exception>` while preserving insertion order. This example constructs a four-level exception chain starting with an `InvalidOperationException("First")` containing `AmbiguousMatchException`, `OutOfMemoryException`, and an inner `AggregateException` with an `AccessViolationException`. Key setup includes building the nested exception tree and calling `Flatten()` to produce a flat sequence. Console output shows the count of `4` and each exception type name in order: `InvalidOperationException`, `AmbiguousMatchException`, `OutOfMemoryException`, `AccessViolationException`.
+`ExceptionExtensions.Flatten` unwinds deeply nested exception hierarchies into a flat `IEnumerable<Exception>` while preserving insertion order. This example constructs a four-level exception chain starting with an `InvalidOperationException("First")` containing `AmbiguousMatchException`, `OutOfMemoryException`, and an inner `AggregateException` with an `AccessViolationException`. Key setup includes building the nested exception tree and calling `Flatten()` to produce a flat sequence. Console output shows the count of `4` and each caller-facing exception message in order.
 
 ```csharp
 using System;
@@ -32,7 +32,7 @@ public static class ExceptionExtensionsExample
         Console.WriteLine(flattened.Count());
         foreach (var ex in flattened)
         {
-            Console.WriteLine(ex.GetType().Name);
+            Console.WriteLine(ex.Message);
         }
     }
 }

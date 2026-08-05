@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`ExceptionConverter` in the `Xml.Serialization` namespace serializes `Exception` instances to XML and deserializes them back, with optional stack trace and `Data` dictionary inclusion. This example creates an outer `InvalidOperationException` with an inner `ArgumentNullException` and a `"Server"` data entry, configures an `XmlFormatter` with the converter including stack trace and data, and serializes to XML output showing `<Source>`, `<Message>`, `<Stack>`, `<Data>`, and nested `<Inner>` elements. It also demonstrates deserializing from an XML string back to an exception instance with `converter.ReadXml`, and serialization without stack trace or data for simpler output. Console output displays the XML content and deserialized type name.
+`ExceptionConverter` in the `Xml.Serialization` namespace serializes `Exception` instances to XML and deserializes them back, with optional stack trace and `Data` dictionary inclusion. This example creates an outer `InvalidOperationException` with an inner `ArgumentNullException` and a `"Server"` data entry, configures an `XmlFormatter` with the converter including stack trace and data, and serializes to XML output showing `<Source>`, `<Message>`, `<Stack>`, `<Data>`, and nested `<Inner>` elements. It also demonstrates deserializing from an XML string back to an exception instance with `converter.ReadXml`, and serialization without stack trace or data for simpler output. Console output displays the XML content and restored message.
 
 ```csharp
 using System;
@@ -65,8 +65,7 @@ public class ExceptionConverterExample
         using (var reader = XmlReader.Create(new StringReader(xml)))
         {
             var restored = converter.ReadXml(typeof(InvalidOperationException), reader);
-            Console.WriteLine(restored.GetType().Name); // "InvalidOperationException"
-            Console.WriteLine(restored.Message);        // "Something went wrong."
+            Console.WriteLine(restored.Message); // "Something went wrong."
         }
     }
 

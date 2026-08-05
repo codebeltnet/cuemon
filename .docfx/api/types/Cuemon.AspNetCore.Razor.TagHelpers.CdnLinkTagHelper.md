@@ -19,11 +19,13 @@ public static class CdnLinkTagHelperExample
     {
         var options = Options.Create(CreateStylesheetOptions("nblcdn.net"));
 
-        var tagHelper = new CdnLinkTagHelper(options);
-        var stylesheetHref = options.Value.GetFormattedBaseUrl() + "packages/fontawesome/5.15.3/css/all.css";
+        var tagHelper = new CdnLinkTagHelper(options)
+        {
+            Href = "packages/fontawesome/5.15.3/css/all.css"
+        };
+        var stylesheetHref = tagHelper.Options.GetFormattedBaseUrl() + tagHelper.Href;
 
         Console.WriteLine(stylesheetHref);
-        Console.WriteLine(tagHelper.GetType().Name);
     }
 
     private static CdnTagHelperOptions CreateStylesheetOptions(string baseUrl)

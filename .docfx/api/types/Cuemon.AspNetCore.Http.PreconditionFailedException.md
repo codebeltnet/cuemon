@@ -15,12 +15,18 @@ public static class PreconditionFailedExceptionExample
 {
     public static void Demonstrate()
     {
-        var exception = new PreconditionFailedException(
-            "The supplied If-Match value does not match the current ETag.",
-            new InvalidOperationException("ETag mismatch."));
+        const string currentEtag = "\"v2\"";
+        const string suppliedEtag = "\"v1\"";
+        if (!string.Equals(suppliedEtag, currentEtag, StringComparison.Ordinal))
+        {
+            var exception = new PreconditionFailedException(
+                $"The supplied If-Match value {suppliedEtag} does not match the current ETag {currentEtag}.",
+                new InvalidOperationException("The resource changed after the client read it."));
 
-        Console.WriteLine(exception.StatusCode);
-        Console.WriteLine(exception.InnerException?.Message);
+            Console.WriteLine(exception.StatusCode);
+            Console.WriteLine(exception.Message);
+            Console.WriteLine(exception.InnerException?.Message);
+        }
     }
 }
 ```

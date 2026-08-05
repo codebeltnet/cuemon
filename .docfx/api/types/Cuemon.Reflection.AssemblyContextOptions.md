@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure <xref:Cuemon.Reflection.AssemblyContextOptions> to control which assemblies are returned by <xref:Cuemon.Reflection.AssemblyContext.GetCurrentDomainAssemblies%2A>.
+The following example demonstrates how to configure <xref:Cuemon.Reflection.AssemblyContextOptions> to control which assemblies are returned by [GetCurrentDomainAssemblies](https://docs.cuemon.net/api/dotnet/Cuemon.Reflection.AssemblyContext.html#Cuemon_Reflection_AssemblyContext_GetCurrentDomainAssemblies_System_Action_Cuemon_Reflection_AssemblyContextOptions__).
 
 ```csharp
 using System;

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates generating query fragments for SQL IN clauses using the <xref:Cuemon.Extensions.Data.QueryFormatExtensions.Embed(Cuemon.Data.QueryFormat,System.Collections.Generic.IEnumerable{System.String},System.Boolean)> extension method.
+The following example demonstrates generating query fragments for SQL IN clauses using the [Embed](https://docs.cuemon.net/api/extensions/dotnet/Cuemon.Extensions.Data.QueryFormatExtensions.html#Cuemon_Extensions_Data_QueryFormatExtensions_Embed_Cuemon_Data_QueryFormat_System_Collections_Generic_IEnumerable_System_String__System_Boolean_) extension method.
 
 ```csharp
 using System;

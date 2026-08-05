@@ -20,7 +20,7 @@ public static class LatencyExceptionExample
         var exception = new LatencyException("Order processing exceeded the configured latency threshold.", timeout);
 
         Console.WriteLine(exception.Message);
-        Console.WriteLine(exception.InnerException?.GetType().Name);
+        Console.WriteLine(exception.InnerException?.Message);
     }
 }
 ```

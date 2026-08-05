@@ -15,12 +15,14 @@ public static class BadRequestExceptionExample
 {
     public static void Demonstrate()
     {
+        var missingFields = new[] { "email", "displayName" };
         var exception = new BadRequestException(
-            "The JSON payload is missing the required 'email' field.",
+            $"The JSON payload is missing required fields: {string.Join(", ", missingFields)}.",
             new FormatException("Unexpected end of JSON input."));
 
         Console.WriteLine(exception.StatusCode);
-        Console.WriteLine(exception.InnerException?.GetType().Name);
+        Console.WriteLine(exception.Message);
+        Console.WriteLine(exception.InnerException?.Message);
     }
 }
 ```

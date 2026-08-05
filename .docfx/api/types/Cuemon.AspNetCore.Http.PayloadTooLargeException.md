@@ -29,14 +29,14 @@ public class PayloadTooLargeExceptionExample
         // Create with inner exception
         var inner = new InvalidOperationException("Stream exceeded configured limit.");
         var withInner = new PayloadTooLargeException("Request entity too large.", inner);
-        Console.WriteLine(withInner.InnerException?.GetType().Name); // InvalidOperationException
+        Console.WriteLine(withInner.InnerException?.Message); // Stream exceeded configured limit.
 
         // Use TryParse from the base class to resolve by status code
         if (HttpStatusCodeException.TryParse(413, "File exceeds 10 MB limit.", out var parsed))
         {
-            Console.WriteLine(parsed.GetType().Name); // PayloadTooLargeException
-            Console.WriteLine(parsed.StatusCode);     // 413
             Console.WriteLine(parsed.Message);        // File exceeds 10 MB limit.
+            Console.WriteLine(parsed.StatusCode);     // 413
+        }
 
         // Simulate a payload size check
         long uploadSize = 15 * 1024 * 1024; // 15 MB
@@ -47,7 +47,8 @@ public class PayloadTooLargeExceptionExample
                 $"Upload of {uploadSize / 1024 / 1024} MB exceeds the {maxSize / 1024 / 1024} MB limit.");
             Console.WriteLine(rejected.Message);
 
-}}}
+        }
+    }
 }
 
 ```

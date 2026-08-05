@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use <xref cref="Cuemon.AspNetCore.Http.ConflictException"/> to signal HTTP 409 Conflict responses.
+The following example demonstrates how to use <xref cref="Cuemon.AspNetCore.Http.ConflictException"/> to signal HTTP 409 Conflict responses. It compares the default, custom-message, inner-exception, and status-code parsing paths before applying a timestamp check that represents optimistic concurrency in an application service. The console output exposes the status code, reason phrase, and caller-facing message that an API exception handler can return to a client.
 
 ```csharp
 using System;
@@ -29,13 +29,14 @@ public class ConflictExceptionExample
         // Create with inner exception
         var inner = new InvalidOperationException("Duplicate key violation.");
         var withInner = new ConflictException("Resource update conflict.", inner);
-        Console.WriteLine(withInner.InnerException?.GetType().Name); // InvalidOperationException
+        Console.WriteLine(withInner.InnerException?.Message); // Duplicate key violation.
 
         // Use TryParse from the base class to resolve by status code
         if (HttpStatusCodeException.TryParse(409, out var parsed))
         {
-            Console.WriteLine(parsed.GetType().Name); // ConflictException
+            Console.WriteLine(parsed.Message);          // The request could not be completed due to a conflict.
             Console.WriteLine(parsed.StatusCode);     // 409
+        }
 
         // Simulate a conflict check without throwing
         var dbTimestamp = DateTime.UtcNow;
@@ -46,7 +47,8 @@ public class ConflictExceptionExample
                 "The resource was modified by another user. Please refresh and retry.");
             Console.WriteLine(conflict.Message); // The resource was modified by another user...
 
-}}}
+        }
+    }
 }
 
 ```

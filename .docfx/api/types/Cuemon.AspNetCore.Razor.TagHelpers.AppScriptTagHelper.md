@@ -8,7 +8,6 @@ The following example demonstrates how to create <xref cref="Cuemon.AspNetCore.R
 
 ```csharp
 using System;
-using System.Collections.Generic;
 using Cuemon.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Options;
 
@@ -24,15 +23,13 @@ public static class AppScriptTagHelperExample
             BaseUrl = "static.cuemon.net"
         });
 
-        var tagHelper = new AppScriptTagHelper(options);
-        var segments = new List<string>
+        var tagHelper = new AppScriptTagHelper(options)
         {
-            options.Value.GetFormattedBaseUrl(),
-            "js/app.js"
+            Src = "js/app.js",
+            Defer = true
         };
 
-        Console.WriteLine(string.Concat(segments));
-        Console.WriteLine(tagHelper.GetType().Name);
+        Console.WriteLine(string.Concat(tagHelper.Options.GetFormattedBaseUrl(), tagHelper.Src));
     }
 }
 

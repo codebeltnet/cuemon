@@ -687,7 +687,7 @@ namespace Cuemon
             if (string.IsNullOrWhiteSpace(value)) { return false; }
             try
             {
-                Validator.ThrowIfInvalidConfigurator(setup, out UriStringOptions options);
+                Validator.ThrowIfInvalidConfigurator(setup, out var options);
                 var isValid = options.Kind == UriKind.Relative;
                 if (!isValid)
                 {

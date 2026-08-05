@@ -4,27 +4,28 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use <see cref="AsyncRunOptions"/> to configure timeout and retry delay for an asynchronous operation.
+The following example demonstrates how to use <see cref="AsyncRunOptions"/> to configure timeout, retry delay, the optional zero-delay safeguard, and the time provider used by an asynchronous operation.
 
 ```csharp
 using System;
 using System.Threading;
-using System.Threading.Tasks;
-using Cuemon.Threading; // for AsyncRunOptions
+using Cuemon.Threading;
 
 namespace MyApp.Examples;
 
 public class AsyncRunOptionsExample
 {
-    public async Task DemonstrateAsync()
+    public void Demonstrate()
     {
         var options = new AsyncRunOptions
         {
             Timeout = TimeSpan.FromSeconds(30),
-            Delay = TimeSpan.FromMilliseconds(500)
+            Delay = TimeSpan.FromMilliseconds(500),
+            TimeProvider = TimeProvider.System
         };
         Console.WriteLine(options.Timeout); // 00:00:30
         Console.WriteLine(options.Delay);   // 00:00:00.5000000
+        Console.WriteLine(options.TimeProvider == TimeProvider.System); // True
 
         // Use with cancellation support
         var withCancellation = new AsyncRunOptions
@@ -33,12 +34,23 @@ public class AsyncRunOptionsExample
             CancellationToken = new CancellationTokenSource(5000).Token
         };
 
+        // Zero-delay retries require an explicit attempt limit
+        var zeroDelay = new AsyncRunOptions
+        {
+            Timeout = TimeSpan.FromSeconds(1),
+            Delay = TimeSpan.Zero,
+            MaximumAttempts = 3
+        };
+        Console.WriteLine(zeroDelay.MaximumAttempts); // 3
+
         // Defaults: timeout 5s, delay 100ms
         var defaults = new AsyncRunOptions();
         Console.WriteLine(defaults.Timeout); // 00:00:05
         Console.WriteLine(defaults.Delay);   // 00:00:00.1000000
-
-}
+        Console.WriteLine(defaults.MaximumAttempts == null); // True
+        Console.WriteLine(defaults.TimeProvider == TimeProvider.System); // True
+        Console.WriteLine(withCancellation.CancellationToken.CanBeCanceled); // True
+    }
 }
 
 ```

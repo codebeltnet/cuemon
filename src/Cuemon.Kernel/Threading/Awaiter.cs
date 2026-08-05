@@ -59,13 +59,13 @@ namespace Cuemon.Threading
 
         private static async Task<ConditionalValue> RunUntilSuccessfulOrTimeoutCoreAsync(Func<Task<ConditionalValue>> method, AsyncRunOptions options)
         {
-            var stopwatch = Stopwatch.StartNew();
+            var startedAt = Stopwatch.GetTimestamp();
             var initialAttempt = true;
             var attemptCount = 0;
             Exception firstException = null;
             List<Exception> exceptions = null;
 
-            while (initialAttempt || !HasReachedTimeout(stopwatch, options.Timeout))
+            while (initialAttempt || !HasReachedTimeout(startedAt , options.Timeout))
             {
                 initialAttempt = false;
 
@@ -79,10 +79,10 @@ namespace Cuemon.Threading
                 {
                     conditionalValue = await method().ConfigureAwait(false);
                 }
-                catch (Exception ex) when (Patterns.IsRecoverableException(ex) && ex is not OperationCanceledException)
+                catch (Exception ex) when (ex is not OperationCanceledException && Patterns.IsRecoverableException(ex))
                 {
                     CaptureException(ref firstException, ref exceptions, ex);
-                    if (!TryGetRetryDelay(stopwatch, options, attemptCount, out retryDelay)) { break; }
+                    if (!TryGetRetryDelay(startedAt , options, attemptCount, out retryDelay)) { break; }
                     await DelayAsync(options, retryDelay).ConfigureAwait(false);
                     continue;
                 }
@@ -90,19 +90,19 @@ namespace Cuemon.Threading
                 if (conditionalValue == null) { throw new InvalidOperationException("The specified delegate returned a null ConditionalValue."); }
                 if (conditionalValue.Succeeded) { return conditionalValue; }
 
-                if (!TryGetRetryDelay(stopwatch, options, attemptCount, out retryDelay)) { break; }
+                if (!TryGetRetryDelay(startedAt , options, attemptCount, out retryDelay)) { break; }
                 await DelayAsync(options, retryDelay).ConfigureAwait(false);
             }
 
             return GetUnsuccessfulValue(firstException, exceptions);
         }
 
-        private static bool HasReachedTimeout(Stopwatch stopwatch, TimeSpan timeout)
+        private static bool HasReachedTimeout(long startedAt, TimeSpan timeout)
         {
-            return stopwatch.Elapsed >= timeout;
+            return GetElapsedTime(startedAt) >= timeout;
         }
 
-        private static bool TryGetRetryDelay(Stopwatch stopwatch, AsyncRunOptions options, int attemptCount, out TimeSpan delay)
+        private static bool TryGetRetryDelay(long startedAt, AsyncRunOptions options, int attemptCount, out TimeSpan delay)
         {
             if (options.MaximumAttempts > 0 && attemptCount >= options.MaximumAttempts)
             {
@@ -110,24 +110,46 @@ namespace Cuemon.Threading
                 return false;
             }
 
-            var remaining = options.Timeout - stopwatch.Elapsed;
+            var remaining = options.Timeout - GetElapsedTime(startedAt);
             if (remaining <= TimeSpan.Zero)
             {
                 delay = TimeSpan.Zero;
                 return false;
             }
 
-            delay = options.Delay <= remaining ? options.Delay : remaining;
+            delay = options.Delay <= remaining
+                ? options.Delay
+                : remaining;
             return true;
         }
 
-        private static async Task DelayAsync(AsyncRunOptions options, TimeSpan delay)
+        private static TimeSpan GetElapsedTime(long startedAt)
         {
-            if (delay == TimeSpan.Zero) { return; }
+#if NET9_0_OR_GREATER
+            return Stopwatch.GetElapsedTime(startedAt);
+#else
+            var elapsedTimestamp = Stopwatch.GetTimestamp() - startedAt;
+
+            var wholeSeconds = elapsedTimestamp / Stopwatch.Frequency;
+
+            var remainingTimestamp = elapsedTimestamp % Stopwatch.Frequency;
+
+            var elapsedTicks =
+                (wholeSeconds * TimeSpan.TicksPerSecond) +
+                ((remainingTimestamp * TimeSpan.TicksPerSecond) /
+                 Stopwatch.Frequency);
+
+            return TimeSpan.FromTicks(elapsedTicks);
+#endif
+        }
+
+        private static Task DelayAsync(AsyncRunOptions options, TimeSpan delay)
+        {
+            if (delay == TimeSpan.Zero) { return Task.CompletedTask; }
 
             var delayToken = options.CancellationToken;
             delayToken.ThrowIfCancellationRequested();
-            await Task.Delay(delay, delayToken).ConfigureAwait(false);
+            return Task.Delay(delay, delayToken);
         }
 
         private static void CaptureException(ref Exception firstException, ref List<Exception> exceptions, Exception exception)

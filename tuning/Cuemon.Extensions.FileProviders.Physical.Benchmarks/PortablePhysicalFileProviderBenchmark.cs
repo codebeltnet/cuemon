@@ -1,283 +1,939 @@
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using Microsoft.Extensions.FileProviders;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
+using System.Threading;
 
 namespace Cuemon.Extensions.FileProviders
 {
     /// <summary>
-    /// Performance benchmark for <see cref="PortablePhysicalFileProvider"/> path resolution and caching behavior.
+    /// Measures steady-state successful file lookups after the portable provider cache has been primed.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// This benchmark measures the cost of case-insensitive path resolution under various scenarios:
-    /// - Cache hits: repeated lookups of previously resolved paths
-    /// - Cache misses with varying directory sizes: resolution cost scales with entry enumeration
-    /// - Deep path resolution: multiple segment-by-segment enumerations
-    /// </para>
-    /// <para>
-    /// The provider resolves paths segment-by-segment using case-insensitive matching against physical directory entries,
-    /// caching successful results. Misses (and collisions) force re-enumeration on each call.
-    /// </para>
+    /// Cache priming occurs in <see cref="GlobalSetup"/>. The measured methods reuse the same providers, files, and
+    /// precomputed request strings so the results isolate warm-cache lookup overhead rather than setup work.
     /// </remarks>
     [MemoryDiagnoser]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
-    public class PortablePhysicalFileProviderBenchmark
+    public class PortablePhysicalFileProviderWarmFileLookupBenchmark
     {
-        /// <summary>
-        /// Scenario object combining directory structure size and path to resolve.
-        /// </summary>
-        public class ResolutionScenario
-        {
-            public ResolutionScenario(string name, int siblingCount, string relativeFilePath, string requestedPath)
-            {
-                Name = name;
-                SiblingCount = siblingCount;
-                RelativeFilePath = relativeFilePath;
-                RequestedPath = requestedPath;
-            }
+        private BenchmarkFileSystemScope _scope;
+        private PhysicalFileProvider _physicalProvider;
+        private PortablePhysicalFileProvider _portableProvider;
+        private string _exactPath;
+        private string _variedCasePath;
 
-            public string Name { get; }
-            public int SiblingCount { get; }
-            public string RelativeFilePath { get; }
-            public string RequestedPath { get; }
+        [Params(LookupDepth.Shallow, LookupDepth.Deep)]
+        public LookupDepth Depth { get; set; }
 
-            public override string ToString() => Name;
-        }
-
-        private string _tempRootPath;
-        private PortablePhysicalFileProvider _provider;
-
-        // Scenario sources
-        public IEnumerable<ResolutionScenario> ShallowResolutionScenarios()
-        {
-            return new[]
-            {
-                // Small directory: 5 siblings
-                new ResolutionScenario("shallow-5-siblings", 5, "Assets/logo.svg", "assets/logo.svg"),
-                // Medium directory: 50 siblings
-                new ResolutionScenario("shallow-50-siblings", 50, "Assets/logo.svg", "assets/logo.svg"),
-                // Large directory: 500 siblings
-                new ResolutionScenario("shallow-500-siblings", 500, "Assets/logo.svg", "assets/logo.svg"),
-            };
-        }
-
-        public IEnumerable<ResolutionScenario> DeepResolutionScenarios()
-        {
-            return new[]
-            {
-                // 2 segments (1 intermediate directory)
-                new ResolutionScenario("deep-2-segments", 10, "A/B/logo.svg", "a/b/logo.svg"),
-                // 3 segments (2 intermediate directories)
-                new ResolutionScenario("deep-3-segments", 10, "A/B/C/logo.svg", "a/b/c/logo.svg"),
-                // 5 segments (4 intermediate directories)
-                new ResolutionScenario("deep-5-segments", 10, "A/B/C/D/E/logo.svg", "a/b/c/d/e/logo.svg"),
-            };
-        }
+        [Params(5, 500)]
+        public int SiblingCount { get; set; }
 
         [GlobalSetup]
         public void GlobalSetup()
         {
-            _tempRootPath = Path.Combine(Path.GetTempPath(), "cuemon-benchmark", Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(_tempRootPath);
+            var scenario = PortablePhysicalFileProviderBenchmarkScenarios.CreateFileLookupScenario(Depth, SiblingCount);
+            _scope = new BenchmarkFileSystemScope($"warm-file-{Depth}-{SiblingCount}");
+            _scope.CreateFileLookupScenario(scenario);
+            _physicalProvider = new PhysicalFileProvider(_scope.RootPath);
+            _portableProvider = new PortablePhysicalFileProvider(_scope.RootPath);
+            _exactPath = scenario.ExactPath;
+            _variedCasePath = scenario.VariedCasePath;
+
+            if (!_portableProvider.GetFileInfo(_exactPath).Exists)
+            {
+                throw new InvalidOperationException($"Unable to prime the warm-cache file benchmark for '{scenario.Name}'.");
+            }
         }
 
         [GlobalCleanup]
         public void GlobalCleanup()
         {
-            _provider?.Dispose();
-            if (Directory.Exists(_tempRootPath))
+            _portableProvider?.Dispose();
+            _physicalProvider?.Dispose();
+            _scope?.Dispose();
+        }
+
+        [Benchmark(Baseline = true, Description = "PhysicalFileProvider - exact casing")]
+        [BenchmarkCategory("Warm file lookup")]
+        public bool PhysicalFileProvider_ExactCasing()
+        {
+            return _physicalProvider.GetFileInfo(_exactPath).Exists;
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - exact casing (warm cache)")]
+        [BenchmarkCategory("Warm file lookup")]
+        public bool PortablePhysicalFileProvider_ExactCasing()
+        {
+            return _portableProvider.GetFileInfo(_exactPath).Exists;
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - varied casing (warm cache)")]
+        [BenchmarkCategory("Warm file lookup")]
+        public bool PortablePhysicalFileProvider_VariedCasing()
+        {
+            return _portableProvider.GetFileInfo(_variedCasePath).Exists;
+        }
+    }
+
+    /// <summary>
+    /// Measures steady-state successful directory lookups after the portable provider cache has been primed.
+    /// </summary>
+    /// <remarks>
+    /// The portable provider path cache is primed in <see cref="GlobalSetup"/>, but each measured call still enumerates
+    /// the resolved directory contents so the comparison stays aligned with the <see cref="PhysicalFileProvider"/> baseline.
+    /// </remarks>
+    [MemoryDiagnoser]
+    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+    public class PortablePhysicalFileProviderWarmDirectoryLookupBenchmark
+    {
+        private BenchmarkFileSystemScope _scope;
+        private PhysicalFileProvider _physicalProvider;
+        private PortablePhysicalFileProvider _portableProvider;
+        private string _exactPath;
+        private string _variedCasePath;
+        private int _childEntryCount;
+
+        [Params(LookupDepth.Shallow, LookupDepth.Deep)]
+        public LookupDepth Depth { get; set; }
+
+        [Params(5, 500)]
+        public int SiblingCount { get; set; }
+
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            var scenario = PortablePhysicalFileProviderBenchmarkScenarios.CreateDirectoryLookupScenario(Depth, SiblingCount);
+            _scope = new BenchmarkFileSystemScope($"warm-directory-{Depth}-{SiblingCount}");
+            _scope.CreateDirectoryLookupScenario(scenario);
+            _physicalProvider = new PhysicalFileProvider(_scope.RootPath);
+            _portableProvider = new PortablePhysicalFileProvider(_scope.RootPath);
+            _exactPath = scenario.ExactPath;
+            _variedCasePath = scenario.VariedCasePath;
+            _childEntryCount = scenario.ChildEntryCount;
+
+            if (BenchmarkFileSystemScope.CountEntries(_portableProvider.GetDirectoryContents(_exactPath)) != _childEntryCount)
             {
-                Directory.Delete(_tempRootPath, true);
+                throw new InvalidOperationException($"Unable to prime the warm-cache directory benchmark for '{scenario.Name}'.");
             }
+        }
+
+        [GlobalCleanup]
+        public void GlobalCleanup()
+        {
+            _portableProvider?.Dispose();
+            _physicalProvider?.Dispose();
+            _scope?.Dispose();
+        }
+
+        [Benchmark(Baseline = true, Description = "PhysicalFileProvider - exact casing")]
+        [BenchmarkCategory("Warm directory lookup")]
+        public int PhysicalFileProvider_ExactCasing()
+        {
+            return BenchmarkFileSystemScope.CountEntries(_physicalProvider.GetDirectoryContents(_exactPath));
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - exact casing (warm cache)")]
+        [BenchmarkCategory("Warm directory lookup")]
+        public int PortablePhysicalFileProvider_ExactCasing()
+        {
+            return BenchmarkFileSystemScope.CountEntries(_portableProvider.GetDirectoryContents(_exactPath));
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - varied casing (warm cache)")]
+        [BenchmarkCategory("Warm directory lookup")]
+        public int PortablePhysicalFileProvider_VariedCasing()
+        {
+            return BenchmarkFileSystemScope.CountEntries(_portableProvider.GetDirectoryContents(_variedCasePath));
+        }
+    }
+
+    /// <summary>
+    /// Measures successful file lookups with a fresh provider so each invocation starts without a portable path-cache entry.
+    /// </summary>
+    /// <remarks>
+    /// The file-system layout is created once per scenario, but each iteration creates fresh providers and uses
+    /// <see cref="InvocationCountAttribute"/> set to <c>1</c> so the measured call remains provider-cold.
+    /// This is a cold-resolution benchmark, not an operating-system page-cache flush.
+    /// </remarks>
+    [MemoryDiagnoser]
+    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+    [InvocationCount(1)]
+    public class PortablePhysicalFileProviderColdFileLookupBenchmark
+    {
+        private BenchmarkFileSystemScope _scope;
+        private PhysicalFileProvider _physicalProvider;
+        private PortablePhysicalFileProvider _portableProvider;
+        private string _exactPath;
+        private string _variedCasePath;
+
+        [Params(LookupDepth.Shallow, LookupDepth.Deep)]
+        public LookupDepth Depth { get; set; }
+
+        [Params(5, 500)]
+        public int SiblingCount { get; set; }
+
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            var scenario = PortablePhysicalFileProviderBenchmarkScenarios.CreateFileLookupScenario(Depth, SiblingCount);
+            _scope = new BenchmarkFileSystemScope($"cold-file-{Depth}-{SiblingCount}");
+            _scope.CreateFileLookupScenario(scenario);
+            _exactPath = scenario.ExactPath;
+            _variedCasePath = scenario.VariedCasePath;
         }
 
         [IterationSetup]
         public void IterationSetup()
         {
-            // Dispose previous provider for fresh state each iteration
-            _provider?.Dispose();
-            _provider = new PortablePhysicalFileProvider(_tempRootPath);
+            _physicalProvider = new PhysicalFileProvider(_scope.RootPath);
+            _portableProvider = new PortablePhysicalFileProvider(_scope.RootPath);
         }
 
-        /// <summary>
-        /// Benchmark: Cache hit on previously resolved path.
-        /// The path is resolved once, cached, then measured on repeated lookup.
-        /// </summary>
-        [Benchmark(Baseline = true, Description = "Cache hit (prime + lookup)")]
-        [BenchmarkCategory("CacheHit")]
-        public void CacheHit_PrimeAndLookup()
+        [IterationCleanup]
+        public void IterationCleanup()
         {
-            using var scenario = new TempFileSystemScope(_tempRootPath, 5, "Assets/logo.svg");
+            _portableProvider?.Dispose();
+            _physicalProvider?.Dispose();
+            _portableProvider = null;
+            _physicalProvider = null;
+        }
 
-            // Prime the cache: first call
-            var first = _provider.GetFileInfo("assets/logo.svg");
-            _ = first.Exists; // Force read
+        [GlobalCleanup]
+        public void GlobalCleanup()
+        {
+            _scope?.Dispose();
+        }
 
-            // Measure: cached lookup (case-insensitive key, no enumeration)
-            var cached = _provider.GetFileInfo("assets/logo.svg");
-            _ = cached.Exists;
+        [Benchmark(Baseline = true, Description = "PhysicalFileProvider - exact casing")]
+        [BenchmarkCategory("Cold file lookup")]
+        public bool PhysicalFileProvider_ExactCasing()
+        {
+            return _physicalProvider.GetFileInfo(_exactPath).Exists;
+        }
 
-            // Verify: confirm cache hit by checking identical physical paths
-            if (!first.Exists || first.PhysicalPath != cached.PhysicalPath)
+        [Benchmark(Description = "PortablePhysicalFileProvider - exact casing (cold resolution)")]
+        [BenchmarkCategory("Cold file lookup")]
+        public bool PortablePhysicalFileProvider_ExactCasing()
+        {
+            return _portableProvider.GetFileInfo(_exactPath).Exists;
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - varied casing (cold resolution)")]
+        [BenchmarkCategory("Cold file lookup")]
+        public bool PortablePhysicalFileProvider_VariedCasing()
+        {
+            return _portableProvider.GetFileInfo(_variedCasePath).Exists;
+        }
+    }
+
+    /// <summary>
+    /// Measures successful directory lookups with a fresh provider so each invocation starts without a portable path-cache entry.
+    /// </summary>
+    /// <remarks>
+    /// Each iteration recreates both providers while preserving the same directories and files, which keeps the filesystem work
+    /// comparable while guaranteeing that the portable provider starts cold for the requested logical path.
+    /// </remarks>
+    [MemoryDiagnoser]
+    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+    [InvocationCount(1)]
+    public class PortablePhysicalFileProviderColdDirectoryLookupBenchmark
+    {
+        private BenchmarkFileSystemScope _scope;
+        private PhysicalFileProvider _physicalProvider;
+        private PortablePhysicalFileProvider _portableProvider;
+        private string _exactPath;
+        private string _variedCasePath;
+
+        [Params(LookupDepth.Shallow, LookupDepth.Deep)]
+        public LookupDepth Depth { get; set; }
+
+        [Params(5, 500)]
+        public int SiblingCount { get; set; }
+
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            var scenario = PortablePhysicalFileProviderBenchmarkScenarios.CreateDirectoryLookupScenario(Depth, SiblingCount);
+            _scope = new BenchmarkFileSystemScope($"cold-directory-{Depth}-{SiblingCount}");
+            _scope.CreateDirectoryLookupScenario(scenario);
+            _exactPath = scenario.ExactPath;
+            _variedCasePath = scenario.VariedCasePath;
+        }
+
+        [IterationSetup]
+        public void IterationSetup()
+        {
+            _physicalProvider = new PhysicalFileProvider(_scope.RootPath);
+            _portableProvider = new PortablePhysicalFileProvider(_scope.RootPath);
+        }
+
+        [IterationCleanup]
+        public void IterationCleanup()
+        {
+            _portableProvider?.Dispose();
+            _physicalProvider?.Dispose();
+            _portableProvider = null;
+            _physicalProvider = null;
+        }
+
+        [GlobalCleanup]
+        public void GlobalCleanup()
+        {
+            _scope?.Dispose();
+        }
+
+        [Benchmark(Baseline = true, Description = "PhysicalFileProvider - exact casing")]
+        [BenchmarkCategory("Cold directory lookup")]
+        public int PhysicalFileProvider_ExactCasing()
+        {
+            return BenchmarkFileSystemScope.CountEntries(_physicalProvider.GetDirectoryContents(_exactPath));
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - exact casing (cold resolution)")]
+        [BenchmarkCategory("Cold directory lookup")]
+        public int PortablePhysicalFileProvider_ExactCasing()
+        {
+            return BenchmarkFileSystemScope.CountEntries(_portableProvider.GetDirectoryContents(_exactPath));
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - varied casing (cold resolution)")]
+        [BenchmarkCategory("Cold directory lookup")]
+        public int PortablePhysicalFileProvider_VariedCasing()
+        {
+            return BenchmarkFileSystemScope.CountEntries(_portableProvider.GetDirectoryContents(_variedCasePath));
+        }
+    }
+
+    /// <summary>
+    /// Measures repeated lookup of the same missing file path across narrow and wide directories.
+    /// </summary>
+    /// <remarks>
+    /// The same providers are reused for the full benchmark because misses are intentionally not cached. Each call therefore
+    /// re-evaluates the unresolved path against the same file-system layout.
+    /// </remarks>
+    [MemoryDiagnoser]
+    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+    public class PortablePhysicalFileProviderRepeatedMissingFileBenchmark
+    {
+        private const string ExactMissingPath = "Assets/missing.svg";
+        private const string VariedCaseMissingPath = "assets/missing.svg";
+
+        private BenchmarkFileSystemScope _scope;
+        private PhysicalFileProvider _physicalProvider;
+        private PortablePhysicalFileProvider _portableProvider;
+
+        [Params(5, 50, 500)]
+        public int SiblingCount { get; set; }
+
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            _scope = new BenchmarkFileSystemScope($"repeated-miss-{SiblingCount}");
+            _scope.CreateMissingFileScenario("Assets", SiblingCount);
+            _physicalProvider = new PhysicalFileProvider(_scope.RootPath);
+            _portableProvider = new PortablePhysicalFileProvider(_scope.RootPath);
+        }
+
+        [GlobalCleanup]
+        public void GlobalCleanup()
+        {
+            _portableProvider?.Dispose();
+            _physicalProvider?.Dispose();
+            _scope?.Dispose();
+        }
+
+        [Benchmark(Baseline = true, Description = "PhysicalFileProvider - same missing path")]
+        [BenchmarkCategory("Repeated missing path")]
+        public bool PhysicalFileProvider_ExactCasing()
+        {
+            return _physicalProvider.GetFileInfo(ExactMissingPath).Exists;
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - same missing path")]
+        [BenchmarkCategory("Repeated missing path")]
+        public bool PortablePhysicalFileProvider_VariedCasing()
+        {
+            return _portableProvider.GetFileInfo(VariedCaseMissingPath).Exists;
+        }
+    }
+
+    /// <summary>
+    /// Measures unique missing file paths under the same directory across narrow and wide layouts.
+    /// </summary>
+    /// <remarks>
+    /// Request strings are precomputed in <see cref="GlobalSetup"/> so the benchmark reflects repeated unresolved-path
+    /// evaluation instead of string construction.
+    /// </remarks>
+    [MemoryDiagnoser]
+    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+    public class PortablePhysicalFileProviderUniqueMissingFileBenchmark
+    {
+        private BenchmarkFileSystemScope _scope;
+        private PhysicalFileProvider _physicalProvider;
+        private PortablePhysicalFileProvider _portableProvider;
+        private string[] _exactMissingPaths;
+        private string[] _variedCaseMissingPaths;
+        private int _nextExactPathIndex;
+        private int _nextVariedPathIndex;
+
+        [Params(5, 50, 500)]
+        public int SiblingCount { get; set; }
+
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            _scope = new BenchmarkFileSystemScope($"unique-miss-{SiblingCount}");
+            _scope.CreateMissingFileScenario("Assets", SiblingCount);
+            _physicalProvider = new PhysicalFileProvider(_scope.RootPath);
+            _portableProvider = new PortablePhysicalFileProvider(_scope.RootPath);
+            _exactMissingPaths = Enumerable.Range(0, 1_024).Select(i => $"Assets/missing-{i:D4}.svg").ToArray();
+            _variedCaseMissingPaths = _exactMissingPaths.Select(path => path.ToLowerInvariant()).ToArray();
+        }
+
+        [GlobalCleanup]
+        public void GlobalCleanup()
+        {
+            _portableProvider?.Dispose();
+            _physicalProvider?.Dispose();
+            _scope?.Dispose();
+        }
+
+        [Benchmark(Baseline = true, Description = "PhysicalFileProvider - unique missing paths")]
+        [BenchmarkCategory("Unique missing paths")]
+        public bool PhysicalFileProvider_ExactCasing()
+        {
+            return _physicalProvider.GetFileInfo(NextPath(_exactMissingPaths, ref _nextExactPathIndex)).Exists;
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - unique missing paths")]
+        [BenchmarkCategory("Unique missing paths")]
+        public bool PortablePhysicalFileProvider_VariedCasing()
+        {
+            return _portableProvider.GetFileInfo(NextPath(_variedCaseMissingPaths, ref _nextVariedPathIndex)).Exists;
+        }
+
+        private static string NextPath(IReadOnlyList<string> paths, ref int nextPathIndex)
+        {
+            var path = paths[nextPathIndex];
+            nextPathIndex++;
+
+            if (nextPathIndex == paths.Count)
             {
-                throw new InvalidOperationException("Cache hit verification failed.");
+                nextPathIndex = 0;
+            }
+
+            return path;
+        }
+    }
+
+    /// <summary>
+    /// Measures repeated lookup of the same case-insensitive collision when the host filesystem can materialize both entries.
+    /// </summary>
+    /// <remarks>
+    /// No <see cref="PhysicalFileProvider"/> baseline is provided because an exact-casing native lookup does not perform
+    /// comparable ambiguity detection. When the temporary filesystem cannot host distinct case-only entries, the scenario
+    /// source is empty and this benchmark is skipped.
+    /// </remarks>
+    [MemoryDiagnoser]
+    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+    public class PortablePhysicalFileProviderCollisionBenchmark
+    {
+        private const string CollisionRequestPath = "LOGO.SVG";
+        private const string LowerCollisionFileName = "logo.svg";
+        private const string UpperCollisionFileName = "Logo.svg";
+
+        private BenchmarkFileSystemScope _scope;
+        private PortablePhysicalFileProvider _portableProvider;
+
+        [ParamsSource(nameof(SiblingCounts))]
+        public int SiblingCount { get; set; }
+
+        public static IEnumerable<int> SiblingCounts()
+        {
+            return CaseDistinctEntryCapabilityDetector.IsSupported ? new[] { 50 } : Array.Empty<int>();
+        }
+
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            _scope = new BenchmarkFileSystemScope($"collision-{SiblingCount}");
+            _scope.CreateCollisionFileScenario(LowerCollisionFileName, UpperCollisionFileName, SiblingCount);
+            _portableProvider = new PortablePhysicalFileProvider(_scope.RootPath);
+        }
+
+        [GlobalCleanup]
+        public void GlobalCleanup()
+        {
+            _portableProvider?.Dispose();
+            _scope?.Dispose();
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - same casing collision")]
+        [BenchmarkCategory("Repeated casing collision")]
+        public bool PortablePhysicalFileProvider_SameCollisionPath()
+        {
+            return _portableProvider.GetFileInfo(CollisionRequestPath).Exists;
+        }
+    }
+
+    /// <summary>
+    /// Measures concurrent missing-file lookups under a wide directory using long-lived workers.
+    /// </summary>
+    /// <remarks>
+    /// Each benchmark invocation coordinates four pre-created worker threads. The results therefore include provider work,
+    /// filesystem enumeration, and the harness barrier synchronization required to release the batch, but exclude
+    /// per-invocation task or thread creation overhead.
+    /// </remarks>
+    [MemoryDiagnoser]
+    [ThreadingDiagnoser]
+    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+    public class PortablePhysicalFileProviderConcurrentMissingFileBenchmark
+    {
+        private const int WorkerCount = 4;
+
+        private BenchmarkFileSystemScope _scope;
+        private PhysicalFileProvider _physicalProvider;
+        private PortablePhysicalFileProvider _portableProvider;
+        private ConcurrentMissingPathHarness _physicalSamePathHarness;
+        private ConcurrentMissingPathHarness _portableSamePathHarness;
+        private ConcurrentMissingPathHarness _physicalDifferentPathsHarness;
+        private ConcurrentMissingPathHarness _portableDifferentPathsHarness;
+
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            _scope = new BenchmarkFileSystemScope("concurrent-miss-500");
+            _scope.CreateMissingFileScenario("Assets", 500);
+            _physicalProvider = new PhysicalFileProvider(_scope.RootPath);
+            _portableProvider = new PortablePhysicalFileProvider(_scope.RootPath);
+
+            var exactSamePath = Enumerable.Repeat("Assets/missing.svg", WorkerCount).ToArray();
+            var variedSamePath = Enumerable.Repeat("assets/missing.svg", WorkerCount).ToArray();
+            var exactDifferentPaths = Enumerable.Range(0, WorkerCount).Select(i => $"Assets/missing-{i:D4}.svg").ToArray();
+            var variedDifferentPaths = exactDifferentPaths.Select(path => path.ToLowerInvariant()).ToArray();
+
+            _physicalSamePathHarness = new ConcurrentMissingPathHarness(_physicalProvider, exactSamePath);
+            _portableSamePathHarness = new ConcurrentMissingPathHarness(_portableProvider, variedSamePath);
+            _physicalDifferentPathsHarness = new ConcurrentMissingPathHarness(_physicalProvider, exactDifferentPaths);
+            _portableDifferentPathsHarness = new ConcurrentMissingPathHarness(_portableProvider, variedDifferentPaths);
+        }
+
+        [GlobalCleanup]
+        public void GlobalCleanup()
+        {
+            _portableDifferentPathsHarness?.Dispose();
+            _physicalDifferentPathsHarness?.Dispose();
+            _portableSamePathHarness?.Dispose();
+            _physicalSamePathHarness?.Dispose();
+            _portableProvider?.Dispose();
+            _physicalProvider?.Dispose();
+            _scope?.Dispose();
+        }
+
+        [Benchmark(Baseline = true, Description = "PhysicalFileProvider - same missing path", OperationsPerInvoke = WorkerCount)]
+        [BenchmarkCategory("Concurrent same missing path")]
+        public int PhysicalFileProvider_SameMissingPath()
+        {
+            return _physicalSamePathHarness.RunBatch();
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - same missing path", OperationsPerInvoke = WorkerCount)]
+        [BenchmarkCategory("Concurrent same missing path")]
+        public int PortablePhysicalFileProvider_SameMissingPath()
+        {
+            return _portableSamePathHarness.RunBatch();
+        }
+
+        [Benchmark(Baseline = true, Description = "PhysicalFileProvider - different missing paths", OperationsPerInvoke = WorkerCount)]
+        [BenchmarkCategory("Concurrent different missing paths")]
+        public int PhysicalFileProvider_DifferentMissingPaths()
+        {
+            return _physicalDifferentPathsHarness.RunBatch();
+        }
+
+        [Benchmark(Description = "PortablePhysicalFileProvider - different missing paths", OperationsPerInvoke = WorkerCount)]
+        [BenchmarkCategory("Concurrent different missing paths")]
+        public int PortablePhysicalFileProvider_DifferentMissingPaths()
+        {
+            return _portableDifferentPathsHarness.RunBatch();
+        }
+    }
+
+    /// <summary>
+    /// Defines the relative depth used by the portable file-provider benchmarks.
+    /// </summary>
+    public enum LookupDepth
+    {
+        Shallow,
+        Deep
+    }
+
+    internal sealed class FileLookupScenario
+    {
+        public FileLookupScenario(string name, string[] physicalSegments, int[] siblingCounts)
+        {
+            Name = string.IsNullOrWhiteSpace(name) ? throw new ArgumentException("A benchmark scenario name is required.", nameof(name)) : name;
+            PhysicalSegments = physicalSegments ?? throw new ArgumentNullException(nameof(physicalSegments));
+            SiblingCounts = siblingCounts ?? throw new ArgumentNullException(nameof(siblingCounts));
+
+            if (PhysicalSegments.Length == 0)
+            {
+                throw new ArgumentException("At least one physical segment is required.", nameof(physicalSegments));
+            }
+
+            if (PhysicalSegments.Length != SiblingCounts.Length)
+            {
+                throw new ArgumentException("The sibling-count array must contain one entry per physical segment.", nameof(siblingCounts));
+            }
+
+            ValidateSiblingCounts(SiblingCounts);
+
+            ExactPath = string.Join("/", PhysicalSegments);
+            VariedCasePath = ExactPath.ToLowerInvariant();
+        }
+
+        public string Name { get; }
+
+        public string[] PhysicalSegments { get; }
+
+        public int[] SiblingCounts { get; }
+
+        public string ExactPath { get; }
+
+        public string VariedCasePath { get; }
+
+        public override string ToString() => Name;
+
+        internal static void ValidateSiblingCounts(IReadOnlyList<int> siblingCounts)
+        {
+            for (var i = 0; i < siblingCounts.Count; i++)
+            {
+                if (siblingCounts[i] < 1)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(siblingCounts), siblingCounts[i], "Sibling counts must be greater than zero.");
+                }
+            }
+        }
+    }
+
+    internal sealed class DirectoryLookupScenario
+    {
+        public DirectoryLookupScenario(string name, string[] physicalSegments, int[] siblingCounts, int childEntryCount)
+        {
+            Name = string.IsNullOrWhiteSpace(name) ? throw new ArgumentException("A benchmark scenario name is required.", nameof(name)) : name;
+            PhysicalSegments = physicalSegments ?? throw new ArgumentNullException(nameof(physicalSegments));
+            SiblingCounts = siblingCounts ?? throw new ArgumentNullException(nameof(siblingCounts));
+
+            if (PhysicalSegments.Length == 0)
+            {
+                throw new ArgumentException("At least one physical segment is required.", nameof(physicalSegments));
+            }
+
+            if (PhysicalSegments.Length != SiblingCounts.Length)
+            {
+                throw new ArgumentException("The sibling-count array must contain one entry per physical segment.", nameof(siblingCounts));
+            }
+
+            if (childEntryCount < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(childEntryCount), childEntryCount, "A directory benchmark requires at least one child entry.");
+            }
+
+            FileLookupScenario.ValidateSiblingCounts(SiblingCounts);
+            ChildEntryCount = childEntryCount;
+            ExactPath = string.Join("/", PhysicalSegments);
+            VariedCasePath = ExactPath.ToLowerInvariant();
+        }
+
+        public string Name { get; }
+
+        public string[] PhysicalSegments { get; }
+
+        public int[] SiblingCounts { get; }
+
+        public int ChildEntryCount { get; }
+
+        public string ExactPath { get; }
+
+        public string VariedCasePath { get; }
+
+        public override string ToString() => Name;
+    }
+
+    internal static class PortablePhysicalFileProviderBenchmarkScenarios
+    {
+        public static FileLookupScenario CreateFileLookupScenario(LookupDepth depth, int siblingCount)
+        {
+            return depth == LookupDepth.Shallow
+                ? new FileLookupScenario("shallow-file", new[] { "Assets", "Logo.svg" }, new[] { siblingCount, siblingCount })
+                : new FileLookupScenario("deep-file", new[] { "Assets", "Images", "Branding", "Campaigns", "Logo.svg" }, new[] { siblingCount, siblingCount, siblingCount, siblingCount, siblingCount });
+        }
+
+        public static DirectoryLookupScenario CreateDirectoryLookupScenario(LookupDepth depth, int siblingCount)
+        {
+            return depth == LookupDepth.Shallow
+                ? new DirectoryLookupScenario("shallow-directory", new[] { "Assets" }, new[] { siblingCount }, siblingCount)
+                : new DirectoryLookupScenario("deep-directory", new[] { "Assets", "Images", "Branding", "Campaigns" }, new[] { siblingCount, siblingCount, siblingCount, siblingCount }, siblingCount);
+        }
+    }
+
+    internal sealed class BenchmarkFileSystemScope : IDisposable
+    {
+        public BenchmarkFileSystemScope(string scenarioName)
+        {
+            RootPath = Path.Combine(Path.GetTempPath(), "cuemon", "portable-physical-file-provider-benchmarks", scenarioName, Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(RootPath);
+        }
+
+        public string RootPath { get; }
+
+        public void CreateFileLookupScenario(FileLookupScenario scenario)
+        {
+            var currentPath = RootPath;
+
+            for (var i = 0; i < scenario.PhysicalSegments.Length; i++)
+            {
+                var segment = scenario.PhysicalSegments[i];
+                var siblingCount = scenario.SiblingCounts[i];
+                var isFile = i == scenario.PhysicalSegments.Length - 1;
+
+                if (isFile)
+                {
+                    CreateSiblingFiles(currentPath, siblingCount - 1);
+                    File.WriteAllText(Path.Combine(currentPath, segment), "benchmark-content");
+                    return;
+                }
+
+                CreateSiblingDirectories(currentPath, siblingCount - 1);
+                currentPath = Path.Combine(currentPath, segment);
+                Directory.CreateDirectory(currentPath);
             }
         }
 
-        /// <summary>
-        /// Benchmark: Cache miss requiring directory enumeration.
-        /// Each call enumerates the directory to find the matching entry.
-        /// Scenario parameter controls directory size (5, 50, 500 siblings).
-        /// </summary>
-        [Benchmark(Description = "Cache miss (shallow, {0} siblings)")]
-        [BenchmarkCategory("CacheMiss_Shallow")]
-        [ArgumentsSource(nameof(ShallowResolutionScenarios))]
-        public void CacheMiss_Shallow(ResolutionScenario scenario)
+        public void CreateDirectoryLookupScenario(DirectoryLookupScenario scenario)
         {
-            using var scope = new TempFileSystemScope(_tempRootPath, scenario.SiblingCount, scenario.RelativeFilePath);
+            var currentPath = RootPath;
 
-            // Measure: fresh lookup each call (no cache, full enumeration)
-            var result = _provider.GetFileInfo(scenario.RequestedPath);
-            _ = result.Exists;
-
-            // Verify: path resolved correctly despite directory size
-            if (!result.Exists)
+            for (var i = 0; i < scenario.PhysicalSegments.Length; i++)
             {
-                throw new InvalidOperationException($"Expected file to exist at {scenario.RequestedPath}");
+                CreateSiblingDirectories(currentPath, scenario.SiblingCounts[i] - 1);
+                currentPath = Path.Combine(currentPath, scenario.PhysicalSegments[i]);
+                Directory.CreateDirectory(currentPath);
+            }
+
+            CreateSiblingFiles(currentPath, scenario.ChildEntryCount);
+        }
+
+        public void CreateMissingFileScenario(string directoryName, int siblingCount)
+        {
+            CreateSiblingDirectories(RootPath, siblingCount - 1);
+
+            var directoryPath = Path.Combine(RootPath, directoryName);
+            Directory.CreateDirectory(directoryPath);
+
+            CreateSiblingFiles(directoryPath, siblingCount);
+        }
+
+        public void CreateCollisionFileScenario(string lowerFileName, string upperFileName, int siblingCount)
+        {
+            if (siblingCount < 2)
+            {
+                throw new ArgumentOutOfRangeException(nameof(siblingCount), siblingCount, "A collision scenario requires at least two entries.");
+            }
+
+            CreateSiblingFiles(RootPath, siblingCount - 2);
+            File.WriteAllText(Path.Combine(RootPath, lowerFileName), "lower");
+            File.WriteAllText(Path.Combine(RootPath, upperFileName), "upper");
+        }
+
+        public static int CountEntries(IDirectoryContents contents)
+        {
+            var count = 0;
+
+            foreach (var entry in contents)
+            {
+                _ = entry;
+                count++;
+            }
+
+            return count;
+        }
+
+        public void Dispose()
+        {
+            if (Directory.Exists(RootPath))
+            {
+                Directory.Delete(RootPath, true);
             }
         }
 
-        /// <summary>
-        /// Benchmark: Deep path resolution requiring multiple segment-by-segment enumerations.
-        /// Each segment requires enumerating its parent directory.
-        /// Scenario parameter controls path depth (2, 3, 5 segments).
-        /// </summary>
-        [Benchmark(Description = "Cache miss (deep {0})")]
-        [BenchmarkCategory("CacheMiss_Deep")]
-        [ArgumentsSource(nameof(DeepResolutionScenarios))]
-        public void CacheMiss_Deep(ResolutionScenario scenario)
+        private static void CreateSiblingDirectories(string parentPath, int count)
         {
-            using var scope = new TempFileSystemScope(_tempRootPath, scenario.SiblingCount, scenario.RelativeFilePath);
+            Directory.CreateDirectory(parentPath);
 
-            // Measure: fresh lookup each call (no cache, multiple enumerations per depth)
-            var result = _provider.GetFileInfo(scenario.RequestedPath);
-            _ = result.Exists;
-
-            // Verify: deep path resolved correctly
-            if (!result.Exists)
+            for (var i = 0; i < count; i++)
             {
-                throw new InvalidOperationException($"Expected file to exist at {scenario.RequestedPath}");
+                Directory.CreateDirectory(Path.Combine(parentPath, $"sibling-dir-{i:D4}"));
             }
         }
 
-        /// <summary>
-        /// Benchmark: Mixed case lookup after cache priming.
-        /// Verifies that case-insensitive key matching works correctly and efficiently.
-        /// </summary>
-        [Benchmark(Description = "Cache hit (varied case)")]
-        [BenchmarkCategory("CacheHit")]
-        public void CacheHit_VariedCase()
+        private static void CreateSiblingFiles(string parentPath, int count)
         {
-            using var scenario = new TempFileSystemScope(_tempRootPath, 5, "Assets/Images/Logo.svg");
+            Directory.CreateDirectory(parentPath);
 
-            // Prime with one casing
-            var primed = _provider.GetFileInfo("assets/images/logo.svg");
-            _ = primed.Exists;
-
-            // Measure: lookup with different casing (should hit cache due to ordinal case-insensitive key)
-            var variant = _provider.GetFileInfo("ASSETS/IMAGES/LOGO.SVG");
-            _ = variant.Exists;
-
-            // Verify: same physical path despite case variation
-            if (!primed.Exists || !variant.Exists || primed.PhysicalPath != variant.PhysicalPath)
+            for (var i = 0; i < count; i++)
             {
-                throw new InvalidOperationException("Case-insensitive cache hit verification failed.");
+                File.WriteAllText(Path.Combine(parentPath, $"sibling-file-{i:D4}.txt"), "sibling");
+            }
+        }
+    }
+
+    internal sealed class ConcurrentMissingPathHarness : IDisposable
+    {
+        private readonly Barrier _phaseBarrier;
+        private readonly IFileProvider _provider;
+        private readonly string[] _paths;
+        private readonly Thread[] _threads;
+        private Exception _capturedException;
+        private int _existingCount;
+        private bool _disposing;
+
+        public ConcurrentMissingPathHarness(IFileProvider provider, string[] paths)
+        {
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            _paths = paths ?? throw new ArgumentNullException(nameof(paths));
+
+            if (_paths.Length == 0)
+            {
+                throw new ArgumentException("At least one path is required.", nameof(paths));
+            }
+
+            _phaseBarrier = new Barrier(_paths.Length + 1);
+            _threads = new Thread[_paths.Length];
+
+            for (var i = 0; i < _threads.Length; i++)
+            {
+                var workerIndex = i;
+                _threads[i] = new Thread(() => Worker(workerIndex))
+                {
+                    IsBackground = true,
+                    Name = $"portable-physical-file-provider-benchmark-worker-{workerIndex:D2}"
+                };
+                _threads[i].Start();
             }
         }
 
-        /// <summary>
-        /// Temporary file system scope: creates deterministic files and directories for benchmarking.
-        /// </summary>
-        private sealed class TempFileSystemScope : IDisposable
+        public int RunBatch()
         {
-            private readonly string _benchmarkRootPath;
-            private readonly bool _created;
+            _existingCount = 0;
+            _capturedException = null;
 
-            /// <summary>
-            /// Creates a temporary directory structure with the specified number of sibling entries
-            /// and a target file at the given relative path.
-            /// </summary>
-            /// <param name="rootPath">Root directory for benchmark files.</param>
-            /// <param name="siblingCount">Number of sibling entries to create in the directory containing the target file.</param>
-            /// <param name="relativeFilePath">Relative path to the target file (e.g., "Assets/logo.svg").</param>
-            public TempFileSystemScope(string rootPath, int siblingCount, string relativeFilePath)
+            _phaseBarrier.SignalAndWait();
+            _phaseBarrier.SignalAndWait();
+
+            if (_capturedException is not null)
             {
-                _benchmarkRootPath = rootPath;
+                throw new InvalidOperationException("A concurrent benchmark worker failed.", _capturedException);
+            }
+
+            return _existingCount;
+        }
+
+        public void Dispose()
+        {
+            _disposing = true;
+            _phaseBarrier.SignalAndWait();
+
+            foreach (var thread in _threads)
+            {
+                thread.Join();
+            }
+
+            _phaseBarrier.Dispose();
+        }
+
+        private void Worker(int index)
+        {
+            while (true)
+            {
+                _phaseBarrier.SignalAndWait();
+
+                if (_disposing)
+                {
+                    return;
+                }
 
                 try
                 {
-                    var segments = relativeFilePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-                    var targetFileName = segments[segments.Length - 1];
-                    var dirPath = segments.Length > 1
-                        ? Path.Combine(rootPath, Path.Combine(segments.Take(segments.Length - 1).ToArray()))
-                        : rootPath;
-
-                    Directory.CreateDirectory(dirPath);
-
-                    // Create the target file
-                    var targetPath = Path.Combine(dirPath, targetFileName);
-                    File.WriteAllText(targetPath, "benchmark-content");
-
-                    // Create sibling entries
-                    for (var i = 0; i < siblingCount; i++)
+                    if (_provider.GetFileInfo(_paths[index]).Exists)
                     {
-                        var siblingPath = Path.Combine(dirPath, $"sibling-{i:D6}.dat");
-                        File.WriteAllText(siblingPath, $"sibling-{i}");
+                        Interlocked.Increment(ref _existingCount);
                     }
-
-                    _created = true;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    _created = false;
-                    throw;
+                    Interlocked.CompareExchange(ref _capturedException, ex, null);
                 }
+
+                _phaseBarrier.SignalAndWait();
             }
+        }
+    }
 
-            public void Dispose()
+    internal static class CaseDistinctEntryCapabilityDetector
+    {
+        private static readonly Lazy<bool> SupportsDistinctCaseEntries = new(DetectSupportsDistinctCaseEntries);
+
+        public static bool IsSupported => SupportsDistinctCaseEntries.Value;
+
+        private static bool DetectSupportsDistinctCaseEntries()
+        {
+            var rootPath = Path.Combine(Path.GetTempPath(), "cuemon", "portable-physical-file-provider-benchmarks-probe", Guid.NewGuid().ToString("N"));
+            var lowerPath = Path.Combine(rootPath, "probe");
+            var upperPath = Path.Combine(rootPath, "PROBE");
+
+            Directory.CreateDirectory(rootPath);
+
+            try
             {
-                if (_created && Directory.Exists(_benchmarkRootPath))
+                using (File.Open(lowerPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                 {
-                    try
+                }
+
+                try
+                {
+                    using (File.Open(upperPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                     {
-                        // Clean up only the benchmark-specific subdirectories, not the entire temp root
-                        var benchmarkDir = _benchmarkRootPath;
-                        if (Directory.Exists(benchmarkDir))
-                        {
-                            // Remove all contents
-                            foreach (var item in Directory.EnumerateFileSystemEntries(benchmarkDir, "*", SearchOption.AllDirectories))
-                            {
-                                try
-                                {
-                                    if (File.Exists(item))
-                                        File.Delete(item);
-                                    else if (Directory.Exists(item))
-                                        Directory.Delete(item);
-                                }
-                                catch
-                                {
-                                    // Ignore cleanup errors
-                                }
-                            }
-                        }
                     }
-                    catch
-                    {
-                        // Ignore cleanup errors
-                    }
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    return false;
+                }
+
+                var lowerExists = File.Exists(lowerPath);
+                var upperExists = File.Exists(upperPath);
+                return lowerExists && upperExists;
+            }
+            finally
+            {
+                if (File.Exists(lowerPath))
+                {
+                    File.Delete(lowerPath);
+                }
+
+                if (File.Exists(upperPath))
+                {
+                    File.Delete(upperPath);
+                }
+
+                if (Directory.Exists(rootPath))
+                {
+                    Directory.Delete(rootPath, true);
                 }
             }
         }

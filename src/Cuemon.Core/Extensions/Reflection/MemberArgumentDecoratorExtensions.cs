@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -57,10 +57,7 @@ namespace Cuemon.Reflection
                 }
 
                 var innerException = memberArguments.SingleOrDefault(ma => ma.Name.Equals(nameof(Exception.InnerException), StringComparison.OrdinalIgnoreCase));
-                if (innerException != null)
-                {
-                    innerException.Value = instance;
-                }
+                innerException?.Value = instance;
 
                 var parser = new MemberParser(desiredType, memberArguments);
 

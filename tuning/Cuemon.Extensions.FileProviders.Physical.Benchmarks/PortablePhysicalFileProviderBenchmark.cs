@@ -454,12 +454,20 @@ namespace Cuemon.Extensions.FileProviders
 
         public static IEnumerable<int> SiblingCounts()
         {
-            return CaseDistinctEntryCapabilityDetector.IsSupported ? new[] { 50 } : Array.Empty<int>();
+            // Always return at least one value for BenchmarkDotNet discovery, even on case-insensitive filesystems.
+            // The benchmark is skipped in GlobalSetup if the filesystem doesn't support case-distinct entries.
+            return new[] { 50 };
         }
 
         [GlobalSetup]
         public void GlobalSetup()
         {
+            // Skip this benchmark on filesystems that don't support case-distinct entries (e.g., Windows).
+            if (!CaseDistinctEntryCapabilityDetector.IsSupported)
+            {
+                throw new NotSupportedException("This benchmark requires a case-sensitive filesystem.");
+            }
+
             _scope = new BenchmarkFileSystemScope($"collision-{SiblingCount}");
             _scope.CreateCollisionFileScenario(LowerCollisionFileName, UpperCollisionFileName, SiblingCount);
             _portableProvider = new PortablePhysicalFileProvider(_scope.RootPath);

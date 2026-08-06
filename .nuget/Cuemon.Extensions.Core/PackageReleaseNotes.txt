@@ -1,3 +1,9 @@
+Version: 10.6.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
 Version: 10.5.5
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 
@@ -174,3 +180,4 @@ Availability: .NET 9, .NET 8 and .NET Standard 2.0
 - ADDED HierarchyOptions class in the Cuemon.Extensions.Runtime namespace that represents a set of options to configure the behavior of the Hierarchy and HierarchySerializer class
 - ADDED IHierarchy interface in the Cuemon.Extensions.Runtime namespace that defines a way to expose a node of a hierarchical structure
 - ADDED HierarchySerializer class in the Cuemon.Extensions.Runtime.Serialization namespace that provides a way to serialize objects to nodes of IHierarchy
+

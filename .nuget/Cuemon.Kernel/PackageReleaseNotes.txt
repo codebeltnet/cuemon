@@ -1,3 +1,12 @@
+Version: 10.6.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+# New Features
+- ADDED AsyncRunOptions.MaximumAttempts property to enforce explicit attempt limits during zero-delay retries and prevent unbounded retry loops
+
 Version: 10.5.5
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

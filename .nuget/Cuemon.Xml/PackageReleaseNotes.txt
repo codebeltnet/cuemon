@@ -1,3 +1,9 @@
+Version: 10.6.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
 Version: 10.5.5
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 
@@ -170,4 +176,5 @@ Availability: .NET 9, .NET 8 and .NET Standard 2.0
 
 # Bug Fixes
 - FIXED ExceptionConverter class in the Cuemon.Xml.Serialization.Converters namespace to use Environment.NewLine instead of Alphanumeric.NewLine (vital for non-Windows operating systems)
+
 

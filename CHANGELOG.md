@@ -6,34 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
-## [10.6.0] - 2026-08-06
+## [10.6.0] - 2026-08-07
 
 This is a minor release focused on portable file provider capabilities, async retry enhancements with fine-grained control, and comprehensive dependency updates across all supported target frameworks.
 
 ### Added
 
-- `TargetFrameworkMoniker` type for runtime-based target framework identification and platform-specific behavior branching,
-- `Cuemon.Extensions.FileProviders.Physical` library providing a portable, case-insensitive file provider implementation with built-in path caching, collision detection, and file filtering for consistent cross-platform file resolution,
-- `AsyncRunOptions` configuration class enabling customizable retry behavior with configurable delays and maximum attempts,
-- Benchmark suite for `PortablePhysicalFileProvider` measuring path resolution performance across cache hit/miss scenarios and file path complexity variations.
+- `TargetFrameworkMoniker` utility class for runtime-based target framework identification and platform-specific behavior branching,
+- `Cuemon.Extensions.FileProviders.Physical` library providing `PortablePhysicalFileProvider` with portable, case-insensitive file resolution, intelligent path normalization, built-in caching for successful lookups, and collision detection across supported target frameworks,
+- `AsyncRunOptions` configuration class for structured retry behavior control with configurable delays and explicit maximum-attempt limits to prevent unbounded retry loops,
+- Performance benchmarks for `PortablePhysicalFileProvider` measuring path resolution across cache hit/miss scenarios and file path complexity variations.
 
 ### Changed
 
-- `Awaiter` class refactored to use new `AsyncRunOptions` configuration model, replacing direct parameter passing with a structured options pattern,
-- Primary constructor refactored to traditional constructor in 
-- XML documentation across the codebase modernized with improved example clarity, corrected hyperlink references, and enhanced API guidance,
-- Code quality patterns improved for logging configuration, target framework conditional compilation, and error-handling semantics,
-- Codebelt.Extensions packages upgraded: `BenchmarkDotNet.Console` (1.3.1 → 1.3.2), `Xunit`, `Xunit.Hosting`, `Xunit.Hosting.AspNetCore` (11.1.1 → 11.2.0),
-- Microsoft.Extensions packages pinned to latest compatible versions for .NET 9 and .NET 10.
+- `Awaiter` class refactored to use new `AsyncRunOptions` configuration model, replacing direct parameter passing with a structured options pattern, improving timeout accuracy with `Stopwatch.GetTimestamp()` and optimizing delay handling to reduce allocations,
+- XML documentation across the codebase modernized with improved example clarity, corrected cref hyperlink references for array types and methods, and enhanced API guidance across 45 source files,
+- Code quality patterns improved for logging with IsEnabled guards to avoid allocation when log levels are disabled, target framework conditional compilation using WriteAsync/AppendLine overloads, async pattern matching in line reading, and type inference patterns,
+- All package dependencies updated to latest compatible versions: `Codebelt.Extensions.BenchmarkDotNet.Console` (1.3.1 → 1.3.2), `Codebelt.Extensions.Xunit` (11.1.1 → 11.2.0), `Codebelt.Extensions.Xunit.Hosting` (11.1.1 → 11.2.0), `Codebelt.Extensions.Xunit.Hosting.AspNetCore` (11.1.1 → 11.2.0), Microsoft.Extensions.FileProviders.Physical (new: 9.0.18 for net9, 10.0.10 for net10+netstandard2),
+- File-scoped namespace syntax applied throughout all source and test projects for improved readability and reduced nesting depth.
 
 ### Fixed
 
-- FileWatcher initialization and modified-time comparison logic to use consistent timestamp tracking for reliable change detection,
-- Awaiter retry loop cancellation semantics and delay scheduling behavior to prevent orphaned operations during cancellation.
+- FileWatcher initialization now consistently sets `UtcCreated` to `UtcLastModified` and uses tracked timestamp for modified-time comparison instead of instance creation time,
+- Awaiter retry loop to handle CancellationToken propagation correctly, prevent zero-delay busy loops through fractional-millisecond rounding normalization, and terminate correctly when configured delay exceeds remaining timeout window.
 
 ### Removed
 
-- Legacy analyzer exclusions from `.editorconfig`; modern Roslyn analyzers and IDE rules now apply consistently.
+- Legacy analyzer exclusions from `.editorconfig`; modern Roslyn analyzers and IDE rules now apply consistently,
+- Outdated S2589, S107, and S3776 SonarAnalyzer suppressions that no longer applied after recent code refactoring.
 
 ## [10.5.5] - 2026-07-16
 

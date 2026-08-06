@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.6.0] - 2026-08-06
+
+This is a minor release focused on portable file provider capabilities, async retry enhancements with fine-grained control, and comprehensive dependency updates across all supported target frameworks.
+
+### Added
+
+- `TargetFrameworkMoniker` type for runtime-based target framework identification and platform-specific behavior branching,
+- `Cuemon.Extensions.FileProviders.Physical` library providing a portable, case-insensitive file provider implementation with built-in path caching, collision detection, and file filtering for consistent cross-platform file resolution,
+- `AsyncRunOptions` configuration class enabling customizable retry behavior with configurable delays and maximum attempts,
+- Benchmark suite for `PortablePhysicalFileProvider` measuring path resolution performance across cache hit/miss scenarios and file path complexity variations.
+
+### Changed
+
+- `Awaiter` class refactored to use new `AsyncRunOptions` configuration model, replacing direct parameter passing with a structured options pattern,
+- Primary constructor refactored to traditional constructor in 
+- XML documentation across the codebase modernized with improved example clarity, corrected hyperlink references, and enhanced API guidance,
+- Code quality patterns improved for logging configuration, target framework conditional compilation, and error-handling semantics,
+- Codebelt.Extensions packages upgraded: `BenchmarkDotNet.Console` (1.3.1 → 1.3.2), `Xunit`, `Xunit.Hosting`, `Xunit.Hosting.AspNetCore` (11.1.1 → 11.2.0),
+- Microsoft.Extensions packages pinned to latest compatible versions for .NET 9 and .NET 10.
+
+### Fixed
+
+- FileWatcher initialization and modified-time comparison logic to use consistent timestamp tracking for reliable change detection,
+- Awaiter retry loop cancellation semantics and delay scheduling behavior to prevent orphaned operations during cancellation.
+
+### Removed
+
+- Legacy analyzer exclusions from `.editorconfig`; modern Roslyn analyzers and IDE rules now apply consistently.
+
 ## [10.5.5] - 2026-07-16
 
 This patch release provides systematic dependency updates across all supported target frameworks, alongside new benchmarking infrastructure for the Kernel module.
@@ -1822,6 +1851,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.6.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v10.6.0
 [10.5.5]: https://github.com/codebeltnet/cuemon/compare/v10.5.4...v10.5.5
 [10.5.4]: https://github.com/codebeltnet/cuemon/compare/v10.5.3...v10.5.4
 [10.5.3]: https://github.com/codebeltnet/cuemon/compare/v10.5.2...v10.5.3

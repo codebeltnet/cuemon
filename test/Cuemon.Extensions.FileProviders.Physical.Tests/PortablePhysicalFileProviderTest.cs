@@ -3,6 +3,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Primitives;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -256,6 +258,27 @@ public class PortablePhysicalFileProviderTest : Test
     }
 
     [Fact]
+    public void GetFileInfo_ShouldCanonicalizeSuccessfulFileCache_ForEquivalentSeparatorAndCasingVariations()
+    {
+        using var scope = new TemporaryFileSystemScope();
+        var physicalPath = scope.CreateFile("Assets/Images/Logo.svg", "canonical-file");
+
+        using var sut = new PortablePhysicalFileProvider(scope.RootPath);
+
+        var canonical = sut.GetFileInfo("assets/images/logo.svg");
+        var mixedSeparators = sut.GetFileInfo(CreateMixedSeparatorAlias("ASSETS", "IMAGES", "LOGO.SVG"));
+        var repeatedSeparators = sut.GetFileInfo("/Assets//Images///Logo.svg");
+
+        Assert.True(canonical.Exists);
+        Assert.True(mixedSeparators.Exists);
+        Assert.True(repeatedSeparators.Exists);
+        Assert.Equal(physicalPath, canonical.PhysicalPath);
+        Assert.Equal(physicalPath, mixedSeparators.PhysicalPath);
+        Assert.Equal(physicalPath, repeatedSeparators.PhysicalPath);
+        Assert.Equal(1, GetSuccessfulPathCacheCount(sut, finalSegmentIsDirectory: false));
+    }
+
+    [Fact]
     public void GetFileInfo_ShouldReturnNotFound_WhenIntermediateDirectoryIsMissing()
     {
         using var scope = new TemporaryFileSystemScope();
@@ -344,6 +367,22 @@ public class PortablePhysicalFileProviderTest : Test
     }
 
     [Fact]
+    public void GetFileInfo_ShouldMirrorPhysicalFileProviderBehavior_WhenSubpathEndsWithDirectorySeparator()
+    {
+        using var scope = new TemporaryFileSystemScope();
+        scope.CreateFile("Assets/logo.svg", "one");
+
+        using var expected = new PhysicalFileProvider(scope.RootPath);
+        using var sut = new PortablePhysicalFileProvider(scope.RootPath);
+
+        var baseline = expected.GetFileInfo("Assets/logo.svg/");
+        var info = sut.GetFileInfo("Assets/logo.svg/");
+
+        AssertEquivalentFileInfo(baseline, info);
+        Assert.Equal(0, GetSuccessfulPathCacheCount(sut, finalSegmentIsDirectory: false));
+    }
+
+    [Fact]
     public void GetFileInfo_ShouldUseOrdinalIgnoreCase_IndependentOfCurrentCulture()
     {
         using var scope = new TemporaryFileSystemScope();
@@ -424,6 +463,28 @@ public class PortablePhysicalFileProviderTest : Test
         Assert.True(third.Exists);
         Assert.Equal(GetOrderedNames(first), GetOrderedNames(second));
         Assert.Equal(GetOrderedNames(first), GetOrderedNames(third));
+    }
+
+    [Fact]
+    public void GetDirectoryContents_ShouldCanonicalizeSuccessfulDirectoryCache_ForEquivalentSeparatorAndCasingVariations()
+    {
+        using var scope = new TemporaryFileSystemScope();
+        scope.CreateFile("Assets/Images/logo.svg", "one");
+        scope.CreateFile("Assets/Images/banner.svg", "two");
+
+        using var sut = new PortablePhysicalFileProvider(scope.RootPath);
+
+        var canonical = sut.GetDirectoryContents("assets/images");
+        var mixedSeparators = sut.GetDirectoryContents(CreateMixedSeparatorAlias("ASSETS", "IMAGES", trailingSeparator: true));
+        var repeatedSeparators = sut.GetDirectoryContents("/Assets//Images///");
+
+        Assert.True(canonical.Exists);
+        Assert.True(mixedSeparators.Exists);
+        Assert.True(repeatedSeparators.Exists);
+        Assert.Equal(new[] { "banner.svg", "logo.svg" }, GetOrderedNames(canonical));
+        Assert.Equal(GetOrderedNames(canonical), GetOrderedNames(mixedSeparators));
+        Assert.Equal(GetOrderedNames(canonical), GetOrderedNames(repeatedSeparators));
+        Assert.Equal(1, GetSuccessfulPathCacheCount(sut, finalSegmentIsDirectory: true));
     }
 
     [Fact]
@@ -1176,6 +1237,53 @@ public class PortablePhysicalFileProviderTest : Test
     private static string[] GetOrderedNames(IEnumerable<IFileInfo> entries)
     {
         return entries.Select(entry => entry.Name).OrderBy(name => name, StringComparer.Ordinal).ToArray();
+    }
+
+    private static int GetSuccessfulPathCacheCount(PortablePhysicalFileProvider provider, bool finalSegmentIsDirectory)
+    {
+        return GetSuccessfulPathCache(provider, finalSegmentIsDirectory).Count;
+    }
+
+    private static ConcurrentDictionary<string, string> GetSuccessfulPathCache(PortablePhysicalFileProvider provider, bool finalSegmentIsDirectory)
+    {
+        var fieldName = finalSegmentIsDirectory ? "_directories" : "_files";
+        var field = typeof(PortablePhysicalFileProvider).GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+
+        if (field?.GetValue(provider) is ConcurrentDictionary<string, string> cache)
+        {
+            return cache;
+        }
+
+        throw new InvalidOperationException($"Unable to locate PortablePhysicalFileProvider.{fieldName}.");
+    }
+
+    private static string CreateMixedSeparatorAlias(string firstSegment, string secondSegment, string thirdSegment = null, bool trailingSeparator = false)
+    {
+        var primarySeparator = Path.DirectorySeparatorChar;
+        var alternateSeparator = Path.DirectorySeparatorChar == Path.AltDirectorySeparatorChar ? Path.DirectorySeparatorChar : Path.AltDirectorySeparatorChar;
+        var builder = new StringBuilder();
+
+        builder.Append(primarySeparator);
+        builder.Append(alternateSeparator);
+        builder.Append(firstSegment);
+        builder.Append(primarySeparator);
+        builder.Append(alternateSeparator);
+        builder.Append(secondSegment);
+
+        if (thirdSegment is not null)
+        {
+            builder.Append(alternateSeparator);
+            builder.Append(primarySeparator);
+            builder.Append(thirdSegment);
+        }
+
+        if (trailingSeparator)
+        {
+            builder.Append(primarySeparator);
+            builder.Append(alternateSeparator);
+        }
+
+        return builder.ToString();
     }
 
     private static string ReadAllText(IFileInfo info)

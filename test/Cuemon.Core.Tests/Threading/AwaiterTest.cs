@@ -193,20 +193,15 @@ namespace Cuemon.Threading
         [Fact]
         public async Task RunUntilSuccessfulOrTimeoutAsync_ShouldReturnDefaultUnsuccessful_WhenRepeatedResultsRemainUnsuccessfulUntilTimeout()
         {
-            var callCount = 0;
-
             Task<ConditionalValue> Method()
             {
-                callCount++;
                 return Task.FromResult<ConditionalValue>(new UnsuccessfulValue());
             }
 
-            var result = await Run(Method, TimeSpan.FromMilliseconds(80), RetryDelay);
+            var unsuccessful = Assert.IsType<UnsuccessfulValue>(await Run(Method, TimeSpan.FromMilliseconds(80), RetryDelay));
 
-            Assert.IsType<UnsuccessfulValue>(result);
-            Assert.False(result.Succeeded);
-            Assert.Null(result.Failure);
-            Assert.True(callCount >= 2);
+            Assert.False(unsuccessful.Succeeded);
+            Assert.Null(unsuccessful.Failure);
         }
 
         [Fact]

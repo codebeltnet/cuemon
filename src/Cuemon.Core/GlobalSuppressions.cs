@@ -1,4 +1,4 @@
-﻿// This file is used by Code Analysis to maintain SuppressMessage 
+// This file is used by Code Analysis to maintain SuppressMessage 
 // attributes that are applied to this project.
 // Project-level suppressions either have no target or are given 
 // a specific target and scoped to a namespace, type, member, etc.
@@ -37,7 +37,6 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Major Code Smell", "S3011:Reflection should not be used to increase accessibility of classes, methods, or fields", Justification = "By design.", Scope = "member", Target = "~M:Cuemon.Reflection.MemberReflection.#ctor(System.Action{Cuemon.Reflection.MemberReflectionOptions})")]
 [assembly: SuppressMessage("Major Code Smell", "S3011:Reflection should not be used to increase accessibility of classes, methods, or fields", Justification = "By design.", Scope = "member", Target = "~M:Cuemon.Globalization.ResourceAttribute.GetString(System.String)~System.String")]
 [assembly: SuppressMessage("Style", "IDE0220:Add explicit cast", Justification = "False-Positive", Scope = "member", Target = "~M:Cuemon.StringReplaceEngine.RenderReplacement~System.String")]
-[assembly: SuppressMessage("Major Code Smell", "S2589:Boolean expressions should not be gratuitous", Justification = "False Positive", Scope = "member", Target = "~M:Cuemon.Security.CyclicRedundancyCheck.PolynomialTableInitializerCore(System.UInt64)~System.Collections.Generic.List{System.UInt64}")]
 [assembly: SuppressMessage("Minor Code Smell", "S3236:Caller information arguments should not be provided explicitly", Justification = "By design - and unit tested to that no information is lost.", Scope = "member", Target = "~M:Cuemon.Decorator`1.#ctor(`0,System.Boolean,System.String)")]
 [assembly: SuppressMessage("Critical Code Smell", "S3776:Cognitive Complexity of methods should not be too high", Justification = "Acceptable.", Scope = "member", Target = "~M:Cuemon.Text.ParserFactory.FromValueType~Cuemon.Text.IConfigurableParser{System.Object,Cuemon.FormattingOptions}")]
 [assembly: SuppressMessage("Critical Code Smell", "S3776:Cognitive Complexity of methods should not be too high", Justification = "Acceptable.", Scope = "member", Target = "~M:Cuemon.Reflection.MemberArgumentDecoratorExtensions.CreateException(Cuemon.IDecorator{System.Collections.Generic.Stack{System.Collections.Generic.IList{Cuemon.Reflection.MemberArgument}}},System.Boolean)~System.Exception")]

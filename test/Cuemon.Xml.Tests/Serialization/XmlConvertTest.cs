@@ -2,71 +2,69 @@ using Codebelt.Extensions.Xunit;
 using Cuemon.Extensions.IO;
 using Xunit;
 
-namespace Cuemon.Xml.Serialization
+namespace Cuemon.Xml.Serialization;
+[Collection(nameof(XmlConvertDefaultSettingsCollection))]
+public class XmlConvertTest : Test
 {
-    [Collection(nameof(XmlConvertDefaultSettingsCollection))]
-    public class XmlConvertTest : Test
+    public XmlConvertTest(ITestOutputHelper output) : base(output)
     {
-        public XmlConvertTest(ITestOutputHelper output) : base(output)
+    }
+
+    [Fact]
+    public void DefaultSettings_ShouldBeNullByDefault()
+    {
+        var original = XmlConvert.DefaultSettings;
+        try
         {
+            XmlConvert.DefaultSettings = null;
+            Assert.Null(XmlConvert.DefaultSettings);
         }
-
-        [Fact]
-        public void DefaultSettings_ShouldBeNullByDefault()
+        finally
         {
-            var original = XmlConvert.DefaultSettings;
-            try
-            {
-                XmlConvert.DefaultSettings = null;
-                Assert.Null(XmlConvert.DefaultSettings);
-            }
-            finally
-            {
-                XmlConvert.DefaultSettings = original;
-            }
+            XmlConvert.DefaultSettings = original;
         }
+    }
 
-        [Fact]
-        public void DefaultSettings_ShouldReturnConfiguredOptionsWhenSet()
+    [Fact]
+    public void DefaultSettings_ShouldReturnConfiguredOptionsWhenSet()
+    {
+        var original = XmlConvert.DefaultSettings;
+        try
         {
-            var original = XmlConvert.DefaultSettings;
-            try
-            {
-                var expected = new XmlSerializerOptions { RootName = new XmlQualifiedEntity("Custom") };
-                XmlConvert.DefaultSettings = () => expected;
+            var expected = new XmlSerializerOptions { RootName = new XmlQualifiedEntity("Custom") };
+            XmlConvert.DefaultSettings = () => expected;
 
-                var result = XmlConvert.DefaultSettings?.Invoke();
+            var result = XmlConvert.DefaultSettings?.Invoke();
 
-                Assert.NotNull(result);
-                Assert.Equal("Custom", result.RootName.LocalName);
-            }
-            finally
-            {
-                XmlConvert.DefaultSettings = original;
-            }
+            Assert.NotNull(result);
+            Assert.Equal("Custom", result.RootName.LocalName);
         }
-
-        [Fact]
-        public void DefaultSettings_ShouldBeUsedByXmlSerializerCreate_WhenSettingsArgumentIsNull()
+        finally
         {
-            var original = XmlConvert.DefaultSettings;
-            try
-            {
-                var expected = new XmlSerializerOptions { RootName = new XmlQualifiedEntity("FromDefault") };
-                XmlConvert.DefaultSettings = () => expected;
+            XmlConvert.DefaultSettings = original;
+        }
+    }
 
-                var serializer = XmlSerializer.Create(null);
-                var result = serializer.Serialize("hello", typeof(string));
-                var xml = result.ToEncodedString();
+    [Fact]
+    public void DefaultSettings_ShouldBeUsedByXmlSerializerCreate_WhenSettingsArgumentIsNull()
+    {
+        var original = XmlConvert.DefaultSettings;
+        try
+        {
+            var expected = new XmlSerializerOptions { RootName = new XmlQualifiedEntity("FromDefault") };
+            XmlConvert.DefaultSettings = () => expected;
 
-                TestOutput.WriteLine(xml);
-                Assert.NotNull(serializer);
-                Assert.Contains("<FromDefault>", xml);
-            }
-            finally
-            {
-                XmlConvert.DefaultSettings = original;
-            }
+            var serializer = XmlSerializer.Create(null);
+            var result = serializer.Serialize("hello", typeof(string));
+            var xml = result.ToEncodedString();
+
+            TestOutput.WriteLine(xml);
+            Assert.NotNull(serializer);
+            Assert.Contains("<FromDefault>", xml);
+        }
+        finally
+        {
+            XmlConvert.DefaultSettings = original;
         }
     }
 }

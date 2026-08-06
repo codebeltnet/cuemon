@@ -5,29 +5,27 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace Cuemon.Extensions.AspNetCore.Xml.Formatters
+namespace Cuemon.Extensions.AspNetCore.Xml.Formatters;
+public class ServiceCollectionExtensionsTest : Test
 {
-    public class ServiceCollectionExtensionsTest : Test
+    public ServiceCollectionExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public ServiceCollectionExtensionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void AddXmlFormatterOptions_ShouldOnlyRegisterOnce_WhenCalledMultipleTimes()
-        {
-            var sut = new ServiceCollection();
+    [Fact]
+    public void AddXmlFormatterOptions_ShouldOnlyRegisterOnce_WhenCalledMultipleTimes()
+    {
+        var sut = new ServiceCollection();
 
-            sut.AddXmlFormatterOptions();
-            sut.AddXmlFormatterOptions();
-            sut.AddXmlFormatterOptions();
+        sut.AddXmlFormatterOptions();
+        sut.AddXmlFormatterOptions();
+        sut.AddXmlFormatterOptions();
 
-            var configureOptionsCount = sut.Count(sd =>
-                sd.ServiceType == typeof(IConfigureOptions<XmlFormatterOptions>));
+        var configureOptionsCount = sut.Count(sd =>
+            sd.ServiceType == typeof(IConfigureOptions<XmlFormatterOptions>));
 
-            TestOutput.WriteLine($"IConfigureOptions<XmlFormatterOptions> registrations: {configureOptionsCount}");
+        TestOutput.WriteLine($"IConfigureOptions<XmlFormatterOptions> registrations: {configureOptionsCount}");
 
-            Assert.Equal(1, configureOptionsCount);
-        }
+        Assert.Equal(1, configureOptionsCount);
     }
 }

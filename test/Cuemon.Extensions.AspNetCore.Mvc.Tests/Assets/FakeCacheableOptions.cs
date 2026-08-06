@@ -1,14 +1,12 @@
 ﻿using Cuemon.Configuration;
 
-namespace Cuemon.Extensions.AspNetCore.Mvc.Assets
+namespace Cuemon.Extensions.AspNetCore.Mvc.Assets;
+public class FakeCacheableOptions : IParameterObject
 {
-    public class FakeCacheableOptions : IParameterObject
+    public FakeCacheableOptions()
     {
-        public FakeCacheableOptions()
-        {
-            Greeting = "Hello!";
-        }
-
-        public string Greeting { get; set; }
+        Greeting = "Hello!";
     }
+
+    public string Greeting { get; set; }
 }

@@ -1,7 +1,5 @@
-﻿namespace Cuemon.Assets
+﻿namespace Cuemon.Assets;
+public interface INotifier
 {
-    public interface INotifier
-    {
-        string Send(string message);
-    }
+    string Send(string message);
 }

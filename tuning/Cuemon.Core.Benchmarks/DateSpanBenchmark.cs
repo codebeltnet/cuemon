@@ -3,92 +3,90 @@ using System.Globalization;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 
-namespace Cuemon
+namespace Cuemon;
+[MemoryDiagnoser]
+[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+public class DateSpanBenchmark
 {
-    [MemoryDiagnoser]
-    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
-    public class DateSpanBenchmark
+    private DateTime _now;
+    private DateTime _shortEnd;
+    private DateTime _mediumEnd;
+    private DateTime _longEnd;
+
+    private DateSpan _shortSpan;
+    private DateSpan _mediumSpan;
+    private DateSpan _longSpan;
+
+    private string _shortStartString;
+    private string _shortEndString;
+    private string _longStartString;
+    private string _longEndString;
+
+    [GlobalSetup]
+    public void Setup()
     {
-        private DateTime _now;
-        private DateTime _shortEnd;
-        private DateTime _mediumEnd;
-        private DateTime _longEnd;
+        _now = DateTime.UtcNow;
 
-        private DateSpan _shortSpan;
-        private DateSpan _mediumSpan;
-        private DateSpan _longSpan;
+        _shortEnd = _now.AddHours(36); // ~1.5 days
+        _mediumEnd = _now.AddMonths(5).AddDays(12).AddHours(3);
+        _longEnd = _now.AddYears(5).AddMonths(2).AddDays(10).AddHours(4).AddMilliseconds(123);
 
-        private string _shortStartString;
-        private string _shortEndString;
-        private string _longStartString;
-        private string _longEndString;
+        _shortSpan = new DateSpan(_now, _shortEnd);
+        _mediumSpan = new DateSpan(_now, _mediumEnd);
+        _longSpan = new DateSpan(_now, _longEnd);
 
-        [GlobalSetup]
-        public void Setup()
-        {
-            _now = DateTime.UtcNow;
+        // ISO sortable ("s") uses invariant culture, matches DateSpan.Parse overloads
+        _shortStartString = _now.ToString("s", CultureInfo.InvariantCulture);
+        _shortEndString = _shortEnd.ToString("s", CultureInfo.InvariantCulture);
 
-            _shortEnd = _now.AddHours(36); // ~1.5 days
-            _mediumEnd = _now.AddMonths(5).AddDays(12).AddHours(3);
-            _longEnd = _now.AddYears(5).AddMonths(2).AddDays(10).AddHours(4).AddMilliseconds(123);
+        _longStartString = _now.ToString("s", CultureInfo.InvariantCulture);
+        _longEndString = _longEnd.ToString("s", CultureInfo.InvariantCulture);
+    }
 
-            _shortSpan = new DateSpan(_now, _shortEnd);
-            _mediumSpan = new DateSpan(_now, _mediumEnd);
-            _longSpan = new DateSpan(_now, _longEnd);
+    // Construction: common scenarios
+    [Benchmark(Baseline = true, Description = "Ctor (short span)")]
+    public DateSpan Construct_Short() => new DateSpan(_now, _shortEnd);
 
-            // ISO sortable ("s") uses invariant culture, matches DateSpan.Parse overloads
-            _shortStartString = _now.ToString("s", CultureInfo.InvariantCulture);
-            _shortEndString = _shortEnd.ToString("s", CultureInfo.InvariantCulture);
+    [Benchmark(Description = "Ctor (medium span)")]
+    public DateSpan Construct_Medium() => new DateSpan(_now, _mediumEnd);
 
-            _longStartString = _now.ToString("s", CultureInfo.InvariantCulture);
-            _longEndString = _longEnd.ToString("s", CultureInfo.InvariantCulture);
-        }
+    [Benchmark(Description = "Ctor (long span)")]
+    public DateSpan Construct_Long() => new DateSpan(_now, _longEnd);
 
-        // Construction: common scenarios
-        [Benchmark(Baseline = true, Description = "Ctor (short span)")]
-        public DateSpan Construct_Short() => new DateSpan(_now, _shortEnd);
+    // Single-argument ctor that uses DateTime.Today as upper bound
+    [Benchmark(Description = "Ctor (single-date)")]
+    public DateSpan Construct_SingleDate() => new DateSpan(_now);
 
-        [Benchmark(Description = "Ctor (medium span)")]
-        public DateSpan Construct_Medium() => new DateSpan(_now, _mediumEnd);
+    // Parsing from string (culture-aware overload)
+    [Benchmark(Description = "Parse (short)")]
+    public DateSpan Parse_Short() => DateSpan.Parse(_shortStartString, _shortEndString, CultureInfo.InvariantCulture);
 
-        [Benchmark(Description = "Ctor (long span)")]
-        public DateSpan Construct_Long() => new DateSpan(_now, _longEnd);
+    [Benchmark(Description = "Parse (long)")]
+    public DateSpan Parse_Long() => DateSpan.Parse(_longStartString, _longEndString, CultureInfo.InvariantCulture);
 
-        // Single-argument ctor that uses DateTime.Today as upper bound
-        [Benchmark(Description = "Ctor (single-date)")]
-        public DateSpan Construct_SingleDate() => new DateSpan(_now);
+    // Common instance operations
+    [Benchmark(Description = "ToString (short)")]
+    public string ToString_Short() => _shortSpan.ToString();
 
-        // Parsing from string (culture-aware overload)
-        [Benchmark(Description = "Parse (short)")]
-        public DateSpan Parse_Short() => DateSpan.Parse(_shortStartString, _shortEndString, CultureInfo.InvariantCulture);
+    [Benchmark(Description = "ToString (long)")]
+    public string ToString_Long() => _longSpan.ToString();
 
-        [Benchmark(Description = "Parse (long)")]
-        public DateSpan Parse_Long() => DateSpan.Parse(_longStartString, _longEndString, CultureInfo.InvariantCulture);
+    [Benchmark(Description = "GetWeeks (short)")]
+    public int GetWeeks_Short() => _shortSpan.GetWeeks();
 
-        // Common instance operations
-        [Benchmark(Description = "ToString (short)")]
-        public string ToString_Short() => _shortSpan.ToString();
+    [Benchmark(Description = "GetWeeks (long)")]
+    public int GetWeeks_Long() => _longSpan.GetWeeks();
 
-        [Benchmark(Description = "ToString (long)")]
-        public string ToString_Long() => _longSpan.ToString();
+    [Benchmark(Description = "GetHashCode")]
+    public int GetHashCode_Benchmark() => _longSpan.GetHashCode();
 
-        [Benchmark(Description = "GetWeeks (short)")]
-        public int GetWeeks_Short() => _shortSpan.GetWeeks();
+    [Benchmark(Description = "Equals (value vs same value)")]
+    public bool Equals_Same() => _longSpan.Equals(new DateSpan(_now, _longEnd));
 
-        [Benchmark(Description = "GetWeeks (long)")]
-        public int GetWeeks_Long() => _longSpan.GetWeeks();
-
-        [Benchmark(Description = "GetHashCode")]
-        public int GetHashCode_Benchmark() => _longSpan.GetHashCode();
-
-        [Benchmark(Description = "Equals (value vs same value)")]
-        public bool Equals_Same() => _longSpan.Equals(new DateSpan(_now, _longEnd));
-
-        [Benchmark(Description = "Operator == (same value)")]
-        public bool OperatorEquality_Same()
-        {
-            var other = new DateSpan(_now, _longEnd);
-            return _longSpan == other;
-        }
+    [Benchmark(Description = "Operator == (same value)")]
+    public bool OperatorEquality_Same()
+    {
+        var other = new DateSpan(_now, _longEnd);
+        return _longSpan == other;
     }
 }

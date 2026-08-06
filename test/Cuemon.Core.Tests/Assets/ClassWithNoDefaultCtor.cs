@@ -1,12 +1,10 @@
-﻿namespace Cuemon.Assets
+﻿namespace Cuemon.Assets;
+public class ClassWithNoDefaultCtor
 {
-    public class ClassWithNoDefaultCtor
+    public ClassWithNoDefaultCtor(int id)
     {
-        public ClassWithNoDefaultCtor(int id)
-        {
-            Id = id;
-        }
-
-        public int Id { get; }
+        Id = id;
     }
+
+    public int Id { get; }
 }

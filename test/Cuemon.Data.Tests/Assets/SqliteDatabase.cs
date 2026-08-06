@@ -5,14 +5,13 @@ using System.Linq;
 using Cuemon.Reflection;
 using Xunit;
 
-namespace Cuemon.Data.Assets
+namespace Cuemon.Data.Assets;
+internal static class SqliteDatabase
 {
-    internal static class SqliteDatabase
+    internal static void Create(DataManager manager, ITestOutputHelper output)
     {
-        internal static void Create(DataManager manager, ITestOutputHelper output)
-        {
 
-            manager.Execute(new DataStatement("""
+        manager.Execute(new DataStatement("""
                                                       CREATE TABLE Product (
                                                       	ProductID INTEGER PRIMARY KEY,
                                                       	Name TEXT NOT NULL,
@@ -41,15 +40,15 @@ namespace Cuemon.Data.Assets
                                                       	ModifiedDate TEXT NOT NULL);
                                                       """));
 
-            using var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("AdventureWorks2022_Product.csv", ManifestResourceMatch.ContainsName).Values.Single();
-            using var reader = new DsvDataReader(new StreamReader(file), setup: o =>
-            {
-                o.FormatProvider = CultureInfo.GetCultureInfo("da-DK");
-                o.Delimiter = ";";
-            });
-            while (reader.Read())
-            {
-                var statement = new DataStatement($$"""
+        using var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("AdventureWorks2022_Product.csv", ManifestResourceMatch.ContainsName).Values.Single();
+        using var reader = new DsvDataReader(new StreamReader(file), setup: o =>
+        {
+            o.FormatProvider = CultureInfo.GetCultureInfo("da-DK");
+            o.Delimiter = ";";
+        });
+        while (reader.Read())
+        {
+            var statement = new DataStatement($$"""
                                                             INSERT INTO Product
                                                             ([ProductID]
                                                             ,[Name]
@@ -104,22 +103,21 @@ namespace Cuemon.Data.Assets
                                                             "{{reader.GetDateTime(24):O}}")
                                                             """);
 
-                try
-                {
-                    manager.Execute(statement);
-                }
-                catch (Exception e)
-                {
-                    output.WriteLine(statement.Text);
-                    throw;
-                }
+            try
+            {
+                manager.Execute(statement);
+            }
+            catch (Exception e)
+            {
+                output.WriteLine(statement.Text);
+                throw;
             }
         }
+    }
 
-        private static string StringOrNull(string value)
-        {
-            if (value == "NULL") { return "NULL"; }
-            return (value.StartsWith("\"") && value.EndsWith("\"")) ? $"{value}" : $"\"{value}\"";
-        }
+    private static string StringOrNull(string value)
+    {
+        if (value == "NULL") { return "NULL"; }
+        return (value.StartsWith("\"") && value.EndsWith("\"")) ? $"{value}" : $"\"{value}\"";
     }
 }

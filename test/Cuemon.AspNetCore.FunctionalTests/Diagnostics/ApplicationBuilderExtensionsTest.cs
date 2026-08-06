@@ -12,104 +12,103 @@ using Codebelt.Extensions.Xunit.Hosting.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Xunit;
 
-namespace Cuemon.AspNetCore.Diagnostics
+namespace Cuemon.AspNetCore.Diagnostics;
+public class ApplicationBuilderExtensionsTest : Test
 {
-    public class ApplicationBuilderExtensionsTest : Test
+    public ApplicationBuilderExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public ApplicationBuilderExtensionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_WhenRequestServicesIsWrappedByAspVersioningInjectApiVersion()
-        {
-            using var response = await WebHostTestFactory.RunAsync(
-                services =>
-                {
-                    services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
-                    services.AddJsonExceptionResponseFormatter();
-                },
-                app =>
-                {
-                    app.UseFaultDescriptorExceptionHandler();
-                    app.Use((Func<Microsoft.AspNetCore.Http.HttpContext, Func<Task>, Task>)((context, _) =>
-                    {
-                        context.RequestServices = new Asp.Versioning.Builder.EndpointBuilderFinalizer.InjectApiVersion(context.RequestServices);
-                        throw new NotFoundException();
-                    }));
-                },
-                responseFactory: client =>
-                {
-                    client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-                    return client.GetAsync("/");
-                });
-
-            var body = await response.Content.ReadAsStringAsync();
-
-            TestOutput.WriteLine(body);
-
-            Assert.Equal(404, (int)response.StatusCode);
-            Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
-            Assert.EndsWith("Asp.Versioning.Builder.EndpointBuilderFinalizer+InjectApiVersion", typeof(Asp.Versioning.Builder.EndpointBuilderFinalizer.InjectApiVersion).FullName, StringComparison.Ordinal);
-            Assert.Contains("\"title\": \"NotFound\"", body, StringComparison.Ordinal);
-            Assert.Contains("\"status\": 404", body, StringComparison.Ordinal);
-        }
-
-        [Theory]
-        [InlineData(FaultSensitivityDetails.All)]
-        [InlineData(FaultSensitivityDetails.Evidence)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
-        [InlineData(FaultSensitivityDetails.FailureWithData)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
-        [InlineData(FaultSensitivityDetails.Failure)]
-        [InlineData(FaultSensitivityDetails.None)]
-        public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_RenderAsExceptionDescriptor_UsingJson(FaultSensitivityDetails sensitivity)
-        {
-            using var response = await WebHostTestFactory.RunAsync(
-                services =>
-                {
-                    services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.FaultDetails);
-                    services.AddJsonExceptionResponseFormatter();
-                    services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
-                },
-                app =>
-                {
-                    app.UseFaultDescriptorExceptionHandler();
-                    app.Use(async (context, next) =>
-                    {
-                        try
-                        {
-                            throw new ArgumentException("This is an inner exception message ...", nameof(app))
-                            {
-                                Data =
-                                {
-                                    { "1st", "data value" }
-                                },
-                                HelpLink = "https://www.savvyio.net/"
-                            };
-                        }
-                        catch (Exception e)
-                        {
-                            throw new NotFoundException("Main exception - look out for inner!", e);
-                        }
-
-                        await next(context);
-                    });
-                },
-                responseFactory: client =>
-                {
-                    client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-                    return client.GetAsync("/");
-                });
-
-            var body = await response.Content.ReadAsStringAsync();
-
-            TestOutput.WriteLine(body);
-
-            switch (sensitivity)
+    [Fact]
+    public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_WhenRequestServicesIsWrappedByAspVersioningInjectApiVersion()
+    {
+        using var response = await WebHostTestFactory.RunAsync(
+            services =>
             {
-                case FaultSensitivityDetails.All:
-                    Assert.True(Match("""
+                services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
+                services.AddJsonExceptionResponseFormatter();
+            },
+            app =>
+            {
+                app.UseFaultDescriptorExceptionHandler();
+                app.Use((Func<Microsoft.AspNetCore.Http.HttpContext, Func<Task>, Task>)((context, _) =>
+                {
+                    context.RequestServices = new Asp.Versioning.Builder.EndpointBuilderFinalizer.InjectApiVersion(context.RequestServices);
+                    throw new NotFoundException();
+                }));
+            },
+            responseFactory: client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                return client.GetAsync("/");
+            });
+
+        var body = await response.Content.ReadAsStringAsync();
+
+        TestOutput.WriteLine(body);
+
+        Assert.Equal(404, (int)response.StatusCode);
+        Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
+        Assert.EndsWith("Asp.Versioning.Builder.EndpointBuilderFinalizer+InjectApiVersion", typeof(Asp.Versioning.Builder.EndpointBuilderFinalizer.InjectApiVersion).FullName, StringComparison.Ordinal);
+        Assert.Contains("\"title\": \"NotFound\"", body, StringComparison.Ordinal);
+        Assert.Contains("\"status\": 404", body, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(FaultSensitivityDetails.All)]
+    [InlineData(FaultSensitivityDetails.Evidence)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
+    [InlineData(FaultSensitivityDetails.FailureWithData)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
+    [InlineData(FaultSensitivityDetails.Failure)]
+    [InlineData(FaultSensitivityDetails.None)]
+    public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_RenderAsExceptionDescriptor_UsingJson(FaultSensitivityDetails sensitivity)
+    {
+        using var response = await WebHostTestFactory.RunAsync(
+            services =>
+            {
+                services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.FaultDetails);
+                services.AddJsonExceptionResponseFormatter();
+                services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
+            },
+            app =>
+            {
+                app.UseFaultDescriptorExceptionHandler();
+                app.Use(async (context, next) =>
+                {
+                    try
+                    {
+                        throw new ArgumentException("This is an inner exception message ...", nameof(app))
+                        {
+                            Data =
+                            {
+                                { "1st", "data value" }
+                            },
+                            HelpLink = "https://www.savvyio.net/"
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        throw new NotFoundException("Main exception - look out for inner!", e);
+                    }
+
+                    await next(context);
+                });
+            },
+            responseFactory: client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                return client.GetAsync("/");
+            });
+
+        var body = await response.Content.ReadAsStringAsync();
+
+        TestOutput.WriteLine(body);
+
+        switch (sensitivity)
+        {
+            case FaultSensitivityDetails.All:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/",
@@ -158,9 +157,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Evidence:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Evidence:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/",
@@ -184,9 +183,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTraceAndData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTraceAndData:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/",
@@ -222,9 +221,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithData:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/",
@@ -252,9 +251,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTrace:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTrace:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/",
@@ -287,9 +286,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Failure:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Failure:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/",
@@ -314,9 +313,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.None:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.None:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/",
@@ -327,65 +326,65 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-            }
+                break;
         }
+    }
 
-        [Theory]
-        [InlineData(FaultSensitivityDetails.All)]
-        [InlineData(FaultSensitivityDetails.Evidence)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
-        [InlineData(FaultSensitivityDetails.FailureWithData)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
-        [InlineData(FaultSensitivityDetails.Failure)]
-        [InlineData(FaultSensitivityDetails.None)]
-        public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_RenderAsProblemDetails_UsingJson(FaultSensitivityDetails sensitivity)
-        {
-            using var response = await WebHostTestFactory.RunAsync(
-                services =>
-                {
-                    services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
-                    services.AddJsonExceptionResponseFormatter();
-                    services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
-                },
-                app =>
-                {
-                    app.UseFaultDescriptorExceptionHandler();
-                    app.Use(async (context, next) =>
-                    {
-                        try
-                        {
-                            throw new ArgumentException("This is an inner exception message ...", nameof(app))
-                            {
-                                Data =
-                                {
-                                    { "1st", "data value" }
-                                },
-                                HelpLink = "https://www.savvyio.net/"
-                            };
-                        }
-                        catch (Exception e)
-                        {
-                            throw new NotFoundException("Main exception - look out for inner!", e);
-                        }
-
-                        await next(context);
-                    });
-                },
-                responseFactory: client =>
-                {
-                    client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-                    return client.GetAsync("/");
-                });
-
-            var body = await response.Content.ReadAsStringAsync();
-
-            TestOutput.WriteLine(body);
-
-            switch (sensitivity)
+    [Theory]
+    [InlineData(FaultSensitivityDetails.All)]
+    [InlineData(FaultSensitivityDetails.Evidence)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
+    [InlineData(FaultSensitivityDetails.FailureWithData)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
+    [InlineData(FaultSensitivityDetails.Failure)]
+    [InlineData(FaultSensitivityDetails.None)]
+    public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_RenderAsProblemDetails_UsingJson(FaultSensitivityDetails sensitivity)
+    {
+        using var response = await WebHostTestFactory.RunAsync(
+            services =>
             {
-                case FaultSensitivityDetails.All:
-                    Assert.True(Match("""
+                services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
+                services.AddJsonExceptionResponseFormatter();
+                services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
+            },
+            app =>
+            {
+                app.UseFaultDescriptorExceptionHandler();
+                app.Use(async (context, next) =>
+                {
+                    try
+                    {
+                        throw new ArgumentException("This is an inner exception message ...", nameof(app))
+                        {
+                            Data =
+                            {
+                                { "1st", "data value" }
+                            },
+                            HelpLink = "https://www.savvyio.net/"
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        throw new NotFoundException("Main exception - look out for inner!", e);
+                    }
+
+                    await next(context);
+                });
+            },
+            responseFactory: client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                return client.GetAsync("/");
+            });
+
+        var body = await response.Content.ReadAsStringAsync();
+
+        TestOutput.WriteLine(body);
+
+        switch (sensitivity)
+        {
+            case FaultSensitivityDetails.All:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "NotFound",
@@ -431,9 +430,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Evidence:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Evidence:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "NotFound",
@@ -454,9 +453,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTraceAndData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTraceAndData:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "NotFound",
@@ -491,9 +490,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithData:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "NotFound",
@@ -520,9 +519,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTrace:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTrace:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "NotFound",
@@ -554,9 +553,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Failure:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Failure:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "NotFound",
@@ -580,9 +579,9 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.None:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.None:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "NotFound",
@@ -592,55 +591,55 @@ namespace Cuemon.AspNetCore.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-            }
+                break;
         }
+    }
 
-        [Fact]
-        public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_RenderAsExceptionDescriptor_UsingXml_WithSensitivityAll()
-        {
-            using var response = await WebHostTestFactory.RunAsync(
-                services =>
+    [Fact]
+    public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_RenderAsExceptionDescriptor_UsingXml_WithSensitivityAll()
+    {
+        using var response = await WebHostTestFactory.RunAsync(
+            services =>
+            {
+                services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.FaultDetails);
+                services.AddXmlExceptionResponseFormatter(o => o.Settings.Writer.Indent = true);
+                services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = FaultSensitivityDetails.All);
+            },
+            app =>
+            {
+                app.UseFaultDescriptorExceptionHandler();
+                app.Use(async (context, next) =>
                 {
-                    services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.FaultDetails);
-                    services.AddXmlExceptionResponseFormatter(o => o.Settings.Writer.Indent = true);
-                    services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = FaultSensitivityDetails.All);
-                },
-                app =>
-                {
-                    app.UseFaultDescriptorExceptionHandler();
-                    app.Use(async (context, next) =>
+                    try
                     {
-                        try
+                        throw new ArgumentException("This is an inner exception message ...", nameof(app))
                         {
-                            throw new ArgumentException("This is an inner exception message ...", nameof(app))
+                            Data =
                             {
-                                Data =
-                                {
-                                    { "1st", "data value" }
-                                },
-                                HelpLink = "https://www.savvyio.net/"
-                            };
-                        }
-                        catch (Exception e)
-                        {
-                            throw new NotFoundException("Main exception - look out for inner!", e);
-                        }
+                                { "1st", "data value" }
+                            },
+                            HelpLink = "https://www.savvyio.net/"
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        throw new NotFoundException("Main exception - look out for inner!", e);
+                    }
 
-                        await next(context);
-                    });
-                },
-                responseFactory: client =>
-                {
-                    client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/xml"));
-                    return client.GetAsync("/");
+                    await next(context);
                 });
+            },
+            responseFactory: client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/xml"));
+                return client.GetAsync("/");
+            });
 
-            var body = await response.Content.ReadAsStringAsync();
+        var body = await response.Content.ReadAsStringAsync();
 
-            TestOutput.WriteLine(body);
+        TestOutput.WriteLine(body);
 
-            Assert.True(Match("""
+        Assert.True(Match("""
                               <?xml version="1.0" encoding="utf-8"?>
                               <HttpExceptionDescriptor>
                               	<Error>
@@ -684,53 +683,53 @@ namespace Cuemon.AspNetCore.Diagnostics
                               	<TraceId>*</TraceId>
                               </HttpExceptionDescriptor>
                               """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-        }
+    }
 
-        [Fact]
-        public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_RenderAsProblemDetails_UsingXml_WithSensitivityAll()
-        {
-            using var response = await WebHostTestFactory.RunAsync(
-                services =>
+    [Fact]
+    public async Task UseFaultDescriptorExceptionHandler_ShouldCaptureException_RenderAsProblemDetails_UsingXml_WithSensitivityAll()
+    {
+        using var response = await WebHostTestFactory.RunAsync(
+            services =>
+            {
+                services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
+                services.AddXmlExceptionResponseFormatter(o => o.Settings.Writer.Indent = true);
+                services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = FaultSensitivityDetails.All);
+            },
+            app =>
+            {
+                app.UseFaultDescriptorExceptionHandler();
+                app.Use(async (context, next) =>
                 {
-                    services.AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
-                    services.AddXmlExceptionResponseFormatter(o => o.Settings.Writer.Indent = true);
-                    services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = FaultSensitivityDetails.All);
-                },
-                app =>
-                {
-                    app.UseFaultDescriptorExceptionHandler();
-                    app.Use(async (context, next) =>
+                    try
                     {
-                        try
+                        throw new ArgumentException("This is an inner exception message ...", nameof(app))
                         {
-                            throw new ArgumentException("This is an inner exception message ...", nameof(app))
+                            Data =
                             {
-                                Data =
-                                {
-                                    { "1st", "data value" }
-                                },
-                                HelpLink = "https://www.savvyio.net/"
-                            };
-                        }
-                        catch (Exception e)
-                        {
-                            throw new NotFoundException("Main exception - look out for inner!", e);
-                        }
+                                { "1st", "data value" }
+                            },
+                            HelpLink = "https://www.savvyio.net/"
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        throw new NotFoundException("Main exception - look out for inner!", e);
+                    }
 
-                        await next(context);
-                    });
-                },
-                responseFactory: client =>
-                {
-                    client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/xml"));
-                    return client.GetAsync("/");
+                    await next(context);
                 });
+            },
+            responseFactory: client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/xml"));
+                return client.GetAsync("/");
+            });
 
-            var body = await response.Content.ReadAsStringAsync();
+        var body = await response.Content.ReadAsStringAsync();
 
-            TestOutput.WriteLine(body);
+        TestOutput.WriteLine(body);
 
-            Assert.True(Match("""
+        Assert.True(Match("""
                               <?xml version="1.0" encoding="utf-8"?>
                               <ProblemDetails>
                               	<Type>about:blank</Type>
@@ -769,27 +768,5 @@ namespace Cuemon.AspNetCore.Diagnostics
                               	</Request>
                               </ProblemDetails>
                               """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-        }
-    }
-}
-
-namespace Asp.Versioning.Builder
-{
-    internal static class EndpointBuilderFinalizer
-    {
-        internal sealed class InjectApiVersion : IServiceProvider
-        {
-            private readonly IServiceProvider _serviceProvider;
-
-            public InjectApiVersion(IServiceProvider serviceProvider)
-            {
-                _serviceProvider = serviceProvider;
-            }
-
-            public object GetService(Type serviceType)
-            {
-                return _serviceProvider.GetService(serviceType);
-            }
-        }
     }
 }

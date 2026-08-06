@@ -6,1292 +6,1290 @@ using Cuemon.Extensions;
 using Codebelt.Extensions.Xunit;
 using Xunit;
 
-namespace Cuemon.Diagnostics
+namespace Cuemon.Diagnostics;
+public class TimeMeasureTest : Test
 {
-    public class TimeMeasureTest : Test
+    private static readonly TimeSpan ExpectedExecutionTime = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan LowerJitter = TimeSpan.FromMilliseconds(250);
+    private static readonly TimeSpan UpperJitter = TimeSpan.FromMilliseconds(500);
+
+    public TimeMeasureTest(ITestOutputHelper output) : base(output)
     {
-        private static readonly TimeSpan ExpectedExecutionTime = TimeSpan.FromSeconds(1);
-        private static readonly TimeSpan LowerJitter = TimeSpan.FromMilliseconds(250);
-        private static readonly TimeSpan UpperJitter = TimeSpan.FromMilliseconds(500);
+    }
 
-        public TimeMeasureTest(ITestOutputHelper output) : base(output)
+    private static void AssertElapsedAround(TimeSpan actual, TimeSpan expected)
+    {
+        Assert.InRange(actual, expected.Subtract(LowerJitter), expected.Add(UpperJitter));
+    }
+
+    [Fact]
+    public void WithAction_Use_0_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction(() => Thread.Sleep(expected));
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.False(profiler.Member.HasParameters());
+        Assert.Empty(profiler.Data);
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithAction_Use_1_Argument_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction(a1 => Thread.Sleep(expected), 1);
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Contains(profiler.Data.Values, o => o is int i && i == 1);
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithAction_Use_2_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction((a1, a2) => Thread.Sleep(expected), 1, 2);
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values, i => Assert.Equal(1, i), i => Assert.Equal(2, i));
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithAction_Use_3_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction((a1, a2, a3) => Thread.Sleep(expected), 1, 2, 3);
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            o1 => Assert.Equal(1, o1),
+            o2 => Assert.Equal(2, o2),
+            o3 => Assert.Equal(3, o3));
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithAction_Use_4_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction((a1, a2, a3, a4) => Thread.Sleep(expected), 1, 2, 3, 4);
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i));
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithAction_Use_5_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5) => Thread.Sleep(expected), 1, 2, 3, 4, 5);
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i));
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithAction_Use_6_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5, a6) => Thread.Sleep(expected), 1, 2, 3, 4, 5, 6);
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i));
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithAction_Use_7_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5, a6, a7) => Thread.Sleep(expected), 1, 2, 3, 4, 5, 6, 7);
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i));
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithAction_Use_8_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5, a6, a7, a8) => Thread.Sleep(expected), 1, 2, 3, 4, 5, 6, 7, 8);
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i));
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithAction_Use_9_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5, a6, a7, a8, a9) => Thread.Sleep(expected), 1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i),
+            i => Assert.Equal(9, i));
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithAction_Use_10_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) => Thread.Sleep(expected), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i),
+            i => Assert.Equal(9, i),
+            i => Assert.Equal(10, i));
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithFunc_Use_0_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+
+        var profiler = TimeMeasure.WithFunc(() =>
         {
-        }
+            Thread.Sleep(expected);
+            return 42;
+        });
 
-        private static void AssertElapsedAround(TimeSpan actual, TimeSpan expected)
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.False(profiler.Member.HasParameters());
+        Assert.Empty(profiler.Data);
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithFunc_Use_1_Argument_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+
+        var profiler = TimeMeasure.WithFunc((a) =>
         {
-            Assert.InRange(actual, expected.Subtract(LowerJitter), expected.Add(UpperJitter));
-        }
+            Thread.Sleep(expected);
+            return 42;
+        }, 1);
 
-        [Fact]
-        public void WithAction_Use_0_Arguments_ShouldTakeAroundOneSecond()
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i));
+
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public void WithFunc_Use_2_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+
+        var profiler = TimeMeasure.WithFunc((a1, a2) =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction(() => Thread.Sleep(expected));
+            Thread.Sleep(expected);
+            return 42;
+        }, 1, 2);
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.False(profiler.Member.HasParameters());
-            Assert.Empty(profiler.Data);
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i));
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithAction_Use_1_Argument_ShouldTakeAroundOneSecond()
+    [Fact]
+    public void WithFunc_Use_3_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+
+        var profiler = TimeMeasure.WithFunc((a1, a2, a3) =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction(a1 => Thread.Sleep(expected), 1);
+            Thread.Sleep(expected);
+            return 42;
+        }, 1, 2, 3);
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Contains(profiler.Data.Values, o => o is int i && i == 1);
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i));
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithAction_Use_2_Arguments_ShouldTakeAroundOneSecond()
+    [Fact]
+    public void WithFunc_Use_4_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+
+        var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4) =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction((a1, a2) => Thread.Sleep(expected), 1, 2);
+            Thread.Sleep(expected);
+            return 42;
+        }, 1, 2, 3, 4);
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values, i => Assert.Equal(1, i), i => Assert.Equal(2, i));
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i));
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithAction_Use_3_Arguments_ShouldTakeAroundOneSecond()
+    [Fact]
+    public void WithFunc_Use_5_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+
+        var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5) =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction((a1, a2, a3) => Thread.Sleep(expected), 1, 2, 3);
+            Thread.Sleep(expected);
+            return 42;
+        }, 1, 2, 3, 4, 5);
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                o1 => Assert.Equal(1, o1),
-                o2 => Assert.Equal(2, o2),
-                o3 => Assert.Equal(3, o3));
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i));
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithAction_Use_4_Arguments_ShouldTakeAroundOneSecond()
+    [Fact]
+    public void WithFunc_Use_6_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+
+        var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5, a6) =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction((a1, a2, a3, a4) => Thread.Sleep(expected), 1, 2, 3, 4);
+            Thread.Sleep(expected);
+            return 42;
+        }, 1, 2, 3, 4, 5, 6);
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i));
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i));
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithAction_Use_5_Arguments_ShouldTakeAroundOneSecond()
+    [Fact]
+    public void WithFunc_Use_7_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+
+        var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5, a6, a7) =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5) => Thread.Sleep(expected), 1, 2, 3, 4, 5);
+            Thread.Sleep(expected);
+            return 42;
+        }, 1, 2, 3, 4, 5, 6, 7);
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i));
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i));
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithAction_Use_6_Arguments_ShouldTakeAroundOneSecond()
+    [Fact]
+    public void WithFunc_Use_8_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+
+        var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5, a6, a7, a8) =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5, a6) => Thread.Sleep(expected), 1, 2, 3, 4, 5, 6);
+            Thread.Sleep(expected);
+            return 42;
+        }, 1, 2, 3, 4, 5, 6, 7, 8);
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i));
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i));
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithAction_Use_7_Arguments_ShouldTakeAroundOneSecond()
+    [Fact]
+    public void WithFunc_Use_9_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+
+        var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5, a6, a7, a8, a9) =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5, a6, a7) => Thread.Sleep(expected), 1, 2, 3, 4, 5, 6, 7);
+            Thread.Sleep(expected);
+            return 42;
+        }, 1, 2, 3, 4, 5, 6, 7, 8, 9);
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i));
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i),
+            i => Assert.Equal(9, i));
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithAction_Use_8_Arguments_ShouldTakeAroundOneSecond()
+    [Fact]
+    public void WithFunc_Use_10_Arguments_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5, a6, a7, a8) => Thread.Sleep(expected), 1, 2, 3, 4, 5, 6, 7, 8);
+            Thread.Sleep(expected);
+            return 42;
+        }, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i));
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i),
+            i => Assert.Equal(9, i),
+            i => Assert.Equal(10, i));
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithAction_Use_9_Arguments_ShouldTakeAroundOneSecond()
+    [Fact]
+    public async Task WithActionAsync_Use_0_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5, a6, a7, a8, a9) => Thread.Sleep(expected), 1, 2, 3, 4, 5, 6, 7, 8, 9);
+            await TimeMeasure.WithActionAsync(token => Task.Delay(expected, token), o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i),
-                i => Assert.Equal(9, i));
+        var profiler = await TimeMeasure.WithActionAsync(token => Task.Delay(expected, token), o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.Empty(profiler.Data);
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithAction_Use_10_Arguments_ShouldTakeAroundOneSecond()
+    [Fact]
+    public async Task WithActionAsync_Use_1_Argument_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithAction((a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) => Thread.Sleep(expected), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+            await TimeMeasure.WithActionAsync((a, token) => Task.Delay(expected, token), 1, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i),
-                i => Assert.Equal(9, i),
-                i => Assert.Equal(10, i));
+        var profiler = await TimeMeasure.WithActionAsync((a, token) => Task.Delay(expected, token), 1, o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i));
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void WithFunc_Use_0_Arguments_ShouldTakeAroundOneSecond()
+    [Fact]
+    public async Task WithActionAsync_Use_2_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
+            await TimeMeasure.WithActionAsync((a1, a2, token) => Task.Delay(expected, token), 1, 2, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            var profiler = TimeMeasure.WithFunc(() =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            });
+        var profiler = await TimeMeasure.WithActionAsync((a1, a2, token) => Task.Delay(expected, token), 1, 2, o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i));
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.False(profiler.Member.HasParameters());
-            Assert.Empty(profiler.Data);
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+    [Fact]
+    public async Task WithActionAsync_Use_3_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
 
-        [Fact]
-        public void WithFunc_Use_1_Argument_ShouldTakeAroundOneSecond()
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
+            await TimeMeasure.WithActionAsync((a1, a2, a3, token) => Task.Delay(expected, token), 1, 2, 3, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            var profiler = TimeMeasure.WithFunc((a) =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            }, 1);
+        var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, token) => Task.Delay(expected, token), 1, 2, 3, o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i));
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i));
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+    [Fact]
+    public async Task WithActionAsync_Use_4_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
 
-        [Fact]
-        public void WithFunc_Use_2_Arguments_ShouldTakeAroundOneSecond()
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
+            await TimeMeasure.WithActionAsync((a1, a2, a3, a4, token) => Task.Delay(expected, token), 1, 2, 3, 4, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            var profiler = TimeMeasure.WithFunc((a1, a2) =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            }, 1, 2);
+        var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, token) => Task.Delay(expected, token), 1, 2, 3, 4, o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i));
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i));
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+    [Fact]
+    public async Task WithActionAsync_Use_5_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
 
-        [Fact]
-        public void WithFunc_Use_3_Arguments_ShouldTakeAroundOneSecond()
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
+            await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            var profiler = TimeMeasure.WithFunc((a1, a2, a3) =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            }, 1, 2, 3);
+        var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i));
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i));
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+    [Fact]
+    public async Task WithActionAsync_Use_6_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
 
-        [Fact]
-        public void WithFunc_Use_4_Arguments_ShouldTakeAroundOneSecond()
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
+            await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4) =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            }, 1, 2, 3, 4);
+        var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i));
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i));
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+    [Fact]
+    public async Task WithActionAsync_Use_7_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
 
-        [Fact]
-        public void WithFunc_Use_5_Arguments_ShouldTakeAroundOneSecond()
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
+            await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5) =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            }, 1, 2, 3, 4, 5);
+        var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i));
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i));
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+    [Fact]
+    public async Task WithActionAsync_Use_8_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
 
-        [Fact]
-        public void WithFunc_Use_6_Arguments_ShouldTakeAroundOneSecond()
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
+            await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5, a6) =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            }, 1, 2, 3, 4, 5, 6);
+        var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i));
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i));
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+    [Fact]
+    public async Task WithActionAsync_Use_9_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
 
-        [Fact]
-        public void WithFunc_Use_7_Arguments_ShouldTakeAroundOneSecond()
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
+            await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, a9, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, 9, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5, a6, a7) =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            }, 1, 2, 3, 4, 5, 6, 7);
+        var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, a9, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, 9, o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i),
+            i => Assert.Equal(9, i));
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i));
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+    [Fact]
+    public async Task WithActionAsync_Use_10_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
 
-        [Fact]
-        public void WithFunc_Use_8_Arguments_ShouldTakeAroundOneSecond()
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
+            await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5, a6, a7, a8) =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            }, 1, 2, 3, 4, 5, 6, 7, 8);
+        var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, o => o.CancellationToken = ctsShouldPass.Token);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i),
+            i => Assert.Equal(9, i),
+            i => Assert.Equal(10, i));
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i));
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
+    [Fact]
+    public async Task WithFuncAsync_Use_0_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
 
-        [Fact]
-        public void WithFunc_Use_9_Arguments_ShouldTakeAroundOneSecond()
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
         {
-            var expected = ExpectedExecutionTime;
-
-            var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5, a6, a7, a8, a9) =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            }, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i),
-                i => Assert.Equal(9, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public void WithFunc_Use_10_Arguments_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var profiler = TimeMeasure.WithFunc((a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) =>
-            {
-                Thread.Sleep(expected);
-                return 42;
-            }, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i),
-                i => Assert.Equal(9, i),
-                i => Assert.Equal(10, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_0_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync(token => Task.Delay(expected, token), o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync(token => Task.Delay(expected, token), o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.Empty(profiler.Data);
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_1_Argument_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync((a, token) => Task.Delay(expected, token), 1, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync((a, token) => Task.Delay(expected, token), 1, o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_2_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync((a1, a2, token) => Task.Delay(expected, token), 1, 2, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync((a1, a2, token) => Task.Delay(expected, token), 1, 2, o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_3_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync((a1, a2, a3, token) => Task.Delay(expected, token), 1, 2, 3, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, token) => Task.Delay(expected, token), 1, 2, 3, o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_4_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync((a1, a2, a3, a4, token) => Task.Delay(expected, token), 1, 2, 3, 4, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, token) => Task.Delay(expected, token), 1, 2, 3, 4, o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_5_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_6_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_7_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_8_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_9_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, a9, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, 9, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, a9, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, 9, o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i),
-                i => Assert.Equal(9, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithActionAsync_Use_10_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithActionAsync((a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, token) => Task.Delay(expected, token), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, o => o.CancellationToken = ctsShouldPass.Token);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i),
-                i => Assert.Equal(9, i),
-                i => Assert.Equal(10, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_0_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
-        {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async token =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, o => o.CancellationToken = ctsShouldFail.Token);
-            });
-
-            var profiler = await TimeMeasure.WithFuncAsync(async token =>
+            await TimeMeasure.WithFuncAsync(async token =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, o => o.CancellationToken = ctsShouldPass.Token);
+            }, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.Empty(profiler.Data);
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_1_Argument_And_CancellationToken_ShouldTakeAroundOneSecond()
+        var profiler = await TimeMeasure.WithFuncAsync(async token =>
         {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
+            await Task.Delay(expected, token);
+            return 42;
+        }, o => o.CancellationToken = ctsShouldPass.Token);
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async (a, token) =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, 1, o => o.CancellationToken = ctsShouldFail.Token);
-            });
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.Empty(profiler.Data);
 
-            var profiler = await TimeMeasure.WithFuncAsync(async (a, token) =>
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public async Task WithFuncAsync_Use_1_Argument_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await TimeMeasure.WithFuncAsync(async (a, token) =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, 1, o => o.CancellationToken = ctsShouldPass.Token);
+            }, 1, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_2_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+        var profiler = await TimeMeasure.WithFuncAsync(async (a, token) =>
         {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
+            await Task.Delay(expected, token);
+            return 42;
+        }, 1, o => o.CancellationToken = ctsShouldPass.Token);
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async (a1, a2, token) =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, 1, 2, o => o.CancellationToken = ctsShouldFail.Token);
-            });
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i));
 
-            var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, token) =>
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public async Task WithFuncAsync_Use_2_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await TimeMeasure.WithFuncAsync(async (a1, a2, token) =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, 1, 2, o => o.CancellationToken = ctsShouldPass.Token);
+            }, 1, 2, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_3_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+        var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, token) =>
         {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
+            await Task.Delay(expected, token);
+            return 42;
+        }, 1, 2, o => o.CancellationToken = ctsShouldPass.Token);
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async (a1, a2, a3, token) =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, 1, 2, 3, o => o.CancellationToken = ctsShouldFail.Token);
-            });
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i));
 
-            var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, token) =>
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public async Task WithFuncAsync_Use_3_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await TimeMeasure.WithFuncAsync(async (a1, a2, a3, token) =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, 1, 2, 3, o => o.CancellationToken = ctsShouldPass.Token);
+            }, 1, 2, 3, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_4_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+        var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, token) =>
         {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
+            await Task.Delay(expected, token);
+            return 42;
+        }, 1, 2, 3, o => o.CancellationToken = ctsShouldPass.Token);
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, token) =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, 1, 2, 3, 4, o => o.CancellationToken = ctsShouldFail.Token);
-            });
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i));
 
-            var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, token) =>
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public async Task WithFuncAsync_Use_4_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, token) =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, 1, 2, 3, 4, o => o.CancellationToken = ctsShouldPass.Token);
+            }, 1, 2, 3, 4, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_5_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+        var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, token) =>
         {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
+            await Task.Delay(expected, token);
+            return 42;
+        }, 1, 2, 3, 4, o => o.CancellationToken = ctsShouldPass.Token);
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, token) =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, 1, 2, 3, 4, 5, o => o.CancellationToken = ctsShouldFail.Token);
-            });
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i));
 
-            var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, token) =>
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public async Task WithFuncAsync_Use_5_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, token) =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, 1, 2, 3, 4, 5, o => o.CancellationToken = ctsShouldPass.Token);
+            }, 1, 2, 3, 4, 5, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_6_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+        var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, token) =>
         {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
+            await Task.Delay(expected, token);
+            return 42;
+        }, 1, 2, 3, 4, 5, o => o.CancellationToken = ctsShouldPass.Token);
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, token) =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, 1, 2, 3, 4, 5, 6, o => o.CancellationToken = ctsShouldFail.Token);
-            });
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i));
 
-            var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, token) =>
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public async Task WithFuncAsync_Use_6_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, token) =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, 1, 2, 3, 4, 5, 6, o => o.CancellationToken = ctsShouldPass.Token);
+            }, 1, 2, 3, 4, 5, 6, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_7_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+        var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, token) =>
         {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
+            await Task.Delay(expected, token);
+            return 42;
+        }, 1, 2, 3, 4, 5, 6, o => o.CancellationToken = ctsShouldPass.Token);
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, token) =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, 1, 2, 3, 4, 5, 6, 7, o => o.CancellationToken = ctsShouldFail.Token);
-            });
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i));
 
-            var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, token) =>
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public async Task WithFuncAsync_Use_7_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, token) =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, 1, 2, 3, 4, 5, 6, 7, o => o.CancellationToken = ctsShouldPass.Token);
+            }, 1, 2, 3, 4, 5, 6, 7, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_8_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+        var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, token) =>
         {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
+            await Task.Delay(expected, token);
+            return 42;
+        }, 1, 2, 3, 4, 5, 6, 7, o => o.CancellationToken = ctsShouldPass.Token);
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, token) =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, 1, 2, 3, 4, 5, 6, 7, 8, o => o.CancellationToken = ctsShouldFail.Token);
-            });
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i));
 
-            var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, token) =>
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public async Task WithFuncAsync_Use_8_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, token) =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, 1, 2, 3, 4, 5, 6, 7, 8, o => o.CancellationToken = ctsShouldPass.Token);
+            }, 1, 2, 3, 4, 5, 6, 7, 8, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_9_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+        var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, token) =>
         {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
+            await Task.Delay(expected, token);
+            return 42;
+        }, 1, 2, 3, 4, 5, 6, 7, 8, o => o.CancellationToken = ctsShouldPass.Token);
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, a9, token) =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, 1, 2, 3, 4, 5, 6, 7, 8, 9, o => o.CancellationToken = ctsShouldFail.Token);
-            });
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i));
 
-            var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, a9, token) =>
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public async Task WithFuncAsync_Use_9_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, a9, token) =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, 1, 2, 3, 4, 5, 6, 7, 8, 9, o => o.CancellationToken = ctsShouldPass.Token);
+            }, 1, 2, 3, 4, 5, 6, 7, 8, 9, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i),
-                i => Assert.Equal(9, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public async Task WithFuncAsync_Use_10_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+        var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, a9, token) =>
         {
-            var expected = ExpectedExecutionTime;
-            var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
-            var ctsShouldPass = new CancellationTokenSource();
+            await Task.Delay(expected, token);
+            return 42;
+        }, 1, 2, 3, 4, 5, 6, 7, 8, 9, o => o.CancellationToken = ctsShouldPass.Token);
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            {
-                await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, token) =>
-                {
-                    await Task.Delay(expected, token);
-                    return 42;
-                }, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, o => o.CancellationToken = ctsShouldFail.Token);
-            });
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i),
+            i => Assert.Equal(9, i));
 
-            var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, token) =>
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
+
+    [Fact]
+    public async Task WithFuncAsync_Use_10_Arguments_And_CancellationToken_ShouldTakeAroundOneSecond()
+    {
+        var expected = ExpectedExecutionTime;
+        var ctsShouldFail = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        var ctsShouldPass = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, token) =>
             {
                 await Task.Delay(expected, token);
                 return 42;
-            }, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, o => o.CancellationToken = ctsShouldPass.Token);
+            }, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, o => o.CancellationToken = ctsShouldFail.Token);
+        });
 
-            Assert.Equal(42, profiler.Result);
-            AssertElapsedAround(profiler.Elapsed, expected);
-            Assert.True(profiler.Member.HasParameters());
-            Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
-            Assert.NotEmpty(profiler.Data);
-            Assert.Collection(profiler.Data.Values,
-                i => Assert.Equal(1, i),
-                i => Assert.Equal(2, i),
-                i => Assert.Equal(3, i),
-                i => Assert.Equal(4, i),
-                i => Assert.Equal(5, i),
-                i => Assert.Equal(6, i),
-                i => Assert.Equal(7, i),
-                i => Assert.Equal(8, i),
-                i => Assert.Equal(9, i),
-                i => Assert.Equal(10, i));
-
-            TestOutput.WriteLine(profiler.Elapsed.ToString());
-            TestOutput.WriteLine(profiler.Member.ToString());
-        }
-
-        [Fact]
-        public void WithAction_ShouldInvokeCompletedCallback_WhenThresholdIsMet()
+        var profiler = await TimeMeasure.WithFuncAsync(async (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, token) =>
         {
-            var callbacks = new ConcurrentBag<TimeMeasureProfiler>();
-            var previous = TimeMeasure.CompletedCallback;
-            try
-            {
-                TimeMeasure.CompletedCallback = profiler =>
-                {
-                    callbacks.Add(profiler);
-                    previous?.Invoke(profiler);
-                };
+            await Task.Delay(expected, token);
+            return 42;
+        }, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, o => o.CancellationToken = ctsShouldPass.Token);
 
-                var measured = TimeMeasure.WithAction(() => Thread.Sleep(TimeSpan.FromMilliseconds(50)), o => o.TimeMeasureCompletedThreshold = TimeSpan.FromMilliseconds(10));
+        Assert.Equal(42, profiler.Result);
+        AssertElapsedAround(profiler.Elapsed, expected);
+        Assert.True(profiler.Member.HasParameters());
+        Assert.Contains(profiler.Member.Parameters, item => item.ParameterName == "token" && item.ParameterType == typeof(CancellationToken));
+        Assert.NotEmpty(profiler.Data);
+        Assert.Collection(profiler.Data.Values,
+            i => Assert.Equal(1, i),
+            i => Assert.Equal(2, i),
+            i => Assert.Equal(3, i),
+            i => Assert.Equal(4, i),
+            i => Assert.Equal(5, i),
+            i => Assert.Equal(6, i),
+            i => Assert.Equal(7, i),
+            i => Assert.Equal(8, i),
+            i => Assert.Equal(9, i),
+            i => Assert.Equal(10, i));
 
-                Assert.Contains(callbacks, profiler => ReferenceEquals(profiler, measured));
-            }
-            finally
-            {
-                TimeMeasure.CompletedCallback = previous;
-            }
-        }
+        TestOutput.WriteLine(profiler.Elapsed.ToString());
+        TestOutput.WriteLine(profiler.Member.ToString());
+    }
 
-        [Fact]
-        public void ToString_ShouldIncludeParameters_WhenProfilerHasData()
+    [Fact]
+    public void WithAction_ShouldInvokeCompletedCallback_WhenThresholdIsMet()
+    {
+        var callbacks = new ConcurrentBag<TimeMeasureProfiler>();
+        var previous = TimeMeasure.CompletedCallback;
+        try
         {
-            var profiler = TimeMeasure.WithAction((a1, a2) => Thread.Sleep(TimeSpan.FromMilliseconds(10)), 1, "two");
-
-            var result = profiler.ToString();
-
-            Assert.Contains("took", result);
-            Assert.Contains("Parameters: {", result);
-            foreach (var parameterName in profiler.Data.Keys)
+            TimeMeasure.CompletedCallback = profiler =>
             {
-                Assert.Contains(parameterName + "=", result);
-            }
-        }
+                callbacks.Add(profiler);
+                previous?.Invoke(profiler);
+            };
 
-        [Fact]
-        public void WithAction_ShouldHaveStoppedProfiler_WhenCompleted()
+            var measured = TimeMeasure.WithAction(() => Thread.Sleep(TimeSpan.FromMilliseconds(50)), o => o.TimeMeasureCompletedThreshold = TimeSpan.FromMilliseconds(10));
+
+            Assert.Contains(callbacks, profiler => ReferenceEquals(profiler, measured));
+        }
+        finally
         {
-            var profiler = TimeMeasure.WithAction(() => Thread.Sleep(TimeSpan.FromMilliseconds(10)));
-
-            Assert.False(profiler.IsRunning);
-            Assert.False(profiler.Timer.IsRunning);
+            TimeMeasure.CompletedCallback = previous;
         }
+    }
+
+    [Fact]
+    public void ToString_ShouldIncludeParameters_WhenProfilerHasData()
+    {
+        var profiler = TimeMeasure.WithAction((a1, a2) => Thread.Sleep(TimeSpan.FromMilliseconds(10)), 1, "two");
+
+        var result = profiler.ToString();
+
+        Assert.Contains("took", result);
+        Assert.Contains("Parameters: {", result);
+        foreach (var parameterName in profiler.Data.Keys)
+        {
+            Assert.Contains(parameterName + "=", result);
+        }
+    }
+
+    [Fact]
+    public void WithAction_ShouldHaveStoppedProfiler_WhenCompleted()
+    {
+        var profiler = TimeMeasure.WithAction(() => Thread.Sleep(TimeSpan.FromMilliseconds(10)));
+
+        Assert.False(profiler.IsRunning);
+        Assert.False(profiler.Timer.IsRunning);
     }
 }

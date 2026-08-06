@@ -10,171 +10,169 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Cuemon.Extensions.AspNetCore.Mvc.Rendering
+namespace Cuemon.Extensions.AspNetCore.Mvc.Rendering;
+public class HtmlHelperExtensionsTest : Test
 {
-    public class HtmlHelperExtensionsTest : Test
+    public HtmlHelperExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public HtmlHelperExtensionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public async Task EnsureThatBothRazorPagesAndControllerViewAreWorking()
+    [Fact]
+    public async Task EnsureThatBothRazorPagesAndControllerViewAreWorking()
+    {
+        using (var filter = WebHostTestFactory.Create(services =>
         {
-            using (var filter = WebHostTestFactory.Create(services =>
-            {
-                services.AddAssemblyCacheBusting();
-                services.AddControllersWithViews();
-                services.AddRazorPages(o => o.Conventions.AddPageRoute("/", "/"));
-            }, app =>
+            services.AddAssemblyCacheBusting();
+            services.AddControllersWithViews();
+            services.AddRazorPages(o => o.Conventions.AddPageRoute("/", "/"));
+        }, app =>
+               {
+                   app.UseStaticFiles();
+                   app.UseRouting();
+                   app.UseEndpoints(endpoints =>
                    {
-                       app.UseStaticFiles();
-                       app.UseRouting();
-                       app.UseEndpoints(endpoints =>
-                       {
-                           endpoints.MapRazorPages();
-                           endpoints.MapControllerRoute(
-                               name: "default",
-                               pattern: "{controller=Home}/{action=Index}");
-                       });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var page = await client.GetAsync("/regions");
-                var view = await client.GetAsync("/home");
-
-                Assert.Equal(HttpStatusCode.OK, page.StatusCode);
-                Assert.Equal(HttpStatusCode.OK, view.StatusCode);
-            }
-        }
-
-        [Fact]
-        public async Task UseWhen_ShouldRenderClassWithActiveKeywordOnRegionsAnchorTag_AsControllerIsRegionAndActionIsRegion()
+                       endpoints.MapRazorPages();
+                       endpoints.MapControllerRoute(
+                           name: "default",
+                           pattern: "{controller=Home}/{action=Index}");
+                   });
+               }))
         {
-            using (var filter = WebHostTestFactory.Create(services =>
-            {
-                services.AddAssemblyCacheBusting();
-                services.AddControllersWithViews();
-            }, app =>
-                   {
-                       app.UseStaticFiles();
-                       app.UseRouting();
-                       app.UseEndpoints(endpoints =>
-                       {
-                           endpoints.MapControllerRoute(
-                               name: "default",
-                               pattern: "{controller=Home}/{action=Index}");
-                       });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var view = await client.GetAsync("/regions/da-dk/denmark");
-                var sut = await view.Content.ReadAsStringAsync();
+            var client = filter.Host.GetTestClient();
+            var page = await client.GetAsync("/regions");
+            var view = await client.GetAsync("/home");
 
-                TestOutput.WriteLine(sut);
-
-                Assert.Equal(HttpStatusCode.OK, view.StatusCode);
-                Assert.Contains("<li class=\"active\"><a href=\"/regions\">Regions</a></li>", sut);
-                Assert.Contains("<li><a href=\"/\">Home</a></li>", sut);
-            }
+            Assert.Equal(HttpStatusCode.OK, page.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, view.StatusCode);
         }
+    }
 
-        [Fact]
-        public async Task UseWhen_ShouldRenderClassWithActiveKeywordOnHomeAnchorTag_AsControllerIsHomeAndActionIsIndex()
+    [Fact]
+    public async Task UseWhen_ShouldRenderClassWithActiveKeywordOnRegionsAnchorTag_AsControllerIsRegionAndActionIsRegion()
+    {
+        using (var filter = WebHostTestFactory.Create(services =>
         {
-            using (var filter = WebHostTestFactory.Create(services =>
-            {
-                services.AddAssemblyCacheBusting();
-                services.AddControllersWithViews();
-            }, app =>
+            services.AddAssemblyCacheBusting();
+            services.AddControllersWithViews();
+        }, app =>
+               {
+                   app.UseStaticFiles();
+                   app.UseRouting();
+                   app.UseEndpoints(endpoints =>
                    {
-                       app.UseStaticFiles();
-                       app.UseRouting();
-                       app.UseEndpoints(endpoints =>
-                       {
-                           endpoints.MapControllerRoute(
-                               name: "default",
-                               pattern: "{controller=Home}/{action=Index}");
-                       });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var view = await client.GetAsync("/");
-                var sut = await view.Content.ReadAsStringAsync();
+                       endpoints.MapControllerRoute(
+                           name: "default",
+                           pattern: "{controller=Home}/{action=Index}");
+                   });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var view = await client.GetAsync("/regions/da-dk/denmark");
+            var sut = await view.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(sut);
+            TestOutput.WriteLine(sut);
 
-                Assert.Equal(HttpStatusCode.OK, view.StatusCode);
-                Assert.Contains("<li><a href=\"/regions\">Regions</a></li>", sut);
-                Assert.Contains("<li class=\"active\"><a href=\"/\">Home</a></li>", sut);
-            }
+            Assert.Equal(HttpStatusCode.OK, view.StatusCode);
+            Assert.Contains("<li class=\"active\"><a href=\"/regions\">Regions</a></li>", sut);
+            Assert.Contains("<li><a href=\"/\">Home</a></li>", sut);
         }
+    }
 
-        [Fact]
-        public async Task UseWhen_ShouldRenderClassWithActiveKeywordOnRegionsAnchorTag_AsPerPageStructure()
+    [Fact]
+    public async Task UseWhen_ShouldRenderClassWithActiveKeywordOnHomeAnchorTag_AsControllerIsHomeAndActionIsIndex()
+    {
+        using (var filter = WebHostTestFactory.Create(services =>
         {
-            using (var filter = WebHostTestFactory.Create(services =>
-            {
-                services.AddAssemblyCacheBusting();
-                services.AddRazorPages(o =>
-                {
-                    o.Conventions.AddPageRoute("/Regions/Index", "regions");
-                    o.Conventions.AddPageRoute("/Regions/CultureCollection", "regions/{regionName}/{regionDisplayName}");
-                });
-            }, app =>
+            services.AddAssemblyCacheBusting();
+            services.AddControllersWithViews();
+        }, app =>
+               {
+                   app.UseStaticFiles();
+                   app.UseRouting();
+                   app.UseEndpoints(endpoints =>
                    {
-                       app.UseStaticFiles();
-                       app.UseRouting();
-                       app.UseEndpoints(endpoints =>
-                       {
-                           endpoints.MapRazorPages();
-                       });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var page = await client.GetAsync("/regions/da-dk/denmark");
-                var sut = await page.Content.ReadAsStringAsync();
+                       endpoints.MapControllerRoute(
+                           name: "default",
+                           pattern: "{controller=Home}/{action=Index}");
+                   });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var view = await client.GetAsync("/");
+            var sut = await view.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(sut);
+            TestOutput.WriteLine(sut);
 
-                Assert.Equal(HttpStatusCode.OK, page.StatusCode);
-                Assert.Contains("<li class=\"active\"><a>Regions</a></li>", sut);
-                Assert.Contains("<li><a>Home</a></li>", sut);
-            }
+            Assert.Equal(HttpStatusCode.OK, view.StatusCode);
+            Assert.Contains("<li><a href=\"/regions\">Regions</a></li>", sut);
+            Assert.Contains("<li class=\"active\"><a href=\"/\">Home</a></li>", sut);
         }
+    }
 
-        [Fact]
-        public async Task UseWhen_ShouldRenderClassWithActiveKeywordOnHomeAnchorTag_AsPerPageStructure()
+    [Fact]
+    public async Task UseWhen_ShouldRenderClassWithActiveKeywordOnRegionsAnchorTag_AsPerPageStructure()
+    {
+        using (var filter = WebHostTestFactory.Create(services =>
         {
-            using (var filter = WebHostTestFactory.Create(services =>
+            services.AddAssemblyCacheBusting();
+            services.AddRazorPages(o =>
             {
-                services.AddAssemblyCacheBusting();
-                services.AddRazorPages(o =>
-                {
-                    o.Conventions.AddPageRoute("/", "/");
-                    o.Conventions.AddPageRoute("/Regions/Index", "regions");
-                    o.Conventions.AddPageRoute("/Regions/CultureCollection", "/regions/{regionName}/{regionDisplayName}");
-                });
-            }, app =>
+                o.Conventions.AddPageRoute("/Regions/Index", "regions");
+                o.Conventions.AddPageRoute("/Regions/CultureCollection", "regions/{regionName}/{regionDisplayName}");
+            });
+        }, app =>
+               {
+                   app.UseStaticFiles();
+                   app.UseRouting();
+                   app.UseEndpoints(endpoints =>
                    {
-                       app.UseStaticFiles();
-                       app.UseRouting();
-                       app.UseEndpoints(endpoints =>
-                       {
-                           endpoints.MapRazorPages();
-                       });
-                   }))
+                       endpoints.MapRazorPages();
+                   });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var page = await client.GetAsync("/regions/da-dk/denmark");
+            var sut = await page.Content.ReadAsStringAsync();
+
+            TestOutput.WriteLine(sut);
+
+            Assert.Equal(HttpStatusCode.OK, page.StatusCode);
+            Assert.Contains("<li class=\"active\"><a>Regions</a></li>", sut);
+            Assert.Contains("<li><a>Home</a></li>", sut);
+        }
+    }
+
+    [Fact]
+    public async Task UseWhen_ShouldRenderClassWithActiveKeywordOnHomeAnchorTag_AsPerPageStructure()
+    {
+        using (var filter = WebHostTestFactory.Create(services =>
+        {
+            services.AddAssemblyCacheBusting();
+            services.AddRazorPages(o =>
             {
-                var client = filter.Host.GetTestClient();
-                var page = await client.GetAsync("/");
-                var sut = await page.Content.ReadAsStringAsync();
+                o.Conventions.AddPageRoute("/", "/");
+                o.Conventions.AddPageRoute("/Regions/Index", "regions");
+                o.Conventions.AddPageRoute("/Regions/CultureCollection", "/regions/{regionName}/{regionDisplayName}");
+            });
+        }, app =>
+               {
+                   app.UseStaticFiles();
+                   app.UseRouting();
+                   app.UseEndpoints(endpoints =>
+                   {
+                       endpoints.MapRazorPages();
+                   });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var page = await client.GetAsync("/");
+            var sut = await page.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(sut);
+            TestOutput.WriteLine(sut);
 
-                Assert.Equal(HttpStatusCode.OK, page.StatusCode);
-                Assert.Contains("<li><a>Regions</a></li>", sut);
-                Assert.Contains("<li class=\"active\"><a>Home</a></li>", sut);
-            }
+            Assert.Equal(HttpStatusCode.OK, page.StatusCode);
+            Assert.Contains("<li><a>Regions</a></li>", sut);
+            Assert.Contains("<li class=\"active\"><a>Home</a></li>", sut);
         }
     }
 }

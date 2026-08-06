@@ -4,73 +4,71 @@ using Cuemon.Assets;
 using Codebelt.Extensions.Xunit;
 using Xunit;
 
-namespace Cuemon
+namespace Cuemon;
+public class FinalizeDisposableTest : Test
 {
-    public class FinalizeDisposableTest : Test
+    public FinalizeDisposableTest(ITestOutputHelper output) : base(output)
     {
-        public FinalizeDisposableTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void Dispose_ShouldSetDisposedAndInvokeUnmanagedResources()
-        {
-            TrackingFinalizeDisposable.Reset();
-            var sut = new TrackingFinalizeDisposable();
+    [Fact]
+    public void Dispose_ShouldSetDisposedAndInvokeUnmanagedResources()
+    {
+        TrackingFinalizeDisposable.Reset();
+        var sut = new TrackingFinalizeDisposable();
 
-            sut.Dispose();
+        sut.Dispose();
 
-            Assert.True(sut.Disposed);
-            Assert.Equal(1, TrackingFinalizeDisposable.UnmanagedDisposeCount);
-        }
+        Assert.True(sut.Disposed);
+        Assert.Equal(1, TrackingFinalizeDisposable.UnmanagedDisposeCount);
+    }
 
-        [Fact]
-        public void DisposeCore_ShouldSetDisposedAndInvokeUnmanagedResourcesWhenDisposingIsFalse()
-        {
-            TrackingFinalizeDisposable.Reset();
-            var sut = new TrackingFinalizeDisposable();
+    [Fact]
+    public void DisposeCore_ShouldSetDisposedAndInvokeUnmanagedResourcesWhenDisposingIsFalse()
+    {
+        TrackingFinalizeDisposable.Reset();
+        var sut = new TrackingFinalizeDisposable();
 
-            sut.DisposeCore(false);
+        sut.DisposeCore(false);
 
-            Assert.True(sut.Disposed);
-            Assert.Equal(1, TrackingFinalizeDisposable.UnmanagedDisposeCount);
-        }
+        Assert.True(sut.Disposed);
+        Assert.Equal(1, TrackingFinalizeDisposable.UnmanagedDisposeCount);
+    }
 
-        [Fact]
-        public void Finalizer_ShouldInvokeUnmanagedResources()
-        {
-            TrackingFinalizeDisposable.Reset();
-            CreateFinalizableInstance();
+    [Fact]
+    public void Finalizer_ShouldInvokeUnmanagedResources()
+    {
+        TrackingFinalizeDisposable.Reset();
+        CreateFinalizableInstance();
 
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-            GC.WaitForPendingFinalizers();
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+        GC.WaitForPendingFinalizers();
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
 
-            Assert.True(SpinWait.SpinUntil(() => TrackingFinalizeDisposable.UnmanagedDisposeCount == 1, TimeSpan.FromSeconds(5)));
-        }
+        Assert.True(SpinWait.SpinUntil(() => TrackingFinalizeDisposable.UnmanagedDisposeCount == 1, TimeSpan.FromSeconds(5)));
+    }
 
-        [Fact]
-        public void Dispose_ShouldSuppressFinalizer()
-        {
-            TrackingFinalizeDisposable.Reset();
-            CreateDisposedInstance();
+    [Fact]
+    public void Dispose_ShouldSuppressFinalizer()
+    {
+        TrackingFinalizeDisposable.Reset();
+        CreateDisposedInstance();
 
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-            GC.WaitForPendingFinalizers();
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+        GC.WaitForPendingFinalizers();
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
 
-            Assert.Equal(1, TrackingFinalizeDisposable.UnmanagedDisposeCount);
-        }
+        Assert.Equal(1, TrackingFinalizeDisposable.UnmanagedDisposeCount);
+    }
 
-        private static void CreateFinalizableInstance()
-        {
-            _ = new TrackingFinalizeDisposable();
-        }
+    private static void CreateFinalizableInstance()
+    {
+        _ = new TrackingFinalizeDisposable();
+    }
 
-        private static void CreateDisposedInstance()
-        {
-            var sut = new TrackingFinalizeDisposable();
-            sut.Dispose();
-        }
+    private static void CreateDisposedInstance()
+    {
+        var sut = new TrackingFinalizeDisposable();
+        sut.Dispose();
     }
 }

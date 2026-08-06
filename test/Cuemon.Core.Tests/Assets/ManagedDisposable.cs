@@ -1,26 +1,24 @@
 ﻿using System.IO;
 
-namespace Cuemon.Assets
+namespace Cuemon.Assets;
+public class ManagedDisposable : Disposable
 {
-    public class ManagedDisposable : Disposable
+    public ManagedDisposable()
     {
-        public ManagedDisposable()
+        Stream = new MemoryStream();
+    }
+
+    public MemoryStream Stream { get; private set; }
+
+    protected override void OnDisposeManagedResources()
+    {
+        try
         {
-            Stream = new MemoryStream();
+            Stream?.Dispose();
         }
-
-        public MemoryStream Stream { get; private set; }
-
-        protected override void OnDisposeManagedResources()
+        finally
         {
-            try
-            {
-                Stream?.Dispose();
-            }
-            finally
-            {
-                Stream = null;
-            }
+            Stream = null;
         }
     }
 }

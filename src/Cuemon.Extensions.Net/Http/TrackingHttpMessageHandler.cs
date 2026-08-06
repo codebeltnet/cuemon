@@ -1,16 +1,14 @@
 ﻿using System.Net.Http;
 
-namespace Cuemon.Extensions.Net.Http
+namespace Cuemon.Extensions.Net.Http;
+internal sealed class TrackingHttpMessageHandler : DelegatingHandler
 {
-    internal sealed class TrackingHttpMessageHandler : DelegatingHandler
+    public TrackingHttpMessageHandler(HttpMessageHandler inner) : base(inner)
     {
-        public TrackingHttpMessageHandler(HttpMessageHandler inner) : base(inner)
-        {
-        }
+    }
 
-        protected override void Dispose(bool disposing)
-        {
-            // The lifetime of this is tracked separately by ActiveHandler
-        }
+    protected override void Dispose(bool disposing)
+    {
+        // The lifetime of this is tracked separately by ActiveHandler
     }
 }

@@ -1,17 +1,15 @@
 ﻿using System;
 
-namespace Cuemon.Assets
+namespace Cuemon.Assets;
+public class FailPostConfigurableOptions : PostConfigurableOptions
 {
-    public class FailPostConfigurableOptions : PostConfigurableOptions
+    public FailPostConfigurableOptions()
     {
-        public FailPostConfigurableOptions()
-        {
-        }
+    }
 
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public override void PostConfigureOptions()
-        {
-        }
+    public override void PostConfigureOptions()
+    {
     }
 }

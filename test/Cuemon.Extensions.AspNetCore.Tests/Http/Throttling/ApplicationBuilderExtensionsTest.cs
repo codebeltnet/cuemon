@@ -9,42 +9,40 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Cuemon.Extensions.AspNetCore.Http.Throttling
+namespace Cuemon.Extensions.AspNetCore.Http.Throttling;
+public class ApplicationBuilderExtensionsTest : Test
 {
-    public class ApplicationBuilderExtensionsTest : Test
+    public ApplicationBuilderExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public ApplicationBuilderExtensionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public async Task UseThrottlingSentinel_ShouldThrottleSecondRequest_WhenQuotaIsExceeded()
-        {
-            using var host = WebHostTestFactory.Create(
-                services =>
+    [Fact]
+    public async Task UseThrottlingSentinel_ShouldThrottleSecondRequest_WhenQuotaIsExceeded()
+    {
+        using var host = WebHostTestFactory.Create(
+            services =>
+            {
+                services.AddRouting();
+                services.AddMemoryThrottlingCache();
+                services.AddThrottlingSentinelOptions(o =>
                 {
-                    services.AddRouting();
-                    services.AddMemoryThrottlingCache();
-                    services.AddThrottlingSentinelOptions(o =>
-                    {
-                        o.ContextResolver = _ => "global";
-                        o.Quota = new ThrottleQuota(1, TimeSpan.FromMinutes(1));
-                    });
-                },
-                app =>
-                {
-                    app.UseThrottlingSentinel();
-                    app.UseRouting();
-                    app.UseEndpoints(endpoints => endpoints.MapGet("/", () => "ok"));
+                    o.ContextResolver = _ => "global";
+                    o.Quota = new ThrottleQuota(1, TimeSpan.FromMinutes(1));
                 });
+            },
+            app =>
+            {
+                app.UseThrottlingSentinel();
+                app.UseRouting();
+                app.UseEndpoints(endpoints => endpoints.MapGet("/", () => "ok"));
+            });
 
-            var client = host.Host.GetTestClient();
-            using var first = await client.GetAsync("/");
+        var client = host.Host.GetTestClient();
+        using var first = await client.GetAsync("/");
 
-            var second = await Assert.ThrowsAsync<ThrottlingException>(() => client.GetAsync("/"));
+        var second = await Assert.ThrowsAsync<ThrottlingException>(() => client.GetAsync("/"));
 
-            Assert.Equal(HttpStatusCode.OK, first.StatusCode);
-            Assert.Equal("Throttling rate limit quota violation. Quota limit exceeded.", second.Message);
-        }
+        Assert.Equal(HttpStatusCode.OK, first.StatusCode);
+        Assert.Equal("Throttling rate limit quota violation. Quota limit exceeded.", second.Message);
     }
 }

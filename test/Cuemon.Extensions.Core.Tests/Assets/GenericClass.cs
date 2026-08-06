@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cuemon.Extensions.Assets
+namespace Cuemon.Extensions.Assets;
+public class GenericClass<T>
 {
-    public class GenericClass<T>
-    {
-    }
 }

@@ -12,47 +12,46 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Xunit;
 
-namespace Cuemon.AspNetCore.Razor.TagHelpers
+namespace Cuemon.AspNetCore.Razor.TagHelpers;
+public class GenericRazorTest : Test
 {
-    public class GenericRazorTest : Test
+    public GenericRazorTest(ITestOutputHelper output) : base(output)
     {
-        public GenericRazorTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public async Task Index_VerifyCachingWorks()
-        {
-            using (var filter = WebHostTestFactory.Create(services =>
+    [Fact]
+    public async Task Index_VerifyCachingWorks()
+    {
+        using (var filter = WebHostTestFactory.Create(services =>
+               {
+                   services.AddRazorPages();
+                   services.Configure<HttpCacheableOptions>(o =>
                    {
-                       services.AddRazorPages();
-                       services.Configure<HttpCacheableOptions>(o =>
-                       {
-                           o.CacheControl.MaxAge = TimeSpan.FromHours(1);
-                           o.CacheControl.NoTransform = true;
-                           o.CacheControl.Public = true;
-                           o.CacheControl.Private = false;
-                           o.Filters.AddEntityTagHeader(eo => eo.UseEntityTagResponseParser = true);
-                       });
-                       services.AddControllersWithViews(o =>
-                       {
-                           o.Filters.AddHttpCacheable();
-                       });
-                   }, app =>
+                       o.CacheControl.MaxAge = TimeSpan.FromHours(1);
+                       o.CacheControl.NoTransform = true;
+                       o.CacheControl.Public = true;
+                       o.CacheControl.Private = false;
+                       o.Filters.AddEntityTagHeader(eo => eo.UseEntityTagResponseParser = true);
+                   });
+                   services.AddControllersWithViews(o =>
                    {
-                       app.UseRouting();
-                       app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/Index");
-                var body = await result.Content.ReadAsStringAsync();
-                var etag = result.Headers.ETag!.ToString();
+                       o.Filters.AddHttpCacheable();
+                   });
+               }, app =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/Index");
+            var body = await result.Content.ReadAsStringAsync();
+            var etag = result.Headers.ETag!.ToString();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.Equal(StatusCodes.Status200OK, (int)result.StatusCode);
-                Assert.Equal("""
+            Assert.Equal(StatusCodes.Status200OK, (int)result.StatusCode);
+            Assert.Equal("""
                              <!DOCTYPE html>
                              <html lang="en">
                              <head>
@@ -63,16 +62,15 @@ namespace Cuemon.AspNetCore.Razor.TagHelpers
                              </html>
                              """.ReplaceLineEndings(), body.ReplaceLineEndings());
 
-                client.DefaultRequestHeaders.Add(HeaderNames.IfNoneMatch, etag);
+            client.DefaultRequestHeaders.Add(HeaderNames.IfNoneMatch, etag);
 
-                result = await client.GetAsync("/Index");
-                body = await result.Content.ReadAsStringAsync();
+            result = await client.GetAsync("/Index");
+            body = await result.Content.ReadAsStringAsync();
 
-                Assert.Equal(StatusCodes.Status304NotModified, (int)result.StatusCode);
-                Assert.Equal("", body);
+            Assert.Equal(StatusCodes.Status304NotModified, (int)result.StatusCode);
+            Assert.Equal("", body);
 
-                TestOutput.WriteLine(body);
-            }
+            TestOutput.WriteLine(body);
         }
     }
 }

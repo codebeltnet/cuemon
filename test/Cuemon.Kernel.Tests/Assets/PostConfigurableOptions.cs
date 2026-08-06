@@ -1,24 +1,22 @@
 ﻿using System;
 using Cuemon.Configuration;
 
-namespace Cuemon.Assets
+namespace Cuemon.Assets;
+public class PostConfigurableOptions : IPostConfigurableParameterObject, IValidatableParameterObject
 {
-    public class PostConfigurableOptions : IPostConfigurableParameterObject, IValidatableParameterObject
+    public PostConfigurableOptions()
     {
-        public PostConfigurableOptions()
-        {
-        }
+    }
 
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public virtual void PostConfigureOptions()
-        {
-            Id = Guid.NewGuid();
-        }
+    public virtual void PostConfigureOptions()
+    {
+        Id = Guid.NewGuid();
+    }
 
-        public void ValidateOptions()
-        {
-            Validator.ThrowIfInvalidState(Id == Guid.Empty);
-        }
+    public void ValidateOptions()
+    {
+        Validator.ThrowIfInvalidState(Id == Guid.Empty);
     }
 }

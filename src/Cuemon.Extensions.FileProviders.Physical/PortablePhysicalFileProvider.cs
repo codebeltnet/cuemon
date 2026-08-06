@@ -32,24 +32,34 @@ namespace Cuemon.Extensions.FileProviders;
 /// Wildcard watch filters are delegated unchanged and are not inspected for casing collisions. Literal file filters, and literal directory filters that end with a trailing directory separator, are resolved to their physical casing when the corresponding entry exists without a collision. Literal directory filters without a trailing separator are delegated unchanged and follow the normal interpretation of <see cref="PhysicalFileProvider"/>. <see cref="PhysicalFileProvider"/> distinguishes wildcard watch patterns by the presence of <c>*</c>.
 /// </para>
 /// <para>
-/// Successfully resolved paths are cached using ordinal, case-insensitive keys for the lifetime of this provider. Misses and collisions are not cached and are re-evaluated on each call. The root should therefore have a stable naming topology for previously successful logical paths. After a case-only rename, or after introducing or removing a casing collision for a previously successful logical path, create a new provider instance to guarantee that the path is resolved again.
+/// Successfully resolved paths are cached for the lifetime of this provider by using case-insensitive logical keys that normalize supported directory separators together with redundant leading, repeated, and directory-only trailing separators. Equivalent successful requests such as <c>assets/logo.svg</c>, <c>/assets/logo.svg</c>, and <c>assets//logo.svg</c> therefore share the same cache entry.
+/// </para>
+/// <para>
+/// Resolving an uncached path enumerates each directory that must be traversed and fully inspects each segment until uniqueness or collision is determined. A cold lookup therefore scales approximately with the sum of the sibling counts in the traversed directories, so wide directories are materially more expensive than warm cache hits.
+/// </para>
+/// <para>
+/// Misses and collisions are not cached and are re-evaluated on each call. Repeated unresolved requests, especially for wide directories or user-controlled arbitrary paths, can therefore be substantially more expensive than successful cache hits. Consumers that expose arbitrary paths should consider upstream validation, response caching, rate limiting, or other suitable controls.
+/// </para>
+/// <para>
+/// The root should therefore have a stable naming topology for previously successful logical paths. After a case-only rename, or after introducing or removing a casing collision for a previously successful logical path, create a new provider instance to guarantee that the path is resolved again.
 /// </para>
 /// </remarks>
 public sealed class PortablePhysicalFileProvider : Disposable, IFileProvider
 {
+    private const char CanonicalDirectorySeparator = '/';
+    private static readonly char[] CanonicalPathSeparators = { CanonicalDirectorySeparator };
     private readonly PhysicalFileProvider _provider;
     private readonly ConcurrentDictionary<string, string> _files = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, string> _directories = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly char[] PathSeparators = { '/' };
 
     /// <summary>
-    /// Initializes a new instance of a PhysicalFileProvider at the given root directory.
+    /// Initializes a new instance of the <see cref="PortablePhysicalFileProvider"/> class at the given root directory.
     /// </summary>
     /// <param name="root">The absolute directory to use as the provider root.</param>
     /// <param name="filters">A bitwise combination of values that specifies which files or directories are excluded.</param>
     public PortablePhysicalFileProvider(string root, ExclusionFilters filters = ExclusionFilters.Sensitive)
     {
-        _provider= new PhysicalFileProvider(root, filters);
+        _provider = new PhysicalFileProvider(root, filters);
     }
 
     /// <inheritdoc cref="PhysicalFileProvider.Root"/>
@@ -159,13 +169,17 @@ public sealed class PortablePhysicalFileProvider : Disposable, IFileProvider
             return cachedPath;
         }
 
-        var segments = subpath.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries);
-
-        if (segments.Length == 0)
+        if (!TryCreateCanonicalSubpath(subpath, finalSegmentIsDirectory, out var canonicalSubpath))
         {
             return subpath;
         }
 
+        if (!ReferenceEquals(canonicalSubpath, subpath) && cache.TryGetValue(canonicalSubpath, out cachedPath))
+        {
+            return cachedPath;
+        }
+
+        var segments = canonicalSubpath.Split(CanonicalPathSeparators, StringSplitOptions.RemoveEmptyEntries);
         var currentPath = string.Empty;
 
         for (var i = 0; i < segments.Length; i++)
@@ -184,13 +198,11 @@ public sealed class PortablePhysicalFileProvider : Disposable, IFileProvider
                 return subpath;
             }
 
-            segments[i] = entry.Name;
-            currentPath = currentPath.Length == 0 ? entry.Name : $"{currentPath}/{entry.Name}";
+            currentPath = currentPath.Length == 0 ? entry.Name : string.Concat(currentPath, "/", entry.Name);
         }
 
-        var resolvedPath = string.Join(Path.DirectorySeparatorChar.ToString(), segments);
-        cache.TryAdd(subpath, resolvedPath);
-        return resolvedPath;
+        cache.TryAdd(canonicalSubpath, currentPath);
+        return currentPath;
     }
 
     private static IFileInfo FindMatchingEntry(string requestedName, Func<IEnumerable<IFileInfo>> entriesFactory, out bool collision)
@@ -223,5 +235,94 @@ public sealed class PortablePhysicalFileProvider : Disposable, IFileProvider
         {
             return null;
         }
+    }
+
+    private static bool TryCreateCanonicalSubpath(string subpath, bool finalSegmentIsDirectory, out string canonicalSubpath)
+    {
+        canonicalSubpath = null;
+
+        var containsSegment = false;
+        var endsWithDirectorySeparator = false;
+        var previousWasDirectorySeparator = true;
+        var requiresNormalization = false;
+
+        for (var i = 0; i < subpath.Length; i++)
+        {
+            var character = subpath[i];
+
+            if (IsSupportedDirectorySeparator(character))
+            {
+                if (previousWasDirectorySeparator || character != CanonicalDirectorySeparator)
+                {
+                    requiresNormalization = true;
+                }
+
+                previousWasDirectorySeparator = true;
+                endsWithDirectorySeparator = true;
+                continue;
+            }
+
+            containsSegment = true;
+            endsWithDirectorySeparator = false;
+            previousWasDirectorySeparator = false;
+        }
+
+        if (!containsSegment)
+        {
+            return false;
+        }
+
+        if (endsWithDirectorySeparator)
+        {
+            if (!finalSegmentIsDirectory)
+            {
+                return false;
+            }
+
+            requiresNormalization = true;
+        }
+
+        if (!requiresNormalization)
+        {
+            canonicalSubpath = subpath;
+            return true;
+        }
+
+        var buffer = new char[subpath.Length];
+        var length = 0;
+        previousWasDirectorySeparator = true;
+
+        for (var i = 0; i < subpath.Length; i++)
+        {
+            var character = subpath[i];
+
+            if (IsSupportedDirectorySeparator(character))
+            {
+                if (previousWasDirectorySeparator)
+                {
+                    continue;
+                }
+
+                previousWasDirectorySeparator = true;
+                buffer[length++] = CanonicalDirectorySeparator;
+                continue;
+            }
+
+            previousWasDirectorySeparator = false;
+            buffer[length++] = character;
+        }
+
+        if (length > 0 && buffer[length - 1] == CanonicalDirectorySeparator)
+        {
+            length--;
+        }
+
+        canonicalSubpath = new string(buffer, 0, length);
+        return true;
+    }
+
+    private static bool IsSupportedDirectorySeparator(char character)
+    {
+        return character == Path.DirectorySeparatorChar || character == Path.AltDirectorySeparatorChar;
     }
 }

@@ -115,7 +115,7 @@ public class DigestAuthenticationMiddleware : ConfigurableMiddleware<INonceTrack
             context.Request.EnableBuffering();
 
             using var body = new MemoryStream();
-            context.Request.Body.CopyToAsync(body).GetAwaiter().GetResult();
+            context.Request.Body.CopyToAsync(body, context.RequestAborted).GetAwaiter().GetResult();
             var db = new DigestAuthorizationHeaderBuilder().AddFromDigestAuthorizationHeader(header);
             var ha1 = options.UseServerSideHa1Storage ? password : db.ComputeHash1(password);
             var ha2 = db.ComputeHash2(context.Request.Method, Decorator.Enclose(body).ToEncodedString());

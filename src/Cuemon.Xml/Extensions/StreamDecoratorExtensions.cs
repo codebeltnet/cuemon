@@ -57,7 +57,10 @@ public static class StreamDecoratorExtensions
             }
 
             var document = new XmlDocument();
-            document.Load(value);
+            using (var reader = XmlReader.Create(value))
+            {
+                document.Load(reader);
+            }
             if (document.FirstChild.NodeType == XmlNodeType.XmlDeclaration)
             {
                 var declaration = (XmlDeclaration)document.FirstChild;

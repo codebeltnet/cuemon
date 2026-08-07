@@ -60,7 +60,7 @@ public class CacheableMiddleware : ConfigurableMiddleware<CacheableOptions>
                 await validator.ProcessAsync(context, bodyStream);
             }
 
-            if (!Decorator.Enclose(context.Response.StatusCode).IsNotModifiedStatusCode()) { await bodyStream.CopyToAsync(body).ConfigureAwait(false); }
+            if (!Decorator.Enclose(context.Response.StatusCode).IsNotModifiedStatusCode()) { await bodyStream.CopyToAsync(body, context.RequestAborted).ConfigureAwait(false); }
         }
     }
 }

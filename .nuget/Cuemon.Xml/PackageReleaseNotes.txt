@@ -4,6 +4,9 @@ Availability: .NET 10, .NET 9 and .NET Standard 2.0
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
 
+# Bug Fixes
+- FIXED StreamDecoratorExtensions.GetXmlEncoding to use XmlReader.Create() for proper stream resource management and cleanup when loading XML documents from streams
+
 Version: 10.5.5
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

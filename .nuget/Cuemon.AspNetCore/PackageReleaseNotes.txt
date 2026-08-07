@@ -7,6 +7,9 @@ Availability: .NET 10 and .NET 9
 # Improvements
 - OPTIMIZED ServerTimingMiddleware with IsEnabled guards on logging calls to avoid parameter allocation when log level is disabled
 
+# Bug Fixes
+- FIXED CacheableMiddleware to propagate request cancellation tokens to async stream copy operations for proper request abort handling
+
 Version: 10.5.5
 Availability: .NET 10 and .NET 9
 

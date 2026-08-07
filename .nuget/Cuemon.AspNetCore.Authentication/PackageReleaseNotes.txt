@@ -4,6 +4,9 @@ Availability: .NET 10 and .NET 9
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
 
+# Bug Fixes
+- FIXED DigestAuthenticationMiddleware to properly propagate request cancellation tokens to async stream copy operations for correct cleanup on request abort
+
 Version: 10.5.5
 Availability: .NET 10 and .NET 9
 

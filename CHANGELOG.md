@@ -28,7 +28,12 @@ This is a minor release that combines new portable file provider and async retry
 ### Fixed
 
 - FileWatcher initialization now consistently sets `UtcCreated` to `UtcLastModified` and uses tracked timestamp for modified-time comparison instead of instance creation time,
-- Awaiter retry loop to handle CancellationToken propagation correctly, prevent zero-delay busy loops through fractional-millisecond rounding normalization, and terminate correctly when configured delay exceeds remaining timeout window.
+- Awaiter retry loop to handle CancellationToken propagation correctly, prevent zero-delay busy loops through fractional-millisecond rounding normalization, and terminate correctly when configured delay exceeds remaining timeout window,
+- Async stream copy operations in authentication and caching middleware now properly propagate cancellation tokens.
+
+### Security
+
+- XML encoding detection now properly rejects Document Type Definitions (DTDs) to prevent XXE and entity expansion attacks.
 
 ### Removed
 

@@ -4,8 +4,12 @@ Availability: .NET 10, .NET 9 and .NET Standard 2.0
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
 
-# New Features
-- ADDED AsyncRunOptions.MaximumAttempts property to enforce explicit attempt limits during zero-delay retries and prevent unbounded retry loops
+# Improvements
+- EXTENDED AsyncRunOptions class in the Cuemon.Threading namespace with MaximumAttempts property to enforce explicit attempt limits during zero-delay retries and prevent unbounded retry loops
+- CHANGED Awaiter class in the Cuemon.Threading namespace refactored to use AsyncRunOptions configuration model, improving timeout accuracy with Stopwatch.GetTimestamp() and optimizing delay handling to reduce allocations
+
+# Bug Fixes
+- FIXED Awaiter retry loop to correctly handle CancellationToken propagation, prevent zero-delay busy loops through fractional-millisecond rounding normalization, and terminate correctly when configured delay exceeds remaining timeout window
 
 Version: 10.5.5
 Availability: .NET 10, .NET 9 and .NET Standard 2.0

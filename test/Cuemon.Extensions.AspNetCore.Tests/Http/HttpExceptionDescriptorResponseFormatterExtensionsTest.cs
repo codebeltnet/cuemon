@@ -5,31 +5,29 @@ using Cuemon.AspNetCore.Diagnostics;
 using Codebelt.Extensions.Xunit;
 using Xunit;
 
-namespace Cuemon.Extensions.AspNetCore.Http
+namespace Cuemon.Extensions.AspNetCore.Http;
+public class HttpExceptionDescriptorResponseFormatterExtensionsTest : Test
 {
-    public class HttpExceptionDescriptorResponseFormatterExtensionsTest : Test
+    public HttpExceptionDescriptorResponseFormatterExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public HttpExceptionDescriptorResponseFormatterExtensionsTest(ITestOutputHelper output) : base(output)
+    }
+
+    [Fact]
+    public void SelectExceptionDescriptorHandlers_ShouldThrowArgumentNullException_WhenFormattersIsNull()
+    {
+        Assert.Throws<ArgumentNullException>("formatters", () =>
         {
-        }
+            HttpExceptionDescriptorResponseFormatterExtensions.SelectExceptionDescriptorHandlers(null).ToList();
+        });
+    }
 
-        [Fact]
-        public void SelectExceptionDescriptorHandlers_ShouldThrowArgumentNullException_WhenFormattersIsNull()
-        {
-            Assert.Throws<ArgumentNullException>("formatters", () =>
-            {
-                HttpExceptionDescriptorResponseFormatterExtensions.SelectExceptionDescriptorHandlers(null).ToList();
-            });
-        }
+    [Fact]
+    public void SelectExceptionDescriptorHandlers_ShouldReturnEmptySequence_WhenFormattersIsEmpty()
+    {
+        var sut = new List<IHttpExceptionDescriptorResponseFormatter>();
 
-        [Fact]
-        public void SelectExceptionDescriptorHandlers_ShouldReturnEmptySequence_WhenFormattersIsEmpty()
-        {
-            var sut = new List<IHttpExceptionDescriptorResponseFormatter>();
+        var result = sut.SelectExceptionDescriptorHandlers().ToList();
 
-            var result = sut.SelectExceptionDescriptorHandlers().ToList();
-
-            Assert.Empty(result);
-        }
+        Assert.Empty(result);
     }
 }

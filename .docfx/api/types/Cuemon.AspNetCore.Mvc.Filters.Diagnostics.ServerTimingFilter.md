@@ -34,7 +34,7 @@ public static class ServerTimingFilterExample
             loggerFactory.CreateLogger<ServerTimingFilter>());
 
         Console.WriteLine(filter.Options.UseTimeMeasureProfiler);
-        Console.WriteLine(filter.GetType().Name);
+        Console.WriteLine(filter.Options.SuppressHeaderPredicate is not null);
     }
 
     private sealed class SampleHostEnvironment : IHostEnvironment

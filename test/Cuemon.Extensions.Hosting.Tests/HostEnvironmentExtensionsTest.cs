@@ -3,51 +3,49 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
 
-namespace Cuemon.Extensions.Hosting
+namespace Cuemon.Extensions.Hosting;
+public class HostEnvironmentExtensionsTest : HostTest<ManagedHostFixture>
 {
-    public class HostEnvironmentExtensionsTest : HostTest<ManagedHostFixture>
+    public HostEnvironmentExtensionsTest(ManagedHostFixture hostFixture, ITestOutputHelper output = null) : base(hostFixture, output)
     {
-        public HostEnvironmentExtensionsTest(ManagedHostFixture hostFixture, ITestOutputHelper output = null) : base(hostFixture, output)
-        {
-        }
+    }
 
-        protected override void ConfigureHost(IHostBuilder hb)
-        {
-            hb.UseEnvironment(Environments.LocalDevelopment);
-        }
+    protected override void ConfigureHost(IHostBuilder hb)
+    {
+        hb.UseEnvironment(Environments.LocalDevelopment);
+    }
 
-        public override void ConfigureServices(IServiceCollection services)
-        {
-        }
+    public override void ConfigureServices(IServiceCollection services)
+    {
+    }
 
-        [Fact]
-        public void IsLocalDevelopment_VerifyEnvironmentEqualsLocalDevelopment()
-        {
+    [Fact]
+    public void IsLocalDevelopment_VerifyEnvironmentEqualsLocalDevelopment()
+    {
 #if NET9_0_OR_GREATER
-            Assert.True(Environment.IsLocalDevelopment());
-            Assert.False(Environment.IsProduction());
-            Assert.False(Environment.IsStaging());
-            Assert.False(Environment.IsDevelopment());
+        Assert.True(Environment.IsLocalDevelopment());
+        Assert.False(Environment.IsProduction());
+        Assert.False(Environment.IsStaging());
+        Assert.False(Environment.IsDevelopment());
 #else
-            Assert.True(Environment.IsLocalDevelopment());
-            Assert.False(Environment.IsProduction());
-            Assert.False(Environment.IsStaging());
-            Assert.False(Environment.IsDevelopment());
+        Assert.True(Environment.IsLocalDevelopment());
+        Assert.False(Environment.IsProduction());
+        Assert.False(Environment.IsStaging());
+        Assert.False(Environment.IsDevelopment());
 #endif
-            TestOutput.WriteLine(Environment.EnvironmentName);
-        }
+        TestOutput.WriteLine(Environment.EnvironmentName);
+    }
 
-        [Fact]
-        public void IsLocalDevelopment_VerifyEnvironmentIsNonProduction()
-        {
+    [Fact]
+    public void IsLocalDevelopment_VerifyEnvironmentIsNonProduction()
+    {
 #if NET9_0_OR_GREATER
-            Assert.True(Environment.IsNonProduction());
-            Assert.False(Environment.IsProduction());
+        Assert.True(Environment.IsNonProduction());
+        Assert.False(Environment.IsProduction());
 #else
-            Assert.True(Environment.IsNonProduction());
-            Assert.False(Environment.IsProduction());
+        Assert.True(Environment.IsNonProduction());
+        Assert.False(Environment.IsProduction());
 #endif
-            TestOutput.WriteLine(Environment.EnvironmentName);
-        }
+        TestOutput.WriteLine(Environment.EnvironmentName);
     }
 }

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates detecting the Unicode encoding of a byte array or stream using the <xref:Cuemon.Extensions.Text.EncodingOptionsExtensions.DetectUnicodeEncoding(Cuemon.Text.IEncodingOptions,System.Byte[])> and <xref:Cuemon.Extensions.Text.EncodingOptionsExtensions.DetectUnicodeEncoding(Cuemon.Text.IEncodingOptions,System.IO.Stream)> extension methods.
+The following example demonstrates detecting the Unicode encoding of a byte array or stream using the [DetectUnicodeEncoding](https://docs.cuemon.net/api/extensions/dotnet/Cuemon.Extensions.Text.EncodingOptionsExtensions.html#Cuemon_Extensions_Text_EncodingOptionsExtensions_DetectUnicodeEncoding_Cuemon_Text_IEncodingOptions_System_Byte___) and [DetectUnicodeEncoding](https://docs.cuemon.net/api/extensions/dotnet/Cuemon.Extensions.Text.EncodingOptionsExtensions.html#Cuemon_Extensions_Text_EncodingOptionsExtensions_DetectUnicodeEncoding_Cuemon_Text_IEncodingOptions_System_IO_Stream_) extension methods.
 
 ```csharp
 using System;

@@ -5,70 +5,68 @@ using Cuemon.Assets;
 using Codebelt.Extensions.Xunit;
 using Xunit;
 
-namespace Cuemon
+namespace Cuemon;
+public class DisposableTest : Test
 {
-    public class DisposableTest : Test
+    public DisposableTest(ITestOutputHelper output) : base(output)
     {
-        public DisposableTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void Dispose_ShouldSetDisposedAndInvokeManagedResourcesOnce()
-        {
-            var sut = new ManagedOnlyDisposable();
+    [Fact]
+    public void Dispose_ShouldSetDisposedAndInvokeManagedResourcesOnce()
+    {
+        var sut = new ManagedOnlyDisposable();
 
-            Assert.False(sut.Disposed);
+        Assert.False(sut.Disposed);
 
-            sut.Dispose();
-            sut.Dispose();
+        sut.Dispose();
+        sut.Dispose();
 
-            Assert.True(sut.Disposed);
-            Assert.Equal(1, sut.ManagedDisposeCount);
-        }
+        Assert.True(sut.Disposed);
+        Assert.Equal(1, sut.ManagedDisposeCount);
+    }
 
-        [Fact]
-        public void DisposeCore_ShouldOnlyInvokeUnmanagedResourcesWhenDisposingIsFalse()
-        {
-            var sut = new TrackingDisposable();
+    [Fact]
+    public void DisposeCore_ShouldOnlyInvokeUnmanagedResourcesWhenDisposingIsFalse()
+    {
+        var sut = new TrackingDisposable();
 
-            sut.DisposeCore(false);
+        sut.DisposeCore(false);
 
-            Assert.True(sut.Disposed);
-            Assert.Equal(0, sut.ManagedDisposeCount);
-            Assert.Equal(1, sut.UnmanagedDisposeCount);
-        }
+        Assert.True(sut.Disposed);
+        Assert.Equal(0, sut.ManagedDisposeCount);
+        Assert.Equal(1, sut.UnmanagedDisposeCount);
+    }
 
-        [Fact]
-        public void Dispose_ShouldInvokeManagedAndUnmanagedResourcesWhenDisposingIsTrue()
-        {
-            var sut = new TrackingDisposable();
+    [Fact]
+    public void Dispose_ShouldInvokeManagedAndUnmanagedResourcesWhenDisposingIsTrue()
+    {
+        var sut = new TrackingDisposable();
 
-            sut.Dispose();
+        sut.Dispose();
 
-            Assert.True(sut.Disposed);
-            Assert.Equal(1, sut.ManagedDisposeCount);
-            Assert.Equal(1, sut.UnmanagedDisposeCount);
-        }
+        Assert.True(sut.Disposed);
+        Assert.Equal(1, sut.ManagedDisposeCount);
+        Assert.Equal(1, sut.UnmanagedDisposeCount);
+    }
 
-        [Fact]
-        public async Task Dispose_ShouldBeThreadSafeAndInvokeCallbacksOnce()
-        {
-            using var managedStarted = new ManualResetEventSlim();
-            using var continueDisposal = new ManualResetEventSlim();
-            var sut = new BlockingDisposable(managedStarted, continueDisposal);
+    [Fact]
+    public async Task Dispose_ShouldBeThreadSafeAndInvokeCallbacksOnce()
+    {
+        using var managedStarted = new ManualResetEventSlim();
+        using var continueDisposal = new ManualResetEventSlim();
+        var sut = new BlockingDisposable(managedStarted, continueDisposal);
 
-            var first = Task.Run(() => sut.Dispose());
-            Assert.True(managedStarted.Wait(TimeSpan.FromSeconds(5)));
+        var first = Task.Run(() => sut.Dispose());
+        Assert.True(managedStarted.Wait(TimeSpan.FromSeconds(5)));
 
-            var second = Task.Run(() => sut.Dispose());
-            continueDisposal.Set();
+        var second = Task.Run(() => sut.Dispose());
+        continueDisposal.Set();
 
-            await Task.WhenAll(first, second);
+        await Task.WhenAll(first, second);
 
-            Assert.True(sut.Disposed);
-            Assert.Equal(1, sut.ManagedDisposeCount);
-            Assert.Equal(1, sut.UnmanagedDisposeCount);
-        }
+        Assert.True(sut.Disposed);
+        Assert.Equal(1, sut.ManagedDisposeCount);
+        Assert.Equal(1, sut.UnmanagedDisposeCount);
     }
 }

@@ -1,7 +1,5 @@
-﻿namespace Cuemon.Extensions.DependencyInjection.Assets
+﻿namespace Cuemon.Extensions.DependencyInjection.Assets;
+public interface IBar
 {
-    public interface IBar
-    {
 
-    }
 }

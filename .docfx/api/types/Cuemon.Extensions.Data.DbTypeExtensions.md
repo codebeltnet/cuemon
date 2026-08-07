@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates converting <see cref="DbType"/> values to their equivalent <see cref="Type"/> using the <xref:Cuemon.Extensions.Data.DbTypeExtensions.ToType(System.Data.DbType)> extension method.
+The following example demonstrates converting <see cref="DbType"/> values to their equivalent <see cref="Type"/> using the [ToType](https://docs.cuemon.net/api/extensions/dotnet/Cuemon.Extensions.Data.DbTypeExtensions.html#Cuemon_Extensions_Data_DbTypeExtensions_ToType_System_Data_DbType_) extension method.
 
 ```csharp
 using System;

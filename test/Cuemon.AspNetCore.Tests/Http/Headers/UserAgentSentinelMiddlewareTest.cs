@@ -14,227 +14,225 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Xunit;
 
-namespace Cuemon.AspNetCore.Http.Headers
+namespace Cuemon.AspNetCore.Http.Headers;
+public class UserAgentSentinelMiddlewareTest : Test
 {
-    public class UserAgentSentinelMiddlewareTest : Test
+    public UserAgentSentinelMiddlewareTest(ITestOutputHelper output) : base(output)
     {
-        public UserAgentSentinelMiddlewareTest(ITestOutputHelper output) : base(output)
+    }
+
+    [Fact]
+    public async Task InvokeAsync_ShouldThrowUserAgentException_BadRequest()
+    {
+        using (var middleware = WebHostTestFactory.Create(services =>
         {
+            services.Configure<UserAgentSentinelOptions>(o => { o.RequireUserAgentHeader = true; });
+        }, app =>
+               {
+                   app.UseUserAgentSentinel();
+               }))
+        {
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
+            var pipeline = middleware.Application.Build();
+
+            var uae = await Assert.ThrowsAsync<UserAgentException>(async () => await pipeline(context));
+
+            Assert.Equal(uae.Message, options.Value.BadRequestMessage);
+            Assert.Equal(uae.StatusCode, StatusCodes.Status400BadRequest);
+            Assert.True(options.Value.RequireUserAgentHeader);
+            Assert.False(options.Value.ValidateUserAgentHeader);
+            Assert.False(options.Value.AllowedUserAgents.Any());
         }
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldThrowUserAgentException_BadRequest()
-        {
-            using (var middleware = WebHostTestFactory.Create(services =>
-            {
-                services.Configure<UserAgentSentinelOptions>(o => { o.RequireUserAgentHeader = true; });
-            }, app =>
+    [Fact]
+    public async Task InvokeAsync_ShouldThrowUserAgentException_Forbidden()
+    {
+        using (var middleware = WebHostTestFactory.Create(services =>
+               {
+                   services.Configure<UserAgentSentinelOptions>(o =>
                    {
-                       app.UseUserAgentSentinel();
-                   }))
-            {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
-                var pipeline = middleware.Application.Build();
+                       o.RequireUserAgentHeader = true;
+                       o.ValidateUserAgentHeader = true;
+                       o.AllowedUserAgents.Add("Cuemon-Agent");
+                   });
+               }, app =>
+               {
+                   app.UseUserAgentSentinel();
+               }))
+        {
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
+            var pipeline = middleware.Application.Build();
 
-                var uae = await Assert.ThrowsAsync<UserAgentException>(async () => await pipeline(context));
+            context.Request.Headers.Add(HeaderNames.UserAgent, "Invalid-Agent");
 
-                Assert.Equal(uae.Message, options.Value.BadRequestMessage);
-                Assert.Equal(uae.StatusCode, StatusCodes.Status400BadRequest);
-                Assert.True(options.Value.RequireUserAgentHeader);
-                Assert.False(options.Value.ValidateUserAgentHeader);
-                Assert.False(options.Value.AllowedUserAgents.Any());
-            }
+            var uae = await Assert.ThrowsAsync<UserAgentException>(async () => await pipeline(context));
+
+            Assert.Equal(uae.Message, options.Value.ForbiddenMessage);
+            Assert.Equal(uae.StatusCode, StatusCodes.Status403Forbidden);
+            Assert.True(options.Value.RequireUserAgentHeader);
+            Assert.True(options.Value.ValidateUserAgentHeader);
+            Assert.True(options.Value.AllowedUserAgents.Any());
         }
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldThrowUserAgentException_Forbidden()
+    [Fact]
+    public async Task InvokeAsync_ShouldCaptureUserAgentException_Forbidden()
+    {
+        using (var middleware = WebHostTestFactory.Create(services =>
         {
-            using (var middleware = WebHostTestFactory.Create(services =>
-                   {
-                       services.Configure<UserAgentSentinelOptions>(o =>
-                       {
-                           o.RequireUserAgentHeader = true;
-                           o.ValidateUserAgentHeader = true;
-                           o.AllowedUserAgents.Add("Cuemon-Agent");
-                       });
-                   }, app =>
-                   {
-                       app.UseUserAgentSentinel();
-                   }))
+            services.Configure<UserAgentSentinelOptions>(o =>
             {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
-                var pipeline = middleware.Application.Build();
+                o.RequireUserAgentHeader = true;
+                o.ValidateUserAgentHeader = true;
+                o.AllowedUserAgents.Add("Cuemon-Agent");
+            });
+        }, app =>
+               {
+                   app.UseFaultDescriptorExceptionHandler();
+                   app.UseUserAgentSentinel();
 
-                context.Request.Headers.Add(HeaderNames.UserAgent, "Invalid-Agent");
+               }))
+        {
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
+            var pipeline = middleware.Application.Build();
 
-                var uae = await Assert.ThrowsAsync<UserAgentException>(async () => await pipeline(context));
+            context.Request.Headers.Add(HeaderNames.UserAgent, "Invalid-Agent");
 
-                Assert.Equal(uae.Message, options.Value.ForbiddenMessage);
-                Assert.Equal(uae.StatusCode, StatusCodes.Status403Forbidden);
-                Assert.True(options.Value.RequireUserAgentHeader);
-                Assert.True(options.Value.ValidateUserAgentHeader);
-                Assert.True(options.Value.AllowedUserAgents.Any());
-            }
+            await pipeline(context);
+
+            Assert.True(options.Value.RequireUserAgentHeader);
+            Assert.True(options.Value.ValidateUserAgentHeader);
+            Assert.True(options.Value.AllowedUserAgents.Any());
+            Assert.Equal(StatusCodes.Status403Forbidden, context.Response.StatusCode);
+            Assert.Contains(options.Value.ForbiddenMessage, context.Response.Body.ToEncodedString());
         }
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldCaptureUserAgentException_Forbidden()
-        {
-            using (var middleware = WebHostTestFactory.Create(services =>
-            {
-                services.Configure<UserAgentSentinelOptions>(o =>
-                {
-                    o.RequireUserAgentHeader = true;
-                    o.ValidateUserAgentHeader = true;
-                    o.AllowedUserAgents.Add("Cuemon-Agent");
-                });
-            }, app =>
+    [Fact]
+    public async Task InvokeAsync_ShouldCaptureUserAgentException_BadRequest()
+    {
+        using (var middleware = WebHostTestFactory.Create(services =>
+               {
+                   services.Configure<UserAgentSentinelOptions>(o =>
                    {
-                       app.UseFaultDescriptorExceptionHandler();
-                       app.UseUserAgentSentinel();
+                       o.RequireUserAgentHeader = true;
+                   });
+               }, app =>
+               {
+                   app.UseFaultDescriptorExceptionHandler();
+                   app.UseUserAgentSentinel();
 
-                   }))
-            {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
-                var pipeline = middleware.Application.Build();
+               }))
+        {
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
+            var pipeline = middleware.Application.Build();
 
-                context.Request.Headers.Add(HeaderNames.UserAgent, "Invalid-Agent");
+            await pipeline(context);
 
-                await pipeline(context);
-
-                Assert.True(options.Value.RequireUserAgentHeader);
-                Assert.True(options.Value.ValidateUserAgentHeader);
-                Assert.True(options.Value.AllowedUserAgents.Any());
-                Assert.Equal(StatusCodes.Status403Forbidden, context.Response.StatusCode);
-                Assert.Contains(options.Value.ForbiddenMessage, context.Response.Body.ToEncodedString());
-            }
+            Assert.True(options.Value.RequireUserAgentHeader);
+            Assert.False(options.Value.ValidateUserAgentHeader);
+            Assert.False(options.Value.AllowedUserAgents.Any());
+            Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
+            Assert.Contains(options.Value.BadRequestMessage, context.Response.Body.ToEncodedString());
         }
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldCaptureUserAgentException_BadRequest()
+    [Fact]
+    public async Task InvokeAsync_ShouldThrowUserAgentException_BadRequest_BecauseOfUseGenericResponse()
+    {
+        using (var middleware = WebHostTestFactory.Create(services =>
         {
-            using (var middleware = WebHostTestFactory.Create(services =>
-                   {
-                       services.Configure<UserAgentSentinelOptions>(o =>
-                       {
-                           o.RequireUserAgentHeader = true;
-                       });
-                   }, app =>
-                   {
-                       app.UseFaultDescriptorExceptionHandler();
-                       app.UseUserAgentSentinel();
-
-                   }))
+            services.Configure<UserAgentSentinelOptions>(o =>
             {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
-                var pipeline = middleware.Application.Build();
+                o.RequireUserAgentHeader = true;
+                o.ValidateUserAgentHeader = true;
+                o.UseGenericResponse = true;
+                o.AllowedUserAgents.Add("Cuemon-Agent");
+            });
+        }, app =>
+               {
+                   app.UseUserAgentSentinel();
+               }))
+        {
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
+            var pipeline = middleware.Application.Build();
 
-                await pipeline(context);
+            context.Request.Headers.Add(HeaderNames.UserAgent, "Invalid-Agent");
 
-                Assert.True(options.Value.RequireUserAgentHeader);
-                Assert.False(options.Value.ValidateUserAgentHeader);
-                Assert.False(options.Value.AllowedUserAgents.Any());
-                Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
-                Assert.Contains(options.Value.BadRequestMessage, context.Response.Body.ToEncodedString());
-            }
+            var uae = await Assert.ThrowsAsync<UserAgentException>(async () => await pipeline(context));
+
+            Assert.Equal(uae.Message, options.Value.BadRequestMessage);
+            Assert.Equal(uae.StatusCode, StatusCodes.Status400BadRequest);
+
+            Assert.True(options.Value.RequireUserAgentHeader);
+            Assert.True(options.Value.ValidateUserAgentHeader);
+            Assert.True(options.Value.UseGenericResponse);
+            Assert.True(options.Value.AllowedUserAgents.Any());
         }
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldThrowUserAgentException_BadRequest_BecauseOfUseGenericResponse()
+    [Fact]
+    public async Task InvokeAsync_ShouldAllowRequestUnconditional()
+    {
+        using (var middleware = WebHostTestFactory.Create(pipelineSetup: app =>
         {
-            using (var middleware = WebHostTestFactory.Create(services =>
+            app.UseUserAgentSentinel();
+            app.Run(context =>
             {
-                services.Configure<UserAgentSentinelOptions>(o =>
-                {
-                    o.RequireUserAgentHeader = true;
-                    o.ValidateUserAgentHeader = true;
-                    o.UseGenericResponse = true;
-                    o.AllowedUserAgents.Add("Cuemon-Agent");
-                });
-            }, app =>
-                   {
-                       app.UseUserAgentSentinel();
-                   }))
-            {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
-                var pipeline = middleware.Application.Build();
+                context.Response.StatusCode = 200;
+                return Task.CompletedTask;
+            });
+        }))
+        {
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
+            var pipeline = middleware.Application.Build();
 
-                context.Request.Headers.Add(HeaderNames.UserAgent, "Invalid-Agent");
+            await pipeline(context);
 
-                var uae = await Assert.ThrowsAsync<UserAgentException>(async () => await pipeline(context));
-
-                Assert.Equal(uae.Message, options.Value.BadRequestMessage);
-                Assert.Equal(uae.StatusCode, StatusCodes.Status400BadRequest);
-
-                Assert.True(options.Value.RequireUserAgentHeader);
-                Assert.True(options.Value.ValidateUserAgentHeader);
-                Assert.True(options.Value.UseGenericResponse);
-                Assert.True(options.Value.AllowedUserAgents.Any());
-            }
+            Assert.False(options.Value.RequireUserAgentHeader);
+            Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
         }
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldAllowRequestUnconditional()
+    [Fact]
+    public async Task InvokeAsync_ShouldAllowRequestAfterBeingValidated()
+    {
+        using (var middleware = WebHostTestFactory.Create(services =>
         {
-            using (var middleware = WebHostTestFactory.Create(pipelineSetup: app =>
+            services.Configure<UserAgentSentinelOptions>(o =>
             {
-                app.UseUserAgentSentinel();
-                app.Run(context =>
-                {
-                    context.Response.StatusCode = 200;
-                    return Task.CompletedTask;
-                });
-            }))
-            {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
-                var pipeline = middleware.Application.Build();
-
-                await pipeline(context);
-
-                Assert.False(options.Value.RequireUserAgentHeader);
-                Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
-            }
-        }
-
-        [Fact]
-        public async Task InvokeAsync_ShouldAllowRequestAfterBeingValidated()
-        {
-            using (var middleware = WebHostTestFactory.Create(services =>
-            {
-                services.Configure<UserAgentSentinelOptions>(o =>
-                {
-                    o.RequireUserAgentHeader = true;
-                    o.ValidateUserAgentHeader = true;
-                    o.AllowedUserAgents.Add("Cuemon-Agent");
-                });
-            }, app =>
+                o.RequireUserAgentHeader = true;
+                o.ValidateUserAgentHeader = true;
+                o.AllowedUserAgents.Add("Cuemon-Agent");
+            });
+        }, app =>
+               {
+                   app.UseUserAgentSentinel();
+                   app.Run(context =>
                    {
-                       app.UseUserAgentSentinel();
-                       app.Run(context =>
-                       {
-                           context.Response.StatusCode = 200;
-                           return Task.CompletedTask;
-                       });
-                   }))
-            {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
-                var pipeline = middleware.Application.Build();
+                       context.Response.StatusCode = 200;
+                       return Task.CompletedTask;
+                   });
+               }))
+        {
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<UserAgentSentinelOptions>>();
+            var pipeline = middleware.Application.Build();
 
-                context.Request.Headers.Add(HeaderNames.UserAgent, "Cuemon-Agent");
+            context.Request.Headers.Add(HeaderNames.UserAgent, "Cuemon-Agent");
 
-                await pipeline(context);
+            await pipeline(context);
 
-                Assert.True(options.Value.RequireUserAgentHeader);
-                Assert.True(options.Value.ValidateUserAgentHeader);
-                Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
-            }
+            Assert.True(options.Value.RequireUserAgentHeader);
+            Assert.True(options.Value.ValidateUserAgentHeader);
+            Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
         }
     }
 }

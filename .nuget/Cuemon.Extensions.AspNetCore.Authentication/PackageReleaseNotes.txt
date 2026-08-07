@@ -1,3 +1,9 @@
+Version: 10.6.0
+Availability: .NET 10 and .NET 9
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
 Version: 10.5.5
 Availability: .NET 10 and .NET 9
 
@@ -150,4 +156,5 @@ Availability: .NET 9 and .NET 8
 # ALM
 - CHANGED Dependencies to latest and greatest with respect to TFMs
 - REMOVED Support for TFM .NET 6 (LTS)
+
 

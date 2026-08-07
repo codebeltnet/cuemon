@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Cuemon.Extensions.FileProviders</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cuemon.Extensions.FileProviders.Physical\Cuemon.Extensions.FileProviders.Physical.csproj" />
+  </ItemGroup>
+
+</Project>

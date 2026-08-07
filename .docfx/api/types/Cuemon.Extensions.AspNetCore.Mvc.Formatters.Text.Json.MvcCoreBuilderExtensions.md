@@ -19,14 +19,14 @@ public class MvcCoreBuilderExtensionsExample
     public void ConfigureMvc(IMvcCoreBuilder builder)
     {
         // Invoke the AddJsonFormatters extension method
-        MvcCoreBuilderExtensions.AddJsonFormatters(builder, options =>
+        builder.AddJsonFormatters(options =>
         {
             options.Settings.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             options.Settings.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         });
 
         // Invoke the AddJsonFormattersOptions extension method
-        MvcCoreBuilderExtensions.AddJsonFormattersOptions(builder, options =>
+        builder.AddJsonFormattersOptions(options =>
         {
             options.Settings.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });

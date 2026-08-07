@@ -1,17 +1,15 @@
 ﻿using System;
 
-namespace Cuemon.Extensions.Reflection.Assets
+namespace Cuemon.Extensions.Reflection.Assets;
+public class CustomException : AggregateException
 {
-    public class CustomException : AggregateException
+    public CustomException()
     {
-        public CustomException()
-        {
-            Code = 42;
-            CodePhrase = "FortyTwo";
-        }
-
-        public int Code { get; }
-
-        public string CodePhrase { get; }
+        Code = 42;
+        CodePhrase = "FortyTwo";
     }
+
+    public int Code { get; }
+
+    public string CodePhrase { get; }
 }

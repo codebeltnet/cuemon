@@ -5,76 +5,84 @@ using System.Xml;
 using Codebelt.Extensions.Xunit;
 using Xunit;
 
-namespace Cuemon.Xml
+namespace Cuemon.Xml;
+public class StreamDecoratorExtensionsTest : Test
 {
-    public class StreamDecoratorExtensionsTest : Test
+    public StreamDecoratorExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public StreamDecoratorExtensionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void ToXmlReader_ShouldReturnXmlReader_WhenValidXmlStream()
+    [Fact]
+    public void ToXmlReader_ShouldReturnXmlReader_WhenValidXmlStream()
+    {
+        var xml = "<root><child>hello</child></root>";
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
         {
-            var xml = "<root><child>hello</child></root>";
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
-            {
-                var reader = Decorator.Enclose(ms).ToXmlReader();
-                Assert.NotNull(reader);
-                reader.MoveToContent();
-                Assert.Equal("root", reader.LocalName);
-                TestOutput.WriteLine(reader.LocalName);
-            }
+            var reader = Decorator.Enclose(ms).ToXmlReader();
+            Assert.NotNull(reader);
+            reader.MoveToContent();
+            Assert.Equal("root", reader.LocalName);
+            TestOutput.WriteLine(reader.LocalName);
         }
+    }
 
-        [Fact]
-        public void ToXmlReader_WithExplicitEncoding_ShouldReturnXmlReader()
+    [Fact]
+    public void ToXmlReader_WithExplicitEncoding_ShouldReturnXmlReader()
+    {
+        var xml = "<root><child>hello</child></root>";
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
         {
-            var xml = "<root><child>hello</child></root>";
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
-            {
-                var reader = Decorator.Enclose(ms).ToXmlReader(Encoding.UTF8);
-                Assert.NotNull(reader);
-                reader.MoveToContent();
-                Assert.Equal("root", reader.LocalName);
-            }
+            var reader = Decorator.Enclose(ms).ToXmlReader(Encoding.UTF8);
+            Assert.NotNull(reader);
+            reader.MoveToContent();
+            Assert.Equal("root", reader.LocalName);
         }
+    }
 
-        [Fact]
-        public void ToXmlReader_Null_ShouldThrowArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => StreamDecoratorExtensions.ToXmlReader(null));
-        }
+    [Fact]
+    public void ToXmlReader_Null_ShouldThrowArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => StreamDecoratorExtensions.ToXmlReader(null));
+    }
 
-        [Fact]
-        public void TryDetectXmlEncoding_ShouldReturnTrueWithUtf8_WhenXmlDeclarationPresent()
+    [Fact]
+    public void TryDetectXmlEncoding_ShouldReturnTrueWithUtf8_WhenXmlDeclarationPresent()
+    {
+        var xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><root/>";
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
         {
-            var xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><root/>";
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
-            {
-                var result = Decorator.Enclose(ms).TryDetectXmlEncoding(out var encoding);
-                Assert.True(result);
-                Assert.NotNull(encoding);
-                TestOutput.WriteLine(encoding.EncodingName);
-            }
+            var result = Decorator.Enclose(ms).TryDetectXmlEncoding(out var encoding);
+            Assert.True(result);
+            Assert.NotNull(encoding);
+            TestOutput.WriteLine(encoding.EncodingName);
         }
+    }
 
-        [Fact]
-        public void TryDetectXmlEncoding_ShouldReturnFalse_WhenNoEncodingInfo()
+    [Fact]
+    public void TryDetectXmlEncoding_ShouldRejectDtd()
+    {
+        var xml = "<!DOCTYPE root [<!ENTITY external \"expanded\">]><root>&external;</root>";
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
         {
-            var xml = "<root/>";
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
-            {
-                var result = Decorator.Enclose(ms).TryDetectXmlEncoding(out var encoding);
-                Assert.False(result);
-                Assert.NotNull(encoding);
-            }
+            Assert.Throws<XmlException>(() => Decorator.Enclose(ms).TryDetectXmlEncoding(out _));
         }
+    }
 
-        [Fact]
-        public void TryDetectXmlEncoding_Null_ShouldThrowArgumentNullException()
+    [Fact]
+    public void TryDetectXmlEncoding_ShouldReturnFalse_WhenNoEncodingInfo()
+    {
+        var xml = "<root/>";
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
         {
-            Assert.Throws<ArgumentNullException>(() => StreamDecoratorExtensions.TryDetectXmlEncoding(null, out _));
+            var result = Decorator.Enclose(ms).TryDetectXmlEncoding(out var encoding);
+            Assert.False(result);
+            Assert.NotNull(encoding);
         }
+    }
+
+    [Fact]
+    public void TryDetectXmlEncoding_Null_ShouldThrowArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => StreamDecoratorExtensions.TryDetectXmlEncoding(null, out _));
     }
 }

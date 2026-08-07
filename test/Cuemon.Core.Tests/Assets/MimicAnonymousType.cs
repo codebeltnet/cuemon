@@ -1,9 +1,7 @@
-﻿namespace Cuemon.Assets
+﻿namespace Cuemon.Assets;
+public sealed class MimicAnonymousType
 {
-    public sealed class MimicAnonymousType
-    {
-        public int Id { get; } = 1;
+    public int Id { get; } = 1;
 
-        public string Name { get; } = "Cuemon";
-    }
+    public string Name { get; } = "Cuemon";
 }

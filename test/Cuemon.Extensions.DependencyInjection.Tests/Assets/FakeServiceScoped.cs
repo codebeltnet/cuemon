@@ -1,14 +1,12 @@
 ﻿using System;
 using Microsoft.Extensions.Options;
 
-namespace Cuemon.Extensions.DependencyInjection.Assets
+namespace Cuemon.Extensions.DependencyInjection.Assets;
+public class FakeServiceScoped : FakeService
 {
-    public class FakeServiceScoped : FakeService
+    public FakeServiceScoped(IOptions<FakeServiceScopedOptions> setup) : base(setup)
     {
-        public FakeServiceScoped(IOptions<FakeServiceScopedOptions> setup) : base(setup)
-        {
-        }
-
-        public override string Lifetime => "Scoped";
     }
+
+    public override string Lifetime => "Scoped";
 }

@@ -1,10 +1,8 @@
-﻿namespace Cuemon.Net
+﻿namespace Cuemon.Net;
+internal static class Infrastructure
 {
-    internal static class Infrastructure
+    internal static bool NotEncoded(char c)
     {
-        internal static bool NotEncoded(char c)
-        {
-            return (c == '!' || c == '(' || c == ')' || c == '*' || c == '-' || c == '.' || c == '_');
-        }
+        return (c == '!' || c == '(' || c == ')' || c == '*' || c == '-' || c == '.' || c == '_');
     }
 }

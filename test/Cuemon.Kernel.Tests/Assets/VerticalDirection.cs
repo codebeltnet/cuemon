@@ -1,8 +1,6 @@
-namespace Cuemon.Assets
+namespace Cuemon.Assets;
+public enum VerticalDirection
 {
-    public enum VerticalDirection
-    {
-        Down,
-        Up
-    }
+    Down,
+    Up
 }

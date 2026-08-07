@@ -29,14 +29,14 @@ public class TooManyRequestsExceptionExample
         // Create with inner exception
         var inner = new InvalidOperationException("Request quota exceeded.");
         var withInner = new TooManyRequestsException("API rate limit reached.", inner);
-        Console.WriteLine(withInner.InnerException?.GetType().Name); // InvalidOperationException
+        Console.WriteLine(withInner.InnerException?.Message); // Request quota exceeded.
 
         // Use TryParse from the base class to resolve by status code
         if (HttpStatusCodeException.TryParse(429, "Slow down!", out var parsed))
         {
-            Console.WriteLine(parsed.GetType().Name); // TooManyRequestsException
-            Console.WriteLine(parsed.StatusCode);     // 429
             Console.WriteLine(parsed.Message);        // Slow down!
+            Console.WriteLine(parsed.StatusCode);     // 429
+        }
 
         // Simulate a rate-limit check using the RetryAfter header
         var requestCount = 101;
@@ -49,7 +49,8 @@ public class TooManyRequestsExceptionExample
             Console.WriteLine(rateLimited.Message);     // Request #101 exceeds the limit...
             Console.WriteLine(rateLimited.Headers["Retry-After"]); // 60
 
-}}}
+        }
+    }
 }
 
 ```

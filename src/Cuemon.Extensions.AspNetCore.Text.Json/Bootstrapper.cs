@@ -2,29 +2,27 @@
 using Cuemon.Extensions.AspNetCore.Text.Json.Converters;
 using Cuemon.Extensions.Text.Json.Formatters;
 
-namespace Cuemon.Extensions.AspNetCore.Text.Json
+namespace Cuemon.Extensions.AspNetCore.Text.Json;
+internal static class Bootstrapper
 {
-    internal static class Bootstrapper
-    {
-        private static readonly Lock PadLock = new();
-        private static bool _initialized;
+    private static readonly Lock PadLock = new();
+    private static bool _initialized;
 
-        internal static void Initialize()
+    internal static void Initialize()
+    {
+        if (!_initialized)
         {
-            if (!_initialized)
+            lock (PadLock)
             {
-                lock (PadLock)
+                if (!_initialized)
                 {
-                    if (!_initialized)
+                    _initialized = true;
+                    JsonFormatterOptions.DefaultConverters += list =>
                     {
-                        _initialized = true;
-                        JsonFormatterOptions.DefaultConverters += list =>
-                        {
-                            list.AddStringValuesConverter();
-                            list.AddProblemDetailsConverter();
-                            list.AddHeaderDictionaryConverter();
-                        };
-                    }
+                        list.AddStringValuesConverter();
+                        list.AddProblemDetailsConverter();
+                        list.AddHeaderDictionaryConverter();
+                    };
                 }
             }
         }

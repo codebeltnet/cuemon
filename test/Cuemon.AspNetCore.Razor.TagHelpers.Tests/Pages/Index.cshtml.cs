@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Cuemon.AspNetCore.Razor.TagHelpers.Pages
+namespace Cuemon.AspNetCore.Razor.TagHelpers.Pages;
+public class IndexModel : PageModel
 {
-    public class IndexModel : PageModel
+    public void OnGet()
     {
-        public void OnGet()
-        {
-        }
     }
 }

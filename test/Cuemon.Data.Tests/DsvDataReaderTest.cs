@@ -6,84 +6,82 @@ using Codebelt.Extensions.Xunit;
 using Cuemon.Reflection;
 using Xunit;
 
-namespace Cuemon.Data
+namespace Cuemon.Data;
+public class DsvDataReaderTest : Test
 {
-    public class DsvDataReaderTest : Test
+    public DsvDataReaderTest(ITestOutputHelper output) : base(output)
     {
-        public DsvDataReaderTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void Read_ShouldReadEmbeddedResourceLineByLine()
+    [Fact]
+    public void Read_ShouldReadEmbeddedResourceLineByLine()
+    {
+        var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("DsvDataReaderTest_Wiki.csv", ManifestResourceMatch.ContainsName).Values.Single();
+        DsvDataReader reader = null;
+        using (reader = new DsvDataReader(new StreamReader(file)))
         {
-            var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("DsvDataReaderTest_Wiki.csv", ManifestResourceMatch.ContainsName).Values.Single();
-            DsvDataReader reader = null;
-            using (reader = new DsvDataReader(new StreamReader(file)))
+            while (reader.Read())
             {
-                while (reader.Read())
-                {
-                    TestOutput.WriteLine(reader.ToString());
-                }
+                TestOutput.WriteLine(reader.ToString());
             }
-            Assert.Equal(5, reader.FieldCount);
-            Assert.Equal(4, reader.RowCount);
-            Assert.True(reader.Disposed);
-            Assert.Throws<ObjectDisposedException>(() => reader.Read());
         }
+        Assert.Equal(5, reader.FieldCount);
+        Assert.Equal(4, reader.RowCount);
+        Assert.True(reader.Disposed);
+        Assert.Throws<ObjectDisposedException>(() => reader.Read());
+    }
 
-        [Fact]
-        public void Read_ShouldReadLargeEmbeddedResourceLineByLine()
+    [Fact]
+    public void Read_ShouldReadLargeEmbeddedResourceLineByLine()
+    {
+        var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("DsvDataReaderTest_100000_SalesRecords.csv", ManifestResourceMatch.ContainsName).Values.Single();
+        DsvDataReader reader = null;
+        using (reader = new DsvDataReader(new StreamReader(file)))
         {
-            var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("DsvDataReaderTest_100000_SalesRecords.csv", ManifestResourceMatch.ContainsName).Values.Single();
-            DsvDataReader reader = null;
-            using (reader = new DsvDataReader(new StreamReader(file)))
+            while (reader.Read())
             {
-                while (reader.Read())
-                {
-                    TestOutput.WriteLine(reader.ToString());
-                }
+                TestOutput.WriteLine(reader.ToString());
             }
-            Assert.Equal(14, reader.FieldCount);
-            Assert.Equal(100000, reader.RowCount);
-            Assert.True(reader.Disposed);
-            Assert.Throws<ObjectDisposedException>(() => reader.Read());
         }
+        Assert.Equal(14, reader.FieldCount);
+        Assert.Equal(100000, reader.RowCount);
+        Assert.True(reader.Disposed);
+        Assert.Throws<ObjectDisposedException>(() => reader.Read());
+    }
 
-        [Fact]
-        public async Task ReadAsync_ShouldReadEmbeddedResourceLineByLine()
+    [Fact]
+    public async Task ReadAsync_ShouldReadEmbeddedResourceLineByLine()
+    {
+        var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("DsvDataReaderTest_Wiki.csv", ManifestResourceMatch.ContainsName).Values.Single();
+        DsvDataReader reader = null;
+        using (reader = new DsvDataReader(new StreamReader(file)))
         {
-            var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("DsvDataReaderTest_Wiki.csv", ManifestResourceMatch.ContainsName).Values.Single();
-            DsvDataReader reader = null;
-            using (reader = new DsvDataReader(new StreamReader(file)))
+            while (await reader.ReadAsync())
             {
-                while (await reader.ReadAsync())
-                {
-                    TestOutput.WriteLine(reader.ToString());
-                }
+                TestOutput.WriteLine(reader.ToString());
             }
-            Assert.Equal(5, reader.FieldCount);
-            Assert.Equal(4, reader.RowCount);
-            Assert.True(reader.Disposed);
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => reader.ReadAsync());
         }
+        Assert.Equal(5, reader.FieldCount);
+        Assert.Equal(4, reader.RowCount);
+        Assert.True(reader.Disposed);
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => reader.ReadAsync());
+    }
 
-        [Fact]
-        public async Task ReadAsync_ShouldReadLargeEmbeddedResourceLineByLineAsync()
+    [Fact]
+    public async Task ReadAsync_ShouldReadLargeEmbeddedResourceLineByLineAsync()
+    {
+        var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("DsvDataReaderTest_100000_SalesRecords.csv", ManifestResourceMatch.ContainsName).Values.Single();
+        DsvDataReader reader = null;
+        using (reader = new DsvDataReader(new StreamReader(file)))
         {
-            var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("DsvDataReaderTest_100000_SalesRecords.csv", ManifestResourceMatch.ContainsName).Values.Single();
-            DsvDataReader reader = null;
-            using (reader = new DsvDataReader(new StreamReader(file)))
+            while (await reader.ReadAsync())
             {
-                while (await reader.ReadAsync())
-                {
-                    TestOutput.WriteLine(reader.ToString());
-                }
+                TestOutput.WriteLine(reader.ToString());
             }
-            Assert.Equal(14, reader.FieldCount);
-            Assert.Equal(100000, reader.RowCount);
-            Assert.True(reader.Disposed);
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => reader.ReadAsync());
         }
+        Assert.Equal(14, reader.FieldCount);
+        Assert.Equal(100000, reader.RowCount);
+        Assert.True(reader.Disposed);
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => reader.ReadAsync());
     }
 }

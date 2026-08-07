@@ -1,11 +1,9 @@
-﻿namespace Cuemon.Extensions.DependencyInjection.Assets
+﻿namespace Cuemon.Extensions.DependencyInjection.Assets;
+public interface IService
 {
-    public interface IService
-    {
-        string ServiceType { get; }
-    }
+    string ServiceType { get; }
+}
 
-    public interface IService<TMarker> : IService, IDependencyInjectionMarker<TMarker>
-    {
-    }
+public interface IService<TMarker> : IService, IDependencyInjectionMarker<TMarker>
+{
 }

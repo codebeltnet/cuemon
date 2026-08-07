@@ -1,9 +1,7 @@
 ﻿using Cuemon.Configuration;
 
-namespace Cuemon.Assets
+namespace Cuemon.Assets;
+public class EssentialOptions : IParameterObject
 {
-    public class EssentialOptions : IParameterObject
-    {
-        public bool Proceed { get; set; }
-    }
+    public bool Proceed { get; set; }
 }

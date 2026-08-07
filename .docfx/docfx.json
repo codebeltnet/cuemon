@@ -38,6 +38,7 @@
             "Cuemon.Extensions.Data.Integrity/**.csproj",
             "Cuemon.Extensions.DependencyInjection/**.csproj",
             "Cuemon.Extensions.Diagnostics/**.csproj",
+            "Cuemon.Extensions.FileProviders.Physical/**.csproj",
             "Cuemon.Extensions.Hosting/**.csproj",
             "Cuemon.Extensions.IO/**.csproj",
             "Cuemon.Extensions.Net/**.csproj",

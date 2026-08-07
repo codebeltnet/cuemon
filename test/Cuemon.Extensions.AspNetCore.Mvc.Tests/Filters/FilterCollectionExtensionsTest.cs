@@ -6,72 +6,70 @@ using Codebelt.Extensions.Xunit;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Xunit;
 
-namespace Cuemon.Extensions.AspNetCore.Mvc.Filters
+namespace Cuemon.Extensions.AspNetCore.Mvc.Filters;
+public class FilterCollectionExtensionsTest : Test
 {
-    public class FilterCollectionExtensionsTest : Test
+    public FilterCollectionExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public FilterCollectionExtensionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void AddHttpCacheable_ShouldAddOneFilterToCollection()
-        {
-            var sut = new FilterCollection();
+    [Fact]
+    public void AddHttpCacheable_ShouldAddOneFilterToCollection()
+    {
+        var sut = new FilterCollection();
 
-            sut.AddHttpCacheable();
+        sut.AddHttpCacheable();
 
-            Assert.Equal(1, sut.Count);
-        }
+        Assert.Equal(1, sut.Count);
+    }
 
-        [Fact]
-        public void AddFaultDescriptor_ShouldAddOneFilterToCollection()
-        {
-            var sut = new FilterCollection();
+    [Fact]
+    public void AddFaultDescriptor_ShouldAddOneFilterToCollection()
+    {
+        var sut = new FilterCollection();
 
-            sut.AddFaultDescriptor();
+        sut.AddFaultDescriptor();
 
-            Assert.Equal(1, sut.Count);
-        }
+        Assert.Equal(1, sut.Count);
+    }
 
-        [Fact]
-        public void AddServerTiming_ShouldAddOneFilterToCollection()
-        {
-            var sut = new FilterCollection();
+    [Fact]
+    public void AddServerTiming_ShouldAddOneFilterToCollection()
+    {
+        var sut = new FilterCollection();
 
-            sut.AddServerTiming();
+        sut.AddServerTiming();
 
-            Assert.Equal(1, sut.Count);
-        }
+        Assert.Equal(1, sut.Count);
+    }
 
-        [Fact]
-        public void AddUserAgentSentinel_ShouldAddOneFilterToCollection()
-        {
-            var sut = new FilterCollection();
+    [Fact]
+    public void AddUserAgentSentinel_ShouldAddOneFilterToCollection()
+    {
+        var sut = new FilterCollection();
 
-            sut.AddUserAgentSentinel();
+        sut.AddUserAgentSentinel();
 
-            Assert.Equal(1, sut.Count);
-        }
+        Assert.Equal(1, sut.Count);
+    }
 
-        [Fact]
-        public void AddThrottlingSentinel_ShouldAddOneFilterToCollection()
-        {
-            var sut = new FilterCollection();
+    [Fact]
+    public void AddThrottlingSentinel_ShouldAddOneFilterToCollection()
+    {
+        var sut = new FilterCollection();
 
-            sut.AddThrottlingSentinel();
+        sut.AddThrottlingSentinel();
 
-            Assert.Equal(1, sut.Count);
-        }
+        Assert.Equal(1, sut.Count);
+    }
 
-        [Fact]
-        public void AddApiKeySentinel_ShouldAddOneFilterToCollection()
-        {
-            var sut = new FilterCollection();
+    [Fact]
+    public void AddApiKeySentinel_ShouldAddOneFilterToCollection()
+    {
+        var sut = new FilterCollection();
 
-            sut.AddApiKeySentinel();
+        sut.AddApiKeySentinel();
 
-            Assert.Equal(1, sut.Count);
-        }
+        Assert.Equal(1, sut.Count);
     }
 }

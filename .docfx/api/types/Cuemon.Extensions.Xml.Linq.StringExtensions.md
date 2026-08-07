@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to parse XML strings into <xref:System.Xml.Linq.XElement> using the <xref:Cuemon.Extensions.Xml.Linq.StringExtensions> class.
+The following example demonstrates how to parse XML strings into [XElement](https://learn.microsoft.com/dotnet/api/system.xml.linq.xelement) using the <xref:Cuemon.Extensions.Xml.Linq.StringExtensions> class.
 
 ```csharp
 using System;

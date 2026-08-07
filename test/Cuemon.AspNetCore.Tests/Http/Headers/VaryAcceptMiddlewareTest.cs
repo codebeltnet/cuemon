@@ -8,120 +8,118 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Xunit;
 
-namespace Cuemon.AspNetCore.Http.Headers
+namespace Cuemon.AspNetCore.Http.Headers;
+public class VaryAcceptMiddlewareTest : Test
 {
-    public class VaryAcceptMiddlewareTest : Test
+    public VaryAcceptMiddlewareTest(ITestOutputHelper output) : base(output)
     {
-        public VaryAcceptMiddlewareTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldAddVaryAcceptHeaderToEveryResponse()
-        {
-            var varyHeaderValue = string.Empty;
+    [Fact]
+    public async Task InvokeAsync_ShouldAddVaryAcceptHeaderToEveryResponse()
+    {
+        var varyHeaderValue = string.Empty;
 
-            await WebHostTestFactory.RunAsync(pipelineSetup: app =>
+        await WebHostTestFactory.RunAsync(pipelineSetup: app =>
+        {
+            app.UseVaryAccept();
+
+            app.Use(async (context, next) =>
             {
-                app.UseVaryAccept();
-
-                app.Use(async (context, next) =>
-                {
-                    await context.Response.WriteAsync("Hello.");
-                    await next();
-                });
-
-                app.Run(context =>
-                {
-                    varyHeaderValue = context.Response.Headers[HeaderNames.Vary];
-                    TestOutput.WriteLine(varyHeaderValue);
-                    return Task.CompletedTask;
-                });
+                await context.Response.WriteAsync("Hello.");
+                await next();
             });
 
-            Assert.Equal(HeaderNames.Accept, varyHeaderValue);
-        }
-
-        [Fact]
-        public async Task InvokeAsync_ShouldDelegateToNextRequestDelegate()
-        {
-            var nextInvoked = false;
-
-            await WebHostTestFactory.RunAsync(pipelineSetup: app =>
+            app.Run(context =>
             {
-                app.UseVaryAccept();
+                varyHeaderValue = context.Response.Headers[HeaderNames.Vary];
+                TestOutput.WriteLine(varyHeaderValue);
+                return Task.CompletedTask;
+            });
+        });
 
-                app.Run(context =>
-                {
-                    nextInvoked = true;
-                    return Task.CompletedTask;
-                });
+        Assert.Equal(HeaderNames.Accept, varyHeaderValue);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_ShouldDelegateToNextRequestDelegate()
+    {
+        var nextInvoked = false;
+
+        await WebHostTestFactory.RunAsync(pipelineSetup: app =>
+        {
+            app.UseVaryAccept();
+
+            app.Run(context =>
+            {
+                nextInvoked = true;
+                return Task.CompletedTask;
+            });
+        });
+
+        Assert.True(nextInvoked);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_ShouldAppendAcceptToExistingVaryHeaderWithoutDuplication()
+    {
+        var varyHeaderValue = string.Empty;
+
+        await WebHostTestFactory.RunAsync(pipelineSetup: app =>
+        {
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers[HeaderNames.Vary] = HeaderNames.AcceptEncoding;
+                await next();
             });
 
-            Assert.True(nextInvoked);
-        }
+            app.UseVaryAccept();
 
-        [Fact]
-        public async Task InvokeAsync_ShouldAppendAcceptToExistingVaryHeaderWithoutDuplication()
-        {
-            var varyHeaderValue = string.Empty;
-
-            await WebHostTestFactory.RunAsync(pipelineSetup: app =>
+            app.Run(async context =>
             {
-                app.Use(async (context, next) =>
-                {
-                    context.Response.Headers[HeaderNames.Vary] = HeaderNames.AcceptEncoding;
-                    await next();
-                });
-
-                app.UseVaryAccept();
-
-                app.Run(async context =>
-                {
-                    await context.Response.WriteAsync("test");
-                    varyHeaderValue = context.Response.Headers[HeaderNames.Vary];
-                    TestOutput.WriteLine(varyHeaderValue);
-                });
+                await context.Response.WriteAsync("test");
+                varyHeaderValue = context.Response.Headers[HeaderNames.Vary];
+                TestOutput.WriteLine(varyHeaderValue);
             });
+        });
 
-            Assert.Contains(HeaderNames.AcceptEncoding, varyHeaderValue);
-            Assert.Contains(HeaderNames.Accept, varyHeaderValue);
+        Assert.Contains(HeaderNames.AcceptEncoding, varyHeaderValue);
+        Assert.Contains(HeaderNames.Accept, varyHeaderValue);
 
-            var acceptCount = 0;
-            foreach (var part in varyHeaderValue.Split(','))
+        var acceptCount = 0;
+        foreach (var part in varyHeaderValue.Split(','))
+        {
+            if (part.Trim().Equals(HeaderNames.Accept, StringComparison.OrdinalIgnoreCase))
             {
-                if (part.Trim().Equals(HeaderNames.Accept, StringComparison.OrdinalIgnoreCase))
-                {
-                    acceptCount++;
-                }
+                acceptCount++;
             }
-            Assert.Equal(1, acceptCount);
         }
+        Assert.Equal(1, acceptCount);
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldNotDuplicateAcceptWhenAlreadyPresentInVaryHeader()
+    [Fact]
+    public async Task InvokeAsync_ShouldNotDuplicateAcceptWhenAlreadyPresentInVaryHeader()
+    {
+        var varyHeaderValue = string.Empty;
+
+        await WebHostTestFactory.RunAsync(pipelineSetup: app =>
         {
-            var varyHeaderValue = string.Empty;
-
-            await WebHostTestFactory.RunAsync(pipelineSetup: app =>
+            app.Use(async (context, next) =>
             {
-                app.Use(async (context, next) =>
-                {
-                    context.Response.Headers[HeaderNames.Vary] = HeaderNames.Accept;
-                    await next();
-                });
-
-                app.UseVaryAccept();
-
-                app.Run(async context =>
-                {
-                    await context.Response.WriteAsync("test");
-                    varyHeaderValue = context.Response.Headers[HeaderNames.Vary];
-                    TestOutput.WriteLine(varyHeaderValue);
-                });
+                context.Response.Headers[HeaderNames.Vary] = HeaderNames.Accept;
+                await next();
             });
 
-            Assert.Equal(HeaderNames.Accept, varyHeaderValue);
-        }
+            app.UseVaryAccept();
+
+            app.Run(async context =>
+            {
+                await context.Response.WriteAsync("test");
+                varyHeaderValue = context.Response.Headers[HeaderNames.Vary];
+                TestOutput.WriteLine(varyHeaderValue);
+            });
+        });
+
+        Assert.Equal(HeaderNames.Accept, varyHeaderValue);
     }
 }

@@ -1,25 +1,23 @@
-﻿namespace Cuemon.Extensions.DependencyInjection.Assets
+﻿namespace Cuemon.Extensions.DependencyInjection.Assets;
+public class DefaultService : IService
 {
-    public class DefaultService : IService
+    public DefaultService()
     {
-        public DefaultService()
-        {
-            ServiceType = nameof(DefaultService);
-        }
-
-        public string ServiceType { get; protected set; }
-
-        public override string ToString()
-        {
-            return ServiceType;
-        }
+        ServiceType = nameof(DefaultService);
     }
 
-    public class DefaultService<TMarker> : DefaultService, IService<TMarker>
+    public string ServiceType { get; protected set; }
+
+    public override string ToString()
     {
-        public DefaultService()
-        {
-            ServiceType = $"{nameof(DefaultService)}:{typeof(TMarker).Name}";
-        }
+        return ServiceType;
+    }
+}
+
+public class DefaultService<TMarker> : DefaultService, IService<TMarker>
+{
+    public DefaultService()
+    {
+        ServiceType = $"{nameof(DefaultService)}:{typeof(TMarker).Name}";
     }
 }

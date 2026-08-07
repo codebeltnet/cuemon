@@ -18,13 +18,13 @@ public class MvcCoreBuilderExtensionsExample
     public void ConfigureMvc(IMvcCoreBuilder builder)
     {
         // Invoke the AddXmlFormatters extension method
-        MvcCoreBuilderExtensions.AddXmlFormatters(builder, options =>
+        builder.AddXmlFormatters(options =>
         {
             options.SynchronizeWithXmlConvert = true;
         });
 
         // Invoke the AddXmlFormattersOptions extension method
-        MvcCoreBuilderExtensions.AddXmlFormattersOptions(builder, options =>
+        builder.AddXmlFormattersOptions(options =>
         {
             options.SynchronizeWithXmlConvert = true;
         });

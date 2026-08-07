@@ -1,26 +1,24 @@
 ﻿using System;
 using Microsoft.Extensions.Options;
 
-namespace Cuemon.Extensions.DependencyInjection.Assets
+namespace Cuemon.Extensions.DependencyInjection.Assets;
+public abstract class FakeService
 {
-    public abstract class FakeService
+    protected FakeService(IOptions<FakeOptions> setup)
     {
-        protected FakeService(IOptions<FakeOptions> setup)
-        {
-            var options = setup.Value;
-            Id = Guid.NewGuid();
-            Greeting = options.Greeting;
-        }
+        var options = setup.Value;
+        Id = Guid.NewGuid();
+        Greeting = options.Greeting;
+    }
 
-        public Guid Id { get; }
+    public Guid Id { get; }
 
-        public abstract string Lifetime { get; }
+    public abstract string Lifetime { get; }
 
-        public string Greeting { get; }
+    public string Greeting { get; }
 
-        public override string ToString()
-        {
-            return Greeting;
-        }
+    public override string ToString()
+    {
+        return Greeting;
     }
 }

@@ -1,6 +1,4 @@
-﻿namespace Cuemon.Extensions.DependencyInjection.Assets
+﻿namespace Cuemon.Extensions.DependencyInjection.Assets;
+public class Foo : IFoo, IBar
 {
-    public class Foo : IFoo, IBar
-    {
-    }
 }

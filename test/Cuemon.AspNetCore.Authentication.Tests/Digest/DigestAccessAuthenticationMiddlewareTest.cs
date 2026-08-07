@@ -15,292 +15,290 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Xunit;
 
-namespace Cuemon.AspNetCore.Authentication.Digest
+namespace Cuemon.AspNetCore.Authentication.Digest;
+public class DigestAccessAuthenticationMiddlewareTest : Test
 {
-    public class DigestAccessAuthenticationMiddlewareTest : Test
+    public DigestAccessAuthenticationMiddlewareTest(ITestOutputHelper output) : base(output)
     {
-        public DigestAccessAuthenticationMiddlewareTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldNotBeAuthenticated()
+    [Fact]
+    public async Task InvokeAsync_ShouldNotBeAuthenticated()
+    {
+        using (var middleware = WebHostTestFactory.Create(services =>
         {
-            using (var middleware = WebHostTestFactory.Create(services =>
+            services.Configure<DigestAuthenticationOptions>(o =>
             {
-                services.Configure<DigestAuthenticationOptions>(o =>
+                o.Authenticator = (string username, out string password) =>
                 {
-                    o.Authenticator = (string username, out string password) =>
+                    if (username == "Agent")
                     {
-                        if (username == "Agent")
-                        {
-                            password = "Test";
-                            var cp = new ClaimsPrincipal();
-                            cp.AddIdentity(new ClaimsIdentity(Arguments.Yield(new Claim("Name", "Test Agent"))));
-                            return cp;
-                        }
-                        password = null;
-                        return null;
-                    };
-                    o.Realm = "unittest";
-                    o.RequireSecureConnection = false;
-                });
-                services.AddFakeHttpContextAccessor(ServiceLifetime.Singleton);
-                services.AddInMemoryDigestAuthenticationNonceTracker();
-            }, app =>
-                   {
-                       app.UseExceptionMiddleware();
-                       app.UseDigestAccessAuthentication();
-                   }))
-            {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<DigestAuthenticationOptions>>();
-                var pipeline = middleware.Application.Build();
-
-                var ue = await Assert.ThrowsAsync<UnauthorizedException>(async () => await pipeline(context));
-
-                Assert.Equal(options.Value.UnauthorizedMessage, ue.Message);
-                Assert.Equal(StatusCodes.Status401Unauthorized, ue.StatusCode);
-
-                var wwwAuthenticate = context.Response.Headers[HeaderNames.WWWAuthenticate];
-
-                TestOutput.WriteLine(wwwAuthenticate);
-            }
-        }
-
-        [Fact]
-        public async Task InvokeAsync_ShouldAuthenticateWhenApplyingAuthorizationHeader()
+                        password = "Test";
+                        var cp = new ClaimsPrincipal();
+                        cp.AddIdentity(new ClaimsIdentity(Arguments.Yield(new Claim("Name", "Test Agent"))));
+                        return cp;
+                    }
+                    password = null;
+                    return null;
+                };
+                o.Realm = "unittest";
+                o.RequireSecureConnection = false;
+            });
+            services.AddFakeHttpContextAccessor(ServiceLifetime.Singleton);
+            services.AddInMemoryDigestAuthenticationNonceTracker();
+        }, app =>
+               {
+                   app.UseExceptionMiddleware();
+                   app.UseDigestAccessAuthentication();
+               }))
         {
-            using (var middleware = WebHostTestFactory.Create(services =>
-            {
-                services.Configure<DigestAuthenticationOptions>(o =>
-                {
-                    o.Authenticator = (string username, out string password) =>
-                   {
-                       if (username == "Agent")
-                       {
-                           password = "Test";
-                           var cp = new ClaimsPrincipal();
-                           cp.AddIdentity(new ClaimsIdentity(Arguments.Yield(new Claim("Name", "Test Agent"))));
-                           return cp;
-                       }
-                       password = null;
-                       return null;
-                   };
-                    o.Realm = "unittest";
-                    o.RequireSecureConnection = false;
-                });
-                services.AddFakeHttpContextAccessor(ServiceLifetime.Singleton);
-                services.AddInMemoryDigestAuthenticationNonceTracker();
-            }, app =>
-                   {
-                       app.UseDigestAccessAuthentication();
-                       app.Run(context =>
-                       {
-                           context.Response.StatusCode = 200;
-                           return Task.CompletedTask;
-                       });
-                   }))
-            {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<DigestAuthenticationOptions>>();
-                var pipeline = middleware.Application.Build();
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<DigestAuthenticationOptions>>();
+            var pipeline = middleware.Application.Build();
 
-                var ue = await Assert.ThrowsAsync<UnauthorizedException>(async () => await pipeline(context));
+            var ue = await Assert.ThrowsAsync<UnauthorizedException>(async () => await pipeline(context));
 
-                Assert.Equal(options.Value.UnauthorizedMessage, ue.Message);
-                Assert.Equal(StatusCodes.Status401Unauthorized, ue.StatusCode);
+            Assert.Equal(options.Value.UnauthorizedMessage, ue.Message);
+            Assert.Equal(StatusCodes.Status401Unauthorized, ue.StatusCode);
 
-                var wwwAuthenticate = context.Response.Headers[HeaderNames.WWWAuthenticate];
+            var wwwAuthenticate = context.Response.Headers[HeaderNames.WWWAuthenticate];
 
-
-                TestOutput.WriteLine(wwwAuthenticate);
-
-                var db = new DigestAuthorizationHeaderBuilder(options.Value.DigestAlgorithm)
-                    .AddRealm(options.Value.Realm)
-                    .AddUserName("Agent")
-                    .AddUri("/")
-                    .AddNc(1)
-                    .AddCnonce()
-                    .AddQopAuthentication()
-                    .AddFromWwwAuthenticateHeader(context.Response.Headers);
-
-
-                var ha1 = db.ComputeHash1("Test");
-
-                TestOutput.WriteLine(ha1);
-
-                var ha2 = db.ComputeHash2("GET");
-                var response = db.ComputeResponse(ha1, ha2);
-
-                db.AddResponse("Test", "GET");
-
-                context.Response.Body = new MemoryStream();
-                context.Request.Headers.Add(HeaderNames.Authorization, db.Build().ToString());
-
-                await pipeline(context);
-
-                Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
-            }
+            TestOutput.WriteLine(wwwAuthenticate);
         }
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldAuthenticateWhenApplyingAuthorizationHeaderNoPlainTextPassword()
+    [Fact]
+    public async Task InvokeAsync_ShouldAuthenticateWhenApplyingAuthorizationHeader()
+    {
+        using (var middleware = WebHostTestFactory.Create(services =>
         {
-            using (var middleware = WebHostTestFactory.Create(services =>
+            services.Configure<DigestAuthenticationOptions>(o =>
             {
-                services.Configure<DigestAuthenticationOptions>(o =>
-                {
-                    o.UseServerSideHa1Storage = true;
-                    o.Authenticator = (string username, out string password) =>
+                o.Authenticator = (string username, out string password) =>
+               {
+                   if (username == "Agent")
                    {
-                       if (username == "Agent")
-                       {
-                           password = "a69d6da3eea4fa832dc1c0534863988e550e523f1f786c238951b7ec7abf4d57";
-                           var cp = new ClaimsPrincipal();
-                           cp.AddIdentity(new ClaimsIdentity(Arguments.Yield(new Claim("Name", "Test Agent"))));
-                           return cp;
-                       }
-                       password = null;
-                       return null;
-                   };
-                    o.Realm = "unittest";
-                    o.RequireSecureConnection = false;
-                });
-                services.AddFakeHttpContextAccessor(ServiceLifetime.Singleton);
-                services.AddInMemoryDigestAuthenticationNonceTracker();
-            }, app =>
+                       password = "Test";
+                       var cp = new ClaimsPrincipal();
+                       cp.AddIdentity(new ClaimsIdentity(Arguments.Yield(new Claim("Name", "Test Agent"))));
+                       return cp;
+                   }
+                   password = null;
+                   return null;
+               };
+                o.Realm = "unittest";
+                o.RequireSecureConnection = false;
+            });
+            services.AddFakeHttpContextAccessor(ServiceLifetime.Singleton);
+            services.AddInMemoryDigestAuthenticationNonceTracker();
+        }, app =>
+               {
+                   app.UseDigestAccessAuthentication();
+                   app.Run(context =>
                    {
-                       app.UseDigestAccessAuthentication();
-                       app.Run(context =>
-                       {
-                           context.Response.StatusCode = 200;
-                           return Task.CompletedTask;
-                       });
-                   }))
-            {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<DigestAuthenticationOptions>>();
-                var pipeline = middleware.Application.Build();
+                       context.Response.StatusCode = 200;
+                       return Task.CompletedTask;
+                   });
+               }))
+        {
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<DigestAuthenticationOptions>>();
+            var pipeline = middleware.Application.Build();
 
-                var ue = await Assert.ThrowsAsync<UnauthorizedException>(async () => await pipeline(context));
+            var ue = await Assert.ThrowsAsync<UnauthorizedException>(async () => await pipeline(context));
 
-                Assert.Equal(options.Value.UnauthorizedMessage, ue.Message);
-                Assert.Equal(StatusCodes.Status401Unauthorized, ue.StatusCode);
+            Assert.Equal(options.Value.UnauthorizedMessage, ue.Message);
+            Assert.Equal(StatusCodes.Status401Unauthorized, ue.StatusCode);
 
-                var wwwAuthenticate = context.Response.Headers[HeaderNames.WWWAuthenticate];
-
-                TestOutput.WriteLine(wwwAuthenticate);
-
-                var db = new DigestAuthorizationHeaderBuilder(options.Value.DigestAlgorithm)
-                    .AddRealm(options.Value.Realm)
-                    .AddUserName("Agent")
-                    .AddUri("/")
-                    .AddNc(1)
-                    .AddCnonce()
-                    .AddQopAuthentication()
-                    .AddFromWwwAuthenticateHeader(context.Response.Headers);
+            var wwwAuthenticate = context.Response.Headers[HeaderNames.WWWAuthenticate];
 
 
-                var ha1 = db.ComputeHash1("Test");
+            TestOutput.WriteLine(wwwAuthenticate);
 
-                TestOutput.WriteLine(ha1);
+            var db = new DigestAuthorizationHeaderBuilder(options.Value.DigestAlgorithm)
+                .AddRealm(options.Value.Realm)
+                .AddUserName("Agent")
+                .AddUri("/")
+                .AddNc(1)
+                .AddCnonce()
+                .AddQopAuthentication()
+                .AddFromWwwAuthenticateHeader(context.Response.Headers);
 
-                var ha2 = db.ComputeHash2("GET");
-                var response = db.ComputeResponse(ha1, ha2);
 
-                db.AddResponse("Test", "GET");
+            var ha1 = db.ComputeHash1("Test");
 
-                context.Response.Body = new MemoryStream();
-                context.Request.Headers.Add(HeaderNames.Authorization, db.Build().ToString());
+            TestOutput.WriteLine(ha1);
 
-                await pipeline(context);
+            var ha2 = db.ComputeHash2("GET");
+            var response = db.ComputeResponse(ha1, ha2);
 
-                Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
-            }
+            db.AddResponse("Test", "GET");
+
+            context.Response.Body = new MemoryStream();
+            context.Request.Headers.Add(HeaderNames.Authorization, db.Build().ToString());
+
+            await pipeline(context);
+
+            Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
         }
+    }
 
-        [Fact]
-        public async Task InvokeAsync_ShouldAuthenticateWhenApplyingAuthorizationHeaderWithQopIntegrity()
+    [Fact]
+    public async Task InvokeAsync_ShouldAuthenticateWhenApplyingAuthorizationHeaderNoPlainTextPassword()
+    {
+        using (var middleware = WebHostTestFactory.Create(services =>
         {
-            using (var middleware = WebHostTestFactory.Create(services =>
+            services.Configure<DigestAuthenticationOptions>(o =>
             {
-                services.Configure<DigestAuthenticationOptions>(o =>
-                {
-                    o.Authenticator = (string username, out string password) =>
+                o.UseServerSideHa1Storage = true;
+                o.Authenticator = (string username, out string password) =>
+               {
+                   if (username == "Agent")
                    {
-                       if (username == "Agent")
-                       {
-                           password = "Test";
-                           var cp = new ClaimsPrincipal();
-                           cp.AddIdentity(new ClaimsIdentity(Arguments.Yield(new Claim("Name", "Test Agent"))));
-                           return cp;
-                       }
-                       password = null;
-                       return null;
-                   };
-                    o.Realm = "unittest";
-                    o.RequireSecureConnection = false;
-                });
-                services.AddFakeHttpContextAccessor(ServiceLifetime.Singleton);
-                services.AddInMemoryDigestAuthenticationNonceTracker();
-            }, app =>
+                       password = "a69d6da3eea4fa832dc1c0534863988e550e523f1f786c238951b7ec7abf4d57";
+                       var cp = new ClaimsPrincipal();
+                       cp.AddIdentity(new ClaimsIdentity(Arguments.Yield(new Claim("Name", "Test Agent"))));
+                       return cp;
+                   }
+                   password = null;
+                   return null;
+               };
+                o.Realm = "unittest";
+                o.RequireSecureConnection = false;
+            });
+            services.AddFakeHttpContextAccessor(ServiceLifetime.Singleton);
+            services.AddInMemoryDigestAuthenticationNonceTracker();
+        }, app =>
+               {
+                   app.UseDigestAccessAuthentication();
+                   app.Run(context =>
                    {
-                       app.UseDigestAccessAuthentication();
-                       app.Run(context =>
-                       {
-                           context.Response.StatusCode = 200;
-                           return Task.CompletedTask;
-                       });
-                   }))
+                       context.Response.StatusCode = 200;
+                       return Task.CompletedTask;
+                   });
+               }))
+        {
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<DigestAuthenticationOptions>>();
+            var pipeline = middleware.Application.Build();
+
+            var ue = await Assert.ThrowsAsync<UnauthorizedException>(async () => await pipeline(context));
+
+            Assert.Equal(options.Value.UnauthorizedMessage, ue.Message);
+            Assert.Equal(StatusCodes.Status401Unauthorized, ue.StatusCode);
+
+            var wwwAuthenticate = context.Response.Headers[HeaderNames.WWWAuthenticate];
+
+            TestOutput.WriteLine(wwwAuthenticate);
+
+            var db = new DigestAuthorizationHeaderBuilder(options.Value.DigestAlgorithm)
+                .AddRealm(options.Value.Realm)
+                .AddUserName("Agent")
+                .AddUri("/")
+                .AddNc(1)
+                .AddCnonce()
+                .AddQopAuthentication()
+                .AddFromWwwAuthenticateHeader(context.Response.Headers);
+
+
+            var ha1 = db.ComputeHash1("Test");
+
+            TestOutput.WriteLine(ha1);
+
+            var ha2 = db.ComputeHash2("GET");
+            var response = db.ComputeResponse(ha1, ha2);
+
+            db.AddResponse("Test", "GET");
+
+            context.Response.Body = new MemoryStream();
+            context.Request.Headers.Add(HeaderNames.Authorization, db.Build().ToString());
+
+            await pipeline(context);
+
+            Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
+        }
+    }
+
+    [Fact]
+    public async Task InvokeAsync_ShouldAuthenticateWhenApplyingAuthorizationHeaderWithQopIntegrity()
+    {
+        using (var middleware = WebHostTestFactory.Create(services =>
+        {
+            services.Configure<DigestAuthenticationOptions>(o =>
             {
-                var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                var options = middleware.Host.Services.GetRequiredService<IOptions<DigestAuthenticationOptions>>();
-                var pipeline = middleware.Application.Build();
+                o.Authenticator = (string username, out string password) =>
+               {
+                   if (username == "Agent")
+                   {
+                       password = "Test";
+                       var cp = new ClaimsPrincipal();
+                       cp.AddIdentity(new ClaimsIdentity(Arguments.Yield(new Claim("Name", "Test Agent"))));
+                       return cp;
+                   }
+                   password = null;
+                   return null;
+               };
+                o.Realm = "unittest";
+                o.RequireSecureConnection = false;
+            });
+            services.AddFakeHttpContextAccessor(ServiceLifetime.Singleton);
+            services.AddInMemoryDigestAuthenticationNonceTracker();
+        }, app =>
+               {
+                   app.UseDigestAccessAuthentication();
+                   app.Run(context =>
+                   {
+                       context.Response.StatusCode = 200;
+                       return Task.CompletedTask;
+                   });
+               }))
+        {
+            var context = middleware.Host.Services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            var options = middleware.Host.Services.GetRequiredService<IOptions<DigestAuthenticationOptions>>();
+            var pipeline = middleware.Application.Build();
 
-                var ue = await Assert.ThrowsAsync<UnauthorizedException>(async () => await pipeline(context));
+            var ue = await Assert.ThrowsAsync<UnauthorizedException>(async () => await pipeline(context));
 
-                Assert.Equal(options.Value.UnauthorizedMessage, ue.Message);
-                Assert.Equal(StatusCodes.Status401Unauthorized, ue.StatusCode);
+            Assert.Equal(options.Value.UnauthorizedMessage, ue.Message);
+            Assert.Equal(StatusCodes.Status401Unauthorized, ue.StatusCode);
 
-                var wwwAuthenticate = context.Response.Headers[HeaderNames.WWWAuthenticate];
+            var wwwAuthenticate = context.Response.Headers[HeaderNames.WWWAuthenticate];
 
-                TestOutput.WriteLine(wwwAuthenticate);
+            TestOutput.WriteLine(wwwAuthenticate);
 
-                var db = new DigestAuthorizationHeaderBuilder(options.Value.DigestAlgorithm)
-                    .AddRealm(options.Value.Realm)
-                    .AddUserName("Agent")
-                    .AddUri("/")
-                    .AddNc(1)
-                    .AddCnonce()
-                    .AddQopAuthenticationIntegrity()
-                    .AddFromWwwAuthenticateHeader(context.Response.Headers);
+            var db = new DigestAuthorizationHeaderBuilder(options.Value.DigestAlgorithm)
+                .AddRealm(options.Value.Realm)
+                .AddUserName("Agent")
+                .AddUri("/")
+                .AddNc(1)
+                .AddCnonce()
+                .AddQopAuthenticationIntegrity()
+                .AddFromWwwAuthenticateHeader(context.Response.Headers);
 
-                TestOutput.WriteLine("Body:");
+            TestOutput.WriteLine("Body:");
 
-                var entityBody = "test of entityBody in request";
+            var entityBody = "test of entityBody in request";
 
-                var ha1 = db.ComputeHash1("Test");
+            var ha1 = db.ComputeHash1("Test");
 
-                TestOutput.WriteLine("HA1:");
-                TestOutput.WriteLine(ha1);
+            TestOutput.WriteLine("HA1:");
+            TestOutput.WriteLine(ha1);
 
-                var ha2 = db.ComputeHash2("POST", entityBody);
-                var response = db.ComputeResponse(ha1, ha2);
+            var ha2 = db.ComputeHash2("POST", entityBody);
+            var response = db.ComputeResponse(ha1, ha2);
 
-                TestOutput.WriteLine("HA2:");
-                TestOutput.WriteLine(ha2);
+            TestOutput.WriteLine("HA2:");
+            TestOutput.WriteLine(ha2);
 
-                db.AddResponse("Test", "POST", entityBody);
+            db.AddResponse("Test", "POST", entityBody);
 
-                context.Request.Method = "POST";
-                context.Request.Body = new MemoryStream(entityBody.ToByteArray());
-                context.Request.Headers.Add(HeaderNames.Authorization, db.Build().ToString());
+            context.Request.Method = "POST";
+            context.Request.Body = new MemoryStream(entityBody.ToByteArray());
+            context.Request.Headers.Add(HeaderNames.Authorization, db.Build().ToString());
 
-                await pipeline(context);
+            await pipeline(context);
 
-                Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
-            }
+            Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
         }
     }
 }

@@ -8,7 +8,7 @@ For more details, please refer to `PackageReleaseNotes.txt` on a per assembly ba
 
 ## [10.6.0] - 2026-08-07
 
-This is a minor release focused on portable file provider capabilities, async retry enhancements with fine-grained control, and comprehensive dependency updates across all supported target frameworks.
+This is a minor release that combines new portable file provider and async retry capabilities with bug fixes for retry, timeout, cancellation, and exception-handling edge cases. Existing public APIs remain available, while the corrected failure and retry behavior may differ for affected edge cases. The release also includes comprehensive dependency updates across all supported target frameworks.
 
 ### Added
 

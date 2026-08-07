@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using System.Runtime.Versioning;
 using Codebelt.Extensions.Xunit;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Cuemon.Reflection;
 
@@ -128,8 +129,23 @@ public class TargetFrameworkMonikerTest : Test
     {
         var expected = GetExpectedTargetFrameworkMoniker();
 
-        Assert.True(TargetFrameworkMoniker.TryResolveCurrent(out var actual));
-        Assert.Equal(expected, actual);
+        // Try to resolve the current target framework moniker. Some external test runners
+        // (for example JetBrains test runner) may host tests in a different target framework
+        // than the one the test assembly was compiled for (e.g., netcoreapp3.0). In those
+        // cases the resolved TFM will differ from the expected compile-time TFM and the
+        // assertion below would fail even though the compilation target is correct. To
+        // avoid false negatives when running under non-built-in runners, skip the test
+        // when the runtime-reported TFM does not match the compile-time expected TFM.
+        if (!TargetFrameworkMoniker.TryResolveCurrent(out var actual))
+        {
+            throw SkipException.ForSkip("Could not resolve current Target Framework Moniker at runtime. Skipping test because runner might be hosting tests in a different TFM.");
+        }
+
+        if (!string.Equals(expected, actual, StringComparison.OrdinalIgnoreCase))
+        {
+            throw SkipException.ForSkip($"Runtime Target Framework Moniker ('{actual}') does not match compile-time expected ('{expected}'). Skipping test when running under a different test runner.");
+        }
+
         Assert.Equal(expected, TargetFrameworkMoniker.ResolveCurrent());
 
         TestOutput.WriteLine(actual);

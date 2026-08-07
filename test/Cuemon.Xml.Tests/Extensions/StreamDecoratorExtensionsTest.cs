@@ -59,6 +59,16 @@ public class StreamDecoratorExtensionsTest : Test
     }
 
     [Fact]
+    public void TryDetectXmlEncoding_ShouldRejectDtd()
+    {
+        var xml = "<!DOCTYPE root [<!ENTITY external \"expanded\">]><root>&external;</root>";
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
+        {
+            Assert.Throws<XmlException>(() => Decorator.Enclose(ms).TryDetectXmlEncoding(out _));
+        }
+    }
+
+    [Fact]
     public void TryDetectXmlEncoding_ShouldReturnFalse_WhenNoEncodingInfo()
     {
         var xml = "<root/>";

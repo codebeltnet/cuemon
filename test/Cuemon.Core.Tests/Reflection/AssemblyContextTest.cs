@@ -74,13 +74,12 @@ public class AssemblyContextTest : Test
     [Fact]
     public void GetCurrentDomainAssemblies_ShouldOnlyReturnDomainAssemblies_WhenReferencedAssembliesNotIncluded()
     {
-        var domainSnapshot = AppDomain.CurrentDomain.GetAssemblies();
-
         var result = AssemblyContext.GetCurrentDomainAssemblies(o =>
         {
             o.AssemblyFilter = _ => true;
             o.IncludeReferencedAssemblies = false;
         });
+        var domainSnapshot = AppDomain.CurrentDomain.GetAssemblies();
 
         TestOutput.WriteLine($"Domain assemblies: {domainSnapshot.Length}, returned: {result.Count}");
 

@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
-## [10.7.0] - 2026-08-11
+## [10.7.0] - 2026-08-12
 
 This is a minor release focused on enhancing Razor tag helper flexibility with automatic base URL resolution and modernizing package dependency management. The release introduces opt-in automatic base URL derivation from the current HTTP request while maintaining backward compatibility with the default configured mode. Tag helper functionality remains stable while new capabilities provide greater flexibility for dynamic deployment scenarios.
 

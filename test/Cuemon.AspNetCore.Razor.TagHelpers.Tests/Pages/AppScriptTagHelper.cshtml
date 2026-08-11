@@ -1,2 +1,6 @@
 ﻿@page
-<app-script src="js/site.js" />
+@{
+    var src = Request.Query["path"].ToString();
+    if (string.IsNullOrWhiteSpace(src)) { src = "js/site.js"; }
+}
+<app-script src="@src" />

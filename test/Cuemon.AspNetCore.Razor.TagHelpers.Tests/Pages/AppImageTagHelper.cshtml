@@ -1,2 +1,6 @@
 ﻿@page
-<app-img class="hero-logo-image" src="cuemon-logo.svg" alt="Cuemon for .NET" />
+@{
+    var src = Request.Query["path"].ToString();
+    if (string.IsNullOrWhiteSpace(src)) { src = "cuemon-logo.svg"; }
+}
+<app-img class="hero-logo-image" src="@src" alt="Cuemon for .NET" />

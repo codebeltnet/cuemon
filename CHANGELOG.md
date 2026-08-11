@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.7.0] - 2026-08-11
+
+This is a minor release focused on enhancing Razor tag helper flexibility with automatic base URL resolution and modernizing package dependency management. The release introduces opt-in automatic base URL derivation from the current HTTP request while maintaining backward compatibility with the default configured mode. Tag helper functionality remains stable while new capabilities provide greater flexibility for dynamic deployment scenarios.
+
+### Added
+
+- `TagHelperBaseUrlMode` enumeration with `Configured` and `Automatic` modes to control base URL resolution strategy,
+- Automatic base URL resolution capability in tag helpers allowing dynamic derivation from the current HTTP request scheme, host, and path base when `BaseUrlMode` is set to `Automatic`,
+- `ViewContext` property injection in `CacheBustingTagHelper<TOptions>` base class to enable HTTP request context access for automatic URL resolution,
+- `ResolveUrl` protected method in tag helper base class for consistent URL path normalization and base URL composition,
+- Comprehensive test coverage for automatic base URL resolution across `AppImageTagHelper`, `AppLinkTagHelper`, and `AppScriptTagHelper` with test factory helper.
+
+### Changed
+
+- Central package transitive pinning enabled in `Directory.Packages.props` for improved transitive dependency resolution, requiring explicit declaration of transitive dependencies in affected projects,
+- Package dependencies updated to latest compatible versions across all supported target frameworks: Microsoft.Data.Sqlite (10.0.10 → 10.0.11, 9.0.18 → 9.0.19), Microsoft.Extensions packages (10.0.10 → 10.0.11, 9.0.18 → 9.0.19), System.Text.Json (10.0.10 → 10.0.11),
+- Newtonsoft.Json added as a conditional dependency for Cuemon.Core.Tests to explicitly manage transitive package resolution with transitive pinning enabled.
+
 ## [10.6.0] - 2026-08-07
 
 This is a minor release that combines new portable file provider and async retry capabilities with bug fixes for retry, timeout, cancellation, and exception-handling edge cases. Existing public APIs remain available, while the corrected failure and retry behavior may differ for affected edge cases. The release also includes comprehensive dependency updates across all supported target frameworks.
@@ -1856,6 +1874,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.7.0]: https://github.com/codebeltnet/cuemon/compare/v10.6.0...v10.7.0
 [10.6.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v10.6.0
 [10.5.5]: https://github.com/codebeltnet/cuemon/compare/v10.5.4...v10.5.5
 [10.5.4]: https://github.com/codebeltnet/cuemon/compare/v10.5.3...v10.5.4

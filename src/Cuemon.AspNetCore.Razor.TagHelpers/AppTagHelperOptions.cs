@@ -19,6 +19,10 @@ public class AppTagHelperOptions : TagHelperOptions
     ///         <description><see cref="ProtocolUriScheme.Relative"/></description>
     ///     </item>
     ///     <item>
+    ///         <term><see cref="TagHelperOptions.BaseUrlMode"/></term>
+    ///         <description><see cref="TagHelperBaseUrlMode.Configured"/></description>
+    ///     </item>
+    ///     <item>
     ///         <term><see cref="TagHelperOptions.BaseUrl"/></term>
     ///         <description><c>null</c></description>
     ///     </item>

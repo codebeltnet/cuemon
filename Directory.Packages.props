@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <CentralPackageVersionManagement>true</CentralPackageVersionManagement>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="AutoFixture" Version="4.18.1" />
@@ -15,6 +15,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageVersion Include="MinVer" Version="7.0.0" />
     <PackageVersion Include="NativeLibraryLoader" Version="1.0.13" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" Condition="'$(MSBuildProjectName)' == 'Cuemon.Core.Tests'" />
     <PackageVersion Include="Xunit.v3.Priority" Version="1.1.18" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="coverlet.msbuild" Version="10.0.1" />

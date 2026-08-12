@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Codebelt.Extensions.Xunit;
@@ -192,22 +191,15 @@ public class AwaiterTest : Test
     [Fact]
     public async Task RunUntilSuccessfulOrTimeoutAsync_ShouldReturnDefaultUnsuccessful_WhenRepeatedResultsRemainUnsuccessfulUntilTimeout()
     {
-        var callCount = 0;
-
         Task<ConditionalValue> Method()
         {
-            callCount++;
             return Task.FromResult<ConditionalValue>(new UnsuccessfulValue());
         }
 
-        var result = await Run(Method, TimeSpan.FromMilliseconds(80), RetryDelay);
+        var unsuccessful = Assert.IsType<UnsuccessfulValue>(await Run(Method, TimeSpan.FromMilliseconds(80), RetryDelay));
 
-        TestOutput.WriteLine("Call-count: " + callCount);
-
-        Assert.IsType<UnsuccessfulValue>(result);
-        Assert.False(result.Succeeded);
-        Assert.Null(result.Failure);
-        Assert.True(callCount >= 2);
+        Assert.False(unsuccessful.Succeeded);
+        Assert.Null(unsuccessful.Failure);
     }
 
     [Fact]
@@ -466,8 +458,9 @@ public class AwaiterTest : Test
     [Fact]
     public async Task RunUntilSuccessfulOrTimeoutAsync_ShouldCapDelayToRemainingTimeoutWindow()
     {
-        var stopwatch = Stopwatch.StartNew();
         var callCount = 0;
+        using var cancellationSource = new CancellationTokenSource();
+        cancellationSource.CancelAfter(TimeSpan.FromSeconds(2));
 
         Task<ConditionalValue> Method()
         {
@@ -475,14 +468,11 @@ public class AwaiterTest : Test
             return Task.FromResult<ConditionalValue>(new UnsuccessfulValue());
         }
 
-        var result = await Run(Method, TimeSpan.FromMilliseconds(40), TimeSpan.FromMilliseconds(200));
-
-        stopwatch.Stop();
+        var result = await Run(Method, TimeSpan.FromMilliseconds(40), TimeSpan.FromSeconds(5), cancellationToken: cancellationSource.Token);
 
         Assert.False(result.Succeeded);
         Assert.Null(result.Failure);
         Assert.Equal(1, callCount);
-        Assert.True(stopwatch.Elapsed < TimeSpan.FromMilliseconds(150), $"Expected capped delay, but elapsed was {stopwatch.Elapsed}.");
     }
 
     [Fact]

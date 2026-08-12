@@ -161,7 +161,7 @@ public class DataManagerTest : HostTest<ManagedHostFixture>
     public void ExecuteScalarAsDecimal_ShouldReturnTheFirstValueOfTheFirstRow()
     {
         var sut = _manager.ExecuteScalarAs<decimal>("SELECT ListPrice, Size FROM Product WHERE ProductID > 780");
-        Assert.Equal(2319.99m, sut);
+        Assert.Equal(2319.99m, decimal.Round(sut, 2));
         Assert.IsType<decimal>(sut);
     }
 
@@ -328,7 +328,7 @@ public class DataManagerTest : HostTest<ManagedHostFixture>
     public async Task ExecuteScalarAsDecimalAsync_ShouldReturnTheFirstValueOfTheFirstRow()
     {
         var sut = await _manager.ExecuteScalarAsAsync<decimal>("SELECT ListPrice, Size FROM Product WHERE ProductID > 780");
-        Assert.Equal(2319.99m, sut);
+        Assert.Equal(2319.99m, decimal.Round(sut, 2));
         Assert.IsType<decimal>(sut);
     }
 

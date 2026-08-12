@@ -1186,7 +1186,7 @@ public class PortablePhysicalFileProviderTest : Test
     {
         Assert.Equal(expected.GetType(), actual.GetType());
         Assert.Equal(expected.ActiveChangeCallbacks, actual.ActiveChangeCallbacks);
-        Assert.Equal(expected.HasChanged, actual.HasChanged);
+        // HasChanged is a live observation and may differ between independently created polling tokens.
         Assert.Equal(ReferenceEquals(NullChangeToken.Singleton, expected), ReferenceEquals(NullChangeToken.Singleton, actual));
     }
 

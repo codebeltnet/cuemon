@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Cuemon.AspNetCore.Configuration;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -52,7 +51,7 @@ public abstract class LinkTagHelper<TOptions> : CacheBustingTagHelper<TOptions> 
         output.TagMode = TagMode.StartTagOnly;
         output.TagName = "link";
         output.Attributes.Add("rel", Rel);
-        output.Attributes.Add("href", string.Concat(Options.GetFormattedBaseUrl(), UseCacheBusting ? string.Create(CultureInfo.InvariantCulture, $"{Href}?v={CacheBusting.Version}") : Href));
+        output.Attributes.Add("href", ResolveUrl(Href));
         if (!string.IsNullOrWhiteSpace(Type)) { output.Attributes.Add("type", new HtmlString(Type)); }
         return Task.CompletedTask;
     }

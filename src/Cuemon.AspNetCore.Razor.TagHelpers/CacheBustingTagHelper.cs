@@ -1,6 +1,10 @@
-﻿using Cuemon.AspNetCore.Configuration;
+﻿using System;
+using System.Globalization;
+using Cuemon.AspNetCore.Configuration;
 using Cuemon.Configuration;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Options;
 
 namespace Cuemon.AspNetCore.Razor.TagHelpers;
@@ -35,8 +39,35 @@ public abstract class CacheBustingTagHelper<TOptions> : TagHelper, IConfigurable
     protected bool UseCacheBusting => CacheBusting != null;
 
     /// <summary>
+    /// Gets or sets the current view context.
+    /// </summary>
+    /// <value>The current view context.</value>
+    [HtmlAttributeNotBound]
+    [ViewContext]
+    public ViewContext ViewContext { get; set; }
+
+    /// <summary>
     /// Gets the configured options of this instance.
     /// </summary>
     /// <value>The configured options of this instance.</value>
     public TOptions Options { get; }
+
+    /// <summary>
+    /// Resolves the fully qualified URL of the specified static resource.
+    /// </summary>
+    /// <param name="path">The relative path of the static resource.</param>
+    /// <returns>The fully qualified URL of the specified static resource.</returns>
+    protected string ResolveUrl(string path)
+    {
+        var baseUrl = Options.GetFormattedBaseUrl(ViewContext?.HttpContext?.Request);
+        var resolvedPath = NormalizePath(path, !string.IsNullOrWhiteSpace(baseUrl));
+        return string.Concat(baseUrl, UseCacheBusting ? string.Create(CultureInfo.InvariantCulture, $"{resolvedPath}?v={CacheBusting.Version}") : resolvedPath);
+    }
+
+    private static string NormalizePath(string path, bool normalize)
+    {
+        if (!normalize || string.IsNullOrWhiteSpace(path)) { return path; }
+        if (path.StartsWith("~/", StringComparison.Ordinal)) { path = path.Substring(2); }
+        return path.TrimStart('/');
+    }
 }

@@ -77,8 +77,8 @@ internal static class SqliteDatabase
                                                             ,[ModifiedDate])
                                                             VALUES
                                                             ({{reader.GetInt32(0)}},
-                                                            "{{reader.GetString(1)}}",
-                                                            "{{reader.GetString(2)}}",
+                                                            {{StringOrNull(reader.GetString(1))}},
+                                                            {{StringOrNull(reader.GetString(2))}},
                                                             {{reader.GetInt32(3)}},
                                                             {{reader.GetInt32(4)}},
                                                             {{StringOrNull(reader.GetString(5))}},
@@ -96,11 +96,11 @@ internal static class SqliteDatabase
                                                             {{StringOrNull(reader.GetString(17))}},
                                                             {{(reader.GetString(18) == "NULL" ? "NULL" : reader.GetInt32(18))}},
                                                             {{(reader.GetString(19) == "NULL" ? "NULL" : reader.GetInt32(19))}},
-                                                            "{{reader.GetDateTime(20):O}}",
-                                                            {{(reader.GetString(21) == "NULL" ? "NULL" : string.Concat("\"", reader.GetDateTime(21).ToString("O"), "\""))}},
-                                                            {{(reader.GetString(22) == "NULL" ? "NULL" : string.Concat("\"", reader.GetDateTime(22).ToString("O"), "\""))}},
-                                                            "{{reader.GetString(23)}}",
-                                                            "{{reader.GetDateTime(24):O}}")
+                                                            {{StringOrNull(reader.GetDateTime(20).ToString("O", CultureInfo.InvariantCulture))}},
+                                                            {{(reader.GetString(21) == "NULL" ? "NULL" : StringOrNull(reader.GetDateTime(21).ToString("O", CultureInfo.InvariantCulture)))}},
+                                                            {{(reader.GetString(22) == "NULL" ? "NULL" : StringOrNull(reader.GetDateTime(22).ToString("O", CultureInfo.InvariantCulture)))}},
+                                                            {{StringOrNull(reader.GetString(23))}},
+                                                            {{StringOrNull(reader.GetDateTime(24).ToString("O", CultureInfo.InvariantCulture))}})
                                                             """);
 
             try
@@ -118,6 +118,7 @@ internal static class SqliteDatabase
     private static string StringOrNull(string value)
     {
         if (value == "NULL") { return "NULL"; }
-        return (value.StartsWith("\"") && value.EndsWith("\"")) ? $"{value}" : $"\"{value}\"";
+        if (value.Length >= 2 && value.StartsWith("\"") && value.EndsWith("\"")) { value = value.Substring(1, value.Length - 2); }
+        return $"'{value.Replace("'", "''")}'";
     }
 }

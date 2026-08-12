@@ -1,2 +1,40 @@
 ﻿@page
-<app-link rel="icon" href="favicon.svg" type="image/svg+xml" />
+@{
+    var variant = Request.Query["variant"].ToString();
+    var href = Request.Query["path"].ToString();
+    if (string.IsNullOrWhiteSpace(href))
+    {
+        if (variant == "preload")
+        {
+            href = "fonts/antonio-latin.woff2";
+        }
+        else if (variant == "mask-icon")
+        {
+            href = "mask-icon.svg";
+        }
+        else if (variant == "stylesheet")
+        {
+            href = "css/site.css";
+        }
+        else
+        {
+            href = "favicon.svg";
+        }
+    }
+}
+@if (variant == "preload")
+{
+    <app-link rel="preload" href="@href" as="font" type="font/woff2" crossorigin />
+}
+else if (variant == "mask-icon")
+{
+    <app-link rel="mask-icon" href="@href" type="image/svg+xml" color="#000000" />
+}
+else if (variant == "stylesheet")
+{
+    <app-link href="@href" />
+}
+else
+{
+    <app-link rel="icon" href="@href" type="image/svg+xml" />
+}

@@ -5,6 +5,21 @@ Availability: .NET 11, .NET 10 and .NET Standard 2.0
 - ADDED Support for TFM .NET 11 (LTS)
 - REMOVED Support for TFM .NET 9 (STS)
 
+Version: 10.7.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+Version: 10.6.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+# Improvements
+- ENHANCED DsvDataReader with improved async pattern matching for line reading to support more consistent data parsing behavior
+
 Version: 10.5.5
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

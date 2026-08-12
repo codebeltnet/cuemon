@@ -28,6 +28,7 @@
     <Project Path="src/Cuemon.Extensions.Data/Cuemon.Extensions.Data.csproj" />
     <Project Path="src/Cuemon.Extensions.DependencyInjection/Cuemon.Extensions.DependencyInjection.csproj" />
     <Project Path="src/Cuemon.Extensions.Diagnostics/Cuemon.Extensions.Diagnostics.csproj" />
+    <Project Path="src/Cuemon.Extensions.FileProviders.Physical/Cuemon.Extensions.FileProviders.Physical.csproj" Id="6ad5c8c4-376d-4768-8b91-bef01af74150" />
     <Project Path="src/Cuemon.Extensions.Hosting/Cuemon.Extensions.Hosting.csproj" />
     <Project Path="src/Cuemon.Extensions.IO/Cuemon.Extensions.IO.csproj" />
     <Project Path="src/Cuemon.Extensions.Net/Cuemon.Extensions.Net.csproj" />
@@ -72,6 +73,7 @@
     <Project Path="test/Cuemon.Extensions.Data.Tests/Cuemon.Extensions.Data.Tests.csproj" />
     <Project Path="test/Cuemon.Extensions.DependencyInjection.Tests/Cuemon.Extensions.DependencyInjection.Tests.csproj" />
     <Project Path="test/Cuemon.Extensions.Diagnostics.Tests/Cuemon.Extensions.Diagnostics.Tests.csproj" />
+    <Project Path="test/Cuemon.Extensions.FileProviders.Physical.Tests/Cuemon.Extensions.FileProviders.Physical.Tests.csproj" />
     <Project Path="test/Cuemon.Extensions.Hosting.Tests/Cuemon.Extensions.Hosting.Tests.csproj" />
     <Project Path="test/Cuemon.Extensions.IO.Tests/Cuemon.Extensions.IO.Tests.csproj" />
     <Project Path="test/Cuemon.Extensions.Net.Tests/Cuemon.Extensions.Net.Tests.csproj" />
@@ -94,6 +96,7 @@
   </Folder>
   <Folder Name="/tuning/">
     <Project Path="tuning/Cuemon.Core.Benchmarks/Cuemon.Core.Benchmarks.csproj" />
+    <Project Path="tuning/Cuemon.Extensions.FileProviders.Physical.Benchmarks/Cuemon.Extensions.FileProviders.Physical.Benchmarks.csproj" />
     <Project Path="tuning/Cuemon.Kernel.Benchmarks/Cuemon.Kernel.Benchmarks.csproj" Id="966ec349-0b15-4108-9149-d995edfdc5ff" />
     <Project Path="tuning/Cuemon.Security.Cryptography.Benchmarks/Cuemon.Security.Cryptography.Benchmarks.csproj" />
   </Folder>

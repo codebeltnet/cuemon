@@ -1,84 +1,75 @@
-﻿using System.Threading.Tasks;
-using Cuemon.AspNetCore.Razor.TagHelpers.Assets;
-using Cuemon.Extensions.AspNetCore.Configuration;
+﻿using System;
+using System.Threading.Tasks;
 using Codebelt.Extensions.Xunit;
-using Codebelt.Extensions.Xunit.Hosting.AspNetCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Cuemon.AspNetCore.Razor.TagHelpers
+namespace Cuemon.AspNetCore.Razor.TagHelpers;
+public class AppScriptTagHelperTest : Test
 {
-    public class AppScriptTagHelperTest : Test
+    public AppScriptTagHelperTest(ITestOutputHelper output) : base(output)
     {
-        public AppScriptTagHelperTest(ITestOutputHelper output) : base(output)
+    }
+
+    [Fact]
+    public async Task Page_RenderScriptTagForAppRole()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppScriptTagHelper");
+
+        TestOutput.WriteLine(body);
+
+        Assert.Equal(@"<script type=""text/javascript"" src=""//static.cuemon.net/js/site.js""></script>", body, ignoreLineEndingDifferences: true);
+    }
+
+    [Fact]
+    public async Task Page_RenderScriptTagForAppRole_WithCacheBusting()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppScriptTagHelper", useCacheBusting: true);
+
+        TestOutput.WriteLine(body);
+
+        Assert.Equal(@"<script type=""text/javascript"" src=""//static.cuemon.net/js/site.js?v=00000000000000000000000000000000""></script>", body, ignoreLineEndingDifferences: true);
+    }
+
+    [Fact]
+    public async Task Page_RenderScriptTagForAppRole_UsingCurrentRequestOrigin()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppScriptTagHelper", o =>
         {
-        }
+            o.BaseUrlMode = TagHelperBaseUrlMode.Automatic;
+            o.BaseUrl = null;
+        }, baseAddress: new Uri("https://localhost:7241"));
 
-        [Fact]
-        public async Task Page_RenderScriptTagForAppRole()
+        TestOutput.WriteLine(body);
+
+        Assert.Equal(@"<script type=""text/javascript"" src=""https://localhost:7241/js/site.js""></script>", body, ignoreLineEndingDifferences: true);
+    }
+
+    [Fact]
+    public async Task Page_RenderScriptTagForAppRole_UsingCurrentRequestOriginAndPathBase_WithCacheBusting()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/myapp/AppScriptTagHelper?path=~/js/site.js", o =>
         {
-            using (var filter = WebHostTestFactory.Create(services =>
-            {
-                services.AddRazorPages();
-                services.Configure<CdnTagHelperOptions>(o =>
-                {
-                    o.Scheme = ProtocolUriScheme.Https;
-                    o.BaseUrl = "nblcdn.net";
-                });
-                services.Configure<AppTagHelperOptions>(o =>
-                {
-                    o.Scheme = ProtocolUriScheme.Relative;
-                    o.BaseUrl = "static.cuemon.net";
-                });
-            }, app =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/AppScriptTagHelper");
-                var body = await result.Content.ReadAsStringAsync();
+            o.BaseUrlMode = TagHelperBaseUrlMode.Automatic;
+            o.BaseUrl = null;
+        }, useCacheBusting: true, baseAddress: new Uri("https://example.com"), pathBase: "/myapp");
 
-                TestOutput.WriteLine(body);
+        TestOutput.WriteLine(body);
 
-                Assert.Equal(@"<script type=""text/javascript"" src=""//static.cuemon.net/js/site.js""></script>", body, ignoreLineEndingDifferences: true);
-            }
-        }
+        Assert.Equal(@"<script type=""text/javascript"" src=""https://example.com/myapp/js/site.js?v=00000000000000000000000000000000""></script>", body, ignoreLineEndingDifferences: true);
+    }
 
-        [Fact]
-        public async Task Page_RenderScriptTagForAppRole_WithCacheBusting()
+    [Fact]
+    public async Task Page_RenderScriptTagForAppRole_UsingLocalHttpExternalOriginWhenConfigured()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppScriptTagHelper?path=~/js/site.js", o =>
         {
-            using (var filter = WebHostTestFactory.Create(services =>
-            {
-                services.AddCacheBusting<FakeCacheBusting>();
-                services.AddRazorPages();
-                services.Configure<CdnTagHelperOptions>(o =>
-                {
-                    o.Scheme = ProtocolUriScheme.Https;
-                    o.BaseUrl = "nblcdn.net";
-                });
-                services.Configure<AppTagHelperOptions>(o =>
-                {
-                    o.Scheme = ProtocolUriScheme.Relative;
-                    o.BaseUrl = "static.cuemon.net";
-                });
-            }, app =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/AppScriptTagHelper");
-                var body = await result.Content.ReadAsStringAsync();
+            o.BaseUrlMode = TagHelperBaseUrlMode.Automatic;
+            o.BaseUrl = "localhost:8080";
+            o.Scheme = ProtocolUriScheme.Http;
+        }, baseAddress: new Uri("https://localhost:7241"));
 
-                TestOutput.WriteLine(body);
+        TestOutput.WriteLine(body);
 
-                Assert.Equal(@"<script type=""text/javascript"" src=""//static.cuemon.net/js/site.js?v=00000000000000000000000000000000""></script>", body, ignoreLineEndingDifferences: true);
-            }
-        }
+        Assert.Equal(@"<script type=""text/javascript"" src=""http://localhost:8080/js/site.js""></script>", body, ignoreLineEndingDifferences: true);
     }
 }

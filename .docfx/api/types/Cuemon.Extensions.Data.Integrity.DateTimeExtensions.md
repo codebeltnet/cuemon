@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates generating a <see cref="CacheValidator"/> from timestamp values using the <xref:Cuemon.Extensions.Data.Integrity.DateTimeExtensions.GetCacheValidator(System.DateTime,System.Nullable{System.DateTime},System.Func{Cuemon.Security.Hash},Cuemon.Data.Integrity.EntityDataIntegrityMethod)> and <xref:Cuemon.Extensions.Data.Integrity.DateTimeExtensions.GetCacheValidator(System.DateTime,System.DateTime,System.Byte[],Cuemon.Data.Integrity.EntityDataIntegrityValidation,System.Func{Cuemon.Security.Hash},Cuemon.Data.Integrity.EntityDataIntegrityMethod)> extension methods.
+The following example demonstrates generating a <see cref="CacheValidator"/> from timestamp values using the [GetCacheValidator](https://docs.cuemon.net/api/extensions/dotnet/Cuemon.Extensions.Data.Integrity.DateTimeExtensions.html#Cuemon_Extensions_Data_Integrity_DateTimeExtensions_GetCacheValidator_System_DateTime_System_Nullable_System_DateTime__System_Func_Cuemon_Security_Hash__Cuemon_Data_Integrity_EntityDataIntegrityMethod_) and [GetCacheValidator](https://docs.cuemon.net/api/extensions/dotnet/Cuemon.Extensions.Data.Integrity.DateTimeExtensions.html#Cuemon_Extensions_Data_Integrity_DateTimeExtensions_GetCacheValidator_System_DateTime_System_DateTime_System_Byte___Cuemon_Data_Integrity_EntityDataIntegrityValidation_System_Func_Cuemon_Security_Hash__Cuemon_Data_Integrity_EntityDataIntegrityMethod_) extension methods.
 
 ```csharp
 using System;

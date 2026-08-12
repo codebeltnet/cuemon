@@ -19,10 +19,13 @@ public static class AppImageTagHelperExample
     {
         var options = Options.Create(CreateOptions());
 
-        var tagHelper = new AppImageTagHelper(options);
+        var tagHelper = new AppImageTagHelper(options)
+        {
+            Src = "images/logo.svg",
+            Alt = "Codebelt logo"
+        };
 
-        Console.WriteLine(FormatAssetUrl(options.Value, "images/logo.svg"));
-        Console.WriteLine(tagHelper.GetType().Name);
+        Console.WriteLine(FormatAssetUrl(tagHelper.Options, tagHelper.Src));
     }
 
     private static AppTagHelperOptions CreateOptions() => new()

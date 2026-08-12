@@ -1,84 +1,101 @@
-﻿using System.Threading.Tasks;
-using Cuemon.AspNetCore.Razor.TagHelpers.Assets;
-using Cuemon.Extensions.AspNetCore.Configuration;
+﻿using System;
+using System.Threading.Tasks;
 using Codebelt.Extensions.Xunit;
-using Codebelt.Extensions.Xunit.Hosting.AspNetCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Cuemon.AspNetCore.Razor.TagHelpers
+namespace Cuemon.AspNetCore.Razor.TagHelpers;
+public class AppLinkTagHelperTest : Test
 {
-    public class AppLinkTagHelperTest : Test
+    public AppLinkTagHelperTest(ITestOutputHelper output) : base(output)
     {
-        public AppLinkTagHelperTest(ITestOutputHelper output) : base(output)
+    }
+
+    [Fact]
+    public async Task Page_RenderLinkTagForAppRole()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppLinkTagHelper");
+
+        TestOutput.WriteLine(body);
+
+        Assert.Equal(@"<link rel=""icon"" href=""//static.cuemon.net/favicon.svg"" type=""image/svg+xml"">", body, ignoreLineEndingDifferences: true);
+    }
+
+    [Fact]
+    public async Task Page_RenderLinkTagForAppRole_WithCacheBusting()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppLinkTagHelper", useCacheBusting: true);
+
+        TestOutput.WriteLine(body);
+
+        Assert.Equal(@"<link rel=""icon"" href=""//static.cuemon.net/favicon.svg?v=00000000000000000000000000000000"" type=""image/svg+xml"">", body, ignoreLineEndingDifferences: true);
+    }
+
+    [Fact]
+    public async Task Page_RenderLinkTagForAppRole_WithoutConfiguredBaseUrl()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppLinkTagHelper?variant=stylesheet&path=/css/site.css", o => o.BaseUrl = null);
+
+        TestOutput.WriteLine(body);
+
+        Assert.Equal(@"<link rel=""stylesheet"" href=""/css/site.css"" type=""text/css"">", body, ignoreLineEndingDifferences: true);
+    }
+
+    [Fact]
+    public async Task Page_RenderLinkTagForAppRole_UsingCurrentRequestOrigin()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppLinkTagHelper?variant=stylesheet&path=css/site.css", o =>
         {
-        }
+            o.BaseUrlMode = TagHelperBaseUrlMode.Automatic;
+            o.BaseUrl = null;
+            o.Scheme = ProtocolUriScheme.Http;
+        }, baseAddress: new Uri("https://localhost:7241"));
 
-        [Fact]
-        public async Task Page_RenderLinkTagForAppRole()
+        TestOutput.WriteLine(body);
+
+        Assert.Equal(@"<link rel=""stylesheet"" href=""https://localhost:7241/css/site.css"" type=""text/css"">", body, ignoreLineEndingDifferences: true);
+    }
+
+    [Fact]
+    public async Task Page_RenderLinkTagForAppRole_UsingExplicitBaseUrlWhenAutomaticModeIsEnabled()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppLinkTagHelper?variant=stylesheet&path=/css/site.css", o =>
         {
-            using (var filter = WebHostTestFactory.Create(services =>
-            {
-                services.AddRazorPages();
-                services.Configure<CdnTagHelperOptions>(o =>
-                {
-                    o.Scheme = ProtocolUriScheme.Https;
-                    o.BaseUrl = "nblcdn.net";
-                });
-                services.Configure<AppTagHelperOptions>(o =>
-                {
-                    o.Scheme = ProtocolUriScheme.Relative;
-                    o.BaseUrl = "static.cuemon.net";
-                });
-            }, app =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/AppLinkTagHelper");
-                var body = await result.Content.ReadAsStringAsync();
+            o.BaseUrlMode = TagHelperBaseUrlMode.Automatic;
+            o.BaseUrl = "assets.example.com";
+            o.Scheme = ProtocolUriScheme.Https;
+        }, baseAddress: new Uri("http://localhost:7241"));
 
-                TestOutput.WriteLine(body);
+        TestOutput.WriteLine(body);
 
-                Assert.Equal(@"<link rel=""icon"" href=""//static.cuemon.net/favicon.svg"" type=""image/svg+xml"">", body, ignoreLineEndingDifferences: true);
-            }
-        }
+        Assert.Equal(@"<link rel=""stylesheet"" href=""https://assets.example.com/css/site.css"" type=""text/css"">", body, ignoreLineEndingDifferences: true);
+    }
 
-        [Fact]
-        public async Task Page_RenderLinkTagForAppRole_WithCacheBusting()
-        {
-            using (var filter = WebHostTestFactory.Create(services =>
-            {
-                services.AddCacheBusting<FakeCacheBusting>();
-                services.AddRazorPages();
-                services.Configure<CdnTagHelperOptions>(o =>
-                {
-                    o.Scheme = ProtocolUriScheme.Https;
-                    o.BaseUrl = "nblcdn.net";
-                });
-                services.Configure<AppTagHelperOptions>(o =>
-                {
-                    o.Scheme = ProtocolUriScheme.Relative;
-                    o.BaseUrl = "static.cuemon.net";
-                });
-            }, app =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/AppLinkTagHelper");
-                var body = await result.Content.ReadAsStringAsync();
+    [Fact]
+    public async Task Page_RenderLinkTagForAppRole_PreservesFontPreloadAttributes()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppLinkTagHelper?variant=preload");
 
-                TestOutput.WriteLine(body);
+        TestOutput.WriteLine(body);
 
-                Assert.Equal(@"<link rel=""icon"" href=""//static.cuemon.net/favicon.svg?v=00000000000000000000000000000000"" type=""image/svg+xml"">", body, ignoreLineEndingDifferences: true);
-            }
-        }
+        Assert.Contains(@"<link", body);
+        Assert.Contains(@"rel=""preload""", body);
+        Assert.Contains(@"href=""//static.cuemon.net/fonts/antonio-latin.woff2""", body);
+        Assert.Contains(@"as=""font""", body);
+        Assert.Contains(@"type=""font/woff2""", body);
+        Assert.Contains("crossorigin", body);
+    }
+
+    [Fact]
+    public async Task Page_RenderLinkTagForAppRole_PreservesMaskIconAttributes()
+    {
+        var body = await TagHelperTestFactory.GetBodyAsync("/AppLinkTagHelper?variant=mask-icon");
+
+        TestOutput.WriteLine(body);
+
+        Assert.Contains(@"<link", body);
+        Assert.Contains(@"rel=""mask-icon""", body);
+        Assert.Contains(@"href=""//static.cuemon.net/mask-icon.svg""", body);
+        Assert.Contains(@"type=""image/svg+xml""", body);
+        Assert.Contains(@"color=""#000000""", body);
     }
 }

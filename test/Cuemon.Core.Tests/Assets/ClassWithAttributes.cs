@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Cuemon.Assets
+namespace Cuemon.Assets;
+[DataContract]
+public class ClassWithAttributes
 {
-    [DataContract]
-    public class ClassWithAttributes
-    {
-        [DataMember]
-        public int Id { get; set; }
+    [DataMember]
+    public int Id { get; set; }
 
-        [Obsolete]
-        public string Name { get; set; }
-    }
+    [Obsolete]
+    public string Name { get; set; }
 }

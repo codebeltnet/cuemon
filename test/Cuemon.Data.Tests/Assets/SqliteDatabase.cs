@@ -1,18 +1,17 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using Cuemon.Reflection;
 using Xunit;
 
-namespace Cuemon.Data.Assets
+namespace Cuemon.Data.Assets;
+internal static class SqliteDatabase
 {
-    internal static class SqliteDatabase
+    internal static void Create(DataManager manager, ITestOutputHelper output)
     {
-        internal static void Create(DataManager manager, ITestOutputHelper output)
-        {
 
-            manager.Execute(new DataStatement("""
+        manager.Execute(new DataStatement("""
                                                       CREATE TABLE Product (
                                                       	ProductID INTEGER PRIMARY KEY,
                                                       	Name TEXT NOT NULL,
@@ -41,15 +40,15 @@ namespace Cuemon.Data.Assets
                                                       	ModifiedDate TEXT NOT NULL);
                                                       """));
 
-            using var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("AdventureWorks2022_Product.csv", ManifestResourceMatch.ContainsName).Values.Single();
-            using var reader = new DsvDataReader(new StreamReader(file), setup: o =>
-            {
-                o.FormatProvider = CultureInfo.GetCultureInfo("da-DK");
-                o.Delimiter = ";";
-            });
-            while (reader.Read())
-            {
-                var statement = new DataStatement($$"""
+        using var file = Decorator.Enclose(typeof(DsvDataReaderTest).Assembly).GetManifestResources("AdventureWorks2022_Product.csv", ManifestResourceMatch.ContainsName).Values.Single();
+        using var reader = new DsvDataReader(new StreamReader(file), setup: o =>
+        {
+            o.FormatProvider = CultureInfo.GetCultureInfo("da-DK");
+            o.Delimiter = ";";
+        });
+        while (reader.Read())
+        {
+            var statement = new DataStatement($$"""
                                                             INSERT INTO Product
                                                             ([ProductID]
                                                             ,[Name]
@@ -78,8 +77,8 @@ namespace Cuemon.Data.Assets
                                                             ,[ModifiedDate])
                                                             VALUES
                                                             ({{reader.GetInt32(0)}},
-                                                            {{SqlString(reader.GetString(1))}},
-                                                            {{SqlString(reader.GetString(2))}},
+                                                            {{StringOrNull(reader.GetString(1))}},
+                                                            {{StringOrNull(reader.GetString(2))}},
                                                             {{reader.GetInt32(3)}},
                                                             {{reader.GetInt32(4)}},
                                                             {{StringOrNull(reader.GetString(5))}},
@@ -97,34 +96,29 @@ namespace Cuemon.Data.Assets
                                                             {{StringOrNull(reader.GetString(17))}},
                                                             {{(reader.GetString(18) == "NULL" ? "NULL" : reader.GetInt32(18))}},
                                                             {{(reader.GetString(19) == "NULL" ? "NULL" : reader.GetInt32(19))}},
-                                                            {{SqlString(reader.GetDateTime(20).ToString("O"))}},
-                                                            {{(reader.GetString(21) == "NULL" ? "NULL" : SqlString(reader.GetDateTime(21).ToString("O")))}},
-                                                            {{(reader.GetString(22) == "NULL" ? "NULL" : SqlString(reader.GetDateTime(22).ToString("O")))}},
-                                                            {{SqlString(reader.GetString(23))}},
-                                                            {{SqlString(reader.GetDateTime(24).ToString("O"))}})
+                                                            {{StringOrNull(reader.GetDateTime(20).ToString("O", CultureInfo.InvariantCulture))}},
+                                                            {{(reader.GetString(21) == "NULL" ? "NULL" : StringOrNull(reader.GetDateTime(21).ToString("O", CultureInfo.InvariantCulture)))}},
+                                                            {{(reader.GetString(22) == "NULL" ? "NULL" : StringOrNull(reader.GetDateTime(22).ToString("O", CultureInfo.InvariantCulture)))}},
+                                                            {{StringOrNull(reader.GetString(23))}},
+                                                            {{StringOrNull(reader.GetDateTime(24).ToString("O", CultureInfo.InvariantCulture))}})
                                                             """);
 
-                try
-                {
-                    manager.Execute(statement);
-                }
-                catch (Exception e)
-                {
-                    output.WriteLine(statement.Text);
-                    throw;
-                }
+            try
+            {
+                manager.Execute(statement);
+            }
+            catch (Exception e)
+            {
+                output.WriteLine(statement.Text);
+                throw;
             }
         }
+    }
 
-        private static string StringOrNull(string value)
-        {
-            if (value == "NULL") { return "NULL"; }
-            return (value.StartsWith("\"") && value.EndsWith("\"")) ? SqlString(value.Substring(1, value.Length - 2)) : SqlString(value);
-        }
-
-        private static string SqlString(string value)
-        {
-            return $"'{value.Replace("'", "''")}'";
-        }
+    private static string StringOrNull(string value)
+    {
+        if (value == "NULL") { return "NULL"; }
+        if (value.Length >= 2 && value.StartsWith("\"") && value.EndsWith("\"")) { value = value.Substring(1, value.Length - 2); }
+        return $"'{value.Replace("'", "''")}'";
     }
 }

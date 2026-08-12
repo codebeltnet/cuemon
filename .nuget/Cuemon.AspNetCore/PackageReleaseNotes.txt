@@ -5,6 +5,24 @@ Availability: .NET 11 and .NET 10
 - ADDED Support for TFM .NET 11 (LTS)
 - REMOVED Support for TFM .NET 9 (STS)
 
+Version: 10.7.0
+Availability: .NET 10 and .NET 9
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+Version: 10.6.0
+Availability: .NET 10 and .NET 9
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+# Improvements
+- OPTIMIZED ServerTimingMiddleware with IsEnabled guards on logging calls to avoid parameter allocation when log level is disabled
+
+# Bug Fixes
+- FIXED CacheableMiddleware to propagate request cancellation tokens to async stream copy operations for proper request abort handling
+
 Version: 10.5.5
 Availability: .NET 10 and .NET 9
 

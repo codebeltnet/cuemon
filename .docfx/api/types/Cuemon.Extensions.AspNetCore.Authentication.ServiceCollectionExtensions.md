@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register the in-memory digest nonce tracker and the authorization response handler services.
+The following example demonstrates how to register the in-memory digest nonce tracker and the authorization response handler services. It inserts and reads a nonce to verify the tracker registration, then reports the configured fault-sensitivity option used by the authorization response handler.
 
 ```csharp
 using System;
@@ -29,8 +29,13 @@ public static class ServiceCollectionExtensionsExample
 
         using var provider = services.BuildServiceProvider();
 
-        Console.WriteLine(provider.GetRequiredService<INonceTracker>().GetType().Name);
-        Console.WriteLine(provider.GetRequiredService<AuthorizationResponseHandler>().GetType().Name);
+        var tracker = provider.GetRequiredService<INonceTracker>();
+        var added = tracker.TryAddEntry("docs-nonce", 1);
+        var found = tracker.TryGetEntry("docs-nonce", out var entry);
+        var responseHandler = provider.GetRequiredService<AuthorizationResponseHandler>();
+
+        Console.WriteLine($"Nonce added: {added}; found: {found}; count: {entry?.Count}");
+        Console.WriteLine($"Configured fault sensitivity: {responseHandler.Options.SensitivityDetails}");
     }
 }
 

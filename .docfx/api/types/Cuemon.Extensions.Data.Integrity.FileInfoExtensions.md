@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates generating a <see cref="CacheValidator"/> from a file using the <xref:Cuemon.Extensions.Data.Integrity.FileInfoExtensions.GetCacheValidator(System.IO.FileInfo,System.Func{Cuemon.Security.Hash},System.Action{Cuemon.Data.Integrity.FileChecksumOptions})> extension method.
+The following example demonstrates generating a <see cref="CacheValidator"/> from a file using the [GetCacheValidator](https://docs.cuemon.net/api/extensions/dotnet/Cuemon.Extensions.Data.Integrity.FileInfoExtensions.html#Cuemon_Extensions_Data_Integrity_FileInfoExtensions_GetCacheValidator_System_IO_FileInfo_System_Func_Cuemon_Security_Hash__System_Action_Cuemon_Data_Integrity_FileChecksumOptions__) extension method.
 
 ```csharp
 using System;

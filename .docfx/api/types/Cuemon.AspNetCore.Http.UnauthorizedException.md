@@ -15,12 +15,14 @@ public static class UnauthorizedExceptionExample
 {
     public static void Demonstrate()
     {
+        const string authenticationScheme = "Bearer";
         var exception = new UnauthorizedException(
-            "The request is missing a valid bearer token.",
+            $"The request is missing a valid {authenticationScheme} token.",
             new InvalidOperationException("Token validation failed."));
 
         Console.WriteLine(exception.StatusCode);
-        Console.WriteLine(exception.InnerException?.GetType().Name);
+        Console.WriteLine(exception.Message);
+        Console.WriteLine(exception.InnerException?.Message);
     }
 }
 ```

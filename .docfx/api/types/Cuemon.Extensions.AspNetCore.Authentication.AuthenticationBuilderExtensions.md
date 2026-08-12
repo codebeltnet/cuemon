@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register the Basic, Digest, and HMAC authentication handlers through the extension methods on <xref cref="Microsoft.AspNetCore.Authentication.AuthenticationBuilder" />.
+The following example demonstrates how to register the Basic, Digest, and HMAC authentication handlers through the extension methods on <xref cref="Microsoft.AspNetCore.Authentication.AuthenticationBuilder" />. It resolves each configured handler after building the service provider and prints the scheme-specific options that the authentication middleware will use.
 
 ```csharp
 using System;
@@ -53,9 +53,13 @@ public static class AuthenticationBuilderExtensionsExample
 
         using var provider = services.BuildServiceProvider();
 
-        Console.WriteLine(provider.GetRequiredService<BasicAuthenticationHandler>().GetType().Name);
-        Console.WriteLine(provider.GetRequiredService<DigestAuthenticationHandler>().GetType().Name);
-        Console.WriteLine(provider.GetRequiredService<HmacAuthenticationHandler>().GetType().Name);
+        var basicHandler = provider.GetRequiredService<BasicAuthenticationHandler>();
+        var digestHandler = provider.GetRequiredService<DigestAuthenticationHandler>();
+        var hmacHandler = provider.GetRequiredService<HmacAuthenticationHandler>();
+
+        Console.WriteLine($"Basic authentication requires HTTPS: {basicHandler.Options.RequireSecureConnection}");
+        Console.WriteLine($"Digest authentication requires HTTPS: {digestHandler.Options.RequireSecureConnection}");
+        Console.WriteLine($"HMAC authentication scheme: {hmacHandler.Options.AuthenticationScheme}");
     }
 }
 

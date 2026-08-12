@@ -1,17 +1,15 @@
-﻿namespace Cuemon.Net
+﻿namespace Cuemon.Net;
+/// <summary>
+/// Specifies a range of key-value separators.
+/// </summary>
+public enum FieldValueSeparator
 {
     /// <summary>
-    /// Specifies a range of key-value separators.
+    /// An ampersand (&amp;) separator.
     /// </summary>
-    public enum FieldValueSeparator
-    {
-        /// <summary>
-        /// An ampersand (&amp;) separator.
-        /// </summary>
-        Ampersand,
-        /// <summary>
-        /// A semicolon (;) separator.
-        /// </summary>
-        Semicolon
-    }
+    Ampersand,
+    /// <summary>
+    /// A semicolon (;) separator.
+    /// </summary>
+    Semicolon
 }

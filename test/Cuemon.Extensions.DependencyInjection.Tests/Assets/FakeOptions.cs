@@ -1,12 +1,10 @@
-﻿namespace Cuemon.Extensions.DependencyInjection.Assets
+﻿namespace Cuemon.Extensions.DependencyInjection.Assets;
+public class FakeOptions
 {
-    public class FakeOptions
+    public FakeOptions()
     {
-        public FakeOptions()
-        {
-            Greeting = "";
-        }
-
-        public string Greeting { get; set; }
+        Greeting = "";
     }
+
+    public string Greeting { get; set; }
 }

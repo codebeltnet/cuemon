@@ -1,21 +1,19 @@
-﻿namespace Cuemon.Data.Integrity
+﻿namespace Cuemon.Data.Integrity;
+/// <summary>
+/// Specifies the validation strength of a data checksum.
+/// </summary>
+public enum EntityDataIntegrityValidation
 {
     /// <summary>
-    /// Specifies the validation strength of a data checksum.
+    /// Indicates that no checksum strength was specified.
     /// </summary>
-    public enum EntityDataIntegrityValidation
-    {
-        /// <summary>
-        /// Indicates that no checksum strength was specified.
-        /// </summary>
-        Unspecified = 0,
-        /// <summary>
-        /// Indicates that a weak, semantic equivalent checksum was specified.
-        /// </summary>
-        Weak,
-        /// <summary>
-        /// Indicates that a strong, byte-for-byte checksum was specified.
-        /// </summary>
-        Strong
-    }
+    Unspecified = 0,
+    /// <summary>
+    /// Indicates that a weak, semantic equivalent checksum was specified.
+    /// </summary>
+    Weak,
+    /// <summary>
+    /// Indicates that a strong, byte-for-byte checksum was specified.
+    /// </summary>
+    Strong
 }

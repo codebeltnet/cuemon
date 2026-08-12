@@ -30,11 +30,13 @@ public static class AppLinkTagHelperExample
         };
 
         var version = new StylesheetVersion();
-        var tagHelper = new AppLinkTagHelper(Options.Create(options), version);
-        var stylesheetHref = $"{options.GetFormattedBaseUrl()}css/site.css?v={version.Version}";
+        var tagHelper = new AppLinkTagHelper(Options.Create(options), version)
+        {
+            Href = "css/site.css"
+        };
+        var stylesheetHref = $"{tagHelper.Options.GetFormattedBaseUrl()}{tagHelper.Href}?v={version.Version}";
 
         Console.WriteLine(stylesheetHref);
-        Console.WriteLine(tagHelper.GetType().Name);
     }
 }
 

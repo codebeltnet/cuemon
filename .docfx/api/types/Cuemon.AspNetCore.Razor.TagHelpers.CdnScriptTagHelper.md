@@ -30,11 +30,14 @@ public static class CdnScriptTagHelperExample
         });
 
         var cacheBusting = new ScriptVersion();
-        var tagHelper = new CdnScriptTagHelper(options, cacheBusting);
-        var scriptPath = string.Concat(options.Value.GetFormattedBaseUrl(), "packages/fontawesome/5.15.3/js/all.js?v=", cacheBusting.Version);
+        var tagHelper = new CdnScriptTagHelper(options, cacheBusting)
+        {
+            Src = "packages/fontawesome/5.15.3/js/all.js",
+            Defer = true
+        };
+        var scriptPath = string.Concat(tagHelper.Options.GetFormattedBaseUrl(), tagHelper.Src, "?v=", cacheBusting.Version);
 
         Console.WriteLine(scriptPath);
-        Console.WriteLine(tagHelper.GetType().Name);
     }
 }
 

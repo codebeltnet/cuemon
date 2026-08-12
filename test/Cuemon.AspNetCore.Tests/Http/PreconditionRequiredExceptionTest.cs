@@ -5,35 +5,34 @@ using Cuemon.Xml.Serialization.Formatters;
 using Microsoft.AspNetCore.Http;
 using Xunit;
 
-namespace Cuemon.AspNetCore.Http
+namespace Cuemon.AspNetCore.Http;
+public class PreconditionRequiredExceptionTest : Test
 {
-    public class PreconditionRequiredExceptionTest : Test
+    public PreconditionRequiredExceptionTest(ITestOutputHelper output) : base(output)
     {
-        public PreconditionRequiredExceptionTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void Ctor_ShouldBeSerializableAndHaveCorrectStatusCodeOf428_Json()
-        {
-            var sut1 = new PreconditionRequiredException();
-            var sut2 = new JsonFormatter();
-            var sut3 = sut2.Serialize(sut1);
-            var sut4 = sut3.ToEncodedString(o => o.LeaveOpen = true);
+    [Fact]
+    public void Ctor_ShouldBeSerializableAndHaveCorrectStatusCodeOf428_Json()
+    {
+        var sut1 = new PreconditionRequiredException();
+        var sut2 = new JsonFormatter();
+        var sut3 = sut2.Serialize(sut1);
+        var sut4 = sut3.ToEncodedString(o => o.LeaveOpen = true);
 
-            TestOutput.WriteLine(sut4);
+        TestOutput.WriteLine(sut4);
 
-            var original = sut2.Deserialize<PreconditionRequiredException>(sut3);
+        var original = sut2.Deserialize<PreconditionRequiredException>(sut3);
 
-            sut3.Dispose();
+        sut3.Dispose();
 
-            Assert.Equal(sut1.StatusCode, original.StatusCode);
-            Assert.Equal(sut1.ReasonPhrase, original.ReasonPhrase);
-            Assert.Equal(sut1.Message, original.Message);
-            Assert.Equal(StatusCodes.Status428PreconditionRequired, sut1.StatusCode);
-            Assert.Equal(sut1.ToString(), original.ToString());
+        Assert.Equal(sut1.StatusCode, original.StatusCode);
+        Assert.Equal(sut1.ReasonPhrase, original.ReasonPhrase);
+        Assert.Equal(sut1.Message, original.Message);
+        Assert.Equal(StatusCodes.Status428PreconditionRequired, sut1.StatusCode);
+        Assert.Equal(sut1.ToString(), original.ToString());
 
-            Assert.Equal("""
+        Assert.Equal("""
                          {
                            "type": "Cuemon.AspNetCore.Http.PreconditionRequiredException",
                            "message": "No conditional request-header fields was supplied to the server.",
@@ -42,29 +41,29 @@ namespace Cuemon.AspNetCore.Http
                            "reasonPhrase": "Precondition Required"
                          }
                          """.ReplaceLineEndings(), sut4);
-        }
+    }
 
-        [Fact]
-        public void Ctor_ShouldBeSerializableAndHaveCorrectStatusCodeOf428_Xml()
-        {
-            var sut1 = new PreconditionRequiredException();
-            var sut2 = new XmlFormatter(o => o.Settings.Writer.Indent = true);
-            var sut3 = sut2.Serialize(sut1);
-            var sut4 = sut3.ToEncodedString(o => o.LeaveOpen = true);
+    [Fact]
+    public void Ctor_ShouldBeSerializableAndHaveCorrectStatusCodeOf428_Xml()
+    {
+        var sut1 = new PreconditionRequiredException();
+        var sut2 = new XmlFormatter(o => o.Settings.Writer.Indent = true);
+        var sut3 = sut2.Serialize(sut1);
+        var sut4 = sut3.ToEncodedString(o => o.LeaveOpen = true);
 
-            TestOutput.WriteLine(sut4);
+        TestOutput.WriteLine(sut4);
 
-            var original = sut2.Deserialize<PreconditionRequiredException>(sut3);
+        var original = sut2.Deserialize<PreconditionRequiredException>(sut3);
 
-            sut3.Dispose();
+        sut3.Dispose();
 
-            Assert.Equal(sut1.StatusCode, original.StatusCode);
-            Assert.Equal(sut1.ReasonPhrase, original.ReasonPhrase);
-            Assert.Equal(sut1.Message, original.Message);
-            Assert.Equal(StatusCodes.Status428PreconditionRequired, sut1.StatusCode);
-            Assert.Equal(sut1.ToString(), original.ToString());
+        Assert.Equal(sut1.StatusCode, original.StatusCode);
+        Assert.Equal(sut1.ReasonPhrase, original.ReasonPhrase);
+        Assert.Equal(sut1.Message, original.Message);
+        Assert.Equal(StatusCodes.Status428PreconditionRequired, sut1.StatusCode);
+        Assert.Equal(sut1.ToString(), original.ToString());
 
-            Assert.Equal("""
+        Assert.Equal("""
                          <?xml version="1.0" encoding="utf-8"?>
                          <PreconditionRequiredException namespace="Cuemon.AspNetCore.Http">
                          	<Message>No conditional request-header fields was supplied to the server.</Message>
@@ -73,6 +72,5 @@ namespace Cuemon.AspNetCore.Http
                          	<ReasonPhrase>Precondition Required</ReasonPhrase>
                          </PreconditionRequiredException>
                          """.ReplaceLineEndings(), sut4);
-        }
     }
 }

@@ -8,75 +8,73 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace Cuemon.Extensions.AspNetCore.Text.Json
+namespace Cuemon.Extensions.AspNetCore.Text.Json;
+public class ServiceCollectionExtensionsTest : Test
 {
-    public class ServiceCollectionExtensionsTest : Test
+    public ServiceCollectionExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public ServiceCollectionExtensionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void AddMinimalJsonOptions_ShouldRegisterMinimalJsonOptionsAsSingleton()
-        {
-            var sut = new ServiceCollection();
+    [Fact]
+    public void AddMinimalJsonOptions_ShouldRegisterMinimalJsonOptionsAsSingleton()
+    {
+        var sut = new ServiceCollection();
 
-            sut.AddMinimalJsonOptions();
+        sut.AddMinimalJsonOptions();
 
-            var descriptor = sut.Single(sd =>
-                sd.ServiceType == typeof(IConfigureOptions<JsonOptions>) &&
-                sd.ImplementationType == typeof(MinimalJsonOptions));
+        var descriptor = sut.Single(sd =>
+            sd.ServiceType == typeof(IConfigureOptions<JsonOptions>) &&
+            sd.ImplementationType == typeof(MinimalJsonOptions));
 
-            TestOutput.WriteLine($"Lifetime: {descriptor.Lifetime}");
+        TestOutput.WriteLine($"Lifetime: {descriptor.Lifetime}");
 
-            Assert.Equal(ServiceLifetime.Singleton, descriptor.Lifetime);
-        }
+        Assert.Equal(ServiceLifetime.Singleton, descriptor.Lifetime);
+    }
 
-        [Fact]
-        public void AddMinimalJsonOptions_ShouldRegisterMinimalJsonOptionsOnlyOnce_WhenCalledMultipleTimes()
-        {
-            var sut = new ServiceCollection();
+    [Fact]
+    public void AddMinimalJsonOptions_ShouldRegisterMinimalJsonOptionsOnlyOnce_WhenCalledMultipleTimes()
+    {
+        var sut = new ServiceCollection();
 
-            sut.AddMinimalJsonOptions();
-            sut.AddMinimalJsonOptions();
-            sut.AddMinimalJsonOptions();
+        sut.AddMinimalJsonOptions();
+        sut.AddMinimalJsonOptions();
+        sut.AddMinimalJsonOptions();
 
-            var count = sut.Count(sd =>
-                sd.ServiceType == typeof(IConfigureOptions<JsonOptions>) &&
-                sd.ImplementationType == typeof(MinimalJsonOptions));
+        var count = sut.Count(sd =>
+            sd.ServiceType == typeof(IConfigureOptions<JsonOptions>) &&
+            sd.ImplementationType == typeof(MinimalJsonOptions));
 
-            TestOutput.WriteLine($"MinimalJsonOptions registrations: {count}");
+        TestOutput.WriteLine($"MinimalJsonOptions registrations: {count}");
 
-            Assert.Equal(1, count);
-        }
+        Assert.Equal(1, count);
+    }
 
-        [Fact]
-        public void AddMinimalJsonOptions_ShouldAlsoRegisterJsonExceptionResponseFormatter()
-        {
-            var sut = new ServiceCollection();
-            sut.AddFaultDescriptorOptions();
+    [Fact]
+    public void AddMinimalJsonOptions_ShouldAlsoRegisterJsonExceptionResponseFormatter()
+    {
+        var sut = new ServiceCollection();
+        sut.AddFaultDescriptorOptions();
 
-            sut.AddMinimalJsonOptions();
+        sut.AddMinimalJsonOptions();
 
-            var hasFormatter = sut.Any(sd =>
-                sd.ServiceType == typeof(HttpExceptionDescriptorResponseFormatter<JsonFormatterOptions>));
+        var hasFormatter = sut.Any(sd =>
+            sd.ServiceType == typeof(HttpExceptionDescriptorResponseFormatter<JsonFormatterOptions>));
 
-            Assert.True(hasFormatter);
-        }
+        Assert.True(hasFormatter);
+    }
 
-        [Fact]
-        public void AddMinimalJsonOptions_ShouldRegisterJsonFormatterOptions()
-        {
-            var sut = new ServiceCollection();
+    [Fact]
+    public void AddMinimalJsonOptions_ShouldRegisterJsonFormatterOptions()
+    {
+        var sut = new ServiceCollection();
 
-            sut.AddMinimalJsonOptions();
+        sut.AddMinimalJsonOptions();
 
-            var count = sut.Count(sd =>
-                sd.ServiceType == typeof(IConfigureOptions<JsonFormatterOptions>));
+        var count = sut.Count(sd =>
+            sd.ServiceType == typeof(IConfigureOptions<JsonFormatterOptions>));
 
-            TestOutput.WriteLine($"IConfigureOptions<JsonFormatterOptions> registrations: {count}");
+        TestOutput.WriteLine($"IConfigureOptions<JsonFormatterOptions> registrations: {count}");
 
-            Assert.True(count >= 1);
-        }
+        Assert.True(count >= 1);
     }
 }

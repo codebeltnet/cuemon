@@ -1,14 +1,12 @@
 ﻿using System;
 using Cuemon.Diagnostics;
 
-namespace Cuemon.Assets
+namespace Cuemon.Assets;
+public sealed class ArgumentNullExceptionDescriptorAttribute : ExceptionDescriptorAttribute
 {
-    public sealed class ArgumentNullExceptionDescriptorAttribute : ExceptionDescriptorAttribute
+    public ArgumentNullExceptionDescriptorAttribute() : base(typeof(ArgumentNullException))
     {
-        public ArgumentNullExceptionDescriptorAttribute() : base(typeof(ArgumentNullException))
-        {
-            Code = "ArgumentNullException";
-            Message = TestContext.FaultDescriptor_ArgumentNullException;
-        }
+        Code = "ArgumentNullException";
+        Message = TestContext.FaultDescriptor_ArgumentNullException;
     }
 }

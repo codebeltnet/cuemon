@@ -9,43 +9,41 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Xunit;
 
-namespace Cuemon.Extensions.AspNetCore.Http.Headers
+namespace Cuemon.Extensions.AspNetCore.Http.Headers;
+public class EntityTagCacheableValidatorTest : Test
 {
-    public class EntityTagCacheableValidatorTest : Test
+    public EntityTagCacheableValidatorTest(ITestOutputHelper output) : base(output)
     {
-        public EntityTagCacheableValidatorTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public async Task ProcessAsync_ShouldAddEntityTagHeader_WhenServerTimingIsUnavailable()
-        {
-            var sut = new EntityTagCacheableValidator();
-            var context = new DefaultHttpContext();
-            context.RequestServices = new ServiceCollection().BuildServiceProvider();
-            var body = new MemoryStream(Encoding.UTF8.GetBytes("Hello world!"));
+    [Fact]
+    public async Task ProcessAsync_ShouldAddEntityTagHeader_WhenServerTimingIsUnavailable()
+    {
+        var sut = new EntityTagCacheableValidator();
+        var context = new DefaultHttpContext();
+        context.RequestServices = new ServiceCollection().BuildServiceProvider();
+        var body = new MemoryStream(Encoding.UTF8.GetBytes("Hello world!"));
 
-            await sut.ProcessAsync(context, body);
+        await sut.ProcessAsync(context, body);
 
-            Assert.True(context.Response.Headers.ContainsKey(HeaderNames.ETag));
-            Assert.False(string.IsNullOrWhiteSpace(context.Response.Headers[HeaderNames.ETag]));
-        }
+        Assert.True(context.Response.Headers.ContainsKey(HeaderNames.ETag));
+        Assert.False(string.IsNullOrWhiteSpace(context.Response.Headers[HeaderNames.ETag]));
+    }
 
-        [Fact]
-        public async Task ProcessAsync_ShouldRecordServerTimingMetric_WhenServerTimingIsAvailable()
-        {
-            var sut = new EntityTagCacheableValidator();
-            var serverTiming = new ServerTiming();
-            var context = new DefaultHttpContext();
-            context.RequestServices = new ServiceCollection().AddSingleton<IServerTiming>(serverTiming).BuildServiceProvider();
-            var body = new MemoryStream(Encoding.UTF8.GetBytes("Hello world!"));
+    [Fact]
+    public async Task ProcessAsync_ShouldRecordServerTimingMetric_WhenServerTimingIsAvailable()
+    {
+        var sut = new EntityTagCacheableValidator();
+        var serverTiming = new ServerTiming();
+        var context = new DefaultHttpContext();
+        context.RequestServices = new ServiceCollection().AddSingleton<IServerTiming>(serverTiming).BuildServiceProvider();
+        var body = new MemoryStream(Encoding.UTF8.GetBytes("Hello world!"));
 
-            await sut.ProcessAsync(context, body);
+        await sut.ProcessAsync(context, body);
 
-            var metric = Assert.Single(serverTiming.Metrics);
-            Assert.Equal("entity-tag", metric.Name);
-            Assert.True(metric.Duration.HasValue);
-            Assert.True(context.Response.Headers.ContainsKey(HeaderNames.ETag));
-        }
+        var metric = Assert.Single(serverTiming.Metrics);
+        Assert.Equal("entity-tag", metric.Name);
+        Assert.True(metric.Duration.HasValue);
+        Assert.True(context.Response.Headers.ContainsKey(HeaderNames.ETag));
     }
 }

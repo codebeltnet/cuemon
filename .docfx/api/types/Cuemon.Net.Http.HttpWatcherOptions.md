@@ -30,7 +30,7 @@ public static class HttpWatcherOptionsExample
 
         Console.WriteLine(options.ReadResponseBody);
         Console.WriteLine(options.Period.TotalSeconds);
-        Console.WriteLine(options.ClientFactory().GetType().Name);
+        Console.WriteLine($"HTTP client factory configured: {options.ClientFactory is not null}");
     }
 }
 ```

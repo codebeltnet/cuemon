@@ -1,14 +1,12 @@
 ﻿using System;
 
-namespace Cuemon.Threading
+namespace Cuemon.Threading;
+internal abstract class Loop<TOptions> where TOptions : AsyncOptions, new()
 {
-    internal abstract class Loop<TOptions> where TOptions : AsyncOptions, new()
+    protected Loop(Action<TOptions> setup)
     {
-        protected Loop(Action<TOptions> setup)
-        {
-            Options = Patterns.Configure(setup);
-        }
-
-        protected TOptions Options { get; }
+        Options = Patterns.Configure(setup);
     }
+
+    protected TOptions Options { get; }
 }

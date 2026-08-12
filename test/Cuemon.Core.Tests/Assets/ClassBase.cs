@@ -1,14 +1,12 @@
 ﻿using System;
 
-namespace Cuemon.Assets
+namespace Cuemon.Assets;
+public class ClassBase
 {
-    public class ClassBase
+    public virtual int GetSomeNumber()
     {
-        public virtual int GetSomeNumber()
-        {
-            return int.MinValue;
-        }
-
-        public virtual Guid Id { get; } = Guid.Empty;
+        return int.MinValue;
     }
+
+    public virtual Guid Id { get; } = Guid.Empty;
 }

@@ -13,52 +13,51 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
+namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics;
+public class FaultDescriptorFilterTest : Test
 {
-    public class FaultDescriptorFilterTest : Test
+    public FaultDescriptorFilterTest(ITestOutputHelper output) : base(output)
     {
-        public FaultDescriptorFilterTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Theory]
-        [InlineData(FaultSensitivityDetails.All)]
-        [InlineData(FaultSensitivityDetails.Evidence)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
-        [InlineData(FaultSensitivityDetails.FailureWithData)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
-        [InlineData(FaultSensitivityDetails.Failure)]
-        [InlineData(FaultSensitivityDetails.None)]
-        public async Task OnException_ShouldCaptureException_RenderAsProblemDetails_UsingJson(FaultSensitivityDetails sensitivity)
-        {
-            using var response = await WebHostTestFactory.RunAsync(
-                services =>
-                {
-                    services
-                        .AddControllers(o => o.Filters.AddFaultDescriptor())
-                        .AddApplicationPart(typeof(StatusCodesController).Assembly)
-                        .AddJsonFormatters()
-                        .AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
-                    services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
-                },
-                app =>
-                {
-                    app.UseRouting();
-                    app.UseEndpoints(routes => { routes.MapControllers(); });
-                },
-                responseFactory: client =>
-                {
-                    client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-                    return client.GetAsync("/statuscodes/XXX/serverError");
-                });
-
-            var body = await response.Content.ReadAsStringAsync();
-            TestOutput.WriteLine(body);
-
-            switch (sensitivity)
+    [Theory]
+    [InlineData(FaultSensitivityDetails.All)]
+    [InlineData(FaultSensitivityDetails.Evidence)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
+    [InlineData(FaultSensitivityDetails.FailureWithData)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
+    [InlineData(FaultSensitivityDetails.Failure)]
+    [InlineData(FaultSensitivityDetails.None)]
+    public async Task OnException_ShouldCaptureException_RenderAsProblemDetails_UsingJson(FaultSensitivityDetails sensitivity)
+    {
+        using var response = await WebHostTestFactory.RunAsync(
+            services =>
             {
-                case FaultSensitivityDetails.All:
-                    Assert.True(Match("""
+                services
+                    .AddControllers(o => o.Filters.AddFaultDescriptor())
+                    .AddApplicationPart(typeof(StatusCodesController).Assembly)
+                    .AddJsonFormatters()
+                    .AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
+                services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
+            },
+            app =>
+            {
+                app.UseRouting();
+                app.UseEndpoints(routes => { routes.MapControllers(); });
+            },
+            responseFactory: client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                return client.GetAsync("/statuscodes/XXX/serverError");
+            });
+
+        var body = await response.Content.ReadAsStringAsync();
+        TestOutput.WriteLine(body);
+
+        switch (sensitivity)
+        {
+            case FaultSensitivityDetails.All:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "InternalServerError",
@@ -110,9 +109,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Evidence:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Evidence:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "InternalServerError",
@@ -133,9 +132,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTraceAndData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTraceAndData:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "InternalServerError",
@@ -176,9 +175,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithData:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "InternalServerError",
@@ -202,9 +201,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTrace:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTrace:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "InternalServerError",
@@ -242,9 +241,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Failure:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Failure:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "InternalServerError",
@@ -265,9 +264,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         }
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.None:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.None:
+                Assert.True(Match("""
                                       {
                                         "type": "about:blank",
                                         "title": "InternalServerError",
@@ -277,48 +276,48 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-            }
+                break;
         }
+    }
 
-        [Theory]
-        [InlineData(FaultSensitivityDetails.All)]
-        [InlineData(FaultSensitivityDetails.Evidence)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
-        [InlineData(FaultSensitivityDetails.FailureWithData)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
-        [InlineData(FaultSensitivityDetails.Failure)]
-        [InlineData(FaultSensitivityDetails.None)]
-        public async Task OnException_ShouldCaptureException_RenderAsDefault_UsingJson(FaultSensitivityDetails sensitivity)
-        {
-            using var response = await WebHostTestFactory.RunAsync(
-                services =>
-                {
-                    services
-                        .AddControllers(o => o.Filters.AddFaultDescriptor())
-                        .AddApplicationPart(typeof(StatusCodesController).Assembly)
-                        .AddJsonFormatters()
-                        .AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.FaultDetails);
-                    services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
-                },
-                app =>
-                {
-                    app.UseRouting();
-                    app.UseEndpoints(routes => { routes.MapControllers(); });
-                },
-                responseFactory: client =>
-                {
-                    client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-                    return client.GetAsync("/statuscodes/XXX/serverError");
-                });
-
-            var body = await response.Content.ReadAsStringAsync();
-            TestOutput.WriteLine(body);
-
-            switch (sensitivity)
+    [Theory]
+    [InlineData(FaultSensitivityDetails.All)]
+    [InlineData(FaultSensitivityDetails.Evidence)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
+    [InlineData(FaultSensitivityDetails.FailureWithData)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
+    [InlineData(FaultSensitivityDetails.Failure)]
+    [InlineData(FaultSensitivityDetails.None)]
+    public async Task OnException_ShouldCaptureException_RenderAsDefault_UsingJson(FaultSensitivityDetails sensitivity)
+    {
+        using var response = await WebHostTestFactory.RunAsync(
+            services =>
             {
-                case FaultSensitivityDetails.All:
-                    Assert.True(Match("""
+                services
+                    .AddControllers(o => o.Filters.AddFaultDescriptor())
+                    .AddApplicationPart(typeof(StatusCodesController).Assembly)
+                    .AddJsonFormatters()
+                    .AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.FaultDetails);
+                services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
+            },
+            app =>
+            {
+                app.UseRouting();
+                app.UseEndpoints(routes => { routes.MapControllers(); });
+            },
+            responseFactory: client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                return client.GetAsync("/statuscodes/XXX/serverError");
+            });
+
+        var body = await response.Content.ReadAsStringAsync();
+        TestOutput.WriteLine(body);
+
+        switch (sensitivity)
+        {
+            case FaultSensitivityDetails.All:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/statuscodes/XXX/serverError",
@@ -373,9 +372,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Evidence:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Evidence:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/statuscodes/XXX/serverError",
@@ -399,9 +398,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTraceAndData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTraceAndData:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/statuscodes/XXX/serverError",
@@ -443,9 +442,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithData:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/statuscodes/XXX/serverError",
@@ -470,9 +469,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTrace:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTrace:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/statuscodes/XXX/serverError",
@@ -511,9 +510,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Failure:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Failure:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/statuscodes/XXX/serverError",
@@ -535,9 +534,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.None:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.None:
+                Assert.True(Match("""
                                       {
                                         "error": {
                                           "instance": "http://localhost/statuscodes/XXX/serverError",
@@ -548,50 +547,50 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                         "traceId": "*"
                                       }
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-            }
+                break;
         }
+    }
 
 
 
-        [Theory]
-        [InlineData(FaultSensitivityDetails.All)]
-        [InlineData(FaultSensitivityDetails.Evidence)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
-        [InlineData(FaultSensitivityDetails.FailureWithData)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
-        [InlineData(FaultSensitivityDetails.Failure)]
-        [InlineData(FaultSensitivityDetails.None)]
-        public async Task OnException_ShouldCaptureException_RenderAsProblemDetails_UsingXml(FaultSensitivityDetails sensitivity)
-        {
-            using var response = await WebHostTestFactory.RunAsync(
-                services =>
-                {
-                    services
-                        .AddControllers(o => o.Filters.AddFaultDescriptor())
-                        .AddApplicationPart(typeof(StatusCodesController).Assembly)
-                        .AddXmlFormatters(o => o.Settings.Writer.Indent = true)
-                        .AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
-                    services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
-                },
-                app =>
-                {
-                    app.UseRouting();
-                    app.UseEndpoints(routes => { routes.MapControllers(); });
-                },
-                responseFactory: client =>
-                {
-                    client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/xml"));
-                    return client.GetAsync("/statuscodes/XXX/serverError");
-                });
-
-            var body = await response.Content.ReadAsStringAsync();
-            TestOutput.WriteLine(body);
-
-            switch (sensitivity)
+    [Theory]
+    [InlineData(FaultSensitivityDetails.All)]
+    [InlineData(FaultSensitivityDetails.Evidence)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
+    [InlineData(FaultSensitivityDetails.FailureWithData)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
+    [InlineData(FaultSensitivityDetails.Failure)]
+    [InlineData(FaultSensitivityDetails.None)]
+    public async Task OnException_ShouldCaptureException_RenderAsProblemDetails_UsingXml(FaultSensitivityDetails sensitivity)
+    {
+        using var response = await WebHostTestFactory.RunAsync(
+            services =>
             {
-                case FaultSensitivityDetails.All:
-                    Assert.True(Match("""
+                services
+                    .AddControllers(o => o.Filters.AddFaultDescriptor())
+                    .AddApplicationPart(typeof(StatusCodesController).Assembly)
+                    .AddXmlFormatters(o => o.Settings.Writer.Indent = true)
+                    .AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.ProblemDetails);
+                services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
+            },
+            app =>
+            {
+                app.UseRouting();
+                app.UseEndpoints(routes => { routes.MapControllers(); });
+            },
+            responseFactory: client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/xml"));
+                return client.GetAsync("/statuscodes/XXX/serverError");
+            });
+
+        var body = await response.Content.ReadAsStringAsync();
+        TestOutput.WriteLine(body);
+
+        switch (sensitivity)
+        {
+            case FaultSensitivityDetails.All:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <ProblemDetails>
                                       	<Type>about:blank</Type>
@@ -637,9 +636,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	</Request>
                                       </ProblemDetails>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Evidence:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Evidence:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <ProblemDetails>
                                       	<Type>about:blank</Type>
@@ -656,9 +655,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	</Request>
                                       </ProblemDetails>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTraceAndData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTraceAndData:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <ProblemDetails>
                                       	<Type>about:blank</Type>
@@ -698,9 +697,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	</System.NotSupportedException>
                                       </ProblemDetails>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithData:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <ProblemDetails>
                                       	<Type>about:blank</Type>
@@ -723,9 +722,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	</System.NotSupportedException>
                                       </ProblemDetails>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTrace:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTrace:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <ProblemDetails>
                                       	<Type>about:blank</Type>
@@ -762,9 +761,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	</System.NotSupportedException>
                                       </ProblemDetails>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Failure:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Failure:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <ProblemDetails>
                                       	<Type>about:blank</Type>
@@ -784,9 +783,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	</System.NotSupportedException>
                                       </ProblemDetails>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.None:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.None:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <ProblemDetails>
                                       	<Type>about:blank</Type>
@@ -797,48 +796,48 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	<TraceId>*</TraceId>
                                       </ProblemDetails>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-            }
+                break;
         }
+    }
 
-        [Theory]
-        [InlineData(FaultSensitivityDetails.All)]
-        [InlineData(FaultSensitivityDetails.Evidence)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
-        [InlineData(FaultSensitivityDetails.FailureWithData)]
-        [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
-        [InlineData(FaultSensitivityDetails.Failure)]
-        [InlineData(FaultSensitivityDetails.None)]
-        public async Task OnException_ShouldCaptureException_RenderAsDefault_UsingXml(FaultSensitivityDetails sensitivity)
-        {
-            using var response = await WebHostTestFactory.RunAsync(
-                services =>
-                {
-                    services
-                        .AddControllers(o => o.Filters.AddFaultDescriptor())
-                        .AddApplicationPart(typeof(StatusCodesController).Assembly)
-                        .AddXmlFormatters(o => o.Settings.Writer.Indent = true)
-                        .AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.FaultDetails);
-                    services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
-                },
-                app =>
-                {
-                    app.UseRouting();
-                    app.UseEndpoints(routes => { routes.MapControllers(); });
-                },
-                responseFactory: client =>
-                {
-                    client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/xml"));
-                    return client.GetAsync("/statuscodes/XXX/serverError");
-                });
-
-            var body = await response.Content.ReadAsStringAsync();
-            TestOutput.WriteLine(body);
-
-            switch (sensitivity)
+    [Theory]
+    [InlineData(FaultSensitivityDetails.All)]
+    [InlineData(FaultSensitivityDetails.Evidence)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTraceAndData)]
+    [InlineData(FaultSensitivityDetails.FailureWithData)]
+    [InlineData(FaultSensitivityDetails.FailureWithStackTrace)]
+    [InlineData(FaultSensitivityDetails.Failure)]
+    [InlineData(FaultSensitivityDetails.None)]
+    public async Task OnException_ShouldCaptureException_RenderAsDefault_UsingXml(FaultSensitivityDetails sensitivity)
+    {
+        using var response = await WebHostTestFactory.RunAsync(
+            services =>
             {
-                case FaultSensitivityDetails.All:
-                    Assert.True(Match("""
+                services
+                    .AddControllers(o => o.Filters.AddFaultDescriptor())
+                    .AddApplicationPart(typeof(StatusCodesController).Assembly)
+                    .AddXmlFormatters(o => o.Settings.Writer.Indent = true)
+                    .AddFaultDescriptorOptions(o => o.FaultDescriptor = PreferredFaultDescriptor.FaultDetails);
+                services.PostConfigureAllOf<IExceptionDescriptorOptions>(o => o.SensitivityDetails = sensitivity);
+            },
+            app =>
+            {
+                app.UseRouting();
+                app.UseEndpoints(routes => { routes.MapControllers(); });
+            },
+            responseFactory: client =>
+            {
+                client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/xml"));
+                return client.GetAsync("/statuscodes/XXX/serverError");
+            });
+
+        var body = await response.Content.ReadAsStringAsync();
+        TestOutput.WriteLine(body);
+
+        switch (sensitivity)
+        {
+            case FaultSensitivityDetails.All:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <HttpExceptionDescriptor>
                                       	<Error>
@@ -889,9 +888,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	<TraceId>*</TraceId>
                                       </HttpExceptionDescriptor>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Evidence:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Evidence:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <HttpExceptionDescriptor>
                                       	<Error>
@@ -911,9 +910,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	<TraceId>*</TraceId>
                                       </HttpExceptionDescriptor>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTraceAndData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTraceAndData:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <HttpExceptionDescriptor>
                                       	<Error>
@@ -956,9 +955,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	<TraceId>*</TraceId>
                                       </HttpExceptionDescriptor>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithData:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithData:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <HttpExceptionDescriptor>
                                       	<Error>
@@ -984,9 +983,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	<TraceId>*</TraceId>
                                       </HttpExceptionDescriptor>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.FailureWithStackTrace:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.FailureWithStackTrace:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <HttpExceptionDescriptor>
                                       	<Error>
@@ -1026,9 +1025,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	<TraceId>*</TraceId>
                                       </HttpExceptionDescriptor>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.Failure:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.Failure:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <HttpExceptionDescriptor>
                                       	<Error>
@@ -1051,9 +1050,9 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	<TraceId>*</TraceId>
                                       </HttpExceptionDescriptor>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-                case FaultSensitivityDetails.None:
-                    Assert.True(Match("""
+                break;
+            case FaultSensitivityDetails.None:
+                Assert.True(Match("""
                                       <?xml version="1.0" encoding="utf-8"?>
                                       <HttpExceptionDescriptor>
                                       	<Error>
@@ -1065,8 +1064,7 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                       	<TraceId>*</TraceId>
                                       </HttpExceptionDescriptor>
                                       """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true));
-                    break;
-            }
+                break;
         }
     }
 }

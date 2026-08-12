@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to convert a byte array to an <xref:System.Xml.XmlReader> using the <xref:Cuemon.Extensions.Xml.ByteArrayExtensions> class.
+The following example demonstrates how to convert a byte array to an [XmlReader](https://learn.microsoft.com/dotnet/api/system.xml.xmlreader) using the <xref:Cuemon.Extensions.Xml.ByteArrayExtensions> class.
 
 ```csharp
 using System;

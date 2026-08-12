@@ -2,20 +2,18 @@
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Cuemon.Extensions.DependencyInjection
+namespace Cuemon.Extensions.DependencyInjection;
+public class ServiceOptionsTest : Test
 {
-    public class ServiceOptionsTest : Test
+    public ServiceOptionsTest(ITestOutputHelper output) : base(output)
     {
-        public ServiceOptionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void ValidateOptions_ShouldHaveDefaultValues()
-        {
-            var sut = new ServiceOptions();
+    [Fact]
+    public void ValidateOptions_ShouldHaveDefaultValues()
+    {
+        var sut = new ServiceOptions();
 
-            Assert.Equal(ServiceLifetime.Transient, sut.Lifetime);
-        }
+        Assert.Equal(ServiceLifetime.Transient, sut.Lifetime);
     }
 }

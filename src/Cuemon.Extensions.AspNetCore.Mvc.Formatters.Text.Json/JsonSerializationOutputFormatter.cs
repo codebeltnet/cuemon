@@ -2,24 +2,22 @@
 using Cuemon.Extensions.AspNetCore.Text.Json.Converters;
 using Cuemon.Extensions.Text.Json.Formatters;
 
-namespace Cuemon.Extensions.AspNetCore.Mvc.Formatters.Text.Json
+namespace Cuemon.Extensions.AspNetCore.Mvc.Formatters.Text.Json;
+/// <summary>
+/// This class handles serialization of objects to JSON using <see cref="JsonFormatter"/>.
+/// </summary>
+public class JsonSerializationOutputFormatter : StreamOutputFormatter<JsonFormatter, JsonFormatterOptions>
 {
     /// <summary>
-    /// This class handles serialization of objects to JSON using <see cref="JsonFormatter"/>.
+    /// Initializes a new instance of the <see cref="JsonSerializationOutputFormatter"/> class.
     /// </summary>
-    public class JsonSerializationOutputFormatter : StreamOutputFormatter<JsonFormatter, JsonFormatterOptions>
+    /// <param name="options">The <see cref="JsonFormatterOptions"/> which need to be configured.</param>
+    public JsonSerializationOutputFormatter(JsonFormatterOptions options) : base(options)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JsonSerializationOutputFormatter"/> class.
-        /// </summary>
-        /// <param name="options">The <see cref="JsonFormatterOptions"/> which need to be configured.</param>
-        public JsonSerializationOutputFormatter(JsonFormatterOptions options) : base(options)
+        options.Settings.Converters.AddHttpExceptionDescriptorConverter(o => o.SensitivityDetails = options.SensitivityDetails);
+        foreach (var mediaType in options.SupportedMediaTypes)
         {
-            options.Settings.Converters.AddHttpExceptionDescriptorConverter(o => o.SensitivityDetails = options.SensitivityDetails);
-            foreach (var mediaType in options.SupportedMediaTypes)
-            {
-                SupportedMediaTypes.Add(mediaType.ToString());
-            }
+            SupportedMediaTypes.Add(mediaType.ToString());
         }
     }
 }

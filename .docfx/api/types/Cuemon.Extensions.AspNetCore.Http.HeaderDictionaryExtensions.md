@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to add or update HTTP headers in an <xref:Microsoft.AspNetCore.Http.IHeaderDictionary> using the <xref:Cuemon.Extensions.AspNetCore.Http.HeaderDictionaryExtensions> class.
+The following example demonstrates how to add or update HTTP headers in an [IHeaderDictionary](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.http.iheaderdictionary) using the <xref:Cuemon.Extensions.AspNetCore.Http.HeaderDictionaryExtensions> class.
 
 ```csharp
 using System;

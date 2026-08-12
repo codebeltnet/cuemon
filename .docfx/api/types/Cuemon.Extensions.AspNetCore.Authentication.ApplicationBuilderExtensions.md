@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register the Basic, Digest, and HMAC authentication middleware in an ASP.NET Core request pipeline.
+The following example demonstrates how to register the Basic, Digest, and HMAC authentication middleware in an ASP.NET Core request pipeline. Each extension configures a different credential scheme and returns the same application builder so additional middleware can be appended. The final checks make that fluent-pipeline contract visible without depending on an implementation type name.
 
 ```csharp
 using System;
@@ -31,7 +31,7 @@ public static class ApplicationBuilderExtensionsExample
 
         var app = new ApplicationBuilder(services.BuildServiceProvider());
 
-        app.UseBasicAuthentication(options =>
+        var basicBuilder = app.UseBasicAuthentication(options =>
         {
             options.Realm = "SecureArea";
             options.Authenticator = (username, password) =>
@@ -46,7 +46,7 @@ public static class ApplicationBuilderExtensionsExample
             options.RequireSecureConnection = false;
         });
 
-        app.UseDigestAccessAuthentication(options =>
+        var digestBuilder = app.UseDigestAccessAuthentication(options =>
         {
             options.Realm = "SecureArea";
             options.Authenticator = (string username, out string password) =>
@@ -57,7 +57,7 @@ public static class ApplicationBuilderExtensionsExample
             options.RequireSecureConnection = false;
         });
 
-        app.UseHmacAuthentication(options =>
+        var hmacBuilder = app.UseHmacAuthentication(options =>
         {
             options.AuthenticationScheme = "MyHmac";
             options.Authenticator = (string clientId, out string clientSecret) =>
@@ -68,7 +68,9 @@ public static class ApplicationBuilderExtensionsExample
             options.RequireSecureConnection = false;
         });
 
-        Console.WriteLine(app.GetType().Name);
+        Console.WriteLine($"Basic middleware returned the application builder: {ReferenceEquals(app, basicBuilder)}");
+        Console.WriteLine($"Digest middleware returned the application builder: {ReferenceEquals(app, digestBuilder)}");
+        Console.WriteLine($"HMAC middleware returned the application builder: {ReferenceEquals(app, hmacBuilder)}");
     }
 }
 

@@ -15,41 +15,40 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
+namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics;
+public class FaultDescriptorFilterTest : Test
 {
-    public class FaultDescriptorFilterTest : Test
+    public FaultDescriptorFilterTest(ITestOutputHelper output) : base(output)
     {
-        public FaultDescriptorFilterTest(ITestOutputHelper output) : base(output)
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task OnException_ShouldIncludeFailure_DifferentiateOnUseBaseException(bool useBaseException)
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task OnException_ShouldIncludeFailure_DifferentiateOnUseBaseException(bool useBaseException)
+            services
+                .AddControllers(o => { o.Filters.AddFaultDescriptor(); })
+                .AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters()
+                .AddFaultDescriptorOptions(o => o.UseBaseException = useBaseException);
+            services.PostConfigureAllExceptionDescriptorOptions(o => o.SensitivityDetails = FaultSensitivityDetails.Failure);
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services
-                    .AddControllers(o => { o.Filters.AddFaultDescriptor(); })
-                    .AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters()
-                    .AddFaultDescriptorOptions(o => o.UseBaseException = useBaseException);
-                services.PostConfigureAllExceptionDescriptorOptions(o => o.SensitivityDetails = FaultSensitivityDetails.Failure);
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/400");
-                var body = await result.Content.ReadAsStringAsync();
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/400");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Condition.FlipFlop(useBaseException,
-                    () => Assert.True(Match(@"{
+            Condition.FlipFlop(useBaseException,
+                () => Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/400"",
     ""status"": 400,
@@ -62,7 +61,7 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body, o => o.ThrowOnNoMatch = true)),
-                    () => Assert.True(Match("""
+                () => Assert.True(Match("""
                                        {
                                          "error": {
                                            "instance": "http://localhost/statuscodes/400",
@@ -86,37 +85,37 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
                                        }
                                        """.ReplaceLineEndings(), body.ReplaceLineEndings(), o => o.ThrowOnNoMatch = true)));
 
-                Assert.Equal(StatusCodes.Status400BadRequest, (int)result.StatusCode);
-            }
+            Assert.Equal(StatusCodes.Status400BadRequest, (int)result.StatusCode);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureUserAgentException_BadRequestMessage()
+    [Fact]
+    public async Task OnException_ShouldCaptureUserAgentException_BadRequestMessage()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
+               {
+                   services
+                       .AddControllers(o =>
+                       {
+                           o.Filters.AddFaultDescriptor();
+                           o.Filters.AddUserAgentSentinel();
+                       })
+                       .AddApplicationPart(typeof(FakeController).Assembly)
+                       .AddJsonFormatters()
+                       .AddUserAgentSentinelOptions(o => o.RequireUserAgentHeader = true);
+               }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-                   {
-                       services
-                           .AddControllers(o =>
-                           {
-                               o.Filters.AddFaultDescriptor();
-                               o.Filters.AddUserAgentSentinel();
-                           })
-                           .AddApplicationPart(typeof(FakeController).Assembly)
-                           .AddJsonFormatters()
-                           .AddUserAgentSentinelOptions(o => o.RequireUserAgentHeader = true);
-                   }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/fake/it");
-                var body = await result.Content.ReadAsStringAsync();
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/fake/it");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/fake/it"",
     ""status"": 400,
@@ -125,41 +124,41 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status400BadRequest, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(400), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status400BadRequest, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(400), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureThrottlingException_TooManyRequests()
+    [Fact]
+    public async Task OnException_ShouldCaptureThrottlingException_TooManyRequests()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
+               {
+                   services.AddControllers(o =>
+                       {
+                           o.Filters.AddFaultDescriptor();
+                           o.Filters.AddThrottlingSentinel();
+                       }).AddApplicationPart(typeof(FakeController).Assembly)
+                       .AddJsonFormatters()
+                       .AddThrottlingSentinelOptions(o =>
+                       {
+                           o.ContextResolver = _ => "dummy";
+                           o.Quota = new ThrottleQuota(0, TimeSpan.Zero);
+                       });
+                   services.AddMemoryThrottlingCache();
+               }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-                   {
-                       services.AddControllers(o =>
-                           {
-                               o.Filters.AddFaultDescriptor();
-                               o.Filters.AddThrottlingSentinel();
-                           }).AddApplicationPart(typeof(FakeController).Assembly)
-                           .AddJsonFormatters()
-                           .AddThrottlingSentinelOptions(o =>
-                           {
-                               o.ContextResolver = _ => "dummy";
-                               o.Quota = new ThrottleQuota(0, TimeSpan.Zero);
-                           });
-                       services.AddMemoryThrottlingCache();
-                   }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/fake/it");
-                var body = await result.Content.ReadAsStringAsync();
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/fake/it");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/fake/it"",
     ""status"": 429,
@@ -168,31 +167,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status429TooManyRequests, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(429), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status429TooManyRequests, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(429), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureBadRequest()
+    [Fact]
+    public async Task OnException_ShouldCaptureBadRequest()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/400");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/400");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/400"",
     ""status"": 400,
@@ -201,31 +200,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status400BadRequest, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(400), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status400BadRequest, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(400), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureConflict()
+    [Fact]
+    public async Task OnException_ShouldCaptureConflict()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/409");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/409");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/409"",
     ""status"": 409,
@@ -234,31 +233,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status409Conflict, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(409), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status409Conflict, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(409), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureForbidden()
+    [Fact]
+    public async Task OnException_ShouldCaptureForbidden()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/403");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/403");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/403"",
     ""status"": 403,
@@ -267,31 +266,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status403Forbidden, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(403), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status403Forbidden, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(403), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureGone()
+    [Fact]
+    public async Task OnException_ShouldCaptureGone()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/410");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/410");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/410"",
     ""status"": 410,
@@ -300,31 +299,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status410Gone, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(410), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status410Gone, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(410), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureNotFound()
+    [Fact]
+    public async Task OnException_ShouldCaptureNotFound()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/404");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/404");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/404"",
     ""status"": 404,
@@ -333,31 +332,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status404NotFound, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(404), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status404NotFound, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(404), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCapturePayloadTooLarge()
+    [Fact]
+    public async Task OnException_ShouldCapturePayloadTooLarge()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/413");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/413");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/413"",
     ""status"": 413,
@@ -366,31 +365,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status413PayloadTooLarge, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(413), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status413PayloadTooLarge, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(413), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCapturePreconditionFailed()
+    [Fact]
+    public async Task OnException_ShouldCapturePreconditionFailed()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/412");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/412");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/412"",
     ""status"": 412,
@@ -399,31 +398,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status412PreconditionFailed, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(412), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status412PreconditionFailed, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(412), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCapturePreconditionRequired()
+    [Fact]
+    public async Task OnException_ShouldCapturePreconditionRequired()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/428");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/428");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/428"",
     ""status"": 428,
@@ -432,31 +431,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status428PreconditionRequired, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(428), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status428PreconditionRequired, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(428), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureTooManyRequests()
+    [Fact]
+    public async Task OnException_ShouldCaptureTooManyRequests()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/429");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/429");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/429"",
     ""status"": 429,
@@ -465,31 +464,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status429TooManyRequests, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(429), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status429TooManyRequests, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(429), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureUnauthorized()
+    [Fact]
+    public async Task OnException_ShouldCaptureUnauthorized()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/401");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/401");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/401"",
     ""status"": 401,
@@ -498,31 +497,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status401Unauthorized, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(401), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status401Unauthorized, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(401), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureMethodNotAllowed()
+    [Fact]
+    public async Task OnException_ShouldCaptureMethodNotAllowed()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/405");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/405");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/405"",
     ""status"": 405,
@@ -531,31 +530,31 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status405MethodNotAllowed, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(405), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status405MethodNotAllowed, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(405), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureNotAcceptable()
+    [Fact]
+    public async Task OnException_ShouldCaptureNotAcceptable()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/406");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/406");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/406"",
     ""status"": 406,
@@ -564,61 +563,61 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status406NotAcceptable, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(406), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status406NotAcceptable, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(406), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureGeneric()
+    [Fact]
+    public async Task OnException_ShouldCaptureGeneric()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/XXX");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/XXX");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.Contains(@"{
+            Assert.Contains(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/XXX"",
     ""status"": 500,
     ""code"": ""InternalServerError"",
     ""message"": ""An unhandled exception was raised by ".ReplaceLineEndings(), body);
-                Assert.Equal(StatusCodes.Status500InternalServerError, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(500), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status500InternalServerError, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(500), result.ReasonPhrase);
         }
+    }
 
-        [Fact]
-        public async Task OnException_ShouldCaptureUnsupportedMediaType()
+    [Fact]
+    public async Task OnException_ShouldCaptureUnsupportedMediaType()
+    {
+        using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
         {
-            using (var filter = WebHostTestFactory.CreateWithHostBuilderContext((context, services) =>
-            {
-                services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
-                    .AddJsonFormatters();
-            }, (context, app) =>
-                   {
-                       app.UseRouting();
-                       app.UseEndpoints(routes => { routes.MapControllers(); });
-                   }))
-            {
-                var client = filter.Host.GetTestClient();
-                var result = await client.GetAsync("/statuscodes/415");
-                var body = await result.Content.ReadAsStringAsync();
+            services.AddControllers(o => { o.Filters.AddFaultDescriptor(); }).AddApplicationPart(typeof(FakeController).Assembly)
+                .AddJsonFormatters();
+        }, (context, app) =>
+               {
+                   app.UseRouting();
+                   app.UseEndpoints(routes => { routes.MapControllers(); });
+               }))
+        {
+            var client = filter.Host.GetTestClient();
+            var result = await client.GetAsync("/statuscodes/415");
+            var body = await result.Content.ReadAsStringAsync();
 
-                TestOutput.WriteLine(body);
+            TestOutput.WriteLine(body);
 
-                Assert.True(Match(@"{
+            Assert.True(Match(@"{
   ""error"": {
     ""instance"": ""http://localhost/statuscodes/415"",
     ""status"": 415,
@@ -627,9 +626,8 @@ namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics
   },
   ""traceId"": ""*""
 }".ReplaceLineEndings(), body));
-                Assert.Equal(StatusCodes.Status415UnsupportedMediaType, (int)result.StatusCode);
-                Assert.Equal(HttpStatusDescription.Get(415), result.ReasonPhrase);
-            }
+            Assert.Equal(StatusCodes.Status415UnsupportedMediaType, (int)result.StatusCode);
+            Assert.Equal(HttpStatusDescription.Get(415), result.ReasonPhrase);
         }
     }
 }

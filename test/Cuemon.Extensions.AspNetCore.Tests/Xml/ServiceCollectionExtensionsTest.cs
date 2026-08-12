@@ -8,65 +8,63 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace Cuemon.Extensions.AspNetCore.Xml
+namespace Cuemon.Extensions.AspNetCore.Xml;
+public class ServiceCollectionExtensionsTest : Test
 {
-    public class ServiceCollectionExtensionsTest : Test
+    public ServiceCollectionExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public ServiceCollectionExtensionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void AddMinimalXmlOptions_ShouldThrowArgumentNullException_WhenServicesIsNull()
-        {
-            Assert.Throws<ArgumentNullException>("services", () => ServiceCollectionExtensions.AddMinimalXmlOptions(null));
-        }
+    [Fact]
+    public void AddMinimalXmlOptions_ShouldThrowArgumentNullException_WhenServicesIsNull()
+    {
+        Assert.Throws<ArgumentNullException>("services", () => ServiceCollectionExtensions.AddMinimalXmlOptions(null));
+    }
 
-        [Fact]
-        public void AddMinimalXmlOptions_ShouldRegisterXmlFormatterOptions()
-        {
-            var sut = new ServiceCollection();
+    [Fact]
+    public void AddMinimalXmlOptions_ShouldRegisterXmlFormatterOptions()
+    {
+        var sut = new ServiceCollection();
 
-            sut.AddMinimalXmlOptions();
+        sut.AddMinimalXmlOptions();
 
-            var count = sut.Count(sd =>
-                sd.ServiceType == typeof(IConfigureOptions<XmlFormatterOptions>));
+        var count = sut.Count(sd =>
+            sd.ServiceType == typeof(IConfigureOptions<XmlFormatterOptions>));
 
-            TestOutput.WriteLine($"IConfigureOptions<XmlFormatterOptions> registrations: {count}");
+        TestOutput.WriteLine($"IConfigureOptions<XmlFormatterOptions> registrations: {count}");
 
-            Assert.True(count >= 1);
-        }
+        Assert.True(count >= 1);
+    }
 
-        [Fact]
-        public void AddMinimalXmlOptions_ShouldAlsoRegisterXmlExceptionResponseFormatter()
-        {
-            var sut = new ServiceCollection();
-            sut.AddFaultDescriptorOptions();
+    [Fact]
+    public void AddMinimalXmlOptions_ShouldAlsoRegisterXmlExceptionResponseFormatter()
+    {
+        var sut = new ServiceCollection();
+        sut.AddFaultDescriptorOptions();
 
-            sut.AddMinimalXmlOptions();
+        sut.AddMinimalXmlOptions();
 
-            var hasFormatter = sut.Any(sd =>
-                sd.ServiceType == typeof(HttpExceptionDescriptorResponseFormatter<XmlFormatterOptions>));
+        var hasFormatter = sut.Any(sd =>
+            sd.ServiceType == typeof(HttpExceptionDescriptorResponseFormatter<XmlFormatterOptions>));
 
-            Assert.True(hasFormatter);
-        }
+        Assert.True(hasFormatter);
+    }
 
-        [Fact]
-        public void AddMinimalXmlOptions_ShouldOnlyRegisterXmlExceptionResponseFormatterOnce_WhenCalledMultipleTimes()
-        {
-            var sut = new ServiceCollection();
-            sut.AddFaultDescriptorOptions();
+    [Fact]
+    public void AddMinimalXmlOptions_ShouldOnlyRegisterXmlExceptionResponseFormatterOnce_WhenCalledMultipleTimes()
+    {
+        var sut = new ServiceCollection();
+        sut.AddFaultDescriptorOptions();
 
-            sut.AddMinimalXmlOptions();
-            sut.AddMinimalXmlOptions();
-            sut.AddMinimalXmlOptions();
+        sut.AddMinimalXmlOptions();
+        sut.AddMinimalXmlOptions();
+        sut.AddMinimalXmlOptions();
 
-            var count = sut.Count(sd =>
-                sd.ServiceType == typeof(HttpExceptionDescriptorResponseFormatter<XmlFormatterOptions>));
+        var count = sut.Count(sd =>
+            sd.ServiceType == typeof(HttpExceptionDescriptorResponseFormatter<XmlFormatterOptions>));
 
-            TestOutput.WriteLine($"HttpExceptionDescriptorResponseFormatter<XmlFormatterOptions> registrations: {count}");
+        TestOutput.WriteLine($"HttpExceptionDescriptorResponseFormatter<XmlFormatterOptions> registrations: {count}");
 
-            Assert.Equal(1, count);
-        }
+        Assert.Equal(1, count);
     }
 }

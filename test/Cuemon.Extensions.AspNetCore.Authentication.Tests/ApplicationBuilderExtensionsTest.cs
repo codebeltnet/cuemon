@@ -10,86 +10,84 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace Cuemon.Extensions.AspNetCore.Authentication
+namespace Cuemon.Extensions.AspNetCore.Authentication;
+public class ApplicationBuilderExtensionsTest : Test
 {
-    public class ApplicationBuilderExtensionsTest : Test
+    public ApplicationBuilderExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public ApplicationBuilderExtensionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public void UseBasicAuthentication_ShouldAddBasicAuthenticationMiddlewareAndBasicAuthenticationOptions_ToHost()
-        {
-            using (var host = WebHostTestFactory.Create(pipelineSetup: app =>
+    [Fact]
+    public void UseBasicAuthentication_ShouldAddBasicAuthenticationMiddlewareAndBasicAuthenticationOptions_ToHost()
+    {
+        using (var host = WebHostTestFactory.Create(pipelineSetup: app =>
+               {
+                   app.UseBasicAuthentication(o =>
                    {
-                       app.UseBasicAuthentication(o =>
-                       {
-                           o.Authenticator = (username, password) => ClaimsPrincipal.Current;
-                           o.RequireSecureConnection = false;
-                       });
-                   }))
-            {
-                var options = host.Host.Services.GetRequiredService<IOptions<BasicAuthenticationOptions>>();
-                var middleware = host.Application.Build();
-
-                Assert.NotNull(options);
-                Assert.NotNull(middleware);
-                Assert.IsType<BasicAuthenticationOptions>(options.Value);
-                Assert.IsType<BasicAuthenticationMiddleware>(middleware.Target);
-            }
-        }
-
-        [Fact]
-        public void UseDigestAuthentication_ShouldAddDigestAuthenticationMiddlewareAndDigestAuthenticationOptions_ToHost()
+                       o.Authenticator = (username, password) => ClaimsPrincipal.Current;
+                       o.RequireSecureConnection = false;
+                   });
+               }))
         {
-            using (var host = WebHostTestFactory.Create(pipelineSetup: app =>
-                   {
-                       app.UseDigestAccessAuthentication(o =>
-                       {
-                           o.Authenticator = (string username, out string password) =>
-                           {
-                               password = null;
-                               return ClaimsPrincipal.Current;
-                           };
-                           o.RequireSecureConnection = false;
-                       });
-                   }))
-            {
-                var options = host.Host.Services.GetRequiredService<IOptions<DigestAuthenticationOptions>>();
-                var middleware = host.Application.Build();
+            var options = host.Host.Services.GetRequiredService<IOptions<BasicAuthenticationOptions>>();
+            var middleware = host.Application.Build();
 
-                Assert.NotNull(options);
-                Assert.NotNull(middleware);
-                Assert.IsType<DigestAuthenticationOptions>(options.Value);
-                Assert.IsType<DigestAuthenticationMiddleware>(middleware.Target!.GetType().GetAllFields().Single(fi => fi.Name == "instance").GetValue(middleware.Target));
-            }
+            Assert.NotNull(options);
+            Assert.NotNull(middleware);
+            Assert.IsType<BasicAuthenticationOptions>(options.Value);
+            Assert.IsType<BasicAuthenticationMiddleware>(middleware.Target);
         }
+    }
 
-        [Fact]
-        public void UseHmacAuthentication_ShouldAddHmacAuthenticationMiddlewareAndHmacAuthenticationOptions_ToHost()
-        {
-            using (var host = WebHostTestFactory.Create(pipelineSetup: app =>
+    [Fact]
+    public void UseDigestAuthentication_ShouldAddDigestAuthenticationMiddlewareAndDigestAuthenticationOptions_ToHost()
+    {
+        using (var host = WebHostTestFactory.Create(pipelineSetup: app =>
+               {
+                   app.UseDigestAccessAuthentication(o =>
                    {
-                       app.UseHmacAuthentication(o =>
+                       o.Authenticator = (string username, out string password) =>
                        {
-                           o.Authenticator = (string clientId, out string clientSecret) =>
-                           {
-                               clientSecret = null;
-                               return ClaimsPrincipal.Current;
-                           };
-                           o.RequireSecureConnection = false;
-                       });
-                   }))
-            {
-                var options = host.Host.Services.GetRequiredService<IOptions<HmacAuthenticationOptions>>();
-                var middleware = host.Application.Build();
+                           password = null;
+                           return ClaimsPrincipal.Current;
+                       };
+                       o.RequireSecureConnection = false;
+                   });
+               }))
+        {
+            var options = host.Host.Services.GetRequiredService<IOptions<DigestAuthenticationOptions>>();
+            var middleware = host.Application.Build();
 
-                Assert.NotNull(options);
-                Assert.NotNull(middleware);
-                Assert.IsType<HmacAuthenticationOptions>(options.Value);
-                Assert.IsType<HmacAuthenticationMiddleware>(middleware.Target);
-            }
+            Assert.NotNull(options);
+            Assert.NotNull(middleware);
+            Assert.IsType<DigestAuthenticationOptions>(options.Value);
+            Assert.IsType<DigestAuthenticationMiddleware>(middleware.Target!.GetType().GetAllFields().Single(fi => fi.Name == "instance").GetValue(middleware.Target));
+        }
+    }
+
+    [Fact]
+    public void UseHmacAuthentication_ShouldAddHmacAuthenticationMiddlewareAndHmacAuthenticationOptions_ToHost()
+    {
+        using (var host = WebHostTestFactory.Create(pipelineSetup: app =>
+               {
+                   app.UseHmacAuthentication(o =>
+                   {
+                       o.Authenticator = (string clientId, out string clientSecret) =>
+                       {
+                           clientSecret = null;
+                           return ClaimsPrincipal.Current;
+                       };
+                       o.RequireSecureConnection = false;
+                   });
+               }))
+        {
+            var options = host.Host.Services.GetRequiredService<IOptions<HmacAuthenticationOptions>>();
+            var middleware = host.Application.Build();
+
+            Assert.NotNull(options);
+            Assert.NotNull(middleware);
+            Assert.IsType<HmacAuthenticationOptions>(options.Value);
+            Assert.IsType<HmacAuthenticationMiddleware>(middleware.Target);
         }
     }
 }

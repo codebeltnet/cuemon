@@ -26,13 +26,12 @@ public static class CacheEntryEventArgsExample
         entry.Expired += (_, e) =>
         {
             captured = e;
-            Console.WriteLine(e.GetType().Name);
         };
 
         cache.Add(entry, new CacheInvalidation(new[] { dependency }));
         dependency.SignalChanged();
 
-        Console.WriteLine(captured != null);
+        Console.WriteLine($"Cache entry expired: {captured is not null}");
     }
 
     private sealed class DependencyStub : IDependency

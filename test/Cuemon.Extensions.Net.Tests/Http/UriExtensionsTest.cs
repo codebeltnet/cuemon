@@ -7,100 +7,98 @@ using Codebelt.Extensions.Xunit;
 using Cuemon.Threading;
 using Xunit;
 
-namespace Cuemon.Extensions.Net.Http
+namespace Cuemon.Extensions.Net.Http;
+public class UriExtensionsTest : Test
 {
-    public class UriExtensionsTest : Test
+    public UriExtensionsTest(ITestOutputHelper output) : base(output)
     {
-        public UriExtensionsTest(ITestOutputHelper output) : base(output)
-        {
-        }
+    }
 
-        [Fact]
-        public async Task HttpGetAsync_ShouldGetResponseFromUri()
-        {
-            var factory = new StatusCodeHttpClientFactory(HttpStatusCode.OK);
-            UriExtensions.DefaultHttpClientFactory = factory;
-            var uri = new Uri("https://example.com/200");
-            var expected = 125;
-            var atomicCount = 0;
+    [Fact]
+    public async Task HttpGetAsync_ShouldGetResponseFromUri()
+    {
+        var factory = new StatusCodeHttpClientFactory(HttpStatusCode.OK);
+        UriExtensions.DefaultHttpClientFactory = factory;
+        var uri = new Uri("https://example.com/200");
+        var expected = 125;
+        var atomicCount = 0;
 
-            await ParallelFactory.ForAsync(0, expected, async (i, ct) =>
+        await ParallelFactory.ForAsync(0, expected, async (i, ct) =>
+        {
+            using (var response = await uri.HttpGetAsync(ct))
             {
-                using (var response = await uri.HttpGetAsync(ct))
-                {
-                    Interlocked.Increment(ref atomicCount);
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                }
-            });
+                Interlocked.Increment(ref atomicCount);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+        });
 
-            Assert.Equal(expected, atomicCount);
-            Assert.Equal(expected, factory.RequestCount);
-        }
+        Assert.Equal(expected, atomicCount);
+        Assert.Equal(expected, factory.RequestCount);
+    }
 
-        [Fact]
-        public async Task HttpGetAsync_ShouldHandleHttpStatusCodes()
+    [Fact]
+    public async Task HttpGetAsync_ShouldHandleHttpStatusCodes()
+    {
+        var factory = new StatusCodeHttpClientFactory(HttpStatusCode.NotFound);
+        UriExtensions.DefaultHttpClientFactory = factory;
+        var uri = new Uri("https://example.com/404");
+        var expected = 50;
+        var atomicCount = 0;
+
+        await ParallelFactory.ForAsync(0, expected, async (i, ct) =>
         {
-            var factory = new StatusCodeHttpClientFactory(HttpStatusCode.NotFound);
-            UriExtensions.DefaultHttpClientFactory = factory;
-            var uri = new Uri("https://example.com/404");
-            var expected = 50;
-            var atomicCount = 0;
-
-            await ParallelFactory.ForAsync(0, expected, async (i, ct) =>
+            using (var response = await uri.HttpGetAsync(ct))
             {
-                using (var response = await uri.HttpGetAsync(ct))
-                {
-                    Interlocked.Increment(ref atomicCount);
-                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-                }
-            });
+                Interlocked.Increment(ref atomicCount);
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
+        });
 
-            Assert.Equal(expected, atomicCount);
-            Assert.Equal(expected, factory.RequestCount);
+        Assert.Equal(expected, atomicCount);
+        Assert.Equal(expected, factory.RequestCount);
+    }
+
+    private sealed class StatusCodeHttpClientFactory : IHttpClientFactory
+    {
+        private int _requestCount;
+        private readonly HttpStatusCode _statusCode;
+
+        public StatusCodeHttpClientFactory(HttpStatusCode statusCode)
+        {
+            _statusCode = statusCode;
         }
 
-        private sealed class StatusCodeHttpClientFactory : IHttpClientFactory
+        public int RequestCount => _requestCount;
+
+        public HttpClient CreateClient(string name)
         {
-            private int _requestCount;
+            return new HttpClient(new StatusCodeHttpMessageHandler(this, _statusCode));
+        }
+
+        private void IncrementRequestCount()
+        {
+            Interlocked.Increment(ref _requestCount);
+        }
+
+        private sealed class StatusCodeHttpMessageHandler : HttpMessageHandler
+        {
+            private readonly StatusCodeHttpClientFactory _factory;
             private readonly HttpStatusCode _statusCode;
 
-            public StatusCodeHttpClientFactory(HttpStatusCode statusCode)
+            public StatusCodeHttpMessageHandler(StatusCodeHttpClientFactory factory, HttpStatusCode statusCode)
             {
+                _factory = factory;
                 _statusCode = statusCode;
             }
 
-            public int RequestCount => _requestCount;
-
-            public HttpClient CreateClient(string name)
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
-                return new HttpClient(new StatusCodeHttpMessageHandler(this, _statusCode));
-            }
-
-            private void IncrementRequestCount()
-            {
-                Interlocked.Increment(ref _requestCount);
-            }
-
-            private sealed class StatusCodeHttpMessageHandler : HttpMessageHandler
-            {
-                private readonly StatusCodeHttpClientFactory _factory;
-                private readonly HttpStatusCode _statusCode;
-
-                public StatusCodeHttpMessageHandler(StatusCodeHttpClientFactory factory, HttpStatusCode statusCode)
+                _factory.IncrementRequestCount();
+                return Task.FromResult(new HttpResponseMessage(_statusCode)
                 {
-                    _factory = factory;
-                    _statusCode = statusCode;
-                }
-
-                protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-                {
-                    _factory.IncrementRequestCount();
-                    return Task.FromResult(new HttpResponseMessage(_statusCode)
-                    {
-                        Content = new ByteArrayContent(Array.Empty<byte>()),
-                        RequestMessage = request
-                    });
-                }
+                    Content = new ByteArrayContent(Array.Empty<byte>()),
+                    RequestMessage = request
+                });
             }
         }
     }

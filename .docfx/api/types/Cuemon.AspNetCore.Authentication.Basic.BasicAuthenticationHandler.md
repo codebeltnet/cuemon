@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register `BasicAuthenticationHandler` with ASP.NET Core authentication services. It sets up a `ServiceCollection`, registers the handler with a custom authenticator callback that validates credentials against hardcoded values, and builds the service provider. The handler is then resolved from DI and its type name is written to the console, confirming the authentication pipeline wires up correctly.
+The following example demonstrates how to register `BasicAuthenticationHandler` with ASP.NET Core authentication services. It sets up a `ServiceCollection`, registers the handler with a custom authenticator callback that validates credentials against hardcoded values, and builds the service provider. The handler is then resolved from DI and its configured realm is written to the console, confirming the authentication pipeline wires up correctly.
 
 ```csharp
 using System;
@@ -41,7 +41,7 @@ public static class BasicAuthenticationHandlerExample
         using var provider = services.BuildServiceProvider();
         var handler = provider.GetRequiredService<BasicAuthenticationHandler>();
 
-        Console.WriteLine(handler.GetType().Name);
+        Console.WriteLine($"Authentication realm: {handler.Options.Realm}");
     }
 }
 

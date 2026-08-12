@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates applying the options pattern and factory initialization using the <xref:Cuemon.Extensions.ActionExtensions.Configure``1(System.Action{``0})> and <xref:Cuemon.Extensions.ActionExtensions.CreateInstance``1(System.Action{``0})> extension methods.
+The following example demonstrates applying the options pattern and factory initialization using the [Configure](https://docs.cuemon.net/api/extensions/dotnet/Cuemon.Extensions.ActionExtensions.html#Cuemon_Extensions_ActionExtensions_Configure__1_System_Action___0__) and [CreateInstance](https://docs.cuemon.net/api/extensions/dotnet/Cuemon.Extensions.ActionExtensions.html#Cuemon_Extensions_ActionExtensions_CreateInstance__1_System_Action___0__) extension methods.
 
 ```csharp
 using System;

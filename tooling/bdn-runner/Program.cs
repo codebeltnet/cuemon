@@ -4,6 +4,8 @@ using BenchmarkDotNet.Jobs;
 using Codebelt.Extensions.BenchmarkDotNet;
 using Codebelt.Extensions.BenchmarkDotNet.Console;
 
+namespace BdnRunner;
+
 public class Program
 {
     public static void Main(string[] args)

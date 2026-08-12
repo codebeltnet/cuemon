@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to construct `AuthorizationResponseHandler` with configured options and the required logger dependency. It registers `AuthorizationResponseHandlerOptions` with `FaultSensitivityDetails.All`, adds logging services, and builds the service provider. The handler is then created from the resolved `ILogger<T>` and `IOptions<T>` instances, and its type name is written to the console, confirming the dependency-injection wiring works correctly.
+The following example demonstrates how to construct `AuthorizationResponseHandler` with configured options and the required logger dependency. It registers `AuthorizationResponseHandlerOptions` with `FaultSensitivityDetails.All`, adds logging services, and builds the service provider. The handler is then created from the resolved `ILogger<T>` and `IOptions<T>` instances, and its configured sensitivity is written to the console, confirming the dependency-injection wiring works correctly.
 
 ```csharp
 using System;
@@ -33,7 +33,7 @@ public static class AuthorizationResponseHandlerExample
         var options = provider.GetRequiredService<IOptions<AuthorizationResponseHandlerOptions>>();
         var handler = new AuthorizationResponseHandler(logger, options);
 
-        Console.WriteLine(handler.GetType().Name);
+        Console.WriteLine($"Configured fault sensitivity: {handler.Options.SensitivityDetails}");
     }
 }
 

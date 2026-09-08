@@ -1,53 +1,89 @@
-﻿# Contributing to Cuemon for .NET
-When contributing to this repository, please first discuss the change you wish to make via issue,
-email, or any other method with the owners of this repository before making a change.
+# Contributing to Cuemon for .NET
 
-Please note we have a code of conduct, please follow it in all your interactions with the project.
+This repository is part of the Codebelt .NET library estate. The instructions below describe the current checkout and its CI contract. Please keep changes focused and preserve the shared Codebelt build skeleton unless a deliberate policy change is being made.
 
-## Code of Conduct
-Please review our [code of conduct](CODE_OF_CONDUCT.md).
+## Before you start
 
-## Our Development Process
-We use GitHub with a simple GitFlow inspired flow.
-All new features and/or fixes are merged into the `main` branch by creating a Pull Request.
+- Read the repository `README.md` and open an issue before starting a non-trivial feature or behavioral change.
+- Use an installed .NET SDK that can build the target frameworks listed below. This repository currently targets: **net10.0, net48, net9.0, netstandard2.0, netstandard2.1**.
+- The solution is `Cuemon.slnx`. Central package versions are maintained in `Directory.Packages.props`.
+- The shared build behavior is in `Directory.Build.props` and `Directory.Build.targets`; repository-specific TFMs, package references and metadata remain local to this library.
 
-## Pull Requests
-We actively welcome your pull requests.
+## Repository shape
 
-1. Fork the repo and create your branch from `main`
-2. If you've added code that should be tested, add tests (DO follow [Microsoft Engineering Guidelines](https://github.com/dotnet/aspnetcore/wiki/Engineering-guidelines))
-3. Any changes or additions requires documentation in the form of documenting public members
-4. Ensure that all existing as well as new test passes
-5. Issue that pull request with a big and heartful thanks for contributing
+- `src/` contains production projects.
+- `test/` contains xUnit v3 test projects.
+- `Cuemon.slnx` is the solution used for local development.
+- `.github/workflows/ci-pipeline.yml` is the CI workflow and the authority for the test matrix.
+- `testenvironments.json` declares the supported `WSL-Ubuntu` and `Docker-Ubuntu` test environments.
+
+## Build
+
+Restore and build the solution from the repository root:
+
+```powershell
+dotnet restore "Cuemon.slnx"
+dotnet build "Cuemon.slnx" --configuration Release --no-restore
+```
+
+CI builds both Debug and Release configurations. A clean build should complete before opening a pull request.
+
+## Test
+
+Run tests one project at a time so a failing or hanging project is attributable. This mirrors the CI matrix; it does not silently turn skipped integration tests into passing tests.
+
+```powershell
+$testProjects = Get-ChildItem test -Filter *.csproj -Recurse
+$testProjects = $testProjects | Where-Object { $_.BaseName -notin @('Cuemon.Data.SqlClient.Tests') }
+foreach ($project in $testProjects) {
+    dotnet test $project.FullName --configuration Release --no-restore
+}
+```
+
+The CI test plan currently runs **38** project(s) and excludes **1** project(s). The workflow also has an optional macOS test job.
+
+## Integration and infrastructure
+
+- `WSL-Ubuntu` — WSL distribution `Ubuntu-24.04`.
+- `Docker-Ubuntu` — Docker image `codebeltnet/ubuntu-testrunner:8-9-10-11`.
+
+This repository has `docker-compose.yml` with these services: `database`.
+
+Start the services before running the opt-in integration tests and remove them afterwards:
+
+```powershell
+docker compose up -d
+docker compose down
+```
+
+The normal CI test matrix excludes these integration-dependent projects:
+- `Cuemon.Data.SqlClient.Tests`
+
+## Package and documentation
+
+Create packages using the same solution and Release configuration:
+
+```powershell
+dotnet pack "Cuemon.slnx" --configuration Release --no-restore
+```
+
+Package-specific release notes live under `.nuget/<ProjectName>/PackageReleaseNotes.txt` and package README files live beside them. `Directory.Build.targets` imports the release notes during packing. Public API changes also require XML documentation updates; DocFX documentation is built by the repository automation.
+
+## Pull requests
+
+1. Create or join an issue before substantial work, then fork the repository and create a branch from `main`.
+2. Add or update focused tests and public API documentation where applicable.
+3. Run restore, build, and the relevant per-project tests locally.
+4. Keep the pull request small, explain the behavior change and validation performed, and wait for the CI checks to pass.
 
 ## Issues
-We use GitHub issues to track public bugs. Please ensure your description is
-clear and has sufficient instructions to be able to reproduce the issue.
 
-## Coding Guidelines
-* Please follow Framework Design Guidelines
-* Please follow SOLID principles
-* Make sure you have familiarized yourself with [Cuemon for .NET - Concept Reference](https://docs.cuemon.net/)
-* Consider reading my short take on [Software craftsmanship - a journey with inspirational sources!](https://github.com/gimlichael/Must-Read-Resources)
+Include the affected project, target framework, operating system, SDK version, exact command, expected result, actual result, and a minimal reproduction. Identify whether the behavior differs between local Windows/WSL, Docker-Ubuntu and GitHub Actions.
 
-## Manifesto
-As aspiring Software Craftsmen we are raising the bar of professional software development by practicing it and helping others learn the craft.
+## Coding guidelines
 
-Through this work we have come to value:
-
-* Not only working software,
-but also well-crafted software
-* Not only responding to change,
-but also steadily adding value
-* Not only individuals and interactions,
-but also a community of professionals
-* Not only customer collaboration,
-but also productive partnerships
-
-That is, in pursuit of the items on the left we have found the items on the right to be indispensable.
-
-[Manifesto for Software Craftsmanship](https://manifesto.softwarecraftsmanship.org/) is the originator of this text.
+Follow the existing style, the Framework Design Guidelines, the repository `.editorconfig`, and the shared Codebelt conventions. Do not make unrelated formatting or infrastructure changes in a feature pull request.
 
 ## License
-By contributing to Cuemon for .NET, you agree that your contributions will be licensed
-under the MIT license.
+
+By contributing to Cuemon for .NET, you agree that your contributions will be licensed under the MIT license.

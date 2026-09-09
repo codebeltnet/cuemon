@@ -12,7 +12,7 @@ This is a patch release focused on modernizing the test infrastructure and conso
 
 ### Added
 
-- `global.json` to enforce explicit .NET SDK version management across the repository.
+- `global.json` to configure Microsoft.Testing.Platform as the test runner.
 
 ### Changed
 

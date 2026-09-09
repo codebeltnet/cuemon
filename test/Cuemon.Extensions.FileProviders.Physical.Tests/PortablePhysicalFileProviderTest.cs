@@ -1186,7 +1186,8 @@ public class PortablePhysicalFileProviderTest : Test
     {
         Assert.Equal(expected.GetType(), actual.GetType());
         Assert.Equal(expected.ActiveChangeCallbacks, actual.ActiveChangeCallbacks);
-        Assert.Equal(expected.HasChanged, actual.HasChanged);
+        // Independent watchers can observe a change at different times.
+        // Verify HasChanged after awaiting notifications instead of comparing live snapshots.
         Assert.Equal(ReferenceEquals(NullChangeToken.Singleton, expected), ReferenceEquals(NullChangeToken.Singleton, actual));
     }
 
@@ -1220,7 +1221,12 @@ public class PortablePhysicalFileProviderTest : Test
 
         changeAction();
 
-        Assert.Equal(await expectedChanged.ConfigureAwait(false), await actualChanged.ConfigureAwait(false));
+        var notifications = await Task.WhenAll(expectedChanged, actualChanged).ConfigureAwait(false);
+
+        Assert.True(notifications[0], "PhysicalFileProvider did not report the file change.");
+        Assert.True(notifications[1], "PortablePhysicalFileProvider did not report the file change.");
+        Assert.True(expected.HasChanged);
+        Assert.True(actual.HasChanged);
     }
 
     private static async Task<bool> WaitForChangeAsync(IChangeToken token)

@@ -174,9 +174,3 @@ dotnet_diagnostic.IDE0032.severity = none
 # Excluded becuase of inconsistency with other analyzers
 [*.{cs,vb}]
 dotnet_diagnostic.IDE0036.severity = none
-
-# Order modifiers
-# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0036
-# Excluded becuase of inconsistency with other analyzers
-[*.{cs,vb}]
-dotnet_diagnostic.IDE0036.severity = none

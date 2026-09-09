@@ -36,7 +36,7 @@ Run tests one project at a time so a failing or hanging project is attributable.
 $testProjects = Get-ChildItem test -Filter *.csproj -Recurse
 $testProjects = $testProjects | Where-Object { $_.BaseName -notin @('Cuemon.Data.SqlClient.Tests') }
 foreach ($project in $testProjects) {
-    dotnet test $project.FullName --configuration Release --no-restore
+    dotnet test --project $project.FullName --configuration Release --no-restore
 }
 ```
 

@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.7.1] - 2026-09-09
+
+This is a patch release focused on modernizing the test infrastructure and consolidating dependencies. The release migrates code coverage collection from coverlet to Microsoft.Testing.Extensions.CodeCoverage, upgrades testing frameworks to their latest major versions, and simplifies test environment configuration while maintaining full compatibility with existing functionality.
+
+### Added
+
+- `global.json` to enforce explicit .NET SDK version management across the repository.
+
+### Changed
+
+- Test infrastructure migrated from coverlet (`coverlet.collector` and `coverlet.msbuild`) to Microsoft.Testing.Extensions.CodeCoverage with Microsoft.Testing.Platform configuration,
+- Testing framework dependencies upgraded to latest major versions: xunit.v3 (3.2.2 → 4.0.0), xunit.runner.visualstudio (3.1.5 → 4.0.0), Codebelt.Extensions.Xunit (11.2.0 → 12.0.0), Codebelt.Extensions.Xunit.Hosting (11.2.0 → 12.0.0), Codebelt.Extensions.Xunit.Hosting.AspNetCore (11.2.0 → 12.0.0), Microsoft.NET.Test.Sdk (18.8.1 → 18.10.0),
+- Tooling dependencies updated: MinVer (7.0.0 → 8.0.0), Codebelt.Extensions.BenchmarkDotNet.Console (1.3.2 → 1.3.3),
+- Runtime dependencies updated across supported target frameworks: Microsoft.Data.Sqlite (10.0.11 → 10.0.12), Microsoft.Extensions.* packages (10.0.11 → 10.0.12 for net10+netstandard2), Microsoft.Bcl.AsyncInterfaces (10.0.11 → 10.0.12), System.Text.Json (10.0.11 → 10.0.12),
+- Test environment configuration consolidated to single multi-version Docker image (`codebeltnet/ubuntu-testrunner:8-9-10-11`) supporting .NET 8, 9, 10, and 11 in a single container,
+- Removed Meziantou.Xunit.v3.ParallelTestFramework from test project dependencies,
+- Contributing guide reorganized with Codebelt shared conventions, clarified build/test/package instructions, and updated dotnet test command examples to use modern flag syntax,
+- CI pipeline simplified by removing DisableAppDomain argument from test runner configuration.
+
+### Fixed
+
+- Code style consistency by removing duplicate IDE0036 analyzer rule section from `.editorconfig`.
+
 ## [10.7.0] - 2026-08-12
 
 This is a minor release focused on enhancing Razor tag helper flexibility with automatic base URL resolution and modernizing package dependency management. The release introduces opt-in automatic base URL derivation from the current HTTP request while maintaining backward compatibility with the default configured mode. Tag helper functionality remains stable while new capabilities provide greater flexibility for dynamic deployment scenarios.
@@ -1874,6 +1897,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.7.1]: https://github.com/codebeltnet/cuemon/compare/v10.7.0...v10.7.1
 [10.7.0]: https://github.com/codebeltnet/cuemon/compare/v10.6.0...v10.7.0
 [10.6.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v10.6.0
 [10.5.5]: https://github.com/codebeltnet/cuemon/compare/v10.5.4...v10.5.5

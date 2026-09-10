@@ -143,7 +143,6 @@ jobs:
       configuration: ${{ matrix.configuration }}
       build-switches: -p:SkipSignAssembly=true
       projects: ${{ matrix.project }}
-      test-arguments: -- RunConfiguration.DisableAppDomain=true
       build: true # we need to build for .net48
       restore: true # apparently we need to restore for .net48
       download-pattern: build-${{ matrix.configuration }}-${{ matrix.arch }}
@@ -306,7 +305,15 @@ jobs:
         env:
           CONNECTIONSTRINGS__ADVENTUREWORKS: ${{ secrets.DB_ADVENTUREWORKS }}
 
+      - name: Upload Integration Test Results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: IntegrationTestResults-${{ matrix.configuration }}
+          path: ${{ runner.temp }}/TestResults
+
       - name: Take down SQL Server test dependency for ${{ matrix.configuration }} build
+        if: always()
         uses: codebeltnet/docker-compose@v1
         with:
           command: down

@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Meziantou.Xunit.v3.ParallelTestFramework" />
     <PackageReference Include="Codebelt.Extensions.Xunit.Hosting.AspNetCore" />
   </ItemGroup>
 

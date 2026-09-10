@@ -117,7 +117,7 @@ jobs:
         configuration: [Debug, Release]
         project: ${{ fromJson(needs.prepare_test.outputs.json) }}
         arch: [X64, ARM64]
-    uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
+    uses: ./.github/workflows/test-net11-workaround.yml
     with:
       runs-on: ${{ matrix.arch == 'ARM64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
       configuration: ${{ matrix.configuration }}
@@ -137,7 +137,7 @@ jobs:
         arch: [X64, ARM64]
         configuration: [Debug, Release]
         project: ${{ fromJson(needs.prepare_test.outputs.json) }}
-    uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
+    uses: ./.github/workflows/test-net11-workaround.yml
     with:
       runs-on: ${{ matrix.arch == 'ARM64' && 'windows-11-arm' || 'windows-2025' }}
       configuration: ${{ matrix.configuration }}
@@ -158,7 +158,7 @@ jobs:
         arch: [X64, ARM64]
         configuration: [Debug, Release]
         project: ${{ fromJson(needs.prepare_test.outputs.json) }}
-    uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
+    uses: ./.github/workflows/test-net11-workaround.yml
     with:
       runs-on: ${{ matrix.arch == 'ARM64' && 'macos-26' || 'macos-26-intel' }}
       configuration: ${{ matrix.configuration }}
@@ -298,7 +298,9 @@ jobs:
       - name: Test with ${{ matrix.configuration }} build
         uses: codebeltnet/dotnet-test@v4
         with:
-          projects: ${{ matrix.project }}
+          # Temporary .NET 11 RC1 workaround: use absolute project paths.
+          # Remove once CI uses an SDK with https://github.com/dotnet/sdk/issues/56196 fixed.
+          projects: $GITHUB_WORKSPACE/${{ matrix.project }}
           configuration: ${{ matrix.configuration }}
           build: true # apparently we need to due to xUnitv3
           restore: true # we need to restore since we disabled caching

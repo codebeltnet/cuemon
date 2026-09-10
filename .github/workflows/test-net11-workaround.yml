@@ -1,0 +1,526 @@
+# Temporary Cuemon-local copy of codebeltnet/jobs-dotnet-test default.yml@v3.
+# Remove this file and restore the remote workflow calls once CI uses an SDK
+# with https://github.com/dotnet/sdk/issues/56196 fixed.
+name: .NET Test
+
+on:
+  workflow_call:
+    inputs:
+      projects:
+        description: Optional path to the project(s) file to build. Supports globbing. Default is an empty string.
+        required: false
+        type: string
+        default: ''
+      configuration:
+        description: Defines the build configuration. Default is Release (to reduce risk of surprises when transitioning to Production).
+        required: false
+        type: string
+        default: 'Release'
+      runs-on:
+        description: The type of machine to run the job on. Default is ubuntu-24.04.
+        required: false
+        type: string
+        default: 'ubuntu-24.04'
+      include-preview:
+        description: When set to true, includes preview versions of .NET. Default is false.
+        required: false
+        type: boolean
+        default: false
+      verbosity-level:
+        description: Sets the verbosity level of the command. Allowed values are quiet, minimal, normal, detailed, and diagnostic. Default is quiet.
+        required: false
+        type: string
+        default: 'quiet'
+      coverage-report-folder-name:
+        description: The name of the folder where the coverage report will be written. Default is Coverage.
+        required: false
+        type: string
+        default: 'Coverage'
+      test-results-folder-name:
+        description: The name of the folder where the test results will be written. Default is TestResults.
+        required: false
+        type: string
+        default: 'TestResults'
+      build:
+        description: Whether to build the project(s) before testing. Default is false.
+        required: false
+        type: boolean
+        default: false
+      build-switches:
+        description: Provides a way to fully customize the build. Default is an empty string. See https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-command-line-reference?view=vs-2022#switches for more information.
+        required: false
+        type: string
+        default: ''
+      restore:
+        description: Whether to restore the project(s) before testing. Default is false.
+        required: false
+        type: boolean
+        default: false
+      restore-cache-key:
+        description: When set, the current workspace will be overwritten with the content of the restore cache. Default is an empty string.
+        required: false
+        type: string
+        default: ''
+      blame-hang-timeout:
+        description: The time to wait for a test to complete before collecting a dump. Default is 10 minutes.
+        required: false
+        type: string
+        default: '10m'
+      blame-hang-dump-type:
+        description: The type of dump to collect when a test hangs. Default is mini.
+        required: false
+        type: string
+        default: 'mini'
+      test-arguments:
+        description: Additional arguments to pass to the test runner. Default is an empty string.
+        required: false
+        type: string
+        default: ''
+      timeout-minutes:
+        description: The maximum time in minutes to allow the job to run. Default is 15 minutes.
+        required: false
+        type: number
+        default: 15
+      download-pattern:
+        description: The pattern to use when downloading build artifacts. Default is '*-' suffix with the configuration.
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  test:
+    name: 🧪 Test
+    runs-on: ${{ inputs.runs-on }}
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+    steps:
+      - name: Checkout
+        uses: codebeltnet/git-checkout@v1
+
+      - name: Install .NET
+        uses: codebeltnet/install-dotnet@v3
+        with:
+          includePreview: ${{ inputs.include-preview }}
+
+      - name: Install .NET Tool - Report Generator
+        uses: codebeltnet/dotnet-tool-install-reportgenerator@v1
+
+      - if: inputs.restore-cache-key != ''
+        name: Restore Cache
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            ${{ github.workspace }}
+            !${{ github.workspace }}/.git
+            ~/.nuget/packages
+          key: ${{ inputs.restore-cache-key }}
+          restore-keys: |
+            dotnet-restore-
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: ${{ inputs.download-pattern != '' && inputs.download-pattern || format('*-{0}', inputs.configuration) }}
+          merge-multiple: true
+
+      - if: inputs.restore
+        name: Restore Dependencies
+        uses: codebeltnet/dotnet-restore@v3
+        with:
+          projects: ${{ inputs.projects }}
+          verbosity-level: ${{ inputs.verbosity-level }}
+    
+      - if: inputs.build
+        name: Build with ${{ inputs.configuration }} configuration
+        uses: codebeltnet/dotnet-build@v4
+        with:
+          projects: ${{ inputs.projects }}
+          configuration: ${{ inputs.configuration }}
+          verbosity-level: ${{ inputs.verbosity-level }}
+          build-switches: ${{ inputs.build-switches }}
+
+      - if: runner.os == 'Linux'
+        name: Fix Linux test apphost permissions
+        run: |
+          set -euo pipefail
+
+          VERBOSITY="${{ inputs.verbosity-level }}"
+
+          echo "Linux test executable handling"
+          echo "Verbosity level: $VERBOSITY"
+          echo
+
+          echo "=== Brute-force chmod (all bin + obj) ==="
+          find . -type f \( -path "*/bin/*" -o -path "*/obj/*" \) -exec chmod a+x {} + 2>/dev/null || true
+          echo "chmod completed."
+          echo
+
+          case "$VERBOSITY" in
+            diag|diagnostic)
+              echo "=== Diagnostic mode enabled ==="
+              echo
+
+              echo "--- Runner / context ---"
+              echo "Runner: $RUNNER_OS / $RUNNER_ARCH"
+              echo "Workspace: $GITHUB_WORKSPACE"
+              echo "PWD: $(pwd)"
+              echo "Event: $GITHUB_EVENT_NAME"
+              echo "Ref: $GITHUB_REF"
+              echo "SHA: $GITHUB_SHA"
+              echo
+
+              echo "--- .NET info ---"
+              dotnet --info || true
+              echo
+
+              echo "--- Git state ---"
+              git rev-parse HEAD || true
+              git status --porcelain || true
+              git rev-parse --is-shallow-repository || true
+              echo
+
+              echo "--- Mount options (noexec check) ---"
+              mount | head -n 200 || true
+              echo
+
+              echo "--- Candidate executables (bin + obj) ---"
+              find . -type f \( -path "*/bin/*" -o -path "*/obj/*" \) \
+                ! -name "*.dll" ! -name "*.pdb" ! -name "*.json" ! -name "*.xml" \
+                -printf "%m %u:%g %s %p\n" 2>/dev/null | head -n 200 || true
+              echo
+
+              echo "--- Likely test hosts / apphosts ---"
+              find . -type f \( -path "*/bin/*" -o -path "*/obj/*" \) \( \
+                  -name "testhost*" -o \
+                  -name "*xunit*" -o \
+                  -name "*Tests*" -o \
+                  -name "*Tests" \
+                \) -printf "%m %u:%g %s %p\n" 2>/dev/null | head -n 200 || true
+              echo
+
+              echo "--- Deep diagnostics (file / ELF / shebang) ---"
+              find . -type f \( -path "*/bin/*" -o -path "*/obj/*" \) \( \
+                  -name "testhost*" -o \
+                  -name "*xunit*" -o \
+                  -name "*Tests*" -o \
+                  -name "*Tests" \
+                \) 2>/dev/null | head -n 50 | while IFS= read -r f; do
+                echo ">>> $f"
+                ls -la "$f" 2>/dev/null || true
+                file -L "$f" 2>/dev/null || true
+
+                if file -L "$f" 2>/dev/null | grep -q "ELF"; then
+                  echo "readelf -l:"
+                  readelf -l "$f" 2>/dev/null | head -n 80 || true
+                  echo "ldd:"
+                  ldd "$f" 2>/dev/null || true
+                fi
+
+                if head -c 2 "$f" 2>/dev/null | grep -q "#!"; then
+                  echo "shebang:"
+                  head -n 1 "$f" | cat -A || true
+                fi
+
+                echo
+              done || true
+
+              echo "=== End diagnostic mode ==="
+              ;;
+            *)
+              echo "Diagnostic mode disabled (verbosity-level != diag|diagnostic)."
+              ;;
+          esac
+        shell: bash
+
+      # Temporary .NET 11 RC1 workaround: relative --project paths are duplicated.
+      # https://github.com/dotnet/sdk/issues/56196
+      # Expand GITHUB_WORKSPACE in the action's Bash shell on the actual test runner.
+      # Keep inputs.projects relative for the artifact hashes below.
+      - name: Test with ${{ inputs.configuration }} build
+        uses: codebeltnet/dotnet-test@v4
+        with:
+          configuration: ${{ inputs.configuration }}
+          projects: $GITHUB_WORKSPACE/${{ inputs.projects }}
+          verbosity-level: ${{ inputs.verbosity-level }}
+          test-results-folder-name: ${{ inputs.test-results-folder-name }}
+          build-switches: ${{ inputs.build-switches }}
+          blame-hang-timeout: ${{ inputs.blame-hang-timeout }}
+          blame-hang-dump-type: ${{ inputs.blame-hang-dump-type }}
+          test-arguments: ${{ inputs.test-arguments }}
+          build: ${{ inputs.build }}
+          restore: ${{ inputs.restore }}
+
+      - name: Write Failed Test Details
+        if: failure()
+        shell: pwsh
+        run: |
+          $testResultsPath = Join-Path $env:RUNNER_TEMP '${{ inputs.test-results-folder-name }}'
+          $trxFiles = @(Get-ChildItem -LiteralPath $testResultsPath -Filter '*.trx' -Recurse -File -ErrorAction SilentlyContinue)
+
+          if ($trxFiles.Count -eq 0) {
+            Write-Host "No TRX files found in '$testResultsPath'."
+            exit 0
+          }
+
+          function Get-NodeText {
+            param([System.Xml.XmlNode] $Node)
+
+            if ($null -eq $Node -or [string]::IsNullOrWhiteSpace($Node.InnerText)) {
+              return ''
+            }
+
+            return $Node.InnerText.Trim()
+          }
+
+          function Limit-Text {
+            param(
+              [string] $Text,
+              [int] $MaxLength = 12000
+            )
+
+            if ([string]::IsNullOrWhiteSpace($Text)) {
+              return ''
+            }
+
+            $trimmed = $Text.Trim()
+            if ($trimmed.Length -le $MaxLength) {
+              return $trimmed
+            }
+
+            return "$($trimmed.Substring(0, $MaxLength))`n... truncated ..."
+          }
+
+          function Add-CodeBlock {
+            param(
+              [string] $Path,
+              [string] $Text
+            )
+
+            $safeText = Limit-Text -Text $Text
+            if ([string]::IsNullOrWhiteSpace($safeText)) {
+              Add-Content -LiteralPath $Path -Value '_No details were written to the TRX file._'
+              return
+            }
+
+            Add-Content -LiteralPath $Path -Value '```text'
+            Add-Content -LiteralPath $Path -Value ($safeText -replace '```', '`` `')
+            Add-Content -LiteralPath $Path -Value '```'
+          }
+
+          function ConvertTo-WorkflowCommandData {
+            param([string] $Text)
+
+            if ($null -eq $Text) {
+              return ''
+            }
+
+            return $Text.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+          }
+
+          function ConvertTo-WorkflowCommandProperty {
+            param([string] $Text)
+
+            return (ConvertTo-WorkflowCommandData -Text $Text).Replace(':', '%3A').Replace(',', '%2C')
+          }
+
+          function Write-FailedTestLog {
+            param([object] $Failure)
+
+            $name = ($Failure.Name -replace "`r?`n", ' ').Trim()
+            $message = Limit-Text -Text $Failure.Message
+            $stackTrace = Limit-Text -Text $Failure.StackTrace
+
+            Write-Host "::group::Failed test: $name"
+            $stopToken = [guid]::NewGuid().ToString('N')
+            Write-Host "::stop-commands::$stopToken"
+            try {
+              Write-Host "Duration: $($Failure.Duration)"
+              Write-Host "Results file: $($Failure.TrxFile)"
+              Write-Host ''
+
+              if (-not [string]::IsNullOrWhiteSpace($message)) {
+                Write-Host 'Message:'
+                Write-Host $message
+                Write-Host ''
+              }
+              else {
+                Write-Host 'Message: No details were written to the TRX file.'
+                Write-Host ''
+              }
+
+              if (-not [string]::IsNullOrWhiteSpace($stackTrace)) {
+                Write-Host 'Stack trace:'
+                Write-Host $stackTrace
+                Write-Host ''
+              }
+              else {
+                Write-Host 'Stack trace: No stack trace was written to the TRX file.'
+                Write-Host ''
+              }
+            }
+            finally {
+              Write-Host "::$stopToken::"
+              Write-Host '::endgroup::'
+            }
+
+            $annotation = @(
+              $name
+              ''
+              'Message:'
+              if (-not [string]::IsNullOrWhiteSpace($message)) { $message } else { 'No details were written to the TRX file.' }
+              ''
+              'Stack trace:'
+              if (-not [string]::IsNullOrWhiteSpace($stackTrace)) { $stackTrace } else { 'No stack trace was written to the TRX file.' }
+            ) -join "`n"
+
+            $title = ConvertTo-WorkflowCommandProperty -Text "Failed test: $name"
+            $details = ConvertTo-WorkflowCommandData -Text (Limit-Text -Text $annotation)
+            Write-Host "::error title=$title::$details"
+          }
+
+          $failures = [System.Collections.Generic.List[object]]::new()
+
+          foreach ($trxFile in $trxFiles) {
+            try {
+              [xml] $trx = Get-Content -LiteralPath $trxFile.FullName -Raw
+            }
+            catch {
+              Write-Warning "Could not read TRX file '$($trxFile.FullName)': $_"
+              continue
+            }
+
+            $testDefinitions = @{}
+            foreach ($unitTest in @($trx.SelectNodes("//*[local-name()='UnitTest']"))) {
+              $method = $unitTest.SelectSingleNode("./*[local-name()='TestMethod']")
+              if ($null -ne $method -and -not [string]::IsNullOrWhiteSpace($unitTest.id)) {
+                $testDefinitions[$unitTest.id] = [pscustomobject]@{
+                  ClassName = $method.className
+                  MethodName = $method.name
+                }
+              }
+            }
+
+            foreach ($result in @($trx.SelectNodes("//*[local-name()='UnitTestResult' and @outcome='Failed']"))) {
+              $definition = $null
+              if (-not [string]::IsNullOrWhiteSpace($result.testId) -and $testDefinitions.ContainsKey($result.testId)) {
+                $definition = $testDefinitions[$result.testId]
+              }
+
+              $testName = $result.testName
+              if ($null -ne $definition -and -not [string]::IsNullOrWhiteSpace($definition.ClassName) -and -not [string]::IsNullOrWhiteSpace($definition.MethodName)) {
+                $testName = "$($definition.ClassName).$($definition.MethodName)"
+              }
+
+              if ([string]::IsNullOrWhiteSpace($testName)) {
+                $testName = 'Unknown test'
+              }
+
+              $message = Get-NodeText -Node $result.SelectSingleNode("./*[local-name()='Output']/*[local-name()='ErrorInfo']/*[local-name()='Message']")
+              $stackTrace = Get-NodeText -Node $result.SelectSingleNode("./*[local-name()='Output']/*[local-name()='ErrorInfo']/*[local-name()='StackTrace']")
+
+              $failures.Add([pscustomobject]@{
+                Name = $testName
+                Duration = $result.duration
+                Message = $message
+                StackTrace = $stackTrace
+                TrxFile = $trxFile.FullName
+              })
+            }
+          }
+
+          if ($failures.Count -eq 0) {
+            Write-Host "TRX files were found, but no failed UnitTestResult entries were present."
+            exit 0
+          }
+
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ''
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value '## Failed Tests'
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ''
+
+          foreach ($failure in $failures) {
+            $name = ($failure.Name -replace "`r?`n", ' ').Trim()
+
+            Write-FailedTestLog -Failure $failure
+
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "### ``$name``"
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ''
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "- Duration: ``$($failure.Duration)``"
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "- Results file: ``$($failure.TrxFile)``"
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ''
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value '**Message**'
+            Add-CodeBlock -Path $env:GITHUB_STEP_SUMMARY -Text $failure.Message
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ''
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value '**Stack trace**'
+            Add-CodeBlock -Path $env:GITHUB_STEP_SUMMARY -Text $failure.StackTrace
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value ''
+          }
+
+      - if: always() && runner.os == 'Linux'
+        name: Content of Test Results Folder
+        run: ls -R $RUNNER_TEMP/${{ inputs.test-results-folder-name }}
+
+      - if: always() && runner.os == 'macOS'
+        name: Content of Test Results Folder
+        run: ls -R $RUNNER_TEMP/${{ inputs.test-results-folder-name }}
+
+      - if: always() && runner.os == 'Windows'
+        name: Content of Test Results Folder
+        shell: pwsh
+        run: Get-ChildItem -Path "$env:RUNNER_TEMP\${{ inputs.test-results-folder-name }}" -Recurse
+
+      - name: Find Coverage Files
+        if: always()
+        id: coverage-files
+        shell: pwsh
+        run: |
+          $testResultsPath = Join-Path $env:RUNNER_TEMP '${{ inputs.test-results-folder-name }}'
+          $coverageFiles = @(
+            Get-ChildItem -LiteralPath $testResultsPath -Include '*.opencover.xml', '*.cobertura.xml' -Recurse -File -ErrorAction SilentlyContinue
+          )
+
+          "exists=$($coverageFiles.Count -gt 0)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Found $($coverageFiles.Count) coverage file(s) in '$testResultsPath'."
+
+      - name: Use Report Generator
+        if: success() && steps.coverage-files.outputs.exists == 'true'
+        run: reportgenerator "-reports:$RUNNER_TEMP/${{ inputs.test-results-folder-name }}/**/*.opencover.xml;$RUNNER_TEMP/${{ inputs.test-results-folder-name }}/**/*.cobertura.xml" "-targetdir:${{ github.workspace }}/${{ inputs.coverage-report-folder-name }}" "-reporttypes:Cobertura;MarkdownSummaryGithub;HTMLInline;HTMLChart"
+        shell: bash
+
+      - name: Find Coverage Summary
+        if: always()
+        id: coverage-summary
+        shell: pwsh
+        run: |
+          $summaryPath = Join-Path '${{ github.workspace }}' '${{ inputs.coverage-report-folder-name }}/SummaryGithub.md'
+
+          if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) {
+            "exists=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            Write-Host "Coverage summary '$summaryPath' was not found."
+            exit 0
+          }
+
+          "exists=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "path=$summaryPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Write Coverage Summary
+        if: always() && steps.coverage-summary.outputs.exists == 'true'
+        shell: pwsh
+        run: Get-Content -LiteralPath '${{ steps.coverage-summary.outputs.path }}' | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload CoverageReport
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: CoverageReport-${{ inputs.configuration }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles(inputs.projects) }}
+          path: ${{ github.workspace }}/${{ inputs.coverage-report-folder-name }}
+          include-hidden-files: true
+          if-no-files-found: warn
+
+      - name: Upload TestResults
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: TestResults-${{ inputs.configuration }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles(inputs.projects) }}
+          path: ${{ runner.temp }}/${{ inputs.test-results-folder-name }}
+          include-hidden-files: true

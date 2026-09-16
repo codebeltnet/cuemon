@@ -22,6 +22,7 @@
         }
       ],
       "dest": "api/dotnet",
+      "memberLayout": "separatePages",
       "filter": "filterConfig.yml",
       "properties": {
         "TargetFramework": "net10.0"
@@ -53,6 +54,7 @@
         }
       ],
       "dest": "api/extensions/dotnet",
+      "memberLayout": "separatePages",
       "filter": "filterConfig.yml",
       "properties": {
         "TargetFramework": "net10.0"
@@ -71,6 +73,7 @@
         }
       ],
       "dest": "api/aspnet",
+      "memberLayout": "separatePages",
       "filter": "filterConfig.yml",
       "properties": {
         "TargetFramework": "net10.0"
@@ -93,6 +96,7 @@
         }
       ],
       "dest": "api/extensions/aspnet",
+      "memberLayout": "separatePages",
       "filter": "filterConfig.yml",
       "properties": {
         "TargetFramework": "net10.0"
@@ -140,7 +144,7 @@
       "_disableContribution": false,
       "_gitContribute": {
         "repo": "https://github.com/codebeltnet/cuemon",
-        "branch": "development"
+        "branch": "main"
       },
       "_gitUrlPattern": "github",
       "_lang": "en"
@@ -151,7 +155,8 @@
     "template": [
       "default",
       "modern",
-      "templates/cuemon"
+      "templates/cuemon",
+      "templates/ms-style"
     ],
     "overwrite": [
       {

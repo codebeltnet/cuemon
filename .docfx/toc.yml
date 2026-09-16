@@ -16,7 +16,3 @@
     href: api/aspnet/Cuemon.AspNetCore.html
   - name: ASP.NET Core API Extensions
     href: api/extensions/aspnet/Cuemon.Extensions.AspNetCore.Configuration.html
-- name: Other Projects
-  href: api/extensions
-- name: NuGet
-  href: packages

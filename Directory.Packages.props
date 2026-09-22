@@ -7,18 +7,20 @@
     <PackageVersion Include="AutoFixture" Version="4.18.1" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.8" />
-    <PackageVersion Include="Codebelt.Extensions.BenchmarkDotNet.Console" Version="1.3.3" />
-    <PackageVersion Include="Codebelt.Extensions.Xunit" Version="12.0.0" />
-    <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting" Version="12.0.0" />
-    <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting.AspNetCore" Version="12.0.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.11.0" />
+    <PackageVersion Include="Codebelt.Extensions.BenchmarkDotNet.Console" Version="1.3.4" />
+    <PackageVersion Include="Codebelt.Extensions.Xunit" Version="12.0.1" />
+    <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting" Version="12.0.1" />
+    <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting.AspNetCore" Version="12.0.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageVersion Include="Codebelt.Coverlet.MTP" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.4.1" />
     <PackageVersion Include="MinVer" Version="8.0.0" />
     <PackageVersion Include="NativeLibraryLoader" Version="1.0.13" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" Condition="'$(MSBuildProjectName)' == 'Cuemon.Core.Tests'" />
     <PackageVersion Include="Xunit.v3.Priority" Version="1.1.18" />
-    <PackageVersion Include="xunit.v3" Version="4.0.0" />
-    <PackageVersion Include="xunit.v3.runner.console" Version="4.0.0" />
+    <PackageVersion Include="xunit.v3" Version="4.0.1" />
+    <PackageVersion Include="xunit.v3.extensibility.core" Version="4.0.1" />
+    <PackageVersion Include="xunit.v3.runner.console" Version="4.0.1" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
@@ -35,12 +37,12 @@
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="5.2.3" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net9'))">
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.19" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.19" />
-    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.19" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.19" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.19" />
-    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.19" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.20" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.20" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.20" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.20" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.20" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.20" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net10')) OR $(TargetFramework.StartsWith('netstandard2'))">
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.12" />
@@ -51,6 +53,6 @@
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.12" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net9')) OR $(TargetFramework.StartsWith('net10'))">
-    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.0" />
   </ItemGroup>
 </Project>

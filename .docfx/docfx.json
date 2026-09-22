@@ -139,7 +139,6 @@
       "_appLogoPath": "images/50x50.png",
       "_appFaviconPath": "images/favicon.ico",
       "_googleAnalyticsTagId": "UA-126254455-1",
-      "_disableBreadcrumb": true,
       "_enableSearch": true,
       "_disableContribution": false,
       "_gitContribute": {

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace Cuemon.Extensions.FileProviders;
 public class PortablePhysicalFileProviderTest : Test
 {
     private static readonly TimeSpan ChangeNotificationTimeout = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan ChangeNotificationRetryInterval = TimeSpan.FromMilliseconds(250);
     private static readonly FindMatchingEntryDelegate FindMatchingEntry = CreateFindMatchingEntryDelegate();
     private static readonly ResolvePathDelegate ResolvePathWithEntries = CreateResolvePathDelegate();
     private static readonly ResolveFileInfoDelegate ResolveFileInfoSelection = CreateResolveFileInfoDelegate();
@@ -853,7 +855,7 @@ public class PortablePhysicalFileProviderTest : Test
         AssertEquivalentChangeToken(baseline, token);
         Assert.False(ReferenceEquals(NullChangeToken.Singleton, token));
 
-        await AssertEquivalentChangeNotificationAsync(baseline, token, () => File.WriteAllText(Path.Combine(directoryPath, "new.txt"), Guid.NewGuid().ToString("N")));
+        await AssertEquivalentChangeNotificationAsync(baseline, token, () => File.WriteAllText(Path.Combine(directoryPath, $"{Guid.NewGuid():N}.txt"), Guid.NewGuid().ToString("N")));
     }
 
     [Fact]
@@ -1219,7 +1221,7 @@ public class PortablePhysicalFileProviderTest : Test
         var expectedChanged = WaitForChangeAsync(expected);
         var actualChanged = WaitForChangeAsync(actual);
 
-        changeAction();
+        await SignalChangesUntilCompletedAsync(changeAction, expectedChanged, actualChanged).ConfigureAwait(false);
 
         var notifications = await Task.WhenAll(expectedChanged, actualChanged).ConfigureAwait(false);
 
@@ -1227,6 +1229,32 @@ public class PortablePhysicalFileProviderTest : Test
         Assert.True(notifications[1], "PortablePhysicalFileProvider did not report the file change.");
         Assert.True(expected.HasChanged);
         Assert.True(actual.HasChanged);
+    }
+
+    private static async Task SignalChangesUntilCompletedAsync(Action changeAction, params Task[] changeTasks)
+    {
+        var allChanges = Task.WhenAll(changeTasks);
+        var timer = Stopwatch.StartNew();
+
+        // Polling-based watchers can miss the first mutation while the subscription is still priming.
+        while (timer.Elapsed < ChangeNotificationTimeout && !allChanges.IsCompleted)
+        {
+            changeAction();
+
+            if (allChanges.IsCompleted)
+            {
+                return;
+            }
+
+            var remaining = ChangeNotificationTimeout - timer.Elapsed;
+            if (remaining <= TimeSpan.Zero)
+            {
+                return;
+            }
+
+            var delay = remaining < ChangeNotificationRetryInterval ? remaining : ChangeNotificationRetryInterval;
+            await Task.WhenAny(allChanges, Task.Delay(delay)).ConfigureAwait(false);
+        }
     }
 
     private static async Task<bool> WaitForChangeAsync(IChangeToken token)

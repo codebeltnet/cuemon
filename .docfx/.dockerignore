@@ -1,0 +1,5 @@
+# Local outputs and bookkeeping are not inputs to the container's DocFX build.
+wwwroot/
+obj/
+bin/
+*.ps1

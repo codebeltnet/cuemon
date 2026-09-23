@@ -14,7 +14,9 @@ This repository is part of the Codebelt .NET library estate. The instructions be
 - `src/` contains production projects.
 - `test/` contains xUnit v3 test projects.
 - `Cuemon.slnx` is the solution used for local development.
-- `.github/workflows/ci-pipeline.yml` is the CI workflow and the authority for the test matrix.
+- `.github/workflows/pr.yml` owns the PR test matrix and blocking quality gates.
+- `.github/workflows/release.yml` publishes packages from a human-versioned `main` SHA; post-release assurance and DocFX production run after NuGet publication.
+- `.github/workflows/deploy.yml` promotes the published DocFX image without rebuilding it. See `.github/workflows/README.md` for the CI/CD handoff and release behavior.
 - `testenvironments.json` declares the supported `WSL-Ubuntu` and `Docker-Ubuntu` test environments.
 
 ## Build

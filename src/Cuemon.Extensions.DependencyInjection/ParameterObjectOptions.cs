@@ -27,7 +27,7 @@ internal sealed class ParameterObjectOptions<TOptions> : IPostConfigureOptions<T
             validatable.ValidateOptions();
             return ValidateOptionsResult.Success;
         }
-        catch (Exception e) when (Patterns.IsRecoverableException(e))
+        catch (Exception e) when (e is not OperationCanceledException && Patterns.IsRecoverableException(e))
         {
             return ValidateOptionsResult.Fail(e.Message);
         }

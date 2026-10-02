@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Cuemon.Configuration;
 #if NET9_0_OR_GREATER
 using Cuemon.AspNetCore.Diagnostics;
@@ -219,6 +220,32 @@ public class ServiceCollectionExtensionsTest : Test
             var exception = Record.Exception(() => _ = provider.GetRequiredService<IOptions<LifecycleOptions>>().Value);
 
             Assert.Same(failure, exception);
+        }
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void AddConfiguredOptions_ShouldPropagateValidationCancellation_WhenMaterialized(bool resolveDirect, bool useTaskCancellation)
+    {
+        var token = new CancellationToken(true);
+        OperationCanceledException failure = useTaskCancellation
+            ? new TaskCanceledException(Task.FromCanceled(token))
+            : new OperationCanceledException("Validation canceled.", null, token);
+        var services = new ServiceCollection().AddConfiguredOptions<LifecycleOptions>(options => options.ValidationFailure = failure);
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var exception = Record.Exception(() =>
+            {
+                if (resolveDirect) { provider.GetRequiredService<LifecycleOptions>(); }
+                else { _ = provider.GetRequiredService<IOptions<LifecycleOptions>>().Value; }
+            });
+
+            Assert.Same(failure, exception);
+            Assert.Equal(token, ((OperationCanceledException)exception).CancellationToken);
         }
     }
 

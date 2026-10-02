@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Threading;
+using Cuemon.Configuration;
 #if NET9_0_OR_GREATER
 using Cuemon.AspNetCore.Diagnostics;
 using Cuemon.AspNetCore.Mvc.Filters.Diagnostics;
@@ -18,6 +22,494 @@ public class ServiceCollectionExtensionsTest : Test
 {
     public ServiceCollectionExtensionsTest(ITestOutputHelper output) : base(output)
     {
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldThrowArgumentNullException_WhenServicesIsNull()
+    {
+        IServiceCollection services = null;
+
+        var exception = Assert.Throws<ArgumentNullException>(() => services.AddConfiguredOptions<ParameterOptions>(_ => { }));
+
+        Assert.Equal("services", exception.ParamName);
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldThrowArgumentNullException_WhenSetupIsNull()
+    {
+        var services = new ServiceCollection();
+
+        var exception = Assert.Throws<ArgumentNullException>(() => services.AddConfiguredOptions<ParameterOptions>(null));
+
+        Assert.Equal("setup", exception.ParamName);
+        Assert.Empty(services);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void AddConfiguredOptions_ShouldShareDefaultOptions_WithoutEagerOrRepeatedConfiguration(bool resolveDirectFirst)
+    {
+        var services = new ServiceCollection();
+        var invocationCount = 0;
+        ParameterOptions configured = null;
+        Action<ParameterOptions> setup = options =>
+        {
+            invocationCount++;
+            configured = options;
+            options.Greeting = "Configured";
+        };
+
+        Assert.Same(services, services.AddConfiguredOptions(setup));
+        Assert.Equal(0, invocationCount);
+        Assert.Equal(ServiceLifetime.Singleton, Assert.Single(services, descriptor => descriptor.ServiceType == typeof(ParameterOptions)).Lifetime);
+
+        using (var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true }))
+        {
+            var optionsService = provider.GetRequiredService<IOptions<ParameterOptions>>();
+            Assert.Equal(0, invocationCount);
+            var first = resolveDirectFirst ? provider.GetRequiredService<ParameterOptions>() : optionsService.Value;
+            var second = resolveDirectFirst ? optionsService.Value : provider.GetRequiredService<ParameterOptions>();
+
+            Assert.Same(first, second);
+            Assert.Same(configured, first);
+            Assert.Equal("Configured", first.Greeting);
+            Assert.Equal(1, invocationCount);
+            using (var scope = provider.CreateScope())
+            {
+                Assert.Same(first, scope.ServiceProvider.GetRequiredService<ParameterOptions>());
+            }
+            Assert.Equal(1, invocationCount);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldExposeExactSetup_WithoutRunningConventionsWhenInvokedDirectly()
+    {
+        Action<LifecycleOptions> setup = options => options.Greeting = "Configured";
+        var services = new ServiceCollection().AddConfiguredOptions(setup);
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var resolved = provider.GetRequiredService<Action<LifecycleOptions>>();
+            var fresh = new LifecycleOptions();
+            resolved(fresh);
+
+            Assert.Same(setup, resolved);
+            Assert.Same(setup, Assert.Single(provider.GetServices<Action<LifecycleOptions>>()));
+            Assert.Equal("Configured", fresh.Greeting);
+            Assert.Equal(0, fresh.PostConfigureCount);
+            Assert.Equal(0, fresh.ValidateCount);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldPostConfigure_WithoutRequiringValidation()
+    {
+        var services = new ServiceCollection().AddConfiguredOptions<PostConfiguredOptions>(options => options.Greeting = "Configured");
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var options = provider.GetRequiredService<IOptions<PostConfiguredOptions>>().Value;
+
+            Assert.Equal("Configured post-configured", options.Greeting);
+            Assert.Equal(1, options.PostConfigureCount);
+            Assert.Same(options, provider.GetRequiredService<PostConfiguredOptions>());
+            Assert.Same(options, options.PostConfiguredInstance);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldValidate_WithoutRequiringPostConfiguration()
+    {
+        var services = new ServiceCollection().AddConfiguredOptions<ValidatedOptions>(options => options.Greeting = "Configured");
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var options = provider.GetRequiredService<ValidatedOptions>();
+
+            Assert.Equal("Configured", options.Greeting);
+            Assert.Equal(1, options.ValidateCount);
+            Assert.Same(options, options.ValidatedInstance);
+            Assert.Same(options, provider.GetRequiredService<IOptions<ValidatedOptions>>().Value);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldRunSetupBeforePostConfigurationBeforeValidation_OnTheExposedInstance()
+    {
+        LifecycleOptions configured = null;
+        var services = new ServiceCollection().AddConfiguredOptions<LifecycleOptions>(options =>
+        {
+            configured = options;
+            options.Greeting = "Configured";
+            options.Stages.Add("setup");
+        });
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var options = provider.GetRequiredService<IOptions<LifecycleOptions>>().Value;
+
+            Assert.Equal(new[] { "setup", "post-configure", "validate" }, options.Stages);
+            Assert.Equal("Configured post-configured", options.Greeting);
+            Assert.Equal(options.Greeting, options.ValidatedGreeting);
+            Assert.Equal(1, options.PostConfigureCount);
+            Assert.Equal(1, options.ValidateCount);
+            Assert.Same(configured, options);
+            Assert.Same(options, options.PostConfiguredInstance);
+            Assert.Same(options, options.ValidatedInstance);
+            Assert.Same(options, provider.GetRequiredService<LifecycleOptions>());
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void AddConfiguredOptions_ShouldTranslateRecoverableValidationFailure_WhenMaterialized(bool resolveDirect)
+    {
+        var failure = new InvalidOperationException("Invalid greeting.");
+        var invocationCount = 0;
+        LifecycleOptions configured = null;
+        var services = new ServiceCollection().AddConfiguredOptions<LifecycleOptions>(options =>
+        {
+            invocationCount++;
+            configured = options;
+            options.ValidationFailure = failure;
+        });
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.Equal(0, invocationCount);
+            var exception = Assert.Throws<OptionsValidationException>(() =>
+            {
+                if (resolveDirect) { provider.GetRequiredService<LifecycleOptions>(); }
+                else { _ = provider.GetRequiredService<IOptions<LifecycleOptions>>().Value; }
+            });
+
+            Assert.Equal(Options.DefaultName, exception.OptionsName);
+            Assert.Equal(typeof(LifecycleOptions), exception.OptionsType);
+            Assert.Equal(failure.Message, Assert.Single(exception.Failures));
+            Assert.Equal(1, invocationCount);
+            Assert.Equal(1, configured.PostConfigureCount);
+            Assert.Equal(1, configured.ValidateCount);
+        }
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    public void AddConfiguredOptions_ShouldPropagateFatalValidationExceptions(int exceptionKind)
+    {
+        Exception[] failures =
+        {
+            new OutOfMemoryException("Synthetic failure."),
+            new StackOverflowException("Synthetic failure."),
+            new AccessViolationException("Synthetic failure."),
+            new SEHException("Synthetic failure."),
+            new ThreadInterruptedException("Synthetic failure.")
+        };
+        var failure = failures[exceptionKind];
+        var services = new ServiceCollection().AddConfiguredOptions<LifecycleOptions>(options => options.ValidationFailure = failure);
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var exception = Record.Exception(() => _ = provider.GetRequiredService<IOptions<LifecycleOptions>>().Value);
+
+            Assert.Same(failure, exception);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldPropagatePostConfigurationFailure_WithoutValidation()
+    {
+        var failure = new InvalidOperationException("Post-configuration failed.");
+        LifecycleOptions configured = null;
+        var services = new ServiceCollection().AddConfiguredOptions<LifecycleOptions>(options =>
+        {
+            configured = options;
+            options.PostConfigurationFailure = failure;
+        });
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var exception = Assert.Throws<InvalidOperationException>(() => _ = provider.GetRequiredService<IOptions<LifecycleOptions>>().Value);
+
+            Assert.Same(failure, exception);
+            Assert.Equal(1, configured.PostConfigureCount);
+            Assert.Equal(0, configured.ValidateCount);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldPropagateSetupFailure_WithoutRunningConventions()
+    {
+        var failure = new InvalidOperationException("Configuration failed.");
+        LifecycleOptions configured = null;
+        var services = new ServiceCollection().AddConfiguredOptions<LifecycleOptions>(options =>
+        {
+            configured = options;
+            throw failure;
+        });
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var exception = Assert.Throws<InvalidOperationException>(() => _ = provider.GetRequiredService<IOptions<LifecycleOptions>>().Value);
+
+            Assert.Same(failure, exception);
+            Assert.Equal(0, configured.PostConfigureCount);
+            Assert.Equal(0, configured.ValidateCount);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldKeepFirstSetup_AndRegisterConventionsAndDirectServicesOnce()
+    {
+        var services = new ServiceCollection();
+        var firstCount = 0;
+        var secondCount = 0;
+        Action<LifecycleOptions> first = options => { firstCount++; options.Greeting = "First"; };
+        Action<LifecycleOptions> second = options => { secondCount++; options.Greeting = "Second"; };
+
+        services.AddConfiguredOptions(first);
+        Assert.Same(services, services.AddConfiguredOptions(second));
+        services.AddConfiguredOptions(first);
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var options = provider.GetRequiredService<LifecycleOptions>();
+
+            Assert.Equal("First post-configured", options.Greeting);
+            Assert.Same(first, Assert.Single(provider.GetServices<Action<LifecycleOptions>>()));
+            Assert.Same(options, Assert.Single(provider.GetServices<LifecycleOptions>()));
+            Assert.Single(provider.GetServices<IPostConfigureOptions<LifecycleOptions>>());
+            Assert.Single(provider.GetServices<IValidateOptions<LifecycleOptions>>());
+            Assert.Equal(1, firstCount);
+            Assert.Equal(0, secondCount);
+            Assert.Equal(1, options.PostConfigureCount);
+            Assert.Equal(1, options.ValidateCount);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldRejectNullSetup_EvenAfterPrimaryRegistration()
+    {
+        var services = new ServiceCollection().AddConfiguredOptions<ParameterOptions>(_ => { });
+
+        Assert.Throws<ArgumentNullException>(() => services.AddConfiguredOptions<ParameterOptions>(null));
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldComposeOrdinaryConfigureRegistrations_WhileExposingOnlyPrimarySetup()
+    {
+        Action<LifecycleOptions> setup = options => { options.Greeting += " primary"; options.Stages.Add("primary setup"); };
+        var services = new ServiceCollection()
+            .Configure<LifecycleOptions>(options => { options.Greeting = "Before"; options.Stages.Add("before setup"); })
+            .AddConfiguredOptions(setup)
+            .Configure<LifecycleOptions>(options => { options.Greeting += " after"; options.Stages.Add("after setup"); })
+            .AddConfiguredOptions<LifecycleOptions>(options => options.Greeting = "Ignored");
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var options = provider.GetRequiredService<LifecycleOptions>();
+            var fresh = new LifecycleOptions();
+            provider.GetRequiredService<Action<LifecycleOptions>>()(fresh);
+
+            Assert.Equal("Before primary after post-configured", options.Greeting);
+            Assert.Equal(new[] { "before setup", "primary setup", "after setup", "post-configure", "validate" }, options.Stages);
+            Assert.Same(setup, provider.GetRequiredService<Action<LifecycleOptions>>());
+            Assert.Equal(" primary", fresh.Greeting);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldCoexistWithUserPostConfiguratorsAndValidators_InRegistrationOrder()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<IPostConfigureOptions<LifecycleOptions>>(new PostConfigureOptions<LifecycleOptions>(Options.DefaultName, options => options.Stages.Add("user post-configure before")));
+        services.AddSingleton<IValidateOptions<LifecycleOptions>>(new ValidateOptions<LifecycleOptions>(Options.DefaultName, options => { options.Stages.Add("user validate before"); return true; }, "User validation failed."));
+        services.AddConfiguredOptions<LifecycleOptions>(options => options.Stages.Add("setup"));
+        services.PostConfigure<LifecycleOptions>(options => { options.Stages.Add("user post-configure after"); options.Greeting = "Final"; });
+        services.AddSingleton<IValidateOptions<LifecycleOptions>>(new ValidateOptions<LifecycleOptions>(Options.DefaultName, options => { options.Stages.Add("user validate after"); return true; }, "User validation failed."));
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var options = provider.GetRequiredService<LifecycleOptions>();
+
+            Assert.Equal(new[] { "setup", "user post-configure before", "post-configure", "user post-configure after", "user validate before", "validate", "user validate after" }, options.Stages);
+            Assert.Equal("Final", options.ValidatedGreeting);
+            Assert.Equal(1, options.PostConfigureCount);
+            Assert.Equal(1, options.ValidateCount);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldAggregateUserAndCuemonValidationFailures()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<IValidateOptions<LifecycleOptions>>(new ValidateOptions<LifecycleOptions>(Options.DefaultName, _ => false, "User validation failed."));
+        services.AddConfiguredOptions<LifecycleOptions>(options => options.ValidationFailure = new ArgumentException("Cuemon validation failed."));
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var exception = Assert.Throws<OptionsValidationException>(() => _ = provider.GetRequiredService<IOptions<LifecycleOptions>>().Value);
+
+            Assert.Equal(new[] { "User validation failed.", "Cuemon validation failed." }, exception.Failures);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldCoexistWithPostConfigureAllOfAndTryConfigure()
+    {
+        var services = new ServiceCollection()
+            .AddConfiguredOptions<LifecycleOptions>(options => options.Greeting = "Primary")
+            .TryConfigure<LifecycleOptions>(options => options.Greeting = "Ignored")
+            .PostConfigureAllOf<ParameterOptions>(options => options.Greeting = "Bulk post-configured");
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var options = provider.GetRequiredService<LifecycleOptions>();
+
+            Assert.Equal("Bulk post-configured", options.Greeting);
+            Assert.Equal("Bulk post-configured", options.ValidatedGreeting);
+            Assert.Equal(1, options.PostConfigureCount);
+            Assert.Equal(1, options.ValidateCount);
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldPreserveSnapshotAndMonitorLifecycles_AndApplyConventionsToNamedOptions()
+    {
+        var invocationCount = 0;
+        var services = new ServiceCollection()
+            .AddConfiguredOptions<LifecycleOptions>(options => { invocationCount++; options.Greeting = "Default"; })
+            .Configure<LifecycleOptions>("named", options => options.Greeting = "Named");
+
+        using (var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true }))
+        using (var firstScope = provider.CreateScope())
+        using (var secondScope = provider.CreateScope())
+        {
+            var direct = provider.GetRequiredService<LifecycleOptions>();
+            var firstSnapshot = firstScope.ServiceProvider.GetRequiredService<IOptionsSnapshot<LifecycleOptions>>();
+            var secondSnapshot = secondScope.ServiceProvider.GetRequiredService<IOptionsSnapshot<LifecycleOptions>>();
+            var monitor = provider.GetRequiredService<IOptionsMonitor<LifecycleOptions>>();
+            var monitored = monitor.CurrentValue;
+
+            Assert.Same(direct, provider.GetRequiredService<IOptions<LifecycleOptions>>().Value);
+            Assert.Same(firstSnapshot, firstScope.ServiceProvider.GetRequiredService<IOptionsSnapshot<LifecycleOptions>>());
+            Assert.Same(firstSnapshot.Value, firstSnapshot.Value);
+            Assert.NotSame(firstSnapshot.Value, secondSnapshot.Value);
+            Assert.NotSame(direct, firstSnapshot.Value);
+            Assert.NotSame(direct, monitored);
+            Assert.Same(monitored, monitor.CurrentValue);
+            Assert.Equal(4, invocationCount);
+            Assert.True(provider.GetRequiredService<IOptionsMonitorCache<LifecycleOptions>>().TryRemove(Options.DefaultName));
+            var refreshed = monitor.CurrentValue;
+            Assert.NotSame(monitored, refreshed);
+            Assert.Same(direct, provider.GetRequiredService<LifecycleOptions>());
+            Assert.Equal(5, invocationCount);
+
+            var named = monitor.Get("named");
+            Assert.Same(named, monitor.Get("named"));
+            Assert.NotSame(named, firstSnapshot.Get("named"));
+            Assert.Equal("Named post-configured", named.Greeting);
+            Assert.Equal(named.Greeting, named.ValidatedGreeting);
+            Assert.Equal(1, named.PostConfigureCount);
+            Assert.Equal(1, named.ValidateCount);
+            Assert.Equal(5, invocationCount);
+
+            foreach (var options in new[] { direct, firstSnapshot.Value, secondSnapshot.Value, monitored, refreshed })
+            {
+                Assert.Equal("Default post-configured", options.Greeting);
+                Assert.Equal(1, options.PostConfigureCount);
+                Assert.Equal(1, options.ValidateCount);
+            }
+        }
+    }
+
+    [Fact]
+    public void AddConfiguredOptions_ShouldRegisterIndependentlyForEachOptionsType()
+    {
+        var services = new ServiceCollection()
+            .AddConfiguredOptions<ParameterOptions>(options => options.Greeting = "Plain")
+            .AddConfiguredOptions<LifecycleOptions>(options => options.Greeting = "Lifecycle");
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.Equal("Plain", provider.GetRequiredService<ParameterOptions>().Greeting);
+            Assert.Equal("Lifecycle post-configured", provider.GetRequiredService<LifecycleOptions>().Greeting);
+        }
+    }
+
+    public class ParameterOptions : IParameterObject
+    {
+        public string Greeting { get; set; }
+    }
+
+    public class PostConfiguredOptions : ParameterOptions, IPostConfigurableParameterObject
+    {
+        public int PostConfigureCount { get; private set; }
+
+        public PostConfiguredOptions PostConfiguredInstance { get; private set; }
+
+        public void PostConfigureOptions()
+        {
+            PostConfigureCount++;
+            PostConfiguredInstance = this;
+            Greeting += " post-configured";
+        }
+    }
+
+    public class ValidatedOptions : ParameterOptions, IValidatableParameterObject
+    {
+        public int ValidateCount { get; private set; }
+
+        public ValidatedOptions ValidatedInstance { get; private set; }
+
+        public void ValidateOptions()
+        {
+            ValidateCount++;
+            ValidatedInstance = this;
+        }
+    }
+
+    public class LifecycleOptions : ParameterOptions, IPostConfigurableParameterObject, IValidatableParameterObject
+    {
+        public List<string> Stages { get; } = new List<string>();
+
+        public int PostConfigureCount { get; private set; }
+
+        public int ValidateCount { get; private set; }
+
+        public LifecycleOptions PostConfiguredInstance { get; private set; }
+
+        public LifecycleOptions ValidatedInstance { get; private set; }
+
+        public string ValidatedGreeting { get; private set; }
+
+        public Exception PostConfigurationFailure { get; set; }
+
+        public Exception ValidationFailure { get; set; }
+
+        public void PostConfigureOptions()
+        {
+            PostConfigureCount++;
+            PostConfiguredInstance = this;
+            Stages.Add("post-configure");
+            if (PostConfigurationFailure != null) { throw PostConfigurationFailure; }
+            Greeting += " post-configured";
+        }
+
+        public void ValidateOptions()
+        {
+            ValidateCount++;
+            ValidatedInstance = this;
+            Stages.Add("validate");
+            if (ValidationFailure != null) { throw ValidationFailure; }
+            ValidatedGreeting = Greeting;
+        }
     }
 
     [Theory]

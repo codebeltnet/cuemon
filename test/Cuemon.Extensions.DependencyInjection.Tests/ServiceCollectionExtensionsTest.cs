@@ -20,6 +20,430 @@ public class ServiceCollectionExtensionsTest : Test
     {
     }
 
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void Registration_ShouldResolveWithSpecifiedLifetime_UsingTypesAndFactories(ServiceLifetime lifetime)
+    {
+        Action<IServiceCollection>[] registrations =
+        {
+            s => s.Add<IService, DefaultService>(lifetime),
+            s => s.TryAdd<IService, DefaultService>(lifetime),
+            s => s.Add<IService, DefaultService>(_ => new DefaultService(), lifetime),
+            s => s.TryAdd<IService, DefaultService>(_ => new DefaultService(), lifetime)
+        };
+        foreach (var register in registrations)
+        {
+            var services = new ServiceCollection();
+            register(services);
+            Assert.Equal(lifetime, Assert.Single(services).Lifetime);
+            using (var provider = services.BuildServiceProvider())
+            using (var firstScope = provider.CreateScope())
+            using (var secondScope = provider.CreateScope())
+            {
+                var first = firstScope.ServiceProvider.GetRequiredService<IService>();
+                var repeated = firstScope.ServiceProvider.GetRequiredService<IService>();
+                var other = secondScope.ServiceProvider.GetRequiredService<IService>();
+                Assert.IsType<DefaultService>(first);
+                if (lifetime == ServiceLifetime.Transient) { Assert.NotSame(first, repeated); }
+                else { Assert.Same(first, repeated); }
+                if (lifetime == ServiceLifetime.Singleton) { Assert.Same(first, other); }
+                else { Assert.NotSame(first, other); }
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void Forwarding_ShouldResolveSelectedInterfacesToSameInstance(bool tryAdd, bool factory)
+    {
+        var services = new ServiceCollection();
+        Action<TypeForwardServiceOptions> setup = o => o.Lifetime = ServiceLifetime.Singleton;
+        IServiceCollection result;
+        if (tryAdd)
+        {
+            result = factory ? services.TryAdd<Foo>(_ => new Foo(), setup) : services.TryAdd<Foo>(setup);
+        }
+        else
+        {
+            result = factory ? services.Add<Foo>(_ => new Foo(), setup) : services.Add<Foo>(setup);
+        }
+        Assert.Same(services, result);
+        Assert.Equal(3, services.Count);
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.Same(provider.GetRequiredService<Foo>(), provider.GetRequiredService<IFoo>());
+            Assert.Same(provider.GetRequiredService<Foo>(), provider.GetRequiredService<IBar>());
+        }
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void Forwarding_ShouldChooseMarkerInterface_WhenGenericAndNonGenericInterfacesShareName(bool tryAdd, bool factory)
+    {
+        var services = new ServiceCollection();
+        Action<TypeForwardServiceOptions> setup = o => o.Lifetime = ServiceLifetime.Singleton;
+        if (tryAdd)
+        {
+            if (factory) { services.TryAdd<DefaultService<Foo>>(_ => new DefaultService<Foo>(), setup); }
+            else { services.TryAdd<DefaultService<Foo>>(setup); }
+        }
+        else
+        {
+            if (factory) { services.Add<DefaultService<Foo>>(_ => new DefaultService<Foo>(), setup); }
+            else { services.Add<DefaultService<Foo>>(setup); }
+        }
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.Same(provider.GetRequiredService<DefaultService<Foo>>(), provider.GetRequiredService<IService<Foo>>());
+            Assert.Null(provider.GetService<IService>());
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void FactoryForwarding_ShouldHonorDisabledForwardingAndPredicate(bool tryAdd)
+    {
+        foreach (var disabled in new[] { false, true })
+        {
+            var services = new ServiceCollection();
+            Action<TypeForwardServiceOptions> setup = o =>
+            {
+                o.UseNestedTypeForwarding = !disabled;
+                o.NestedTypeSelector = _ => new[] { typeof(IFoo), typeof(IBar) };
+                o.NestedTypePredicate = t => t == typeof(IBar);
+                o.Lifetime = ServiceLifetime.Singleton;
+            };
+            var result = tryAdd ? services.TryAdd<Foo>(_ => new Foo(), setup) : services.Add<Foo>(_ => new Foo(), setup);
+            Assert.Same(services, result);
+            using (var provider = services.BuildServiceProvider())
+            {
+                Assert.Null(provider.GetService<IFoo>());
+                if (disabled) { Assert.Null(provider.GetService<IBar>()); }
+                else { Assert.Same(provider.GetRequiredService<Foo>(), provider.GetRequiredService<IBar>()); }
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Registration_ShouldPreserveDuplicatesOnlyForAdd(bool factory)
+    {
+        var services = new ServiceCollection();
+        var original = new DefaultService();
+        services.AddSingleton<IService>(original);
+        var descriptor = services.Single();
+        var result = factory
+            ? services.TryAdd<IService, DefaultService>(_ => new DefaultService(), ServiceLifetime.Transient)
+            : services.TryAdd<IService, DefaultService>(ServiceLifetime.Transient);
+        Assert.Same(services, result);
+        Assert.Same(descriptor, Assert.Single(services));
+        if (factory) { services.Add<IService, DefaultService>(_ => new DefaultService(), ServiceLifetime.Transient); }
+        else { services.Add<IService, DefaultService>(ServiceLifetime.Transient); }
+        using (var provider = services.BuildServiceProvider())
+        {
+            var resolved = provider.GetServices<IService>().ToArray();
+            Assert.Equal(2, resolved.Length);
+            Assert.Same(original, resolved[0]);
+            Assert.NotSame(original, resolved[1]);
+        }
+    }
+
+    [Fact]
+    public void Registration_ShouldLeaveCollectionEmpty_WhenLifetimeIsUnknown()
+    {
+        var services = new ServiceCollection();
+        var lifetime = (ServiceLifetime)int.MaxValue;
+        Assert.Same(services, services.Add<IService, DefaultService>(lifetime));
+        Assert.Same(services, services.TryAdd<IService, DefaultService>(lifetime));
+        Assert.Same(services, services.Add<IService, DefaultService>(_ => new DefaultService(), lifetime));
+        Assert.Same(services, services.TryAdd<IService, DefaultService>(_ => new DefaultService(), lifetime));
+        Assert.Empty(services);
+    }
+
+    [Fact]
+    public void TryConfigure_ShouldReturnNull_WhenServicesAreNull()
+    {
+        Assert.Null(ServiceCollectionExtensions.TryConfigure<FakeOptions>(null, o => o.Greeting = "Hello"));
+    }
+
+    [Fact]
+    public void TryConfigure_ShouldIgnoreNullSetup_WhenOptionsAlreadyRegistered()
+    {
+        var services = new ServiceCollection();
+        services.Configure<FakeOptions>(o => o.Greeting = "First");
+        Assert.Same(services, services.TryConfigure<FakeOptions>(null));
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.Equal("First", provider.GetRequiredService<IOptions<FakeOptions>>().Value.Greeting);
+        }
+    }
+
+    [Theory]
+    [InlineData(false, false, "First")]
+    [InlineData(false, true, "Second")]
+    [InlineData(true, false, "First")]
+    [InlineData(true, true, "First")]
+    public void RegistrationWithOptions_ShouldHonorExistingConfiguration(bool tryAdd, bool factory, string expected)
+    {
+        var services = new ServiceCollection();
+        services.Configure<FakeOptions>(o => o.Greeting = "First");
+        IServiceCollection result;
+        if (tryAdd)
+        {
+            result = factory
+                ? services.TryAdd<IService, DefaultService, FakeOptions>(_ => new DefaultService(), ServiceLifetime.Singleton, o => o.Greeting = "Second")
+                : services.TryAdd<IService, DefaultService, FakeOptions>(ServiceLifetime.Singleton, o => o.Greeting = "Second");
+        }
+        else
+        {
+            result = factory
+                ? services.Add<IService, DefaultService, FakeOptions>(_ => new DefaultService(), ServiceLifetime.Singleton, o => o.Greeting = "Second")
+                : services.Add<IService, DefaultService, FakeOptions>(ServiceLifetime.Singleton, o => o.Greeting = "Second");
+        }
+        Assert.Same(services, result);
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.IsType<DefaultService>(provider.GetRequiredService<IService>());
+            Assert.Equal(expected, provider.GetRequiredService<IOptions<FakeOptions>>().Value.Greeting);
+        }
+    }
+
+    [Fact]
+    public void Registration_ShouldRejectNullServices_ForEveryOverload()
+    {
+        Func<IServiceCollection, IServiceCollection>[] registrations =
+        {
+            s => s.Add<IService, DefaultService>(ServiceLifetime.Singleton),
+            s => s.Add<IService, DefaultService, FakeOptions>(ServiceLifetime.Singleton, _ => { }),
+            s => s.Add(typeof(IService), typeof(DefaultService), ServiceLifetime.Singleton),
+            s => s.Add<FakeOptions>(typeof(IService), typeof(DefaultService), ServiceLifetime.Singleton, _ => { }),
+            s => s.Add<IService, DefaultService>(_ => new DefaultService(), ServiceLifetime.Singleton),
+            s => s.Add<IService, DefaultService, FakeOptions>(_ => new DefaultService(), ServiceLifetime.Singleton, _ => { }),
+            s => s.Add(typeof(IService), _ => new DefaultService(), ServiceLifetime.Singleton),
+            s => s.Add<FakeOptions>(typeof(IService), _ => new DefaultService(), ServiceLifetime.Singleton, _ => { }),
+            s => s.Add<Foo>(),
+            s => s.Add<IService, DefaultService>(),
+            s => s.Add(typeof(IService), typeof(DefaultService)),
+            s => s.Add<Foo>(_ => new Foo()),
+            s => s.Add<IService, DefaultService>(_ => new DefaultService()),
+            s => s.Add(typeof(IService), _ => new DefaultService()),
+            s => s.TryAdd<Foo>(),
+            s => s.TryAdd<IService, DefaultService>(),
+            s => s.TryAdd(typeof(IService), typeof(DefaultService)),
+            s => s.TryAdd<Foo>(_ => new Foo()),
+            s => s.TryAdd<IService, DefaultService>(_ => new DefaultService()),
+            s => s.TryAdd(typeof(IService), _ => new DefaultService()),
+            s => s.TryAdd<IService, DefaultService>(ServiceLifetime.Singleton),
+            s => s.TryAdd<IService, DefaultService, FakeOptions>(ServiceLifetime.Singleton, _ => { }),
+            s => s.TryAdd(typeof(IService), typeof(DefaultService), ServiceLifetime.Singleton),
+            s => s.TryAdd<FakeOptions>(typeof(IService), typeof(DefaultService), ServiceLifetime.Singleton, _ => { }),
+            s => s.TryAdd<IService, DefaultService>(_ => new DefaultService(), ServiceLifetime.Singleton),
+            s => s.TryAdd<IService, DefaultService, FakeOptions>(_ => new DefaultService(), ServiceLifetime.Singleton, _ => { }),
+            s => s.TryAdd(typeof(IService), _ => new DefaultService(), ServiceLifetime.Singleton),
+            s => s.TryAdd<FakeOptions>(typeof(IService), _ => new DefaultService(), ServiceLifetime.Singleton, _ => { })
+        };
+        foreach (var register in registrations)
+        {
+            Assert.Equal("services", Assert.Throws<ArgumentNullException>(() => register(null)).ParamName);
+        }
+    }
+
+    [Fact]
+    public void Registration_ShouldRejectNullSetup_BeforeAddingService()
+    {
+        var services = new ServiceCollection();
+        Func<IServiceCollection>[] registrations =
+        {
+            () => services.Add<IService, DefaultService, FakeOptions>(ServiceLifetime.Singleton, null),
+            () => services.Add<IService, DefaultService, FakeOptions>(_ => new DefaultService(), ServiceLifetime.Singleton, null),
+            () => services.TryAdd<IService, DefaultService, FakeOptions>(ServiceLifetime.Singleton, null),
+            () => services.TryAdd<IService, DefaultService, FakeOptions>(_ => new DefaultService(), ServiceLifetime.Singleton, null)
+        };
+        foreach (var register in registrations)
+        {
+            Assert.Equal("setup", Assert.Throws<ArgumentNullException>(() => register()).ParamName);
+            Assert.Empty(services);
+        }
+        Assert.Equal("configureOptions", Assert.Throws<ArgumentNullException>(() => services.TryConfigure<FakeOptions>(null)).ParamName);
+        Assert.Empty(services);
+    }
+
+    [Fact]
+    public void Forwarding_ShouldRegisterOnlyService_WhenNoNestedTypesMatch()
+    {
+        var services = new ServiceCollection();
+        Assert.Same(services, services.Add<Foo>(o => o.NestedTypePredicate = _ => false));
+        Assert.Equal(typeof(Foo), Assert.Single(services).ServiceType);
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.NotNull(provider.GetRequiredService<Foo>());
+            Assert.Null(provider.GetService<IFoo>());
+            Assert.Null(provider.GetService<IBar>());
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void TryAddWithForwarding_ShouldPreserveExistingServiceAndInterface(bool factory)
+    {
+        var services = new ServiceCollection();
+        var originalService = new Foo();
+        var originalInterface = new Foo();
+        services.AddSingleton(originalService);
+        services.AddSingleton<IFoo>(originalInterface);
+        var result = factory ? services.TryAdd<Foo>(_ => new Foo()) : services.TryAdd<Foo>();
+        Assert.Same(services, result);
+        Assert.Equal(3, services.Count);
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.Same(originalService, provider.GetRequiredService<Foo>());
+            Assert.Same(originalInterface, provider.GetRequiredService<IFoo>());
+            Assert.Same(originalService, provider.GetRequiredService<IBar>());
+        }
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void Forwarding_ShouldLeavePrimaryRegistration_WhenSelectorOrPredicateIsNull(bool tryAdd, bool factory)
+    {
+        foreach (var nullSelector in new[] { false, true })
+        {
+            var services = new ServiceCollection();
+            Action<TypeForwardServiceOptions> setup = o =>
+            {
+                if (nullSelector) { o.NestedTypeSelector = null; }
+                else { o.NestedTypePredicate = null; }
+            };
+            // Characterize the current partial registration so the refactor can change it deliberately.
+            Assert.Throws<NullReferenceException>(() =>
+            {
+                if (tryAdd)
+                {
+                    if (factory) { services.TryAdd<Foo>(_ => new Foo(), setup); }
+                    else { services.TryAdd<Foo>(setup); }
+                }
+                else
+                {
+                    if (factory) { services.Add<Foo>(_ => new Foo(), setup); }
+                    else { services.Add<Foo>(setup); }
+                }
+            });
+            Assert.Equal(typeof(Foo), Assert.Single(services).ServiceType);
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Forwarding_ShouldChooseNonGenericInterface_WhenServiceHasNoMarker(bool tryAdd)
+    {
+        var services = new ServiceCollection();
+        Action<TypeForwardServiceOptions> setup = o =>
+        {
+            o.Lifetime = ServiceLifetime.Singleton;
+            o.NestedTypeSelector = _ => new[] { typeof(IService<Foo>), typeof(IService) };
+        };
+        if (tryAdd) { services.TryAdd<object, DefaultService<Foo>>(setup); }
+        else { services.Add<object, DefaultService<Foo>>(setup); }
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.Same(provider.GetRequiredService<object>(), provider.GetRequiredService<IService>());
+            Assert.Null(provider.GetService<IService<Foo>>());
+        }
+    }
+
+    [Fact]
+    public void PostConfigureAllOf_ShouldConfigureOnlyOptionsImplementingInterface()
+    {
+        var services = new ServiceCollection();
+        services.Configure<InterfaceOptions>(o => o.Greeting = "Configured");
+        services.Configure<FakeOptions>(o => o.Greeting = "Unrelated");
+        services.PostConfigureAllOf<IOptionGreeting>(o => o.Greeting += " then post-configured");
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.Equal("Configured then post-configured", provider.GetRequiredService<IOptions<InterfaceOptions>>().Value.Greeting);
+            Assert.Equal("Unrelated", provider.GetRequiredService<IOptions<FakeOptions>>().Value.Greeting);
+        }
+    }
+
+    [Fact]
+    public void Registration_ShouldRejectNullServiceAndImplementationTypes()
+    {
+        var services = new ServiceCollection();
+        Assert.Equal("service", Assert.Throws<ArgumentNullException>(() => services.Add(null, typeof(DefaultService))).ParamName);
+        Assert.Equal("implementation", Assert.Throws<ArgumentNullException>(() => services.Add(typeof(IService), (Type)null)).ParamName);
+        Assert.Equal("service", Assert.Throws<ArgumentNullException>(() => services.TryAdd(null, typeof(DefaultService))).ParamName);
+        Assert.Equal("implementation", Assert.Throws<ArgumentNullException>(() => services.TryAdd(typeof(IService), (Type)null)).ParamName);
+        Assert.Empty(services);
+    }
+
+    [Fact]
+    public void TryAdd_ShouldRejectNullFactory_BeforeAddingService()
+    {
+        var services = new ServiceCollection();
+        Func<IServiceCollection>[] registrations =
+        {
+            () => services.Add<Foo>((Func<IServiceProvider, Foo>)null),
+            () => services.TryAdd<Foo>((Func<IServiceProvider, Foo>)null),
+            () => services.TryAdd<IService, DefaultService>((Func<IServiceProvider, DefaultService>)null, ServiceLifetime.Singleton),
+            () => services.TryAdd<IService, DefaultService, FakeOptions>((Func<IServiceProvider, DefaultService>)null, ServiceLifetime.Singleton, _ => { }),
+            () => services.TryAdd(typeof(IService), (Func<IServiceProvider, object>)null, ServiceLifetime.Singleton),
+            () => services.TryAdd<FakeOptions>(typeof(IService), (Func<IServiceProvider, object>)null, ServiceLifetime.Singleton, _ => { })
+        };
+        foreach (var register in registrations)
+        {
+            Assert.Equal("implementationFactory", Assert.Throws<ArgumentNullException>(() => register()).ParamName);
+            Assert.Empty(services);
+        }
+    }
+
+    [Fact]
+    public void PostConfigureAllOf_ShouldPreserveNamedOptionsAndRunAfterConfigure()
+    {
+        var services = new ServiceCollection();
+        services.Configure<FakeServiceScopedOptions>("named", o => o.Greeting = "Configured");
+        services.Configure<FakeOptions>(o => o.Greeting = "Default");
+        Assert.Same(services, services.PostConfigureAllOf<FakeOptions>(o => o.Greeting += " then post-configured"));
+        using (var provider = services.BuildServiceProvider())
+        {
+            var options = provider.GetRequiredService<IOptionsMonitor<FakeServiceScopedOptions>>();
+            Assert.Equal("Configured then post-configured", options.Get("named").Greeting);
+            Assert.Equal("", options.CurrentValue.Greeting);
+            Assert.Equal("Default then post-configured", provider.GetRequiredService<IOptions<FakeOptions>>().Value.Greeting);
+        }
+    }
+
+    [Fact]
+    public void PostConfigureAllOf_ShouldSkipUnsupportedConfigureDescriptors()
+    {
+        var services = new ServiceCollection();
+        services.AddOptions();
+        services.AddSingleton<IConfigureOptions<FakeOptions>, NonGenericConfigureOptions>();
+        services.AddSingleton<IConfigureOptions<FakeOptions>>(_ => new NonGenericConfigureOptions());
+        services.AddSingleton<IConfigureOptions<FakeOptions>>(new NonGenericConfigureOptions());
+        services.AddSingleton<IConfigureOptions<FakeOptions>>(new GenericConfigureOptions<FakeOptions>());
+        Assert.Same(services, services.PostConfigureAllOf<FakeOptions>(o => o.Greeting = "Post"));
+        Assert.DoesNotContain(services, d => d.ServiceType == typeof(IPostConfigureOptions<FakeOptions>));
+        using (var provider = services.BuildServiceProvider())
+        {
+            Assert.Equal("Configured", provider.GetRequiredService<IOptions<FakeOptions>>().Value.Greeting);
+        }
+    }
+
     [Fact]
     public void AddWithSetup_ShouldAddServiceToServiceCollectionWithSpecifiedLifetime()
     {
@@ -674,4 +1098,23 @@ public class ServiceCollectionExtensionsTest : Test
         Assert.Equal(1, configureOptionsCount);
     }
 
+
+    private class NonGenericConfigureOptions : IConfigureOptions<FakeOptions>
+    {
+        public void Configure(FakeOptions options) { options.Greeting = "Configured"; }
+    }
+
+    public interface IOptionGreeting
+    {
+        string Greeting { get; set; }
+    }
+
+    public class InterfaceOptions : FakeOptions, IOptionGreeting
+    {
+    }
+
+    private class GenericConfigureOptions<TOptions> : IConfigureOptions<TOptions> where TOptions : FakeOptions
+    {
+        public void Configure(TOptions options) { options.Greeting = "Configured"; }
+    }
 }

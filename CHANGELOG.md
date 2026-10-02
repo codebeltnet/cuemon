@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.8.0] - 2026-10-02
+
+This is a minor release adding Parameter Object integration with Microsoft Options and separating pull request validation, package release, and DocFX deployment workflows.
+
+### Added
+
+- `IServiceCollection.AddConfiguredOptions<TOptions>()` integrates Cuemon post-configuration and validation conventions with Microsoft Options and exposes the configured default options instance and primary `Action<TOptions>`,
+- Dedicated pull request, release, and deployment workflows assign CI validation, NuGet publication and release assurance, and DocFX image promotion to separate workflows.
+
+### Changed
+
+- CI references now use the pull request workflow and `main` Codecov branch, run on Ubuntu 26.04, and document the updated workflow responsibilities.
+
+### Removed
+
+- The combined `.github/workflows/ci-pipeline.yml` workflow was removed as CI responsibilities moved to the dedicated pull request, release, and deployment workflows.
+
 ## [10.7.1] - 2026-09-09
 
 This is a patch release focused on modernizing the test infrastructure and consolidating dependencies. The release migrates code coverage collection from coverlet to Microsoft.Testing.Extensions.CodeCoverage, upgrades testing frameworks to their latest major versions, and simplifies test environment configuration while maintaining full compatibility with existing functionality.
@@ -1897,6 +1914,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.8.0]: https://github.com/codebeltnet/cuemon/compare/v10.7.1...v10.8.0
 [10.7.1]: https://github.com/codebeltnet/cuemon/compare/v10.7.0...v10.7.1
 [10.7.0]: https://github.com/codebeltnet/cuemon/compare/v10.6.0...v10.7.0
 [10.6.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v10.6.0

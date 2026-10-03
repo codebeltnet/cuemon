@@ -58,10 +58,19 @@ public abstract class Disposable : IDisposable
                     OnDisposeManagedResources();
                 }
             }
-            finally
+            catch (Exception managedException)
             {
-                OnDisposeUnmanagedResources();
+                try
+                {
+                    OnDisposeUnmanagedResources();
+                }
+                catch (Exception unmanagedException)
+                {
+                    throw new AggregateException(managedException, unmanagedException);
+                }
+                throw;
             }
+            OnDisposeUnmanagedResources();
         }
     }
 }

@@ -51,11 +51,17 @@ public abstract class Disposable : IDisposable
         {
             if (Disposed) { return; }
             Disposed = true;
-            if (disposing)
+            try
             {
-                OnDisposeManagedResources();
+                if (disposing)
+                {
+                    OnDisposeManagedResources();
+                }
             }
-            OnDisposeUnmanagedResources();
+            finally
+            {
+                OnDisposeUnmanagedResources();
+            }
         }
     }
 }

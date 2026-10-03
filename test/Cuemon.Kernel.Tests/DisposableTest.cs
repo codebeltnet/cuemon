@@ -51,6 +51,25 @@ public class DisposableTest : Test
     }
 
     [Fact]
+    public void Dispose_ShouldReleaseUnmanagedResourcesAndPreserveException_WhenManagedCleanupThrows()
+    {
+        var exception = new InvalidOperationException("Managed cleanup failed.");
+        var sut = new ThrowingManagedDisposable(exception);
+
+        var actual = Assert.Throws<InvalidOperationException>(() => sut.Dispose());
+
+        Assert.Same(exception, actual);
+        Assert.True(sut.Disposed);
+        Assert.Equal(1, sut.ManagedDisposeCount);
+        Assert.Equal(1, sut.UnmanagedDisposeCount);
+
+        sut.Dispose();
+
+        Assert.Equal(1, sut.ManagedDisposeCount);
+        Assert.Equal(1, sut.UnmanagedDisposeCount);
+    }
+
+    [Fact]
     public async Task Dispose_ShouldBeThreadSafeAndInvokeCallbacksOnce()
     {
         using var managedStarted = new ManualResetEventSlim();
@@ -68,5 +87,21 @@ public class DisposableTest : Test
         Assert.True(sut.Disposed);
         Assert.Equal(1, sut.ManagedDisposeCount);
         Assert.Equal(1, sut.UnmanagedDisposeCount);
+    }
+
+    private sealed class ThrowingManagedDisposable : TrackingDisposable
+    {
+        private readonly Exception _exception;
+
+        public ThrowingManagedDisposable(Exception exception)
+        {
+            _exception = exception;
+        }
+
+        protected override void OnDisposeManagedResources()
+        {
+            base.OnDisposeManagedResources();
+            throw _exception;
+        }
     }
 }

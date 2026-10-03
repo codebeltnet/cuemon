@@ -8,25 +8,26 @@ For more details, please refer to `PackageReleaseNotes.txt` on a per assembly ba
 
 ## [10.8.0] - 2026-10-03
 
-This is a minor release adding Parameter Object integration with Microsoft Options, improving disposal cleanup, and separating pull request validation, package publication, and documentation deployment.
+This is a minor release adding Parameter Object integration with Microsoft Options, tag-validated package releases, and deployment of released DocFX images, alongside disposal cleanup and test timing fixes.
 
 ### Added
 
-- `IServiceCollection.AddConfiguredOptions<TOptions>()` connects Parameter Object post-configuration and validation to Microsoft Options, exposes the primary `Action<TOptions>`, and registers the cached default options instance for direct injection,
-- Dedicated pull request, release, and deployment workflows validate contributions, publish NuGet packages with post-release assurance, and promote the released DocFX image.
+- `IServiceCollection.AddConfiguredOptions<TOptions>()` connects Parameter Object post-configuration and validation to Microsoft Options, exposes the primary `Action<TOptions>`, and registers the cached default options instance for direct injection; recoverable validation failures become `OptionsValidationException`, while cancellation propagates to the caller,
+- A dedicated release workflow validates version tags against `main` history, builds and publishes NuGet packages from the tagged commit, runs post-release assurance, and attaches a verified multi-platform DocFX OCI archive and checksum before publishing the GitHub Release,
+- A deployment workflow validates published release assets and the tagged source commit, then promotes the released DocFX OCI image to JCR without rebuilding it,
+- A documented `.bot` workspace for local AI working material, with its contents ignored except for `README.md`.
 
 ### Changed
 
-- Updated `Codebelt.Coverlet.MTP` from 10.0.1 to 10.1.0 and `Microsoft.Data.SqlClient` from 7.1.0 to 7.1.1,
-- Updated CI references and guidance for the pull request workflow, `main` Codecov branch, and Ubuntu 26.04 runners.
+- Moved `.github/workflows/ci-pipeline.yml` to `pr.yml`, removed package publication from PR validation, and added an aggregate quality gate that enforces required checks and the privileged-integration policy,
+- Updated `Codebelt.Coverlet.MTP` from 10.0.1 to 10.1.0 and `Microsoft.Data.SqlClient` from 7.1.0 to 7.1.1 for .NET 9 and .NET 10,
+- Updated Linux workflow runners to Ubuntu 26.04, CI references and contributor guidance to the dedicated workflows, and the Codecov badge to `main`,
+- Expanded dependency injection tests for service lifetimes, forwarding, duplicate registrations, argument validation, and post-configuration.
 
 ### Fixed
 
-- `Disposable.Dispose` now runs unmanaged cleanup when managed cleanup throws while preserving the managed cleanup exception and idempotent disposal.
-
-### Removed
-
-- Removed the combined `.github/workflows/ci-pipeline.yml` workflow as pull request, release, and deployment responsibilities moved to dedicated workflows.
+- `Disposable.Dispose` now runs unmanaged cleanup even when managed cleanup throws and retains idempotent disposal,
+- Signed URI tests now derive validity windows from one UTC timestamp, and retry behavior tests apply the strict latency budget only in dedicated latency scenarios.
 
 ## [10.7.1] - 2026-09-09
 
@@ -1919,7 +1920,6 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
-[Unreleased]: https://github.com/codebeltnet/cuemon/compare/v10.8.0...HEAD
 [10.8.0]: https://github.com/codebeltnet/cuemon/compare/v10.7.1...v10.8.0
 [10.7.1]: https://github.com/codebeltnet/cuemon/compare/v10.7.0...v10.7.1
 [10.7.0]: https://github.com/codebeltnet/cuemon/compare/v10.6.0...v10.7.0

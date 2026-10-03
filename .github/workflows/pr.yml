@@ -1,17 +1,9 @@
-name: Cuemon CI Pipeline
+name: PR Flow
 on:
   pull_request:
     branches: [main]
   workflow_dispatch:
     inputs:
-      configuration:
-        type: choice
-        description: The build configuration to use in the deploy stage.
-        required: true
-        default: Release
-        options:
-          - Debug
-          - Release
       run_mac_tests:
         type: boolean
         description: Run the macOS test matrix despite the additional cost and runtime.
@@ -23,7 +15,7 @@ permissions:
 jobs:
   init:
     name: initialize
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       run-privileged-jobs: ${{ steps.vars.outputs.run-privileged-jobs }}
       run-mac-tests: ${{ steps.vars.outputs.run-mac-tests }}
@@ -33,14 +25,20 @@ jobs:
       - id: vars
         name: calculate workflow variables
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          REPOSITORY: ${{ github.repository }}
+          WORKFLOW_REF: ${{ github.ref }}
+          RUN_MAC_TESTS: ${{ inputs.run_mac_tests }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.run_mac_tests }}" == "true" ]]; then
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$RUN_MAC_TESTS" == "true" ]]; then
             echo "run-mac-tests=true" >> "$GITHUB_OUTPUT"
           else
             echo "run-mac-tests=false" >> "$GITHUB_OUTPUT"
           fi
 
-          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
+          if [[ "$EVENT_NAME" == "pull_request" && "$HEAD_REPOSITORY" != "$REPOSITORY" ]]; then
             echo "run-privileged-jobs=false" >> "$GITHUB_OUTPUT"
             echo "strong-name-key-filename=" >> "$GITHUB_OUTPUT"
             echo "build-switches=-p:SkipSignAssembly=true" >> "$GITHUB_OUTPUT"
@@ -50,9 +48,15 @@ jobs:
             echo "build-switches=" >> "$GITHUB_OUTPUT"
           fi
 
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$WORKFLOW_REF" != "refs/heads/main" ]]; then
+            echo "run-privileged-jobs=false" >> "$GITHUB_OUTPUT"
+            echo "strong-name-key-filename=" >> "$GITHUB_OUTPUT"
+            echo "build-switches=-p:SkipSignAssembly=true" >> "$GITHUB_OUTPUT"
+          fi
+
   prepare_test:
     name: 📜 Prepare Test
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     outputs:
       json: ${{ steps.test-projects.outputs.result }}
@@ -83,7 +87,7 @@ jobs:
       configuration: ${{ matrix.configuration }}
       strong-name-key-filename: ${{ needs.init.outputs.strong-name-key-filename }}
       build-switches: ${{ needs.init.outputs.build-switches }}
-      runs-on: ${{ matrix.arch == 'ARM64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
+      runs-on: ${{ matrix.arch == 'ARM64' && 'ubuntu-26.04-arm' || 'ubuntu-26.04' }}
       upload-build-artifact-name: build-${{ matrix.configuration }}-${{ matrix.arch }}
     secrets:
       GCP_TOKEN: ${{ secrets.GCP_TOKEN }}
@@ -113,7 +117,7 @@ jobs:
         arch: [X64, ARM64]
     uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
     with:
-      runs-on: ${{ matrix.arch == 'ARM64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
+      runs-on: ${{ matrix.arch == 'ARM64' && 'ubuntu-26.04-arm' || 'ubuntu-26.04' }}
       configuration: ${{ matrix.configuration }}
       build-switches: -p:SkipSignAssembly=true
       projects: ${{ matrix.project }}
@@ -169,7 +173,7 @@ jobs:
       matrix:
         configuration: [Debug, Release]
         project: [ test/**/Cuemon.Data.SqlClient.Tests.csproj ]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -312,7 +316,7 @@ jobs:
     if: ${{ always() }}
     name: test-qualitygate
     needs: [init, test_linux, test_windows, test_mac, integration_test]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Evaluate test results
         shell: bash
@@ -374,6 +378,7 @@ jobs:
     uses: codebeltnet/jobs-codecov/.github/workflows/default.yml@v1
     with:
       repository: codebeltnet/cuemon
+      configuration: .github/codecov.yml
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -385,20 +390,64 @@ jobs:
     with:
       timeout-minutes: 30
     permissions:
+      contents: read
       security-events: write
 
-  deploy:
-    # Avoid skipped optional jobs (for example disabled macOS matrix runs) from suppressing deployment.
-    if: ${{ always() && github.event_name != 'pull_request' && needs.build.result == 'success' && needs.pack.result == 'success' && needs.test_qualitygate.result == 'success' && needs.sonarcloud.result == 'success' && needs.codecov.result == 'success' && needs.codeql.result == 'success' }}
-    name: call-nuget
-    needs: [build, pack, test_qualitygate, sonarcloud, codecov, codeql]
-    uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3
-    with:
-      version: ${{ needs.build.outputs.version }}
-      environment: Production
-      configuration: ${{ inputs.configuration == '' && 'Release' || inputs.configuration }}
-    permissions:
-      contents: read
-      packages: write
-    secrets:
-      NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+  pr_quality_gate:
+    if: ${{ always() }}
+    name: PR quality gate
+    needs: [init, build, pack, test_qualitygate, sonarcloud, codecov, codeql]
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Evaluate PR proof results
+        shell: bash
+        env:
+          RUN_PRIVILEGED_JOBS: ${{ needs.init.outputs.run-privileged-jobs }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          PACK_RESULT: ${{ needs.pack.result }}
+          TEST_RESULT: ${{ needs.test_qualitygate.result }}
+          SONAR_RESULT: ${{ needs.sonarcloud.result }}
+          CODECOV_RESULT: ${{ needs.codecov.result }}
+          CODEQL_RESULT: ${{ needs.codeql.result }}
+        run: |
+          set -euo pipefail
+
+          require_success() {
+            local job_name="$1"
+            local job_result="$2"
+
+            if [[ "$job_result" != "success" ]]; then
+              echo "::error::$job_name finished with '$job_result'."
+              exit 1
+            fi
+          }
+
+          require_skipped() {
+            local job_name="$1"
+            local job_result="$2"
+
+            if [[ "$job_result" != "skipped" ]]; then
+              echo "::error::$job_name finished with '$job_result' for a run that is not authorized to use privileged integrations."
+              exit 1
+            fi
+          }
+
+          require_success "build" "$BUILD_RESULT"
+          require_success "pack" "$PACK_RESULT"
+          require_success "test_qualitygate" "$TEST_RESULT"
+
+          if [[ "$RUN_PRIVILEGED_JOBS" == "true" ]]; then
+            require_success "sonarcloud" "$SONAR_RESULT"
+            require_success "codecov" "$CODECOV_RESULT"
+            require_success "codeql" "$CODEQL_RESULT"
+          else
+            require_skipped "sonarcloud" "$SONAR_RESULT"
+            require_skipped "codecov" "$CODECOV_RESULT"
+            require_skipped "codeql" "$CODEQL_RESULT"
+          fi
+
+          {
+            echo "## PR proof passed"
+            echo
+            echo "Build and package validation passed. Required Linux and Windows tests passed; optional macOS and trusted-repository checks followed the workflow inputs and fork policy."
+          } >> "$GITHUB_STEP_SUMMARY"

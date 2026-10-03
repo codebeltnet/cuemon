@@ -15,8 +15,8 @@ This repository is part of the Codebelt .NET library estate. The instructions be
 - `test/` contains xUnit v3 test projects.
 - `Cuemon.slnx` is the solution used for local development.
 - `.github/workflows/pr.yml` owns the PR test matrix and blocking quality gates.
-- `.github/workflows/release.yml` publishes packages from a human-versioned `main` SHA; post-release assurance and DocFX production run after NuGet publication.
-- `.github/workflows/deploy.yml` promotes the published DocFX image without rebuilding it. See `.github/workflows/README.md` for the CI/CD handoff and release behavior.
+- `.github/workflows/release.yml` publishes packages from a version-tagged commit in `main` history; post-release assurance and DocFX production run after NuGet publication.
+- `.github/workflows/deploy.yml` promotes the published DocFX image without rebuilding it. See [Release and deployment](#release-and-deployment) for the CI/CD handoff.
 - `testenvironments.json` declares the supported `WSL-Ubuntu` and `Docker-Ubuntu` test environments.
 
 ## Build
@@ -70,6 +70,16 @@ dotnet pack "Cuemon.slnx" --configuration Release --no-restore
 ```
 
 Package-specific release notes live under `.nuget/<ProjectName>/PackageReleaseNotes.txt` and package README files live beside them. `Directory.Build.targets` imports the release notes during packing. Public API changes also require XML documentation updates; DocFX documentation is built by the repository automation.
+
+## Release and deployment
+
+After PR validation and merge, a maintainer creates and pushes a `vX.Y.Z` tag (or `vX.Y.Z-prerelease`, without build metadata) for the intended commit in `main` history. The tag push starts `release.yml`, which checks the tag identity and ancestry, builds signed Release packages from that commit, validates their versions and existing NuGet content, and sends the validated package artifact to the protected `Production` publication job.
+
+After NuGet publication, the workflow runs post-release tests and analysis and builds the multi-platform DocFX OCI image from the same commit. The verified archive and SHA-256 checksum are attached to a draft GitHub Release before that release is published. Post-release assurance failures do not roll back published packages; inspect the release summary and resolve failures against its recorded commit.
+
+A published GitHub Release starts `deploy.yml`. To retry deployment, dispatch that workflow from `main` with the existing published release tag. Deployment requires the versioned OCI archive and checksum, resolves the tag to its source commit, and promotes the verified image to JCR through `Production` without rebuilding it. The workflow reports the immutable image digest for a Kubernetes handoff; this repository does not perform the Kubernetes rollout.
+
+If publication fails, inspect the job results before retrying. A partially completed NuGet push may already have published some packages; rerun the failed publication job to reuse its validated artifact. Keep release tags fixed: publication rechecks the live tag against the built commit and rejects a mismatch.
 
 ## Pull requests
 

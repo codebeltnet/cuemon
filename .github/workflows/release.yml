@@ -385,6 +385,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.release_preflight.outputs.tag }}
+          RELEASE_SHA: ${{ needs.release_preflight.outputs.sha }}
         run: |
           set -euo pipefail
           release_json="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG")"
@@ -396,6 +397,20 @@ jobs:
           fi
           if [[ "$is_draft" != "true" || ! "$release_id" =~ ^[0-9]+$ ]]; then
             echo "::error::GitHub Release '$RELEASE_TAG' is not in a publishable draft state."
+            exit 1
+          fi
+
+          # Resolve the live remote tag immediately before publication, not the earlier checkout.
+          ref_json="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG")"
+          object_type="$(jq -r '.object.type' <<< "$ref_json")"
+          object_sha="$(jq -r '.object.sha' <<< "$ref_json")"
+          while [[ "$object_type" == "tag" ]]; do
+            tag_json="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$object_sha")"
+            object_type="$(jq -r '.object.type' <<< "$tag_json")"
+            object_sha="$(jq -r '.object.sha' <<< "$tag_json")"
+          done
+          if [[ "$object_type" != "commit" || ! "$object_sha" =~ ^[0-9a-fA-F]{40}$ || "$object_sha" != "$RELEASE_SHA" ]]; then
+            echo "::error::Release tag '$RELEASE_TAG' no longer identifies built commit '$RELEASE_SHA'; refusing to publish the draft."
             exit 1
           fi
 

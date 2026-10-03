@@ -1,22 +1,19 @@
 name: Release Flow
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        type: string
-        description: SemVer 2.0 release version without the v prefix. Use x.y.z or x.y.z-prerelease; build metadata is not supported.
-        required: true
+  push:
+    tags:
+      - 'v*'
 
 permissions:
   contents: read
 
 concurrency:
-  group: cuemon-release-${{ inputs.version }}
+  group: cuemon-release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   release_preflight:
-    name: Validate main SHA and release version
+    name: Validate release tag and authoritative main history
     runs-on: ubuntu-26.04
     permissions:
       contents: read
@@ -25,7 +22,8 @@ jobs:
       tag: ${{ steps.validate.outputs.tag }}
       sha: ${{ steps.validate.outputs.sha }}
     steps:
-      - name: Checkout the dispatch SHA
+      # git-checkout fetches full history and tags for MinVer and ancestry validation.
+      - name: Checkout the triggering SHA
         uses: codebeltnet/git-checkout@v1
         with:
           ref: ${{ github.sha }}
@@ -36,66 +34,83 @@ jobs:
         env:
           RELEASE_REF: ${{ github.ref }}
           RELEASE_SHA: ${{ github.sha }}
-          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_TAG: ${{ github.ref_name }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
-          if [[ "$RELEASE_REF" != "refs/heads/main" ]]; then
-            echo "::error::Release dispatch must target refs/heads/main; received '$RELEASE_REF'."
+          if [[ "$RELEASE_REF" != "refs/tags/$RELEASE_TAG" ]]; then
+            echo "::error::Release must be triggered by a Git tag; received '$RELEASE_REF'."
+            exit 1
+          fi
+          if [[ "$RELEASE_TAG" != v* ]]; then
+            echo "::error::Release tag '$RELEASE_TAG' must have the v prefix (for example, v10.7.2)."
             exit 1
           fi
 
+          RELEASE_VERSION="${RELEASE_TAG#v}"
           semver_regex='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)(\.(0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*))*))?$'
           if [[ ! "$RELEASE_VERSION" =~ $semver_regex ]]; then
             echo "::error::'$RELEASE_VERSION' is not a supported SemVer release version. Use x.y.z or x.y.z-prerelease without build metadata."
             exit 1
           fi
 
+          if ! tagged_sha="$(git rev-parse --verify "refs/tags/$RELEASE_TAG^{commit}" 2>/dev/null)"; then
+            echo "::error::Triggering tag '$RELEASE_TAG' is missing or does not resolve to a Git commit."
+            exit 1
+          fi
+          if ! event_sha="$(git rev-parse --verify "$RELEASE_SHA^{commit}" 2>/dev/null)"; then
+            echo "::error::Triggering SHA '$RELEASE_SHA' does not resolve to a Git commit."
+            exit 1
+          fi
           checked_out_sha="$(git rev-parse HEAD)"
-          if [[ "$checked_out_sha" != "$RELEASE_SHA" ]]; then
-            echo "::error::Checkout SHA '$checked_out_sha' does not match dispatch SHA '$RELEASE_SHA'."
+          if [[ "$tagged_sha" != "$event_sha" || "$checked_out_sha" != "$event_sha" ]]; then
+            echo "::error::Tag '$RELEASE_TAG' resolves to '$tagged_sha', checkout to '$checked_out_sha', and triggering commit to '$event_sha'. The tag may have moved; restore the original tag before retrying."
+            exit 1
+          fi
+          RELEASE_SHA="$tagged_sha"
+
+          if ! git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main'; then
+            echo "::error::Could not fetch authoritative main history to validate '$RELEASE_TAG'."
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$RELEASE_SHA" refs/remotes/origin/main; then
+            echo "::error::Tagged commit '$RELEASE_SHA' is not reachable from authoritative main. Tag a commit in main history."
             exit 1
           fi
 
-          release_tag="v$RELEASE_VERSION"
-          assert_absent() {
-            local endpoint="$1"
-            local label="$2"
-            local response
-            local status
-
-            set +e
-            response="$(gh api "$endpoint" 2>&1)"
-            status=$?
-            set -e
-
-            if [[ "$status" -eq 0 ]]; then
-              echo "::error::$label '$release_tag' already exists. Select a new human-approved SemVer version."
+          set +e
+          release_json="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" 2>&1)"
+          release_status=$?
+          set -e
+          if [[ "$release_status" -eq 0 ]]; then
+            expected_prerelease=false
+            if [[ "$RELEASE_VERSION" == *-* ]]; then expected_prerelease=true; fi
+            if ! jq -e --arg tag "$RELEASE_TAG" --argjson prerelease "$expected_prerelease" \
+              '.tag_name == $tag and .prerelease == $prerelease and (.draft | type == "boolean")' <<< "$release_json" > /dev/null; then
+              echo "::error::Existing GitHub Release conflicts with tag '$RELEASE_TAG' or its prerelease identity. Review the existing release before retrying."
               exit 1
             fi
-            if [[ "$response" != *"HTTP 404"* ]]; then
-              echo "::error::Could not verify that $label '$release_tag' is unused."
-              echo "$response"
-              exit 1
-            fi
-          }
-
-          assert_absent "repos/$GITHUB_REPOSITORY/git/ref/tags/$release_tag" "Git tag"
-          assert_absent "repos/$GITHUB_REPOSITORY/releases/tags/$release_tag" "GitHub Release"
+            echo "Compatible GitHub Release '$RELEASE_TAG' already exists; retaining its draft/published state."
+          elif [[ "$release_json" != *"HTTP 404"* ]]; then
+            echo "::error::Could not check GitHub Release '$RELEASE_TAG'."
+            echo "$release_json"
+            exit 1
+          fi
 
           {
             echo "version=$RELEASE_VERSION"
-            echo "tag=$release_tag"
+            echo "tag=$RELEASE_TAG"
             echo "sha=$RELEASE_SHA"
           } >> "$GITHUB_OUTPUT"
 
           {
             echo "## Release request validated"
             echo
-            echo "- Version: `$RELEASE_VERSION`"
-            echo "- Source: `main` at `$RELEASE_SHA`"
-            echo "- Tag: `$release_tag`"
+            printf -- '- Tag: `%s`\n' "$RELEASE_TAG"
+            printf -- '- Version: `%s`\n' "$RELEASE_VERSION"
+            echo '- Source: main'
+            printf -- '- Released SHA: `%s`\n' "$RELEASE_SHA"
           } >> "$GITHUB_STEP_SUMMARY"
 
   release_packages:
@@ -105,8 +120,6 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: read
-    env:
-      MINVERVERSIONOVERRIDE: ${{ needs.release_preflight.outputs.version }}
     steps:
       - name: Checkout the released SHA
         uses: codebeltnet/git-checkout@v1
@@ -139,7 +152,6 @@ jobs:
         uses: codebeltnet/dotnet-build@v4
         with:
           configuration: Release
-          build-switches: -p:MinVerVersionOverride=${{ needs.release_preflight.outputs.version }}
 
       - name: Pack Release packages
         uses: codebeltnet/dotnet-pack@v3
@@ -176,8 +188,8 @@ jobs:
     secrets:
       NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
 
-  tag_and_draft_release:
-    name: Tag released SHA and create draft GitHub Release
+  draft_github_release:
+    name: Create draft GitHub Release for the existing tag
     needs: [release_preflight, release_packages, publish_nuget]
     runs-on: ubuntu-26.04
     permissions:
@@ -188,37 +200,19 @@ jobs:
         with:
           ref: ${{ needs.release_preflight.outputs.sha }}
 
-      - name: Create or verify the version tag
+      - name: Verify the existing release tag still identifies the released SHA
         shell: bash
         env:
-          RELEASE_VERSION: ${{ needs.release_preflight.outputs.version }}
           RELEASE_TAG: ${{ needs.release_preflight.outputs.tag }}
           RELEASE_SHA: ${{ needs.release_preflight.outputs.sha }}
         run: |
           set -euo pipefail
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          set +e
-          git ls-remote --exit-code origin "refs/tags/$RELEASE_TAG" > "$RUNNER_TEMP/release-tag-ref.txt"
-          tag_status=$?
-          set -e
-
-          if [[ "$tag_status" -eq 0 ]]; then
-            git fetch --force --quiet origin "refs/tags/$RELEASE_TAG:refs/tags/$RELEASE_TAG"
-            existing_sha="$(git rev-parse "$RELEASE_TAG^{commit}")"
-            if [[ "$existing_sha" != "$RELEASE_SHA" ]]; then
-              echo "::error::Tag '$RELEASE_TAG' points to '$existing_sha', not released SHA '$RELEASE_SHA'."
-              exit 1
-            fi
-            echo "Tag '$RELEASE_TAG' already points to the released SHA."
-          elif [[ "$tag_status" -eq 2 ]]; then
-            git tag -a "$RELEASE_TAG" "$RELEASE_SHA" -m "Cuemon $RELEASE_TAG"
-            git push origin "refs/tags/$RELEASE_TAG"
-          else
-            echo "::error::Could not check whether tag '$RELEASE_TAG' exists (git ls-remote exit code $tag_status)."
-            cat "$RUNNER_TEMP/release-tag-ref.txt"
+          if ! tagged_sha="$(git rev-parse --verify "refs/tags/$RELEASE_TAG^{commit}" 2>/dev/null)"; then
+            echo "::error::Release tag '$RELEASE_TAG' is missing or does not resolve to a commit; restore the original tag before retrying."
+            exit 1
+          fi
+          if [[ "$tagged_sha" != "$RELEASE_SHA" ]]; then
+            echo "::error::Tag '$RELEASE_TAG' points to '$tagged_sha', not released SHA '$RELEASE_SHA'. Restore the original tag before retrying."
             exit 1
           fi
 
@@ -312,7 +306,7 @@ jobs:
 
   upload_docfx_release_asset:
     name: Attach the built DocFX OCI artifact to its release
-    needs: [release_preflight, tag_and_draft_release, docfx_oci_build]
+    needs: [release_preflight, draft_github_release, docfx_oci_build]
     runs-on: ubuntu-26.04
     permissions:
       contents: write
@@ -444,8 +438,6 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
-    env:
-      MINVERVERSIONOVERRIDE: ${{ needs.release_preflight.outputs.version }}
     steps:
       - name: Checkout the released SHA
         uses: codebeltnet/git-checkout@v1
@@ -465,7 +457,7 @@ jobs:
           configuration: Release
           build: true
           restore: true
-          build-switches: -p:SkipSignAssembly=true -p:MinVerVersionOverride=${{ needs.release_preflight.outputs.version }}
+          build-switches: -p:SkipSignAssembly=true
 
       - name: Upload post-release test results and coverage
         if: always()
@@ -484,8 +476,6 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
-    env:
-      MINVERVERSIONOVERRIDE: ${{ needs.release_preflight.outputs.version }}
     steps:
       - name: Checkout the released SHA
         uses: codebeltnet/git-checkout@v1
@@ -513,7 +503,7 @@ jobs:
           configuration: Release
           build: true
           restore: true
-          build-switches: -p:SkipSignAssembly=true -p:MinVerVersionOverride=${{ needs.release_preflight.outputs.version }}
+          build-switches: -p:SkipSignAssembly=true
         env:
           CONNECTIONSTRINGS__ADVENTUREWORKS: ${{ secrets.DB_ADVENTUREWORKS }}
 
@@ -541,8 +531,6 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: read
-    env:
-      MINVERVERSIONOVERRIDE: ${{ needs.release_preflight.outputs.version }}
     steps:
       - name: Checkout the released SHA as main analysis
         uses: codebeltnet/git-checkout@v1
@@ -570,7 +558,7 @@ jobs:
         uses: codebeltnet/dotnet-build@v4
         with:
           configuration: Release
-          build-switches: -p:SkipSignAssembly=true -p:MinVerVersionOverride=${{ needs.release_preflight.outputs.version }}
+          build-switches: -p:SkipSignAssembly=true
 
       - name: Finalize SonarCloud analysis
         uses: codebeltnet/sonarcloud-scan-finalize@v1
@@ -599,8 +587,6 @@ jobs:
     permissions:
       contents: read
       security-events: write
-    env:
-      MINVERVERSIONOVERRIDE: ${{ needs.release_preflight.outputs.version }}
     steps:
       - name: Checkout the released SHA as main analysis
         uses: codebeltnet/git-checkout@v1
@@ -620,7 +606,7 @@ jobs:
         uses: codebeltnet/dotnet-build@v4
         with:
           configuration: Release
-          build-switches: -p:SkipSignAssembly=true -p:MinVerVersionOverride=${{ needs.release_preflight.outputs.version }}
+          build-switches: -p:SkipSignAssembly=true
 
       - name: Finalize CodeQL analysis
         uses: codebeltnet/codeql-scan-finalize@v1
@@ -632,7 +618,7 @@ jobs:
       - release_preflight
       - release_packages
       - publish_nuget
-      - tag_and_draft_release
+      - draft_github_release
       - docfx_oci_build
       - upload_docfx_release_asset
       - publish_github_release
@@ -652,9 +638,10 @@ jobs:
           PREFLIGHT_RESULT: ${{ needs.release_preflight.result }}
           RELEASE_VERSION: ${{ needs.release_preflight.outputs.version }}
           RELEASE_SHA: ${{ needs.release_preflight.outputs.sha }}
+          RELEASE_TAG: ${{ needs.release_preflight.outputs.tag }}
           PACKAGE_BUILD_RESULT: ${{ needs.release_packages.result }}
           NUGET_RESULT: ${{ needs.publish_nuget.result }}
-          TAG_AND_DRAFT_RESULT: ${{ needs.tag_and_draft_release.result }}
+          DRAFT_RELEASE_RESULT: ${{ needs.draft_github_release.result }}
           DOCFX_BUILD_RESULT: ${{ needs.docfx_oci_build.result }}
           DOCFX_ASSET_RESULT: ${{ needs.upload_docfx_release_asset.result }}
           GITHUB_RELEASE_RESULT: ${{ needs.publish_github_release.result }}
@@ -670,20 +657,21 @@ jobs:
           {
             echo "## Cuemon release status"
             echo
-            echo "- Version: `${RELEASE_VERSION:-not validated}`"
-            echo "- Released SHA: `${RELEASE_SHA:-not validated}`"
-            echo "- Release package build: `$PACKAGE_BUILD_RESULT`"
-            echo "- NuGet publication: `$NUGET_RESULT`"
-            echo "- Git tag and draft release: `$TAG_AND_DRAFT_RESULT`"
-            echo "- DocFX OCI build: `$DOCFX_BUILD_RESULT`"
-            echo "- DocFX release asset: `$DOCFX_ASSET_RESULT`"
-            echo "- Published GitHub Release: `$GITHUB_RELEASE_RESULT`"
+            echo "- Tag: \`${RELEASE_TAG:-not validated}\`"
+            echo "- Version: \`${RELEASE_VERSION:-not validated}\`"
+            echo "- Released SHA: \`${RELEASE_SHA:-not validated}\`"
+            echo "- Release package build: \`$PACKAGE_BUILD_RESULT\`"
+            echo "- NuGet publication: \`$NUGET_RESULT\`"
+            echo "- Draft GitHub Release: \`$DRAFT_RELEASE_RESULT\`"
+            echo "- DocFX OCI build: \`$DOCFX_BUILD_RESULT\`"
+            echo "- DocFX release asset: \`$DOCFX_ASSET_RESULT\`"
+            echo "- Published GitHub Release: \`$GITHUB_RELEASE_RESULT\`"
             echo
           } >> "$GITHUB_STEP_SUMMARY"
 
           if [[ "$PREFLIGHT_RESULT" != "success" ]]; then
             {
-              echo "No release was attempted because the main SHA or human-supplied SemVer request failed preflight validation."
+              echo "No release was attempted because the triggering tag, SemVer, main ancestry or existing release identity failed preflight validation."
             } >> "$GITHUB_STEP_SUMMARY"
           elif [[ "$PACKAGE_BUILD_RESULT" != "success" ]]; then
             {
@@ -697,13 +685,13 @@ jobs:
             {
               echo "NuGet publication did not complete. If the sequential push started, it may already have published some packages. Re-run the failed NuGet publication job on this workflow run to reuse the validated artifact; do not start a fresh run with the same version unless the packages' SHA-512 values match."
             } >> "$GITHUB_STEP_SUMMARY"
-          elif [[ "$TAG_AND_DRAFT_RESULT" != "success" ]]; then
+          elif [[ "$DRAFT_RELEASE_RESULT" != "success" ]]; then
             {
-              echo "NuGet packages were published, but Git tag/GitHub Release finalization did not complete. Check whether the tag or draft exists before retrying; GitHub and NuGet publication cannot be committed transactionally."
+              echo "NuGet packages were published, but draft GitHub Release creation did not complete. Check the existing tag and release before retrying; GitHub and NuGet publication cannot be committed transactionally."
             } >> "$GITHUB_STEP_SUMMARY"
           elif [[ "$DOCFX_BUILD_RESULT" != "success" || "$DOCFX_ASSET_RESULT" != "success" ]]; then
             {
-              echo "NuGet packages and the source tag were published, but the DocFX OCI artifact or release asset upload failed. GitHub Release publication waits for the verified OCI archive and checksum, so the draft remains unpublished."
+              echo "NuGet packages were published for the existing source tag, but the DocFX OCI artifact or release asset upload failed. GitHub Release publication waits for the verified OCI archive and checksum, so the draft remains unpublished."
             } >> "$GITHUB_STEP_SUMMARY"
           elif [[ "$GITHUB_RELEASE_RESULT" != "success" ]]; then
             {
@@ -720,7 +708,7 @@ jobs:
               echo
               echo "**Product release succeeded; post-release assurance failed.**"
               echo
-              echo "Post-release test discovery: `$TEST_DISCOVERY_RESULT`; test matrix: `$TEST_RESULT`; SQL Server integration: `$INTEGRATION_RESULT`; SonarCloud: `$SONAR_RESULT`; Codecov: `$CODECOV_RESULT`; CodeQL: `$CODEQL_RESULT`."
+              echo "Post-release test discovery: \`$TEST_DISCOVERY_RESULT\`; test matrix: \`$TEST_RESULT\`; SQL Server integration: \`$INTEGRATION_RESULT\`; SonarCloud: \`$SONAR_RESULT\`; Codecov: \`$CODECOV_RESULT\`; CodeQL: \`$CODEQL_RESULT\`."
               echo "The package and tag remain released. These findings do not roll back publication; resolve them against the recorded SHA."
             } >> "$GITHUB_STEP_SUMMARY"
           fi

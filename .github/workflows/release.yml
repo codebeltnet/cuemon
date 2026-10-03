@@ -13,6 +13,14 @@ on:
         type: string
         description: GitHub Actions release run containing the already-built release artifacts.
         required: true
+      recovery:
+        type: choice
+        description: Recover OCI asset attachment or replay assurance against main at the released SHA.
+        required: true
+        default: assets
+        options:
+          - assets
+          - assurance
 
 permissions:
   contents: read
@@ -49,6 +57,7 @@ jobs:
           RELEASE_SHA: ${{ github.sha }}
           RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
           SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+          RECOVERY_MODE: ${{ inputs.recovery || 'assets' }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
@@ -115,27 +124,35 @@ jobs:
               [.[].jobs[]] as $jobs |
               ([$jobs[] | select(.name | startswith($prefix))] | any(.conclusion == "success")) and
               ([$jobs[] | select(.name | startswith($prefix))] | all(.conclusion == "success" or .conclusion == "skipped")) and
-              ($jobs | any(.name == "Validate release tag and authoritative main history" and .conclusion == "success")) and
-              ($jobs | any(.name == "Build multi-platform DocFX OCI artifact once" and .conclusion == "success"))
+              ($jobs | any(.name == "Validate release tag and authoritative main history" and .conclusion == "success"))
               ' <<< "$source_jobs" >/dev/null; then
-              echo "::error::Source run '$SOURCE_RUN_ID' has no confirmed successful tag validation, NuGet publication and DocFX OCI build. This recovery only resumes asset attachment after those durable boundaries. Inspect the source jobs; do not republish NuGet."
+              echo "::error::Source run '$SOURCE_RUN_ID' has no confirmed successful tag validation and NuGet publication. Inspect the source jobs; do not republish NuGet."
               exit 1
             fi
 
-            source_artifacts="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID/artifacts?per_page=100")"
-            artifact_json="$(jq -c --arg name "DocFX-OCI-$RELEASE_VERSION" '[.[].artifacts[] | select(.name == $name)]' <<< "$source_artifacts")"
-            if ! jq -e --arg sha "$RELEASE_SHA" --arg tag "$RELEASE_TAG" --argjson run "$SOURCE_RUN_ID" \
-              --argjson repo "$(jq '.repository.id' <<< "$source_run")" '
-              length == 1 and (.[0] | .expired == false and
-              (.expires_at | fromdateiso8601) > now and (.digest | test("^sha256:[0-9a-f]{64}$")) and
-              .workflow_run.id == $run and .workflow_run.repository_id == $repo and
-              .workflow_run.head_repository_id == $repo and .workflow_run.head_branch == $tag and
-              .workflow_run.head_sha == $sha)' <<< "$artifact_json" >/dev/null; then
-              echo "::error::Expected unique, unexpired, SHA-256 identified DocFX-OCI-$RELEASE_VERSION artifact from run '$SOURCE_RUN_ID' for '$RELEASE_SHA'. Restore access to that exact artifact; recovery will not rebuild replacement bytes."
+            if [[ "$RECOVERY_MODE" == "assets" ]]; then
+              if ! jq -e '[.[].jobs[]] | any(.name == "Build multi-platform DocFX OCI artifact once" and .conclusion == "success")' <<< "$source_jobs" >/dev/null; then
+                echo "::error::Source run '$SOURCE_RUN_ID' has no confirmed successful DocFX OCI build. Asset recovery cannot rebuild replacement bytes."
+                exit 1
+              fi
+              source_artifacts="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID/artifacts?per_page=100")"
+              artifact_json="$(jq -c --arg name "DocFX-OCI-$RELEASE_VERSION" '[.[].artifacts[] | select(.name == $name)]' <<< "$source_artifacts")"
+              if ! jq -e --arg sha "$RELEASE_SHA" --arg tag "$RELEASE_TAG" --argjson run "$SOURCE_RUN_ID" \
+                --argjson repo "$(jq '.repository.id' <<< "$source_run")" '
+                length == 1 and (.[0] | .expired == false and
+                (.expires_at | fromdateiso8601) > now and (.digest | test("^sha256:[0-9a-f]{64}$")) and
+                .workflow_run.id == $run and .workflow_run.repository_id == $repo and
+                .workflow_run.head_repository_id == $repo and .workflow_run.head_branch == $tag and
+                .workflow_run.head_sha == $sha)' <<< "$artifact_json" >/dev/null; then
+                echo "::error::Expected unique, unexpired, SHA-256 identified DocFX-OCI-$RELEASE_VERSION artifact from run '$SOURCE_RUN_ID' for '$RELEASE_SHA'. Restore access to that exact artifact; recovery will not rebuild replacement bytes."
+                exit 1
+              fi
+              echo "artifact_id=$(jq -r '.[0].id' <<< "$artifact_json")" >> "$GITHUB_OUTPUT"
+            elif [[ "$RECOVERY_MODE" != "assurance" ]]; then
+              echo "::error::Unknown recovery mode '$RECOVERY_MODE'. Select assets or assurance."
               exit 1
             fi
             echo "source_run_id=$SOURCE_RUN_ID" >> "$GITHUB_OUTPUT"
-            echo "artifact_id=$(jq -r '.[0].id' <<< "$artifact_json")" >> "$GITHUB_OUTPUT"
             echo "NuGet v$RELEASE_VERSION: already published (source run confirmed); recovery will not invoke publication."
           fi
 
@@ -232,7 +249,7 @@ jobs:
       NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
 
   draft_github_release:
-    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && (github.event_name == 'workflow_dispatch' || needs.publish_nuget.result == 'success') }}
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'workflow_dispatch' && inputs.recovery == 'assets') || (github.event_name == 'push' && needs.publish_nuget.result == 'success')) }}
     name: Resolve draft GitHub Release for the existing tag
     needs: [release_preflight, publish_nuget]
     runs-on: ubuntu-26.04
@@ -361,7 +378,7 @@ jobs:
           retention-days: 30
 
   upload_docfx_release_asset:
-    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && needs.draft_github_release.result == 'success' && (github.event_name == 'workflow_dispatch' || needs.docfx_oci_build.result == 'success') }}
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && needs.draft_github_release.result == 'success' && ((github.event_name == 'workflow_dispatch' && inputs.recovery == 'assets') || (github.event_name == 'push' && needs.docfx_oci_build.result == 'success')) }}
     name: Attach the built DocFX OCI artifact to its release
     needs: [release_preflight, draft_github_release, docfx_oci_build]
     runs-on: ubuntu-26.04
@@ -468,7 +485,7 @@ jobs:
           echo "OCI archive and checksum attached to draft release ID '$RELEASE_ID'; awaiting manual publication."
 
   prepare_release_tests:
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
     name: Discover post-release test projects
     needs: [release_preflight, publish_nuget]
     runs-on: ubuntu-26.04
@@ -495,7 +512,7 @@ jobs:
         run: echo "${{ steps.test-projects.outputs.result }}"
 
   post_release_tests:
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && needs.prepare_release_tests.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
     name: Post-release Release tests - ${{ matrix.project }}
     needs: [release_preflight, prepare_release_tests, publish_nuget]
     strategy:
@@ -538,7 +555,7 @@ jobs:
           retention-days: 30
 
   post_release_integration_test:
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
     name: Post-release SQL Server integration test
     needs: [release_preflight, publish_nuget]
     runs-on: ubuntu-26.04
@@ -593,49 +610,29 @@ jobs:
           command: down
 
   post_release_sonarcloud:
-    if: ${{ always() && github.event_name == 'push' && needs.publish_nuget.result == 'success' }}
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
     name: Post-release SonarCloud analysis
     needs: [release_preflight, publish_nuget, prepare_release_tests, post_release_tests, post_release_integration_test]
-    runs-on: ubuntu-26.04
-    timeout-minutes: 45
     permissions:
       contents: read
-    steps:
-      - name: Checkout the released SHA as main analysis
-        uses: codebeltnet/git-checkout@v1
-        with:
-          ref: ${{ needs.release_preflight.outputs.sha }}
-
-      - name: Install .NET
-        uses: codebeltnet/install-dotnet@v3
-
-      - name: Install .NET Tool - Sonar Scanner
-        uses: codebeltnet/dotnet-tool-install-sonarscanner@v3
-
-      - name: Restore released source dependencies
-        uses: codebeltnet/dotnet-restore@v3
-
-      - name: Begin SonarCloud analysis for the released version
-        uses: codebeltnet/sonarcloud-scan@v2
-        with:
-          token: ${{ secrets.SONAR_TOKEN }}
-          organization: geekle
-          projectKey: Cuemon
-          version: ${{ needs.release_preflight.outputs.version }}
-
-      - name: Build released source for SonarCloud
-        uses: codebeltnet/dotnet-build@v4
-        with:
-          configuration: Release
-          build-switches: -p:SkipSignAssembly=true
-
-      - name: Finalize SonarCloud analysis
-        uses: codebeltnet/sonarcloud-scan-finalize@v1
-        with:
-          token: ${{ secrets.SONAR_TOKEN }}
+    uses: codebeltnet/jobs-sonarcloud/.github/workflows/default.yml@v3
+    with:
+      organization: geekle
+      projectKey: Cuemon
+      version: ${{ needs.release_preflight.outputs.version }}
+      ref: ${{ needs.release_preflight.outputs.sha }}
+      configuration: Release
+      timeout-minutes: 45
+      # Custom parameters replace the workflow defaults; retain its exclusions.
+      parameters: >-
+        -d:sonar.exclusions='**/obj/**,**/bin/**'
+        -d:sonar.branch.name=main
+        -d:sonar.scm.revision=${{ needs.release_preflight.outputs.sha }}
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   post_release_codecov:
-    if: ${{ always() && github.event_name == 'push' && needs.publish_nuget.result == 'success' }}
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
     name: Post-release Codecov upload
     needs: [release_preflight, publish_nuget, prepare_release_tests, post_release_tests, post_release_integration_test]
     permissions:
@@ -645,41 +642,78 @@ jobs:
       repository: codebeltnet/cuemon
       configuration: .github/codecov.yml
       ref: ${{ needs.release_preflight.outputs.sha }}
+      branch: main
+      commit: ${{ needs.release_preflight.outputs.sha }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   post_release_codeql:
-    if: ${{ always() && github.event_name == 'push' && needs.publish_nuget.result == 'success' }}
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
     name: Post-release CodeQL analysis
     needs: [release_preflight, publish_nuget, prepare_release_tests, post_release_tests, post_release_integration_test]
-    runs-on: ubuntu-26.04
-    timeout-minutes: 45
     permissions:
       contents: read
       security-events: write
+    uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
+    with:
+      ref: ${{ needs.release_preflight.outputs.sha }}
+      analysis-ref: refs/heads/main
+      analysis-sha: ${{ needs.release_preflight.outputs.sha }}
+      configuration: Release
+      timeout-minutes: 45
+
+  verify_assurance_identity:
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && needs.post_release_sonarcloud.result == 'success' && needs.post_release_codecov.result == 'success' && needs.post_release_codeql.result == 'success' }}
+    name: Verify released SHA on canonical main in quality services
+    needs: [release_preflight, post_release_sonarcloud, post_release_codecov, post_release_codeql]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: read
     steps:
-      - name: Checkout the released SHA as main analysis
-        uses: codebeltnet/git-checkout@v1
-        with:
-          ref: ${{ needs.release_preflight.outputs.sha }}
-
-      - name: Install .NET
-        uses: codebeltnet/install-dotnet@v3
-
-      - name: Restore released source dependencies
-        uses: codebeltnet/dotnet-restore@v3
-
-      - name: Begin CodeQL analysis
-        uses: codebeltnet/codeql-scan@v1
-
-      - name: Build released source for CodeQL
-        uses: codebeltnet/dotnet-build@v4
-        with:
-          configuration: Release
-          build-switches: -p:SkipSignAssembly=true
-
-      - name: Finalize CodeQL analysis
-        uses: codebeltnet/codeql-scan-finalize@v1
+      - name: Verify service records for main at the released SHA
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ needs.release_preflight.outputs.sha }}
+          RELEASE_VERSION: ${{ needs.release_preflight.outputs.version }}
+        run: |
+          set -euo pipefail
+          # Upload completion can precede service-side processing. Bound the wait.
+          for attempt in {1..20}; do
+            sonar_ok=false
+            codecov_ok=false
+            codeql_ok=false
+            if sonar="$(curl --fail --silent --show-error 'https://sonarcloud.io/api/project_analyses/search?project=Cuemon&branch=main&ps=1')" &&
+               jq -e --arg sha "$RELEASE_SHA" --arg version "$RELEASE_VERSION" \
+                 '.analyses[0] | .revision == $sha and .projectVersion == $version' <<< "$sonar" >/dev/null; then
+              sonar_ok=true
+            fi
+            if codecov="$(curl --fail --silent --show-error "https://api.codecov.io/api/v2/github/codebeltnet/repos/cuemon/commits/$RELEASE_SHA/")" &&
+               jq -e --arg sha "$RELEASE_SHA" \
+                 '.branch == "main" and .commitid == $sha and .state == "complete"' <<< "$codecov" >/dev/null; then
+              codecov_ok=true
+            fi
+            if codeql="$(gh api "repos/$GITHUB_REPOSITORY/code-scanning/analyses?tool_name=CodeQL&ref=refs%2Fheads%2Fmain&per_page=100")" &&
+               jq -e --arg sha "$RELEASE_SHA" \
+                 'any(.[]; .tool.name == "CodeQL" and .ref == "refs/heads/main" and .commit_sha == $sha and .error == "")' <<< "$codeql" >/dev/null; then
+              codeql_ok=true
+            fi
+            echo "Service identity check $attempt/20 for $RELEASE_SHA: SonarCloud=$sonar_ok; Codecov=$codecov_ok; CodeQL=$codeql_ok"
+            if [[ "$sonar_ok" == true && "$codecov_ok" == true && "$codeql_ok" == true ]]; then
+              {
+                echo '## Post-release service identity verified'
+                echo "- SonarCloud: main; SCM revision \`$RELEASE_SHA\`; project version \`$RELEASE_VERSION\`"
+                echo "- Codecov: main; commit \`$RELEASE_SHA\`"
+                echo "- CodeQL: refs/heads/main; commit \`$RELEASE_SHA\`"
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            if [[ "$attempt" -lt 20 ]]; then sleep 15; fi
+          done
+          echo "::error::Services did not confirm canonical main at released SHA '$RELEASE_SHA' (SonarCloud=$sonar_ok; Codecov=$codecov_ok; CodeQL=$codeql_ok). Inspect service records; successful uploads alone do not establish assurance."
+          exit 1
 
   release_summary:
     if: ${{ always() }}
@@ -697,6 +731,7 @@ jobs:
       - post_release_sonarcloud
       - post_release_codecov
       - post_release_codeql
+      - verify_assurance_identity
     runs-on: ubuntu-26.04
     permissions:
       contents: read
@@ -711,6 +746,7 @@ jobs:
           RELEASE_ID: ${{ needs.draft_github_release.outputs.release_id }}
           SOURCE_RUN_ID: ${{ inputs.source_run_id }}
           REQUESTED_TAG: ${{ inputs.tag }}
+          RECOVERY_MODE: ${{ inputs.recovery || 'assets' }}
           PACKAGE_BUILD_RESULT: ${{ needs.release_packages.result }}
           NUGET_RESULT: ${{ needs.publish_nuget.result }}
           DRAFT_RELEASE_RESULT: ${{ needs.draft_github_release.result }}
@@ -722,10 +758,33 @@ jobs:
           SONAR_RESULT: ${{ needs.post_release_sonarcloud.result }}
           CODECOV_RESULT: ${{ needs.post_release_codecov.result }}
           CODEQL_RESULT: ${{ needs.post_release_codeql.result }}
+          IDENTITY_RESULT: ${{ needs.verify_assurance_identity.result }}
         run: |
           set -euo pipefail
 
           if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            if [[ "$RECOVERY_MODE" == "assurance" ]]; then
+              {
+                echo '## Post-release assurance recovery status'
+                echo "- Tag: \`${RELEASE_TAG:-$REQUESTED_TAG}\`"
+                echo "- Released SHA: \`${RELEASE_SHA:-not validated}\`"
+                echo "- Source run: \`$SOURCE_RUN_ID\`"
+                echo "- Recovery validation: \`$PREFLIGHT_RESULT\`"
+                echo '- Reporting identity: SonarCloud/Codecov main; CodeQL refs/heads/main at the released SHA'
+                echo "- Test discovery: \`$TEST_DISCOVERY_RESULT\`; test matrix: \`$TEST_RESULT\`; SQL Server integration: \`$INTEGRATION_RESULT\`"
+                echo "- SonarCloud: \`$SONAR_RESULT\`; Codecov: \`$CODECOV_RESULT\`; CodeQL: \`$CODEQL_RESULT\`"
+                echo "- Service identity verification: \`$IDENTITY_RESULT\`"
+                echo '- NuGet publication, OCI build/attachment, GitHub Release and deployment: not invoked'
+              } >> "$GITHUB_STEP_SUMMARY"
+              if [[ "$PREFLIGHT_RESULT" != "success" || "$TEST_DISCOVERY_RESULT" != "success" ||
+                    "$TEST_RESULT" != "success" || "$INTEGRATION_RESULT" != "success" ||
+                    "$SONAR_RESULT" != "success" || "$CODECOV_RESULT" != "success" ||
+                    "$CODEQL_RESULT" != "success" || "$IDENTITY_RESULT" != "success" ]]; then
+                echo '::error::Assurance recovery did not complete. Inspect the failed tests, analysis or service identity check.'
+                exit 1
+              fi
+              exit 0
+            fi
             {
               echo "## Partial-release recovery status"
               echo
@@ -764,6 +823,7 @@ jobs:
             echo "- Tag: \`${RELEASE_TAG:-not validated}\`"
             echo "- Version: \`${RELEASE_VERSION:-not validated}\`"
             echo "- Released SHA: \`${RELEASE_SHA:-not validated}\`"
+            echo '- Repository health identity: SonarCloud/Codecov main; CodeQL refs/heads/main at the released SHA'
             echo "- Release package build: \`$PACKAGE_BUILD_RESULT\`"
             echo "- NuGet publication: \`$NUGET_RESULT\`"
             echo "- Draft GitHub Release: \`$DRAFT_RELEASE_RESULT\`"
@@ -808,13 +868,14 @@ jobs:
           if [[ "$NUGET_RESULT" == "success" && \
                 ( "$TEST_DISCOVERY_RESULT" != "success" || "$TEST_RESULT" != "success" || \
                   "$INTEGRATION_RESULT" != "success" || "$SONAR_RESULT" != "success" || \
-                  "$CODECOV_RESULT" != "success" || "$CODEQL_RESULT" != "success" ) ]]; then
+                  "$CODECOV_RESULT" != "success" || "$CODEQL_RESULT" != "success" || \
+                  "$IDENTITY_RESULT" != "success" ) ]]; then
             echo "::warning::NuGet publication succeeded; post-release assurance did not complete successfully."
             {
               echo
               echo "**NuGet publication succeeded; post-release assurance did not complete successfully.**"
               echo
-              echo "Post-release test discovery: \`$TEST_DISCOVERY_RESULT\`; test matrix: \`$TEST_RESULT\`; SQL Server integration: \`$INTEGRATION_RESULT\`; SonarCloud: \`$SONAR_RESULT\`; Codecov: \`$CODECOV_RESULT\`; CodeQL: \`$CODEQL_RESULT\`."
+              echo "Post-release test discovery: \`$TEST_DISCOVERY_RESULT\`; test matrix: \`$TEST_RESULT\`; SQL Server integration: \`$INTEGRATION_RESULT\`; SonarCloud: \`$SONAR_RESULT\`; Codecov: \`$CODECOV_RESULT\`; CodeQL: \`$CODEQL_RESULT\`; service identity: \`$IDENTITY_RESULT\`."
               echo "The package and tag remain released. These findings do not roll back publication; resolve them against the recorded SHA."
             } >> "$GITHUB_STEP_SUMMARY"
           fi

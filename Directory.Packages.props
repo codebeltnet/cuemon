@@ -12,7 +12,7 @@
     <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting" Version="12.0.1" />
     <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting.AspNetCore" Version="12.0.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
-    <PackageVersion Include="Codebelt.Coverlet.MTP" Version="10.0.1" />
+    <PackageVersion Include="Codebelt.Coverlet.MTP" Version="10.1.0" />
     <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.4.1" />
     <PackageVersion Include="MinVer" Version="8.0.0" />
     <PackageVersion Include="NativeLibraryLoader" Version="1.0.13" />
@@ -53,6 +53,6 @@
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.12" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net9')) OR $(TargetFramework.StartsWith('net10'))">
-    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.0" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.1" />
   </ItemGroup>
 </Project>

@@ -591,7 +591,8 @@ jobs:
       repository: codebeltnet/cuemon
       configuration: .github/codecov.yml
       ref: ${{ needs.release_preflight.outputs.sha }}
-    secrets: inherit
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   post_release_codeql:
     if: ${{ always() && needs.publish_nuget.result == 'success' }}

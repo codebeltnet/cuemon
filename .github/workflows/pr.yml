@@ -379,7 +379,8 @@ jobs:
     with:
       repository: codebeltnet/cuemon
       configuration: .github/codecov.yml
-    secrets: inherit
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   codeql:
     if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}

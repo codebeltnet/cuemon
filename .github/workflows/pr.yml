@@ -375,17 +375,11 @@ jobs:
     if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}
     name: call-codecov
     needs: [init, build, test_qualitygate]
-    runs-on: ubuntu-26.04
-    steps:
-      - name: Checkout
-        uses: codebeltnet/git-checkout@v1
-
-      - name: Upload coverage to Codecov
-        uses: codebeltnet/codecov-scan@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          repository: codebeltnet/cuemon
-          configuration: .github/codecov.yml
+    uses: codebeltnet/jobs-codecov/.github/workflows/default.yml@v1
+    with:
+      repository: codebeltnet/cuemon
+      configuration: .github/codecov.yml
+    secrets: inherit
 
   codeql:
     if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}

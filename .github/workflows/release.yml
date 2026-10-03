@@ -303,9 +303,6 @@ jobs:
           if [[ "$RELEASE_VERSION" == *-* ]]; then expected_prerelease=true; fi
           if [[ "$count" -eq 1 ]]; then
             release_json="$(jq -c '.[0]' <<< "$matches")"
-          elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            echo "::error::Recovery requires the existing draft GitHub Release for '$RELEASE_TAG'. Restore that object; recovery will not create a replacement release."
-            exit 1
           else
             notes="$(gh api --method POST "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
               -f tag_name="$RELEASE_TAG" -f target_commitish="$RELEASE_SHA" --jq '.body')"
@@ -685,11 +682,19 @@ jobs:
             sonar_ok=false
             codecov_ok=false
             codeql_ok=false
-            if sonar="$(curl --fail --silent --show-error 'https://sonarcloud.io/api/project_analyses/search?project=Cuemon&branch=main&ps=1')" &&
-               jq -e --arg sha "$RELEASE_SHA" --arg version "$RELEASE_VERSION" \
-                 '.analyses[0] | .revision == $sha and .projectVersion == $version' <<< "$sonar" >/dev/null; then
-              sonar_ok=true
-            fi
+            # Newer main analyses must not hide the released revision, including on later pages.
+            sonar_page=1
+            while sonar="$(curl --fail --silent --show-error "https://sonarcloud.io/api/project_analyses/search?project=Cuemon&branch=main&ps=100&p=$sonar_page")"; do
+              if jq -e --arg sha "$RELEASE_SHA" --arg version "$RELEASE_VERSION" \
+                'any(.analyses[]; .revision == $sha and .projectVersion == $version)' <<< "$sonar" >/dev/null; then
+                sonar_ok=true
+                break
+              fi
+              if ! jq -e '.paging.pageIndex * .paging.pageSize < .paging.total' <<< "$sonar" >/dev/null; then
+                break
+              fi
+              sonar_page=$((sonar_page + 1))
+            done
             if codecov="$(curl --fail --silent --show-error "https://api.codecov.io/api/v2/github/codebeltnet/repos/cuemon/commits/$RELEASE_SHA/")" &&
                jq -e --arg sha "$RELEASE_SHA" \
                  '.branch == "main" and .commitid == $sha and .state == "complete"' <<< "$codecov" >/dev/null; then

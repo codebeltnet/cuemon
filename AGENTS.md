@@ -19,7 +19,7 @@ Follow the repo rules first; do not invent commands or conventions.
 - Test TFMs: `net10.0;net9.0` on Linux; adds `net48` on Windows.
 - Benchmark TFMs: `net10.0;net9.0`.
 - Central package management via `Directory.Packages.props` (`ManagePackageVersionsCentrally=true`).
-- CI runs on Linux (ubuntu-24.04) and Windows (windows-2025), both X64 and ARM64.
+- CI runs on Linux (ubuntu-26.04) and Windows (windows-2025), both X64 and ARM64.
 - TFM compatibility is mandatory: proposals and code changes must work for all source TFMs. Do not assume `net9.0`/`net10.0` APIs exist in `netstandard2.0`; use conditional compilation (`#if NET9_0_OR_GREATER`) or compatible fallbacks where needed.
 
 ## Build Commands

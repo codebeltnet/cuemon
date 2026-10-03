@@ -51,9 +51,24 @@ public abstract class Disposable : IDisposable
         {
             if (Disposed) { return; }
             Disposed = true;
-            if (disposing)
+            try
             {
-                OnDisposeManagedResources();
+                if (disposing)
+                {
+                    OnDisposeManagedResources();
+                }
+            }
+            catch (Exception managedException)
+            {
+                try
+                {
+                    OnDisposeUnmanagedResources();
+                }
+                catch (Exception unmanagedException)
+                {
+                    throw new AggregateException(managedException, unmanagedException);
+                }
+                throw;
             }
             OnDisposeUnmanagedResources();
         }

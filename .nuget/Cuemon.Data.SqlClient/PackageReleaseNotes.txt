@@ -1,3 +1,9 @@
+Version: 10.8.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- CHANGED Microsoft.Data.SqlClient from 7.1.0 to 7.1.1 for .NET 9 and .NET 10
+
 Version: 10.7.1
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

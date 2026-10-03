@@ -1,3 +1,12 @@
+Version: 10.8.0
+Availability: .NET 10, .NET 9 and .NET Standard 2.0
+
+# ALM
+- CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
+
+# Bug Fixes
+- FIXED Disposable to run unmanaged cleanup when managed cleanup throws while preserving the managed cleanup exception and keeping disposal idempotent
+
 Version: 10.7.1
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

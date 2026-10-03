@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
+using Cuemon.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -491,6 +492,42 @@ public static class ServiceCollectionExtensions
         {
             services.Configure(setup);
         }
+        return services;
+    }
+
+    /// <summary>
+    /// Registers the specified <paramref name="setup"/> with the Microsoft Options pattern and enables direct consumption of <typeparamref name="TOptions"/> and <see cref="Action{T}"/>.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to extend.</param>
+    /// <param name="setup">The delegate that configures the public read-write properties of <typeparamref name="TOptions"/>.</param>
+    /// <returns>A reference to <paramref name="services"/> so that additional configuration calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="services"/> cannot be null.
+    /// - or -
+    /// <paramref name="setup"/> cannot be null.
+    /// </exception>
+    /// <remarks>
+    /// <para>Microsoft Options constructs and configures the options when they are materialized. The <see cref="IPostConfigurableParameterObject"/> and <see cref="IValidatableParameterObject"/> conventions participate in its post-configuration and validation stages for all options names. Recoverable validation exceptions become <see cref="OptionsValidationException"/> failures; post-configuration exceptions and fatal validation exceptions propagate without translation.</para>
+    /// <para>Post-configurators and validators execute in registration order within their respective stages. Cuemon conventions are not forced to run last.</para>
+    /// <para>Direct <typeparamref name="TOptions"/> consumption is registered as a singleton resolving the default <see cref="IOptions{TOptions}.Value"/>. The normal lifecycles of <see cref="IOptionsSnapshot{TOptions}"/> and <see cref="IOptionsMonitor{TOptions}"/> are preserved.</para>
+    /// <para>The first call for an options type registers the exact <paramref name="setup"/> instance as <see cref="Action{T}"/> and as the primary default options configurator. Subsequent calls for that type are ignored. Additional Microsoft Configure registrations still compose in registration order, but are not included in the injectable delegate. Invoking the delegate directly only applies its configuration; it does not perform post-configuration or validation.</para>
+    /// </remarks>
+    public static IServiceCollection AddConfiguredOptions<TOptions>(this IServiceCollection services, Action<TOptions> setup)
+        where TOptions : class, IParameterObject, new()
+    {
+        Validator.ThrowIfNull(services);
+        Validator.ThrowIfNull(setup);
+        if (services.Any(descriptor => descriptor.ServiceType == typeof(IPostConfigureOptions<TOptions>) && descriptor.ImplementationType == typeof(ParameterObjectOptions<TOptions>)))
+        {
+            return services;
+        }
+
+        services.Configure(setup); // support for IOptions<TOptions>
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<TOptions>, ParameterObjectOptions<TOptions>>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<TOptions>, ParameterObjectOptions<TOptions>>());
+        services.AddSingleton(setup); // support for Action<TOptions>
+        services.AddSingleton(provider => provider.GetRequiredService<IOptions<TOptions>>().Value); // support for TOptions
         return services;
     }
 

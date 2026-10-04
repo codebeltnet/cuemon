@@ -461,6 +461,10 @@ jobs:
     name: Verification quality gate
     needs: [init, build, pack, test_qualitygate, sonarcloud, codecov, codeql]
     runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: read
     steps:
       - name: Evaluate verification results
         shell: bash
@@ -515,6 +519,61 @@ jobs:
             require_skipped "codeql" "$CODEQL_RESULT"
           fi
 
+      - name: Verify service records for main at the released SHA
+        if: ${{ inputs.canonical-main }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ inputs.ref }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          # Upload completion can precede service-side processing. Bound the wait.
+          for attempt in {1..20}; do
+            sonar_ok=false
+            codecov_ok=false
+            codeql_ok=false
+            # Newer main analyses must not hide the released revision, including on later pages.
+            sonar_page=1
+            while sonar="$(curl --fail --silent --show-error --connect-timeout 10 --max-time 30 "https://sonarcloud.io/api/project_analyses/search?project=Cuemon&branch=main&ps=100&p=$sonar_page")"; do
+              if jq -e --arg sha "$RELEASE_SHA" --arg version "$RELEASE_VERSION" \
+                'any(.analyses[]; .revision == $sha and .projectVersion == $version)' <<< "$sonar" >/dev/null; then
+                sonar_ok=true
+                break
+              fi
+              if ! jq -e '.paging.pageIndex * .paging.pageSize < .paging.total' <<< "$sonar" >/dev/null; then
+                break
+              fi
+              sonar_page=$((sonar_page + 1))
+            done
+            if codecov="$(curl --fail --silent --show-error --connect-timeout 10 --max-time 30 "https://api.codecov.io/api/v2/github/codebeltnet/repos/cuemon/commits/$RELEASE_SHA/")" &&
+               jq -e --arg sha "$RELEASE_SHA" \
+                 '.branch == "main" and .commitid == $sha and .state == "complete"' <<< "$codecov" >/dev/null; then
+              codecov_ok=true
+            fi
+            if codeql="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/code-scanning/analyses?tool_name=CodeQL&ref=refs%2Fheads%2Fmain&per_page=100")" &&
+               jq -e --arg sha "$RELEASE_SHA" \
+                 'any(.[][]; .tool.name == "CodeQL" and .ref == "refs/heads/main" and .commit_sha == $sha and .error == "")' <<< "$codeql" >/dev/null; then
+              codeql_ok=true
+            fi
+            echo "Service identity check $attempt/20 for $RELEASE_SHA: SonarCloud=$sonar_ok; Codecov=$codecov_ok; CodeQL=$codeql_ok"
+            if [[ "$sonar_ok" == true && "$codecov_ok" == true && "$codeql_ok" == true ]]; then
+              {
+                echo '## Post-release service identity verified'
+                echo "- SonarCloud: main; SCM revision \`$RELEASE_SHA\`; project version \`$RELEASE_VERSION\`"
+                echo "- Codecov: main; commit \`$RELEASE_SHA\`"
+                echo "- CodeQL: refs/heads/main; commit \`$RELEASE_SHA\`"
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            if [[ "$attempt" -lt 20 ]]; then sleep 15; fi
+          done
+          echo "::error::Services did not confirm canonical main at released SHA '$RELEASE_SHA' (SonarCloud=$sonar_ok; Codecov=$codecov_ok; CodeQL=$codeql_ok). Inspect service records; successful uploads alone do not establish assurance."
+          exit 1
+
+      - name: Report verified success
+        shell: bash
+        run: |
           {
             echo "## Shared verification passed"
             echo

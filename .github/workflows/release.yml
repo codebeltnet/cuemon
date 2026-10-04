@@ -11,7 +11,7 @@ on:
         required: true
       source_run_id:
         type: string
-        description: GitHub Actions release run containing the already-built release artifacts.
+        description: Original tag-push release run anchoring the already-published SHA (and OCI artifact for assets).
         required: true
       recovery:
         type: choice
@@ -21,6 +21,10 @@ on:
         options:
           - assets
           - assurance
+      run_mac_tests:
+        type: boolean
+        description: Opt in to the same macOS verification matrix as PR (assurance replay only).
+        default: false
 
 permissions:
   contents: read
@@ -171,66 +175,68 @@ jobs:
             printf -- '- Released SHA: `%s`\n' "$RELEASE_SHA"
           } >> "$GITHUB_STEP_SUMMARY"
 
+  # Release produces authoritative products before reproducing PR proof.
+  release_build:
+    if: ${{ github.event_name == 'push' }}
+    name: Build authoritative Release products
+    needs: [release_preflight]
+    uses: codebeltnet/jobs-dotnet-build/.github/workflows/default.yml@v3
+    with:
+      ref: ${{ needs.release_preflight.outputs.sha }}
+      configuration: Release
+      runs-on: ubuntu-26.04
+      strong-name-key-filename: cuemon.snk
+      upload-build-artifact-name: release-build-Release-X64
+      timeout-minutes: 45
+    secrets:
+      GCP_TOKEN: ${{ secrets.GCP_TOKEN }}
+      GCP_BUCKETNAME: ${{ secrets.GCP_BUCKETNAME }}
+
+  release_pack:
+    if: ${{ github.event_name == 'push' }}
+    name: Pack authoritative Release products
+    needs: [release_preflight, release_build]
+    uses: codebeltnet/jobs-dotnet-pack/.github/workflows/default.yml@v3
+    with:
+      ref: ${{ needs.release_preflight.outputs.sha }}
+      configuration: Release
+      version: ${{ needs.release_build.outputs.version }}
+      download-build-artifact-pattern: release-build-Release-X64
+      upload-packed-artifact-name: NuGet-Release
+      timeout-minutes: 45
+
   release_packages:
     if: ${{ github.event_name == 'push' }}
-    name: Build and validate Release packages
-    needs: [release_preflight]
+    name: Validate authoritative Release packages
+    needs: [release_preflight, release_build, release_pack]
     runs-on: ubuntu-26.04
-    timeout-minutes: 45
-    permissions:
-      contents: read
+    timeout-minutes: 15
     steps:
-      - name: Checkout the released SHA
-        uses: codebeltnet/git-checkout@v1
-        with:
-          ref: ${{ needs.release_preflight.outputs.sha }}
-
-      - name: Install .NET
-        uses: codebeltnet/install-dotnet@v3
-
-      - name: Download the strong-name signing key
-        uses: codebeltnet/gcp-download-file@v1
-        with:
-          serviceAccountKey: ${{ secrets.GCP_TOKEN }}
-          bucketName: ${{ secrets.GCP_BUCKETNAME }}
-          objectName: cuemon.snk
-
-      - name: Verify signing key is present
+      - name: Verify MinVer agrees with the existing tag
         shell: bash
+        env:
+          RELEASE_VERSION: ${{ needs.release_preflight.outputs.version }}
+          BUILD_VERSION: ${{ needs.release_build.outputs.version }}
         run: |
-          set -euo pipefail
-          if [[ ! -s cuemon.snk ]]; then
-            echo "::error::The strong-name key 'cuemon.snk' was not downloaded."
+          if [[ "$BUILD_VERSION" != "$RELEASE_VERSION" ]]; then
+            echo "::error::MinVer '$BUILD_VERSION' does not match release tag version '$RELEASE_VERSION'."
             exit 1
           fi
 
-      - name: Restore Release dependencies
-        uses: codebeltnet/dotnet-restore@v3
+      - name: Install .NET for package validation
+        uses: codebeltnet/install-dotnet@v3
 
-      - name: Build Release packages from the exact SHA
-        uses: codebeltnet/dotnet-build@v4
+      - name: Download authoritative Release packages
+        uses: actions/download-artifact@v8
         with:
-          configuration: Release
-
-      - name: Pack Release packages
-        uses: codebeltnet/dotnet-pack@v3
-        with:
-          configuration: Release
+          name: NuGet-Release
+          path: ${{ runner.temp }}/.nuget
 
       - name: Validate package versions and existing NuGet content
         uses: codebeltnet/nuget-release-validate@v1
         with:
           package-directory: ${{ runner.temp }}/.nuget
           version: ${{ needs.release_preflight.outputs.version }}
-          install-dotnet: 'false'
-      - name: Persist validated NuGet packages for protected publication
-        uses: actions/upload-artifact@v7
-        with:
-          name: NuGet-Release
-          path: ${{ runner.temp }}/.nuget
-          if-no-files-found: error
-          include-hidden-files: true
-          retention-days: 30
 
   publish_nuget:
     if: ${{ github.event_name == 'push' }}
@@ -309,7 +315,7 @@ jobs:
             # Capture the ID directly from creation, never rediscover the new draft by tag.
             release_json="$(gh api --method POST "repos/$GITHUB_REPOSITORY/releases" \
               -f tag_name="$RELEASE_TAG" -f target_commitish="$RELEASE_SHA" \
-              -f name="Cuemon $RELEASE_TAG" -f body="$notes" \
+              -f name="$RELEASE_TAG" -f body="$notes" \
               -F draft=true -F prerelease="$expected_prerelease")"
           fi
 
@@ -481,262 +487,41 @@ jobs:
           done
           echo "OCI archive and checksum attached to draft release ID '$RELEASE_ID'; awaiting manual publication."
 
-  prepare_release_tests:
-    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
-    name: Discover post-release test projects
-    needs: [release_preflight, publish_nuget]
-    runs-on: ubuntu-26.04
-    timeout-minutes: 5
-    permissions:
-      contents: read
-    outputs:
-      json: ${{ steps.test-projects.outputs.result }}
-    steps:
-      - name: Checkout the released SHA
-        uses: codebeltnet/git-checkout@v1
-        with:
-          ref: ${{ needs.release_preflight.outputs.sha }}
-
-      - id: test-projects
-        name: Generate matrix for test projects
-        uses: codebeltnet/shell-globbing@v2
-        with:
-          pattern: |
-            test/**/*.csproj
-            !test/**/Cuemon.Data.SqlClient.Tests.csproj
-
-      - name: JSON output
-        run: echo "${{ steps.test-projects.outputs.result }}"
-
-  post_release_tests:
-    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && needs.prepare_release_tests.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
-    name: Post-release Release tests - ${{ matrix.project }}
-    needs: [release_preflight, prepare_release_tests, publish_nuget]
-    strategy:
-      fail-fast: false
-      matrix:
-        project: ${{ fromJson(needs.prepare_release_tests.outputs.json) }}
-    runs-on: ubuntu-26.04
-    timeout-minutes: 30
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout the released SHA
-        uses: codebeltnet/git-checkout@v1
-        with:
-          ref: ${{ needs.release_preflight.outputs.sha }}
-
-      - name: Install .NET
-        uses: codebeltnet/install-dotnet@v3
-
-      - name: Install .NET Tool - Report Generator
-        uses: codebeltnet/dotnet-tool-install-reportgenerator@v1
-
-      - name: Test Release project with xUnit v3 and coverage
-        uses: codebeltnet/dotnet-test@v4
-        with:
-          projects: ${{ matrix.project }}
-          configuration: Release
-          build: true
-          restore: true
-          build-switches: -p:SkipSignAssembly=true
-
-      - name: Upload post-release test results and coverage
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: TestResults-Release-${{ strategy.job-index }}
-          path: ${{ runner.temp }}/TestResults
-          if-no-files-found: warn
-          include-hidden-files: true
-          retention-days: 30
-
-  post_release_integration_test:
-    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
-    name: Post-release SQL Server integration test
-    needs: [release_preflight, publish_nuget]
-    runs-on: ubuntu-26.04
-    timeout-minutes: 30
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout the released SHA
-        uses: codebeltnet/git-checkout@v1
-        with:
-          ref: ${{ needs.release_preflight.outputs.sha }}
-
-      - name: Install .NET
-        uses: codebeltnet/install-dotnet@v3
-
-      - name: Install .NET Tool - Report Generator
-        uses: codebeltnet/dotnet-tool-install-reportgenerator@v1
-
-      - name: Spin up SQL Server test dependency
-        uses: codebeltnet/docker-compose@v1
-        with:
-          command: up
-          options: --wait
-        env:
-          SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
-
-      - name: Run SQL Server integration tests from the released SHA
-        uses: codebeltnet/dotnet-test@v4
-        with:
-          projects: test/**/Cuemon.Data.SqlClient.Tests.csproj
-          configuration: Release
-          build: true
-          restore: true
-          build-switches: -p:SkipSignAssembly=true
-        env:
-          CONNECTIONSTRINGS__ADVENTUREWORKS: ${{ secrets.DB_ADVENTUREWORKS }}
-
-      - name: Upload SQL Server test results and coverage
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: TestResults-Release-SqlServer
-          path: ${{ runner.temp }}/TestResults
-          if-no-files-found: warn
-          include-hidden-files: true
-          retention-days: 30
-
-      - name: Take down SQL Server test dependency
-        if: always()
-        uses: codebeltnet/docker-compose@v1
-        with:
-          command: down
-
-  post_release_sonarcloud:
-    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
-    name: Post-release SonarCloud analysis
-    needs: [release_preflight, publish_nuget, prepare_release_tests, post_release_tests, post_release_integration_test]
-    permissions:
-      contents: read
-    uses: codebeltnet/jobs-sonarcloud/.github/workflows/default.yml@v3
+  # Normal release waits for draft + immutable OCI attachment. Replay invokes only proof.
+  post_release_verification:
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success' && needs.upload_docfx_release_asset.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
+    name: Reproduce PR proof on canonical main
+    needs: [release_preflight, publish_nuget, upload_docfx_release_asset]
+    uses: ./.github/workflows/verify.yml
     with:
-      organization: geekle
-      projectKey: Cuemon
+      ref: ${{ needs.release_preflight.outputs.sha }}
       version: ${{ needs.release_preflight.outputs.version }}
-      ref: ${{ needs.release_preflight.outputs.sha }}
-      configuration: Release
-      timeout-minutes: 45
-      # Custom parameters replace the workflow defaults; retain its exclusions.
-      parameters: >-
-        -d:sonar.exclusions='**/obj/**,**/bin/**'
-        -d:sonar.branch.name=main
-        -d:sonar.scm.revision=${{ needs.release_preflight.outputs.sha }}
-    secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-  post_release_codecov:
-    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
-    name: Post-release Codecov upload
-    needs: [release_preflight, publish_nuget, prepare_release_tests, post_release_tests, post_release_integration_test]
-    permissions:
-      contents: read
-    uses: codebeltnet/jobs-codecov/.github/workflows/default.yml@v1
-    with:
-      repository: codebeltnet/cuemon
-      configuration: .github/codecov.yml
-      ref: ${{ needs.release_preflight.outputs.sha }}
-      branch: main
-      commit: ${{ needs.release_preflight.outputs.sha }}
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  post_release_codeql:
-    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
-    name: Post-release CodeQL analysis
-    needs: [release_preflight, publish_nuget, prepare_release_tests, post_release_tests, post_release_integration_test]
+      canonical-main: true
+      run-mac-tests: ${{ github.event_name == 'workflow_dispatch' && inputs.run_mac_tests }}
     permissions:
       contents: read
       security-events: write
-    uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
-    with:
-      ref: ${{ needs.release_preflight.outputs.sha }}
-      analysis-ref: refs/heads/main
-      analysis-sha: ${{ needs.release_preflight.outputs.sha }}
-      configuration: Release
-      timeout-minutes: 45
-
-  verify_assurance_identity:
-    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && needs.post_release_sonarcloud.result == 'success' && needs.post_release_codecov.result == 'success' && needs.post_release_codeql.result == 'success' }}
-    name: Verify released SHA on canonical main in quality services
-    needs: [release_preflight, post_release_sonarcloud, post_release_codecov, post_release_codeql]
-    runs-on: ubuntu-26.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      security-events: read
-    steps:
-      - name: Verify service records for main at the released SHA
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_SHA: ${{ needs.release_preflight.outputs.sha }}
-          RELEASE_VERSION: ${{ needs.release_preflight.outputs.version }}
-        run: |
-          set -euo pipefail
-          # Upload completion can precede service-side processing. Bound the wait.
-          for attempt in {1..20}; do
-            sonar_ok=false
-            codecov_ok=false
-            codeql_ok=false
-            # Newer main analyses must not hide the released revision, including on later pages.
-            sonar_page=1
-            while sonar="$(curl --fail --silent --show-error "https://sonarcloud.io/api/project_analyses/search?project=Cuemon&branch=main&ps=100&p=$sonar_page")"; do
-              if jq -e --arg sha "$RELEASE_SHA" --arg version "$RELEASE_VERSION" \
-                'any(.analyses[]; .revision == $sha and .projectVersion == $version)' <<< "$sonar" >/dev/null; then
-                sonar_ok=true
-                break
-              fi
-              if ! jq -e '.paging.pageIndex * .paging.pageSize < .paging.total' <<< "$sonar" >/dev/null; then
-                break
-              fi
-              sonar_page=$((sonar_page + 1))
-            done
-            if codecov="$(curl --fail --silent --show-error "https://api.codecov.io/api/v2/github/codebeltnet/repos/cuemon/commits/$RELEASE_SHA/")" &&
-               jq -e --arg sha "$RELEASE_SHA" \
-                 '.branch == "main" and .commitid == $sha and .state == "complete"' <<< "$codecov" >/dev/null; then
-              codecov_ok=true
-            fi
-            if codeql="$(gh api "repos/$GITHUB_REPOSITORY/code-scanning/analyses?tool_name=CodeQL&ref=refs%2Fheads%2Fmain&per_page=100")" &&
-               jq -e --arg sha "$RELEASE_SHA" \
-                 'any(.[]; .tool.name == "CodeQL" and .ref == "refs/heads/main" and .commit_sha == $sha and .error == "")' <<< "$codeql" >/dev/null; then
-              codeql_ok=true
-            fi
-            echo "Service identity check $attempt/20 for $RELEASE_SHA: SonarCloud=$sonar_ok; Codecov=$codecov_ok; CodeQL=$codeql_ok"
-            if [[ "$sonar_ok" == true && "$codecov_ok" == true && "$codeql_ok" == true ]]; then
-              {
-                echo '## Post-release service identity verified'
-                echo "- SonarCloud: main; SCM revision \`$RELEASE_SHA\`; project version \`$RELEASE_VERSION\`"
-                echo "- Codecov: main; commit \`$RELEASE_SHA\`"
-                echo "- CodeQL: refs/heads/main; commit \`$RELEASE_SHA\`"
-              } >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
-            if [[ "$attempt" -lt 20 ]]; then sleep 15; fi
-          done
-          echo "::error::Services did not confirm canonical main at released SHA '$RELEASE_SHA' (SonarCloud=$sonar_ok; Codecov=$codecov_ok; CodeQL=$codeql_ok). Inspect service records; successful uploads alone do not establish assurance."
-          exit 1
+    secrets:
+      GCP_TOKEN: ${{ secrets.GCP_TOKEN }}
+      GCP_BUCKETNAME: ${{ secrets.GCP_BUCKETNAME }}
+      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
+      DB_ADVENTUREWORKS: ${{ secrets.DB_ADVENTUREWORKS }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   release_summary:
     if: ${{ always() }}
     name: Release and post-release status
     needs:
       - release_preflight
+      - release_build
+      - release_pack
       - release_packages
       - publish_nuget
       - draft_github_release
       - docfx_oci_build
       - upload_docfx_release_asset
-      - prepare_release_tests
-      - post_release_tests
-      - post_release_integration_test
-      - post_release_sonarcloud
-      - post_release_codecov
-      - post_release_codeql
-      - verify_assurance_identity
+      - post_release_verification
     runs-on: ubuntu-26.04
     permissions:
       contents: read
@@ -752,18 +537,14 @@ jobs:
           SOURCE_RUN_ID: ${{ inputs.source_run_id }}
           REQUESTED_TAG: ${{ inputs.tag }}
           RECOVERY_MODE: ${{ inputs.recovery || 'assets' }}
+          PRODUCT_BUILD_RESULT: ${{ needs.release_build.result }}
+          PRODUCT_PACK_RESULT: ${{ needs.release_pack.result }}
           PACKAGE_BUILD_RESULT: ${{ needs.release_packages.result }}
           NUGET_RESULT: ${{ needs.publish_nuget.result }}
           DRAFT_RELEASE_RESULT: ${{ needs.draft_github_release.result }}
           DOCFX_BUILD_RESULT: ${{ needs.docfx_oci_build.result }}
           DOCFX_ASSET_RESULT: ${{ needs.upload_docfx_release_asset.result }}
-          TEST_DISCOVERY_RESULT: ${{ needs.prepare_release_tests.result }}
-          TEST_RESULT: ${{ needs.post_release_tests.result }}
-          INTEGRATION_RESULT: ${{ needs.post_release_integration_test.result }}
-          SONAR_RESULT: ${{ needs.post_release_sonarcloud.result }}
-          CODECOV_RESULT: ${{ needs.post_release_codecov.result }}
-          CODEQL_RESULT: ${{ needs.post_release_codeql.result }}
-          IDENTITY_RESULT: ${{ needs.verify_assurance_identity.result }}
+          VERIFICATION_RESULT: ${{ needs.post_release_verification.result }}
         run: |
           set -euo pipefail
 
@@ -776,16 +557,11 @@ jobs:
                 echo "- Source run: \`$SOURCE_RUN_ID\`"
                 echo "- Recovery validation: \`$PREFLIGHT_RESULT\`"
                 echo '- Reporting identity: SonarCloud/Codecov main; CodeQL refs/heads/main at the released SHA'
-                echo "- Test discovery: \`$TEST_DISCOVERY_RESULT\`; test matrix: \`$TEST_RESULT\`; SQL Server integration: \`$INTEGRATION_RESULT\`"
-                echo "- SonarCloud: \`$SONAR_RESULT\`; Codecov: \`$CODECOV_RESULT\`; CodeQL: \`$CODEQL_RESULT\`"
-                echo "- Service identity verification: \`$IDENTITY_RESULT\`"
+                echo "- Shared PR verification (tests, coverage and analysis): \`$VERIFICATION_RESULT\`"
                 echo '- NuGet publication, OCI build/attachment, GitHub Release and deployment: not invoked'
               } >> "$GITHUB_STEP_SUMMARY"
-              if [[ "$PREFLIGHT_RESULT" != "success" || "$TEST_DISCOVERY_RESULT" != "success" ||
-                    "$TEST_RESULT" != "success" || "$INTEGRATION_RESULT" != "success" ||
-                    "$SONAR_RESULT" != "success" || "$CODECOV_RESULT" != "success" ||
-                    "$CODEQL_RESULT" != "success" || "$IDENTITY_RESULT" != "success" ]]; then
-                echo '::error::Assurance recovery did not complete. Inspect the failed tests, analysis or service identity check.'
+              if [[ "$PREFLIGHT_RESULT" != "success" || "$VERIFICATION_RESULT" != "success" ]]; then
+                echo '::error::Assurance replay did not complete. Inspect the shared verification jobs.'
                 exit 1
               fi
               exit 0
@@ -829,13 +605,14 @@ jobs:
             echo "- Version: \`${RELEASE_VERSION:-not validated}\`"
             echo "- Released SHA: \`${RELEASE_SHA:-not validated}\`"
             echo '- Repository health identity: SonarCloud/Codecov main; CodeQL refs/heads/main at the released SHA'
-            echo "- Release package build: \`$PACKAGE_BUILD_RESULT\`"
+            echo "- Release product build: \`$PRODUCT_BUILD_RESULT\`; pack: \`$PRODUCT_PACK_RESULT\`; package validation: \`$PACKAGE_BUILD_RESULT\`"
             echo "- NuGet publication: \`$NUGET_RESULT\`"
             echo "- Draft GitHub Release: \`$DRAFT_RELEASE_RESULT\`"
             echo "- DocFX OCI build: \`$DOCFX_BUILD_RESULT\`"
             echo "- DocFX release asset: \`$DOCFX_ASSET_RESULT\`"
             echo "- GitHub Release ID: \`${RELEASE_ID:-not resolved}\`"
             echo '- GitHub Release: awaiting manual publication once draft assets and assurance are reviewed'
+            echo "- Shared PR verification: \`$VERIFICATION_RESULT\`"
             echo '- Deployment: not started by this workflow'
             echo
           } >> "$GITHUB_STEP_SUMMARY"
@@ -870,19 +647,11 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          if [[ "$NUGET_RESULT" == "success" && \
-                ( "$TEST_DISCOVERY_RESULT" != "success" || "$TEST_RESULT" != "success" || \
-                  "$INTEGRATION_RESULT" != "success" || "$SONAR_RESULT" != "success" || \
-                  "$CODECOV_RESULT" != "success" || "$CODEQL_RESULT" != "success" || \
-                  "$IDENTITY_RESULT" != "success" ) ]]; then
-            echo "::warning::NuGet publication succeeded; post-release assurance did not complete successfully."
+          if [[ "$NUGET_RESULT" == "success" && "$VERIFICATION_RESULT" != "success" ]]; then
+            echo "::warning::NuGet publication succeeded; post-release verification did not complete successfully."
             {
               echo
-              echo "**NuGet publication succeeded; post-release assurance did not complete successfully.**"
-              echo
-              echo "Post-release test discovery: \`$TEST_DISCOVERY_RESULT\`; test matrix: \`$TEST_RESULT\`; SQL Server integration: \`$INTEGRATION_RESULT\`; SonarCloud: \`$SONAR_RESULT\`; Codecov: \`$CODECOV_RESULT\`; CodeQL: \`$CODEQL_RESULT\`; service identity: \`$IDENTITY_RESULT\`."
-              echo "The package and tag remain released. These findings do not roll back publication; resolve them against the recorded SHA."
+              echo "**NuGet publication succeeded; post-release verification: \`$VERIFICATION_RESULT\`.**"
+              echo "The package and tag remain released. Resolve findings against the recorded SHA; dispatch assurance replay from main with source_run_id '$GITHUB_RUN_ID' and tag '$RELEASE_TAG'."
             } >> "$GITHUB_STEP_SUMMARY"
           fi
-
-

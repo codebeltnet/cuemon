@@ -487,11 +487,11 @@ jobs:
           done
           echo "OCI archive and checksum attached to draft release ID '$RELEASE_ID'; awaiting manual publication."
 
-  # Normal release waits for draft + immutable OCI attachment. Replay invokes only proof.
+  # Published packages require proof independently of OCI finalization. Replay invokes only proof.
   post_release_verification:
-    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success' && needs.upload_docfx_release_asset.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
     name: Reproduce PR proof on canonical main
-    needs: [release_preflight, publish_nuget, upload_docfx_release_asset]
+    needs: [release_preflight, publish_nuget]
     uses: ./.github/workflows/verify.yml
     with:
       ref: ${{ needs.release_preflight.outputs.sha }}

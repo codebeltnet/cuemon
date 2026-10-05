@@ -420,6 +420,7 @@ jobs:
       version: ${{ inputs.version || needs.build.outputs.version }}
       ref: ${{ inputs.ref }}
       configuration: Debug # Preserve PR's proven analysis build configuration for both callers.
+      coverage-mode: normalized
       parameters: >-
         -d:sonar.exclusions='**/obj/**,**/bin/**'
         ${{ inputs.canonical-main && format('-d:sonar.branch.name=main -d:sonar.scm.revision={0}', inputs.ref) || '' }}

@@ -63,7 +63,7 @@ public static class Eradicate
         var match = true;
         for (var i = 0; i < trailingBytes.Length; i++)
         {
-            match &= trailingBytes[i] == bytes[index - i];
+            if (trailingBytes[i] != bytes[index - i]) { match = false; }
         }
         return match;
     }

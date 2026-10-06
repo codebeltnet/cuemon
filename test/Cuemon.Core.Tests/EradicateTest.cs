@@ -49,6 +49,16 @@ public class EradicateTest : Test
         Assert.Equal(new byte[] { 1, 2 }, sut);
     }
 
+    [Theory]
+    [InlineData(new byte[] { 1, 2, 3 }, new byte[] { 1, 2 })]
+    [InlineData(new byte[] { 1, 2, 4 }, new byte[] { 1, 2, 4 })]
+    public void TrailingBytes_ShouldReturnExpectedBytes_WhenTrailingByteMatchesOrDiffers(byte[] bytes, byte[] expected)
+    {
+        var sut = Eradicate.TrailingBytes(bytes, new byte[] { 3 });
+
+        Assert.Equal(expected, sut);
+    }
+
     [Fact]
     public void TrailingBytes_WithoutTrailingPattern_ReturnsSameInstance()
     {

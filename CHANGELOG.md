@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [10.8.1] - 2026-10-14
+
+This is a patch release refreshing the test and runtime package references and consolidating contributor guidance into `AGENTS.md`, with no changes to library source code.
+
+### Changed
+
+- Updated the xUnit v3 test packages to 4.0.2, `xunit.runner.visualstudio` to 4.0.1, `Microsoft.NET.Test.Sdk` to 18.11.0, and `Microsoft.Testing.Extensions.HangDump` to 2.5.1,
+- Updated the `Microsoft.Extensions`, `Microsoft.Data.Sqlite`, `Microsoft.Bcl.AsyncInterfaces`, and `System.Text.Json` package references to 10.0.13 and 9.0.21 for their target groups,
+- Moved the test, benchmark, and XML documentation guidance into `AGENTS.md` as the single shared repository instruction file, and updated the `.bot/README.md` pointer accordingly.
+
+### Removed
+
+- Removed `.github/copilot-instructions.md`; its guidance is now maintained in `AGENTS.md`.
+
 ## [10.8.0] - 2026-10-03
 
 This is a minor release adding Parameter Object integration with Microsoft Options, validated package releases from version tags, and deployment of released DocFX images, alongside dependency updates, disposal exception handling, and test timing fixes.
@@ -1921,6 +1935,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.8.1]: https://github.com/codebeltnet/cuemon/compare/v10.8.0...v10.8.1
 [10.8.0]: https://github.com/codebeltnet/cuemon/compare/v10.7.1...v10.8.0
 [10.7.1]: https://github.com/codebeltnet/cuemon/compare/v10.7.0...v10.7.1
 [10.7.0]: https://github.com/codebeltnet/cuemon/compare/v10.6.0...v10.7.0

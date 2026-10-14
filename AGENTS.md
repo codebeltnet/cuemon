@@ -2,6 +2,7 @@
 
 This file guides agentic coding tools working in this repo.
 Follow the repo rules first; do not invent commands or conventions.
+Keep all shared repository instructions in `AGENTS.md`.
 
 ## Repository Layout
 
@@ -83,11 +84,6 @@ docker compose down
 - Live under `tuning/`; run with `tooling/bdn-runner`.
 - Not unit tests; do not include in test runs.
 
-## Cursor / Copilot Rules
-
-- No Cursor rules (`.cursor/rules/` and `.cursorrules` are absent).
-- Copilot rules live in `.github/copilot-instructions.md` — **must follow**.
-
 ## Code Style and Conventions
 
 ### General Principles
@@ -141,52 +137,417 @@ docker compose down
 
 ## Writing Tests
 
-- Test framework: **xUnit v3** (`xunit.v3` package).
-- Base class: `Test` from `Codebelt.Extensions.Xunit`.
-- **Do NOT** use `Xunit.Abstractions` or `using Xunit.Abstractions` (removed in xUnit v3).
-- Constructor signature: `public FooTest(ITestOutputHelper output) : base(output) { }`.
-- Use `TestOutput.WriteLine(...)` for output, inherited from `Test`.
-- Use `[Fact]` for unit tests, `[Theory]` with `[InlineData]` for parameterized tests.
-- Assertions: xUnit `Assert.*` methods only.
-- Keep tests deterministic and isolated; prefer fakes/stubs/spies.
-- Mocking (Moq) only under special circumstances; **never mock `IMarshaller`** — use `new JsonMarshaller()`.
-- Do NOT use `InternalsVisibleTo`; test through public APIs (Public Facade Testing pattern).
-- Assembly naming: `Cuemon.Foo.Tests` for unit tests, `Cuemon.Foo.FunctionalTests` for functional tests.
+These instructions apply when creating or editing test code and test project files (`.cs` and `.csproj`). Follow them for hand-written tests and generated scaffolding.
 
-### Test File Template
+### Base Class and Test Output
+
+- Test framework: **xUnit v3** (`xunit.v3` package).
+- **Always inherit from `Test` in `Codebelt.Extensions.Xunit` for every unit test class.** This ensures consistent setup, teardown, and output handling.
+- **Do NOT add `using Xunit.Abstractions` or depend on `Xunit.Abstractions`.** xUnit v3 no longer exposes that namespace; importing it causes compilation errors. Use `using Codebelt.Extensions.Xunit;` and `using Xunit;` as shown in the example below.
+- Constructor signature: `public FooTest(ITestOutputHelper output) : base(output) { }`.
+- For test output, rely on the inherited `TestOutput` property and use `TestOutput.WriteLine(...)`. Pass the output helper to the base constructor.
+
+### Attributes, Naming, and Assertions
+
+- Use `[Fact]` for unit tests, `[Theory]` with `[InlineData]` or other data sources for parameterized tests.
+- Test class names **must end with `Test`**, e.g., `DateSpanTest`.
+- Test method names must describe the expected behavior and relevant condition, e.g., `ShouldReturnTrue_WhenConditionIsMet`.
+- Use xUnit `Assert.*` methods for **all assertions**. Prefer explicit, expressive assertions such as `Assert.Equal`, `Assert.NotNull`, and `Assert.Contains`.
+- Keep tests focused, isolated, deterministic, and repeatable. Unit tests must not rely on external systems beyond xUnit and Codebelt.Extensions.Xunit (or its derived testing support). Integration dependencies are covered under Test Commands.
+
+### File, Assembly, and Namespace Organization
+
+- Place test files in the appropriate test project and folder structure. Align folders with production code so SUT/test pairs are easy to locate.
+- A test namespace **MUST match the exact namespace of the System Under Test (SUT)**. **Do NOT append `.Tests`, `.Benchmarks`, or any similar suffix.** Only the assembly/project name identifies the testing role.
+- Unit tests for `Cuemon.Foo` live in `Cuemon.Foo.Tests`; functional tests live in `Cuemon.Foo.FunctionalTests`.
+- For a production `Boo` class in namespace `Cuemon.Foo`, use `BooTest` in namespace `Cuemon.Foo` within `Cuemon.Foo.Tests`.
+- When generating test scaffolding, resolve the SUT namespace from the source file or project/assembly metadata and use that exact namespace in the file header.
+- Override the test project's root namespace to match production. For `Cuemon.Foo`, use:
+
+```xml
+<PropertyGroup>
+  <RootNamespace>Cuemon.Foo</RootNamespace>
+</PropertyGroup>
+```
+
+For a SUT in namespace `Cuemon.Foo.Bar`, the following illustrates the distinction:
+
+| Role | Assembly/project | Namespace | Class |
+|------|------------------|-----------|-------|
+| Production | `Cuemon.Foo` | `Cuemon.Foo.Bar` | `Zoo` |
+| Unit test | `Cuemon.Foo.Tests` | `Cuemon.Foo.Bar` | `ZooTest` |
+| Functional test | `Cuemon.Foo.FunctionalTests` | `Cuemon.Foo.Bar` | `ZooTest` |
+
+Namespaces such as `Cuemon.Foo.Bar.Tests` and `Cuemon.Foo.Bar.Benchmarks` are **incorrect**. Exact namespace matching supports consistent type discovery and XML documentation links and reduces confusion when reading tests.
+
+### Test Doubles
+
+- Prefer dummies, fakes, stubs, and spies when the design allows them.
+- Use mocks with Moq **only under special circumstances**.
+- **Before overriding a method, verify that it is virtual or abstract.** This requirement also applies when configuring mocks.
+- **Never mock `IMarshaller`. Always use a new instance of `JsonMarshaller`.**
+
+### Testing Internal Implementations
+
+**Do NOT use `InternalsVisibleTo` to expose internal types or members to test projects.** Internal classes and methods must be validated by exercising the public APIs that consume them: public facades, public extension methods, or other public entry points.
+
+The preferred pattern is **Public Facade Testing**, also called **Public API Proxy Testing**. Tests must assert observable public behavior rather than target internal implementation details directly.
+
+Example mapping:
+
+| Element | Example |
+|---------|---------|
+| Internal helper | `DelimitedString` (internal static class) |
+| Public entry point | `TestOutputHelperExtensions.WriteLines()` (public extension method) |
+| Test strategy | Test `WriteLines()` and verify its public behavior; this implicitly exercises `DelimitedString.Create()`. |
+
+Apply this pattern when:
+
+- Internal logic is fully exercised through existing public APIs.
+- Public entry points provide sufficient coverage of internal code paths.
+- The internal implementation exists solely as a helper or utility for public-facing functionality.
+
+This avoids exposing internals to test assemblies, reflects real usage, maintains encapsulation and a clean public API, and keeps tests resilient to internal refactoring while public behavior is preserved.
+
+### Code Coverage
+
+**Do NOT use the `ExcludeFromCodeCoverage` attribute on any code.** This prohibition covers test classes, test methods, production code, configuration code, and every other code path.
+
+Exclusions hide coverage gaps and create false confidence in test completeness. **Every executable line should be covered by tests or be genuinely unreachable dead code that must be removed.** If a path cannot or should not be tested, refactor to eliminate the path instead of hiding it from metrics.
+
+Use these alternatives:
+
+| Situation | Required approach |
+|-----------|-------------------|
+| Untestable code path | Refactor to separate concerns and eliminate the untestable path. |
+| External dependency | Use fakes, stubs, or spies instead of excluding coverage. |
+| Configuration-only code | Move it to configuration files or extract testable methods. |
+| Generated or third-party code | Keep it outside the primary codebase; use NuGet packages or dedicated vendor folders where necessary. |
+
+### Complete Test Example
+
+This example uses fixed inputs, explicit component and total-value assertions, and output through the `Test` base class.
 
 ```csharp
+using System;
 using Codebelt.Extensions.Xunit;
 using Xunit;
 
-namespace Cuemon.Foo // matches SUT namespace exactly
-{
-    public class BarTest : Test
-    {
-        public BarTest(ITestOutputHelper output) : base(output) { }
+namespace Cuemon;
 
-        [Fact]
-        public void Method_ShouldExpectedBehavior_WhenCondition()
-        {
-            // Arrange / Act / Assert
-        }
+/// <summary>
+/// Tests for the <see cref="DateSpan"/> class.
+/// </summary>
+public class DateSpanTest : Test
+{
+    public DateSpanTest(ITestOutputHelper output) : base(output)
+    {
+    }
+
+    [Fact]
+    public void Parse_ShouldGetOneMonthOfDifference_UsingIso8601String()
+    {
+        var start = new DateTime(2021, 3, 5).ToString("O");
+        var end = new DateTime(2021, 4, 5).ToString("O");
+
+        var span = DateSpan.Parse(start, end);
+
+        Assert.Equal("0:01:31:00:00:00.0", span.ToString());
+        Assert.Equal(0, span.Years);
+        Assert.Equal(1, span.Months);
+        Assert.Equal(31, span.Days);
+        Assert.Equal(0, span.Hours);
+        Assert.Equal(0, span.Minutes);
+        Assert.Equal(0, span.Seconds);
+        Assert.Equal(0, span.Milliseconds);
+
+        Assert.Equal(0.08493150684931507, span.TotalYears);
+        Assert.Equal(1, span.TotalMonths);
+        Assert.Equal(31, span.TotalDays);
+        Assert.Equal(744, span.TotalHours);
+        Assert.Equal(44640, span.TotalMinutes);
+        Assert.Equal(2678400, span.TotalSeconds);
+        Assert.Equal(2678400000, span.TotalMilliseconds);
+
+        Assert.Equal(6, span.GetWeeks());
+
+        TestOutput.WriteLine(span.ToString());
     }
 }
 ```
 
+For further examples, see [DateSpanTest.cs](test/Cuemon.Core.Tests/DateSpanTest.cs), [DisposableTest.cs](test/Cuemon.Core.Tests/DisposableTest.cs), and [HashFactoryTest.cs](test/Cuemon.Core.Tests/Security/HashFactoryTest.cs).
+
 ## Writing Benchmarks
 
-- Place in `tuning/` in a `*.Benchmarks` project; namespace matches production (no `.Benchmarks` suffix).
-- Use `[MemoryDiagnoser]`, `[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]`.
-- Use `[GlobalSetup]` for expensive prep; keep measured methods focused.
-- Use `[Params]` for multiple input sizes; use deterministic data; avoid external systems.
-- Mark one method `Baseline = true`; use descriptive `Description` values.
+These instructions apply to `tuning/**` and benchmark files matching `**/*Benchmark*.cs`. Use BenchmarkDotNet to keep benchmarks consistent, readable, and comparable.
+
+### Naming and Placement
+
+- Place micro- and component-benchmarks in the appropriate project and folders under `tuning/`, in a `*.Benchmarks` project. Keep these projects isolated from package builds and production artifacts.
+- Benchmarks for `Cuemon.Bar` belong in `Cuemon.Bar.Benchmarks`. A benchmark for `Zoo` is named `ZooBenchmark`; class names **must end with `Benchmark`**.
+- Benchmark namespaces **MUST match the production namespace exactly**. **Do NOT append `.Benchmarks` or a similar suffix.** For `Cuemon.Security.Cryptography`, use namespace `Cuemon.Security.Cryptography` and a class such as `Sha512256Benchmark` in the `Cuemon.Security.Cryptography.Benchmarks` project.
+- Override `<RootNamespace>` in the benchmark `.csproj` to match production, e.g., `<RootNamespace>Cuemon.Bar</RootNamespace>`.
+
+### Attributes and Configuration
+
+- Use `[Benchmark]` on methods representing measured operations.
+- Use `[MemoryDiagnoser]` to capture allocations and `[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]` to group related benchmarks.
+- Use `[Params]` for input sizes or variations and `[GlobalSetup]` for one-time initialization that is outside measured work.
+- Mark one comparison method `Baseline = true`; provide descriptive `Description` values to make reports readable.
+- Keep configuration minimal and explicit; prefer in-class attributes over large shared configurations unless widely reused.
+
+### Structure and Measured Work
+
+- Measure a single logical operation per benchmark method. Keep expensive preparation outside measured methods, using `[GlobalSetup]`, `[IterationSetup]`, or cached fields as appropriate.
+- Use `[Params]` for input variations and small, medium, and large input sizes to verify performance trends. Use small, deterministic data sets.
+- Avoid external systems (network, disk, databases). If necessary, clearly mark those benchmarks and exclude them from CI benchmark runs by default.
+- Use descriptive method names that identify the scenario, e.g., `Parse_Short` or `ComputeHash_Large`. When comparing implementations, use similar method names so reports are easy to read.
+- Capture meaningful measurements: time, allocations, and custom counters where needed.
+
+### Complete Benchmark Example
+
+This example compares creating the same `DateSpan` directly and parsing it from ISO 8601 strings. It demonstrates parameterized inputs, deterministic setup, memory measurements, a baseline, and descriptions using real Cuemon APIs.
+
+```csharp
+using System;
+using System.Globalization;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+
+namespace Cuemon;
+
+[MemoryDiagnoser]
+[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+public class DateSpanBenchmark
+{
+    [Params(1, 31, 3650)]
+    public int Days { get; set; }
+
+    private DateTime _start;
+    private DateTime _end;
+    private string _startString;
+    private string _endString;
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        _start = new DateTime(2021, 3, 5);
+        _end = _start.AddDays(Days);
+        _startString = _start.ToString("O", CultureInfo.InvariantCulture);
+        _endString = _end.ToString("O", CultureInfo.InvariantCulture);
+    }
+
+    [Benchmark(Baseline = true, Description = "DateSpan - constructor")]
+    public DateSpan Create_Constructor()
+    {
+        return new DateSpan(_start, _end, CultureInfo.InvariantCulture.Calendar);
+    }
+
+    [Benchmark(Description = "DateSpan - ISO 8601 parsing")]
+    public DateSpan Create_Parse()
+    {
+        return DateSpan.Parse(_startString, _endString, CultureInfo.InvariantCulture);
+    }
+}
+```
+
+### Reporting, CI, and Shared Helpers
+
+- Benchmarks primarily run locally for tuning. Prefer targeted runs or harnesses for CI; avoid heavy BenchmarkDotNet workloads there by default.
+- Keep benchmarks readable and documented; comment on non-obvious choices. When a benchmark exposes a regression or optimization, add a short note in its file referencing the relevant issue or PR.
+- Keep shared benchmark helpers as small utility classes within `tuning` projects instead of changing production code for benchmark support.
+
+For concrete examples, see [DateSpanBenchmark.cs](tuning/Cuemon.Core.Benchmarks/DateSpanBenchmark.cs) and [Sha512256Benchmark.cs](tuning/Cuemon.Security.Cryptography.Benchmarks/Sha512256Benchmark.cs).
 
 ## XML Documentation
 
-- All public and protected members should have XML doc comments.
+These instructions apply to C# files (`**/*.cs`).
+
+- All public and protected types and members should have XML doc comments, including classes, constructors, methods, and properties.
 - Follow existing wording and style in the codebase.
-- See `.github/copilot-instructions.md` for detailed examples.
+- Use `<summary>` to describe types and members, `<typeparam>` for generic parameters, `<param>` for method and constructor parameters, `<returns>` for return values, and `<value>` for properties.
+- Use `<see cref="..."/>` and `<seealso cref="..."/>` for type/member references and `<paramref name="..."/>` for parameter references. Generic references use braces, e.g., `Hash{TOptions}`.
+- Follow constructor wording such as "Initializes a new instance of the ... class" and property wording such as "Gets or sets ...".
+- Document initial configuration values in constructor `<remarks>` using a `<list type="table">` with property and initial-value columns, as illustrated below.
+
+### Generic Types, Protected Members, and Overloads
+
+The following example from `Hash.cs` shows documentation for a generic base class, its type parameter and related interfaces, a protected constructor, a read-only property, a sealed override, and public and protected abstract methods. Representative overloads illustrate scalar, string, array, sequence, and stream inputs, optional configuration, and return-value documentation. Apply the same documentation pattern to each overload in the full API.
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Cuemon.Collections.Generic;
+using Cuemon.Configuration;
+using Cuemon.IO;
+using Cuemon.Text;
+
+namespace Cuemon.Security;
+/// <summary>
+/// Represents the base class from which all implementations of hash algorithms and checksums should derive.
+/// </summary>
+/// <typeparam name="TOptions">The type of the configured options.</typeparam>
+/// <seealso cref="ConvertibleOptions"/>
+/// <seealso cref="IConfigurable{TOptions}" />
+/// <seealso cref="IHash" />
+public abstract class Hash<TOptions> : Hash, IConfigurable<TOptions> where TOptions : ConvertibleOptions, new()
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Hash{TOptions}"/> class.
+    /// </summary>
+    /// <param name="setup">The <see cref="ConvertibleOptions" /> which may be configured.</param>
+    protected Hash(Action<TOptions> setup)
+    {
+        Options = Patterns.Configure(setup);
+    }
+
+    /// <summary>
+    /// Gets the configured options of this instance.
+    /// </summary>
+    /// <value>The configured options of this instance.</value>
+    public TOptions Options { get; }
+
+
+    /// <summary>
+    /// The endian-initializer of this instance.
+    /// </summary>
+    /// <param name="options">An instance of the configured options.</param>
+    protected sealed override void EndianInitializer(EndianOptions options)
+    {
+        options.ByteOrder = Options.ByteOrder;
+    }
+}
+
+/// <summary>
+/// Represents the base class that defines the public facing structure to expose.
+/// </summary>
+/// <seealso cref="IHash" />
+public abstract class Hash : IHash
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Hash"/> class.
+    /// </summary>
+    protected Hash()
+    {
+    }
+
+    /// <summary>
+    /// Computes the hash value for the specified <see cref="bool"/>.
+    /// </summary>
+    /// <param name="input">The <see cref="bool"/> to compute the hash code for.</param>
+    /// <returns>A <see cref="HashResult"/> containing the computed hash code of the specified <paramref name="input"/>.</returns>
+    public virtual HashResult ComputeHash(bool input)
+    {
+        return ComputeHash(Convertible.GetBytes(input, EndianInitializer));
+    }
+
+    /// <summary>
+    /// Computes the hash value for the specified <see cref="string"/>.
+    /// </summary>
+    /// <param name="input">The <see cref="string"/> to compute the hash code for.</param>
+    /// <param name="setup">The <see cref="EncodingOptions"/> which may be configured.</param>
+    /// <returns>A <see cref="HashResult"/> containing the computed hash code of the specified <paramref name="input"/>.</returns>
+    public virtual HashResult ComputeHash(string input, Action<EncodingOptions> setup = null)
+    {
+        return ComputeHash(Convertible.GetBytes(input, setup));
+    }
+
+    /// <summary>
+    /// Computes the hash value for the specified <see cref="IConvertible"/> array.
+    /// </summary>
+    /// <param name="input">The <see cref="IConvertible"/> array to compute the hash code for.</param>
+    /// <returns>A <see cref="HashResult"/> containing the computed hash code of the specified <paramref name="input"/>.</returns>
+    public virtual HashResult ComputeHash(params IConvertible[] input)
+    {
+        return ComputeHash(Arguments.ToEnumerableOf(input));
+    }
+
+    /// <summary>
+    /// Computes the hash value for the specified sequence of <see cref="IConvertible"/>.
+    /// </summary>
+    /// <param name="input">The sequence of <see cref="IConvertible"/> to compute the hash code for.</param>
+    /// <returns>A <see cref="HashResult"/> containing the computed hash code of the specified <paramref name="input"/>.</returns>
+    public virtual HashResult ComputeHash(IEnumerable<IConvertible> input)
+    {
+        return ComputeHash(Convertible.GetBytes(input));
+    }
+
+    /// <summary>
+    /// Computes the hash value for the specified <see cref="byte"/> array.
+    /// </summary>
+    /// <param name="input">The <see cref="byte"/> array to compute the hash code for.</param>
+    /// <returns>A <see cref="HashResult"/> containing the computed hash code of the specified <paramref name="input"/>.</returns>
+    public abstract HashResult ComputeHash(byte[] input);
+
+    /// <summary>
+    /// Computes the hash value for the specified <see cref="Stream"/>.
+    /// </summary>
+    /// <param name="input">The <see cref="Stream"/> to compute the hash code for.</param>
+    /// <returns>A <see cref="HashResult"/> containing the computed hash code of the specified <paramref name="input"/>.</returns>
+    public virtual HashResult ComputeHash(Stream input)
+    {
+        return ComputeHash(Patterns.SafeInvoke(() => new MemoryStream(), destination =>
+        {
+            Decorator.Enclose(input).CopyStream(destination);
+            return destination;
+        }).ToArray());
+    }
+
+    /// <summary>
+    /// Defines the initializer that <see cref="Hash{TOptions}"/> must implement.
+    /// </summary>
+    /// <param name="options">An instance of the configured options.</param>
+    protected abstract void EndianInitializer(EndianOptions options);
+}
+```
+
+### Configuration Defaults Example
+
+```csharp
+namespace Cuemon.Security;
+
+/// <summary>
+/// Configuration options for <see cref="FowlerNollVoHash"/>.
+/// </summary>
+public class FowlerNollVoOptions : ConvertibleOptions
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FowlerNollVoOptions"/> class.
+    /// </summary>
+    /// <remarks>
+    /// The following table shows the initial property values for an instance of <see cref="FowlerNollVoOptions"/>.
+    /// <list type="table">
+    ///     <listheader>
+    ///         <term>Property</term>
+    ///         <description>Initial Value</description>
+    ///     </listheader>
+    ///     <item>
+    ///         <term><see cref="EndianOptions.ByteOrder"/></term>
+    ///         <description><see cref="Endianness.BigEndian"/></description>
+    ///     </item>
+    ///     <item>
+    ///         <term><see cref="Algorithm"/></term>
+    ///         <description><see cref="FowlerNollVoAlgorithm.Fnv1a"/></description>
+    ///     </item>
+    /// </list>
+    /// </remarks>
+    public FowlerNollVoOptions()
+    {
+        Algorithm = FowlerNollVoAlgorithm.Fnv1a;
+        ByteOrder = Endianness.BigEndian;
+    }
+
+    /// <summary>
+    /// Gets or sets the algorithm of the Fowler-Noll-Vo hash function.
+    /// </summary>
+    /// <value>The algorithm of the Fowler-Noll-Vo hash function.</value>
+    public FowlerNollVoAlgorithm Algorithm { get; set; }
+}
+```
+
+See [Hash.cs](src/Cuemon.Core/Security/Hash.cs) for generic type, protected constructor, method, overload, and return-value documentation, and [FowlerNollVoOptions.cs](src/Cuemon.Core/Security/FowlerNollVoOptions.cs) for the complete configuration example.
 
 ## Release Notes
 

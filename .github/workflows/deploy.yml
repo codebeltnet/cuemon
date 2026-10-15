@@ -1,0 +1,172 @@
+name: Deploy Flow
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: Existing published GitHub Release tag to deploy, e.g. v10.7.2.
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cuemon-deploy-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  resolve_release:
+    name: Resolve published release and authoritative SHA
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      tag: ${{ steps.resolve.outputs.tag }}
+      sha: ${{ steps.resolve.outputs.sha }}
+    steps:
+      - id: resolve
+        name: Validate release identity and resolve the released commit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW_REF: ${{ github.ref }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$GITHUB_EVENT_NAME" == "release" ]]; then
+            if ! jq -e --arg tag "$RELEASE_TAG" '.action == "published" and .release.draft == false and .release.tag_name == $tag' "$GITHUB_EVENT_PATH" >/dev/null; then
+              echo "::error::Deployment requires a published, non-draft GitHub Release matching '$RELEASE_TAG'."
+              exit 1
+            fi
+          elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            if [[ "$WORKFLOW_REF" != "refs/heads/main" ]]; then
+              echo "::error::Deployment dispatch must target refs/heads/main; received '$WORKFLOW_REF'."
+              exit 1
+            fi
+          else
+            echo "::error::Unsupported deployment event '$GITHUB_EVENT_NAME'."
+            exit 1
+          fi
+
+          if [[ "$RELEASE_TAG" != v* ]]; then
+            echo "::error::Release tag '$RELEASE_TAG' must have the v prefix (for example, v10.7.2)."
+            exit 1
+          fi
+
+          RELEASE_VERSION="${RELEASE_TAG#v}"
+          semver_regex='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)(\.(0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*))*))?$'
+          if [[ ! "$RELEASE_VERSION" =~ $semver_regex ]]; then
+            echo "::error::'$RELEASE_VERSION' is not a supported SemVer release version."
+            exit 1
+          fi
+
+          release_tag="$RELEASE_TAG"
+          release_json="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$release_tag")"
+          if ! jq -e --arg tag "$release_tag" '.tag_name == $tag and .draft == false and (.published_at | type == "string")' <<< "$release_json" >/dev/null; then
+            echo "::error::GitHub Release '$release_tag' is missing, has a different tag, or is not published."
+            exit 1
+          fi
+
+          archive_name="cuemon-docfx-$RELEASE_VERSION.oci.tar"
+          checksum_name="$archive_name.sha256"
+          if ! jq -e --arg archive "$archive_name" --arg checksum "$checksum_name" \
+            'any(.assets[]; .name == $archive and .state == "uploaded") and any(.assets[]; .name == $checksum and .state == "uploaded")' <<< "$release_json" >/dev/null; then
+            echo "::error::GitHub Release '$release_tag' must contain the immutable OCI archive '$archive_name' and checksum '$checksum_name'."
+            exit 1
+          fi
+
+          ref_json="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$release_tag")"
+          object_type="$(jq -r '.object.type' <<< "$ref_json")"
+          object_sha="$(jq -r '.object.sha' <<< "$ref_json")"
+          if [[ "$object_type" == "tag" ]]; then
+            tag_json="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$object_sha")"
+            object_type="$(jq -r '.object.type' <<< "$tag_json")"
+            object_sha="$(jq -r '.object.sha' <<< "$tag_json")"
+          fi
+
+          if [[ "$object_type" != "commit" || ! "$object_sha" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "::error::Release tag '$release_tag' does not resolve to a Git commit."
+            exit 1
+          fi
+
+          {
+            echo "version=$RELEASE_VERSION"
+            echo "tag=$release_tag"
+            echo "sha=$object_sha"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## DocFX promotion request validated"
+            echo
+            echo "- Version: $RELEASE_VERSION"
+            echo "- Release tag: $release_tag"
+            echo "- Released SHA: $object_sha"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  promote_docfx_image:
+    name: Promote the released DocFX OCI image to JCR
+    needs: [resolve_release]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    environment: Production
+    permissions:
+      contents: read
+    steps:
+      - name: Download the immutable OCI assets from the GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.resolve_release.outputs.version }}
+          RELEASE_TAG: ${{ needs.resolve_release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          release_json="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG")"
+          if ! jq -e --arg tag "$RELEASE_TAG" '.tag_name == $tag and .draft == false and (.published_at | type == "string")' <<< "$release_json" >/dev/null; then
+            echo "::error::GitHub Release '$RELEASE_TAG' is no longer published."
+            exit 1
+          fi
+
+          artifact_directory="$RUNNER_TEMP/docfx-release-asset"
+          mkdir -p "$artifact_directory"
+          archive_name="cuemon-docfx-$RELEASE_VERSION.oci.tar"
+          checksum_name="$archive_name.sha256"
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$archive_name" --dir "$artifact_directory"
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$checksum_name" --dir "$artifact_directory"
+
+      - id: publish
+        name: Promote the verified OCI artifact to JCR and confirm its digest
+        uses: codebeltnet/oci-artifact-publish@v1
+        with:
+          archive-path: ${{ runner.temp }}/docfx-release-asset/cuemon-docfx-${{ needs.resolve_release.outputs.version }}.oci.tar
+          checksum-path: ${{ runner.temp }}/docfx-release-asset/cuemon-docfx-${{ needs.resolve_release.outputs.version }}.oci.tar.sha256
+          version: ${{ needs.resolve_release.outputs.version }}
+          revision: ${{ needs.resolve_release.outputs.sha }}
+          repository: jcr.codebelt.net/geekle/cuemon-docfx
+          username: ${{ secrets.JCR_USERNAME }}
+          password: ${{ secrets.JCR_PASSWORD }}
+
+      - name: Record the immutable JCR identity and Kubernetes handoff
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ needs.resolve_release.outputs.version }}
+          RELEASE_SHA: ${{ needs.resolve_release.outputs.sha }}
+          IMAGE: ${{ steps.publish.outputs.image }}
+          DIGEST: ${{ steps.publish.outputs.digest }}
+          IMAGE_BY_DIGEST: ${{ steps.publish.outputs.image-by-digest }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## DocFX image promoted"
+            echo
+            echo "- Release: $RELEASE_VERSION"
+            echo "- Released SHA: $RELEASE_SHA"
+            echo "- Registry tag: $IMAGE"
+            echo "- Immutable registry digest: $DIGEST"
+            echo "- Kubernetes-ready image reference: $IMAGE_BY_DIGEST"
+            echo
+            echo "JCR publication succeeded. This POC stops at the immutable registry reference; Kubernetes rollout configuration is not present in this repository."
+          } >> "$GITHUB_STEP_SUMMARY"

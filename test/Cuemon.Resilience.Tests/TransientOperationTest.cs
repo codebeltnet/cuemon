@@ -30,7 +30,6 @@ public class TransientOperationTest : Test
             o.DetectionStrategy = DetectionStrategyCallback;
             o.RetryAttempts = ExpectedRetryAttempts;
             o.RetryStrategy = RetryStrategyCallback;
-            o.MaximumAllowedLatency = ExpectedMaximumAllowedLatency;
         };
     }
 
@@ -54,6 +53,12 @@ public class TransientOperationTest : Test
     }
 
     private Action<TransientOperationOptions> TransientOperationOptionsCallback { get; }
+
+    private void LatencyOperationOptionsCallback(TransientOperationOptions options)
+    {
+        TransientOperationOptionsCallback(options);
+        options.MaximumAllowedLatency = ExpectedMaximumAllowedLatency;
+    }
 
     [Fact]
     public void WithFunc_ShouldBypassTransientFaultHandling()
@@ -112,7 +117,7 @@ public class TransientOperationTest : Test
 
         var profiler = TimeMeasure.WithAction(() =>
         {
-            var aex = Assert.Throws<AggregateException>(() => TransientOperation.WithFunc(FuncTransientOperation.TriggerLatencyException, id, _retryTracker, TransientOperationOptionsCallback));
+            var aex = Assert.Throws<AggregateException>(() => TransientOperation.WithFunc(FuncTransientOperation.TriggerLatencyException, id, _retryTracker, LatencyOperationOptionsCallback));
             Assert.IsType<LatencyException>(aex.InnerExceptions.First());
             Assert.Equal(NormalRunIncrement + DescriptiveExceptionCauseIncrement, aex.InnerExceptions.Count);
             TestOutput.WriteLine(aex.ToString());
@@ -194,7 +199,7 @@ public class TransientOperationTest : Test
 
         var profiler = TimeMeasure.WithAction(() =>
         {
-            var aex = Assert.Throws<AggregateException>(() => TransientOperation.WithAction(ActionTransientOperation.TriggerLatencyException, id, _retryTracker, TransientOperationOptionsCallback));
+            var aex = Assert.Throws<AggregateException>(() => TransientOperation.WithAction(ActionTransientOperation.TriggerLatencyException, id, _retryTracker, LatencyOperationOptionsCallback));
             Assert.IsType<LatencyException>(aex.InnerExceptions.First());
             Assert.Equal(NormalRunIncrement + DescriptiveExceptionCauseIncrement, aex.InnerExceptions.Count);
             TestOutput.WriteLine(aex.ToString());
@@ -276,7 +281,7 @@ public class TransientOperationTest : Test
 
         var profiler = await TimeMeasure.WithActionAsync(async ct =>
         {
-            var aex = await Assert.ThrowsAsync<AggregateException>(() => TransientOperation.WithActionAsync(AsyncActionTransientOperation.TriggerLatencyExceptionAsync, id, _retryTracker, TransientOperationOptionsCallback));
+            var aex = await Assert.ThrowsAsync<AggregateException>(() => TransientOperation.WithActionAsync(AsyncActionTransientOperation.TriggerLatencyExceptionAsync, id, _retryTracker, LatencyOperationOptionsCallback));
 
             TestOutput.WriteLine(aex.ToString());
 
@@ -352,7 +357,7 @@ public class TransientOperationTest : Test
 
         var profiler = await TimeMeasure.WithActionAsync(async ct =>
         {
-            var aex = await Assert.ThrowsAsync<AggregateException>(() => TransientOperation.WithFuncAsync(AsyncFuncTransientOperation.TriggerLatencyExceptionAsync, id, _retryTracker, TransientOperationOptionsCallback));
+            var aex = await Assert.ThrowsAsync<AggregateException>(() => TransientOperation.WithFuncAsync(AsyncFuncTransientOperation.TriggerLatencyExceptionAsync, id, _retryTracker, LatencyOperationOptionsCallback));
             Assert.IsType<LatencyException>(aex.InnerExceptions.First());
             Assert.Equal(NormalRunIncrement + DescriptiveExceptionCauseIncrement, aex.InnerExceptions.Count);
             TestOutput.WriteLine(aex.ToString());

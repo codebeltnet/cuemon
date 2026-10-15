@@ -6,6 +6,11 @@ name: .NET Test
 on:
   workflow_call:
     inputs:
+      ref:
+        description: Exact source SHA to verify; empty retains the triggering ref.
+        required: false
+        type: string
+        default: ''
       projects:
         description: Optional path to the project(s) file to build. Supports globbing. Default is an empty string.
         required: false
@@ -95,6 +100,8 @@ jobs:
     steps:
       - name: Checkout
         uses: codebeltnet/git-checkout@v1
+        with:
+          ref: ${{ inputs.ref || github.ref }}
 
       - name: Install .NET
         uses: codebeltnet/install-dotnet@v3

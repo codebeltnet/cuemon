@@ -17,8 +17,9 @@ public class StringExtensionsTest : Test
     {
         var uriString = "https://www.google.com/search?q=cuemon&rlz=1C1GCEU_enDK858DK858&oq=cuemon&aqs=chrome..69i57j69i59j35i39j69i60l3j69i65l2.3047j0j9&sourceid=chrome&ie=UTF-8";
         var md5Header = "53068c5376dc5a934f1a40b41025148e";
-        var signedUri = uriString.ToSignedUri(Secret, DateTime.UtcNow, DateTime.UtcNow.AddDays(1));
-        var signedUriWithMd5 = uriString.ToSignedUri(Secret, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), o => o.ContentMd5Header = md5Header);
+        var utcNow = DateTime.UtcNow;
+        var signedUri = uriString.ToSignedUri(Secret, utcNow.AddMinutes(-1), utcNow.AddDays(1));
+        var signedUriWithMd5 = uriString.ToSignedUri(Secret, utcNow.AddMinutes(-1), utcNow.AddDays(1), o => o.ContentMd5Header = md5Header);
 
         TestOutput.WriteLine(signedUri.OriginalString);
         TestOutput.WriteLine(signedUriWithMd5.OriginalString);
@@ -35,13 +36,13 @@ public class StringExtensionsTest : Test
             su.Uri.ValidateSignedUri(Secret);
         });
 
-        signedUri = uriString.ToSignedUri(Secret, DateTime.Today.AddDays(1));
+        signedUri = uriString.ToSignedUri(Secret, utcNow.AddDays(1));
         Assert.Throws<SecurityException>(() =>
         {
             signedUri.ValidateSignedUri(Secret);
         });
 
-        signedUri = uriString.ToSignedUri(Secret, expiry: DateTime.Today.AddDays(-1));
+        signedUri = uriString.ToSignedUri(Secret, expiry: utcNow.AddDays(-1));
         Assert.Throws<SecurityException>(() =>
         {
             signedUri.ValidateSignedUri(Secret);

@@ -1,0 +1,51 @@
+name: PR Flow
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_mac_tests:
+        type: boolean
+        description: Run the macOS test matrix despite the additional cost and runtime.
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verification:
+    name: PR proof
+    uses: ./.github/workflows/verify.yml
+    with:
+      run-mac-tests: ${{ github.event_name == 'workflow_dispatch' && inputs.run_mac_tests }}
+    permissions:
+      contents: read
+      security-events: write
+    secrets:
+      GCP_TOKEN: ${{ secrets.GCP_TOKEN }}
+      GCP_BUCKETNAME: ${{ secrets.GCP_BUCKETNAME }}
+      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
+      DB_ADVENTUREWORKS: ${{ secrets.DB_ADVENTUREWORKS }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  # Keep the existing aggregate required-check name for branch protection.
+  pr_quality_gate:
+    if: ${{ always() }}
+    name: PR quality gate
+    needs: [verification]
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Evaluate PR proof
+        shell: bash
+        env:
+          VERIFICATION_RESULT: ${{ needs.verification.result }}
+        run: |
+          if [[ "$VERIFICATION_RESULT" != "success" ]]; then
+            echo "::error::PR verification finished with '$VERIFICATION_RESULT'."
+            exit 1
+          fi

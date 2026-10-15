@@ -47,6 +47,44 @@ The .NET update is straightforward: `net11.0` is now part of the target matrix a
 - `Resolve-PackageReleaseNotesConflicts.ps1` script improved to correctly handle and resolve merge conflict markers in all PackageReleaseNotes.txt files with more robust regex pattern matching,
 - Merge conflict resolution output cleaned up to remove spurious double line breaks and duplicate version entries.
 
+## [10.8.1] - 2026-10-14
+
+This is a patch release refreshing the test and runtime package references and consolidating contributor guidance into `AGENTS.md`, with no changes to library source code.
+
+### Changed
+
+- Updated the xUnit v3 test packages to 4.0.2, `xunit.runner.visualstudio` to 4.0.1, `Microsoft.NET.Test.Sdk` to 18.11.0, and `Microsoft.Testing.Extensions.HangDump` to 2.5.1,
+- Updated the `Microsoft.Extensions`, `Microsoft.Data.Sqlite`, `Microsoft.Bcl.AsyncInterfaces`, and `System.Text.Json` package references to 10.0.13 and 9.0.21 for their target groups,
+- Moved the test, benchmark, and XML documentation guidance into `AGENTS.md` as the single shared repository instruction file, and updated the `.bot/README.md` pointer accordingly.
+
+### Removed
+
+- Removed `.github/copilot-instructions.md`; its guidance is now maintained in `AGENTS.md`.
+
+## [10.8.0] - 2026-10-03
+
+This is a minor release adding Parameter Object integration with Microsoft Options, validated package releases from version tags, and deployment of released DocFX images, alongside dependency updates, disposal exception handling, and test timing fixes.
+
+### Added
+
+- `IServiceCollection.AddConfiguredOptions<TOptions>()` connects Parameter Object post-configuration and validation to Microsoft Options for all options names, exposes the first registered configurator as `Action<TOptions>`, and registers the cached default options instance for direct injection; recoverable validation failures become `OptionsValidationException`, while cancellation propagates to the caller,
+- A dedicated release workflow validates version tags against `main` history, builds and publishes NuGet packages from the tagged commit, runs post-release assurance, and attaches a verified multi-platform DocFX OCI archive and checksum; before publishing the draft GitHub Release, it rechecks that the live tag still identifies the validated commit,
+- A deployment workflow validates published release assets and the tagged source commit, then promotes the released DocFX OCI image to JCR without rebuilding it,
+- A documented `.bot` workspace for local AI working material, with its contents ignored except for `README.md`.
+
+### Changed
+
+- Moved `.github/workflows/ci-pipeline.yml` to `pr.yml`, removed package publication from PR validation, and added an aggregate quality gate that enforces required checks and the privileged-integration policy,
+- Updated the test coverage dependency `Codebelt.Coverlet.MTP` from 10.0.1 to 10.1.0 and `Microsoft.Data.SqlClient` from 7.1.0 to 7.1.1 for .NET 9 and .NET 10,
+- Updated Linux workflow runners to Ubuntu 26.04, CI references to the dedicated workflows, and the Codecov badge to `main`,
+- Expanded contributor guidance for releases from version tags, verified DocFX image promotion, and retries after partial NuGet publication; configured the shared PR Codecov workflow to use `.github/codecov.yml`,
+- Expanded dependency injection tests for service lifetimes, forwarding, duplicate registrations, argument validation, and post-configuration.
+
+### Fixed
+
+- `Disposable.Dispose` now runs unmanaged cleanup even when managed cleanup throws, preserves the original exception when only one cleanup hook fails, and preserves both exceptions in an `AggregateException` when both hooks fail; disposal remains idempotent,
+- Signed URI tests now derive validity windows from one UTC timestamp, and retry behavior tests apply the strict latency budget only in dedicated latency scenarios.
+
 ## [10.7.1] - 2026-09-09
 
 This is a patch release focused on modernizing the test infrastructure and consolidating dependencies. The release migrates code coverage collection from coverlet to Microsoft.Testing.Extensions.CodeCoverage, upgrades testing frameworks to their latest major versions, and simplifies test environment configuration while maintaining full compatibility with existing functionality.
@@ -1938,6 +1976,8 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.8.1]: https://github.com/codebeltnet/cuemon/compare/v10.8.0...v10.8.1
+[10.8.0]: https://github.com/codebeltnet/cuemon/compare/v10.7.1...v10.8.0
 [10.7.1]: https://github.com/codebeltnet/cuemon/compare/v10.7.0...v10.7.1
 [11.0.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v11.0.0
 [10.7.0]: https://github.com/codebeltnet/cuemon/compare/v10.6.0...v10.7.0

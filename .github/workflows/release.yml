@@ -1,0 +1,657 @@
+name: Release Flow
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: Existing release tag to recover, e.g. v10.8.0.
+        required: true
+      source_run_id:
+        type: string
+        description: Original tag-push release run anchoring the already-published SHA (and OCI artifact for assets).
+        required: true
+      recovery:
+        type: choice
+        description: Recover OCI asset attachment or replay assurance against main at the released SHA.
+        required: true
+        default: assets
+        options:
+          - assets
+          - assurance
+      run_mac_tests:
+        type: boolean
+        description: Opt in to the same macOS verification matrix as PR (assurance replay only).
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cuemon-release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release_preflight:
+    name: Validate release tag and authoritative main history
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      tag: ${{ steps.validate.outputs.tag }}
+      sha: ${{ steps.validate.outputs.sha }}
+      source_run_id: ${{ steps.validate.outputs.source_run_id }}
+      artifact_id: ${{ steps.validate.outputs.artifact_id }}
+    steps:
+      # git-checkout fetches full history and tags for MinVer and ancestry validation.
+      - name: Checkout the triggering SHA
+        uses: codebeltnet/git-checkout@v1
+        with:
+          ref: ${{ github.sha }}
+
+      - id: validate
+        name: Validate authoritative release request
+        shell: bash
+        env:
+          RELEASE_REF: ${{ github.ref }}
+          RELEASE_SHA: ${{ github.sha }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+          RECOVERY_MODE: ${{ inputs.recovery || 'assets' }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            if [[ "$RELEASE_REF" != "refs/heads/main" || ! "$SOURCE_RUN_ID" =~ ^[1-9][0-9]*$ ]]; then
+              echo "::error::Recovery must run from main with an existing numeric source_run_id."
+              exit 1
+            fi
+          elif [[ "$GITHUB_EVENT_NAME" != "push" || "$RELEASE_REF" != "refs/tags/$RELEASE_TAG" ]]; then
+            echo "::error::Release must be triggered by a Git tag; received '$RELEASE_REF'."
+            exit 1
+          fi
+          if [[ "$RELEASE_TAG" != v* ]]; then
+            echo "::error::Release tag '$RELEASE_TAG' must have the v prefix (for example, v10.7.2)."
+            exit 1
+          fi
+
+          RELEASE_VERSION="${RELEASE_TAG#v}"
+          semver_regex='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)(\.(0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*))*))?$'
+          if [[ ! "$RELEASE_VERSION" =~ $semver_regex ]]; then
+            echo "::error::'$RELEASE_VERSION' is not a supported SemVer release version. Use x.y.z or x.y.z-prerelease without build metadata."
+            exit 1
+          fi
+
+          if ! tagged_sha="$(git rev-parse --verify "refs/tags/$RELEASE_TAG^{commit}" 2>/dev/null)"; then
+            echo "::error::Triggering tag '$RELEASE_TAG' is missing or does not resolve to a Git commit."
+            exit 1
+          fi
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            if ! event_sha="$(git rev-parse --verify "$RELEASE_SHA^{commit}" 2>/dev/null)"; then
+              echo "::error::Triggering SHA '$RELEASE_SHA' does not resolve to a Git commit."
+              exit 1
+            fi
+            checked_out_sha="$(git rev-parse HEAD)"
+            if [[ "$tagged_sha" != "$event_sha" || "$checked_out_sha" != "$event_sha" ]]; then
+              echo "::error::Tag '$RELEASE_TAG' resolves to '$tagged_sha', checkout to '$checked_out_sha', and triggering commit to '$event_sha'. The tag may have moved; restore the original tag before retrying."
+              exit 1
+            fi
+          fi
+          RELEASE_SHA="$tagged_sha"
+
+          if ! git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main'; then
+            echo "::error::Could not fetch authoritative main history to validate '$RELEASE_TAG'."
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$RELEASE_SHA" refs/remotes/origin/main; then
+            echo "::error::Tagged commit '$RELEASE_SHA' is not reachable from authoritative main. Tag a commit in main history."
+            exit 1
+          fi
+
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            source_run="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID")"
+            if ! jq -e --arg repo "$GITHUB_REPOSITORY" --arg tag "$RELEASE_TAG" --arg sha "$RELEASE_SHA" \
+              '.repository.full_name == $repo and .head_repository.full_name == $repo and
+               .event == "push" and .path == ".github/workflows/release.yml" and
+               .head_branch == $tag and .head_sha == $sha' <<< "$source_run" >/dev/null; then
+              echo "::error::Source run '$SOURCE_RUN_ID' must be this repository's tag-push release.yml run for '$RELEASE_TAG' at '$RELEASE_SHA'. No artifacts will be consumed."
+              exit 1
+            fi
+
+            source_jobs="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID/jobs?per_page=100")"
+            if ! jq -e --arg prefix "Publish NuGet v$RELEASE_VERSION /" '
+              [.[].jobs[]] as $jobs |
+              ([$jobs[] | select(.name | startswith($prefix))] | any(.conclusion == "success")) and
+              ([$jobs[] | select(.name | startswith($prefix))] | all(.conclusion == "success" or .conclusion == "skipped")) and
+              ($jobs | any(.name == "Validate release tag and authoritative main history" and .conclusion == "success"))
+              ' <<< "$source_jobs" >/dev/null; then
+              echo "::error::Source run '$SOURCE_RUN_ID' has no confirmed successful tag validation and NuGet publication. Inspect the source jobs; do not republish NuGet."
+              exit 1
+            fi
+
+            if [[ "$RECOVERY_MODE" == "assets" ]]; then
+              if ! jq -e '[.[].jobs[]] | any(.name == "Build multi-platform DocFX OCI artifact once" and .conclusion == "success")' <<< "$source_jobs" >/dev/null; then
+                echo "::error::Source run '$SOURCE_RUN_ID' has no confirmed successful DocFX OCI build. Asset recovery cannot rebuild replacement bytes."
+                exit 1
+              fi
+              source_artifacts="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID/artifacts?per_page=100")"
+              artifact_json="$(jq -c --arg name "DocFX-OCI-$RELEASE_VERSION" '[.[].artifacts[] | select(.name == $name)]' <<< "$source_artifacts")"
+              if ! jq -e --arg sha "$RELEASE_SHA" --arg tag "$RELEASE_TAG" --argjson run "$SOURCE_RUN_ID" \
+                --argjson repo "$(jq '.repository.id' <<< "$source_run")" '
+                length == 1 and (.[0] | .expired == false and
+                (.expires_at | fromdateiso8601) > now and (.digest | test("^sha256:[0-9a-f]{64}$")) and
+                .workflow_run.id == $run and .workflow_run.repository_id == $repo and
+                .workflow_run.head_repository_id == $repo and .workflow_run.head_branch == $tag and
+                .workflow_run.head_sha == $sha)' <<< "$artifact_json" >/dev/null; then
+                echo "::error::Expected unique, unexpired, SHA-256 identified DocFX-OCI-$RELEASE_VERSION artifact from run '$SOURCE_RUN_ID' for '$RELEASE_SHA'. Restore access to that exact artifact; recovery will not rebuild replacement bytes."
+                exit 1
+              fi
+              echo "artifact_id=$(jq -r '.[0].id' <<< "$artifact_json")" >> "$GITHUB_OUTPUT"
+            elif [[ "$RECOVERY_MODE" != "assurance" ]]; then
+              echo "::error::Unknown recovery mode '$RECOVERY_MODE'. Select assets or assurance."
+              exit 1
+            fi
+            echo "source_run_id=$SOURCE_RUN_ID" >> "$GITHUB_OUTPUT"
+            echo "NuGet v$RELEASE_VERSION: already published (source run confirmed); recovery will not invoke publication."
+          fi
+
+          {
+            echo "version=$RELEASE_VERSION"
+            echo "tag=$RELEASE_TAG"
+            echo "sha=$RELEASE_SHA"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## Release request validated"
+            echo
+            printf -- '- Tag: `%s`\n' "$RELEASE_TAG"
+            printf -- '- Version: `%s`\n' "$RELEASE_VERSION"
+            echo '- Source: main'
+            printf -- '- Released SHA: `%s`\n' "$RELEASE_SHA"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # Release produces authoritative products before reproducing PR proof.
+  release_build:
+    if: ${{ github.event_name == 'push' }}
+    name: Build authoritative Release products
+    needs: [release_preflight]
+    uses: codebeltnet/jobs-dotnet-build/.github/workflows/default.yml@v3
+    with:
+      ref: ${{ needs.release_preflight.outputs.sha }}
+      configuration: Release
+      runs-on: ubuntu-26.04
+      strong-name-key-filename: cuemon.snk
+      upload-build-artifact-name: release-build-Release-X64
+      timeout-minutes: 45
+    secrets:
+      GCP_TOKEN: ${{ secrets.GCP_TOKEN }}
+      GCP_BUCKETNAME: ${{ secrets.GCP_BUCKETNAME }}
+
+  release_pack:
+    if: ${{ github.event_name == 'push' }}
+    name: Pack authoritative Release products
+    needs: [release_preflight, release_build]
+    uses: codebeltnet/jobs-dotnet-pack/.github/workflows/default.yml@v3
+    with:
+      ref: ${{ needs.release_preflight.outputs.sha }}
+      configuration: Release
+      version: ${{ needs.release_build.outputs.version }}
+      download-build-artifact-pattern: release-build-Release-X64
+      upload-packed-artifact-name: NuGet-Release
+      timeout-minutes: 45
+
+  release_packages:
+    if: ${{ github.event_name == 'push' }}
+    name: Validate authoritative Release packages
+    needs: [release_preflight, release_build, release_pack]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    steps:
+      - name: Verify MinVer agrees with the existing tag
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ needs.release_preflight.outputs.version }}
+          BUILD_VERSION: ${{ needs.release_build.outputs.version }}
+        run: |
+          if [[ "$BUILD_VERSION" != "$RELEASE_VERSION" ]]; then
+            echo "::error::MinVer '$BUILD_VERSION' does not match release tag version '$RELEASE_VERSION'."
+            exit 1
+          fi
+
+      - name: Install .NET for package validation
+        uses: codebeltnet/install-dotnet@v3
+
+      - name: Download authoritative Release packages
+        uses: actions/download-artifact@v8
+        with:
+          name: NuGet-Release
+          path: ${{ runner.temp }}/.nuget
+
+      - name: Validate package versions and existing NuGet content
+        uses: codebeltnet/nuget-release-validate@v1
+        with:
+          package-directory: ${{ runner.temp }}/.nuget
+          version: ${{ needs.release_preflight.outputs.version }}
+
+  publish_nuget:
+    if: ${{ github.event_name == 'push' }}
+    name: Publish NuGet v${{ needs.release_preflight.outputs.version }}
+    needs: [release_preflight, release_packages]
+    uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3
+    with:
+      version: ${{ needs.release_preflight.outputs.version }}
+      environment: Production
+      configuration: Release
+      download-build-artifact-name: NuGet-Release
+    permissions:
+      contents: read
+      packages: write
+    secrets:
+      NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+
+  draft_github_release:
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'workflow_dispatch' && inputs.recovery == 'assets') || (github.event_name == 'push' && needs.publish_nuget.result == 'success')) }}
+    name: Resolve draft GitHub Release for the existing tag
+    needs: [release_preflight, publish_nuget]
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write
+    outputs:
+      release_id: ${{ steps.draft.outputs.release_id }}
+    steps:
+      - name: Verify the existing release tag still identifies the released SHA
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.release_preflight.outputs.tag }}
+          RELEASE_SHA: ${{ needs.release_preflight.outputs.sha }}
+        run: |
+          set -euo pipefail
+          ref_json="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG")"
+          object_type="$(jq -r '.object.type' <<< "$ref_json")"
+          object_sha="$(jq -r '.object.sha' <<< "$ref_json")"
+          while [[ "$object_type" == "tag" ]]; do
+            tag_json="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$object_sha")"
+            object_type="$(jq -r '.object.type' <<< "$tag_json")"
+            object_sha="$(jq -r '.object.sha' <<< "$tag_json")"
+          done
+          if [[ "$object_type" != "commit" || "$object_sha" != "$RELEASE_SHA" ]]; then
+            echo "::error::Live tag '$RELEASE_TAG' does not identify released SHA '$RELEASE_SHA'. Restore the original tag before retrying."
+            exit 1
+          fi
+
+      - id: draft
+        name: Create or resolve the draft GitHub Release ID
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.release_preflight.outputs.version }}
+          RELEASE_TAG: ${{ needs.release_preflight.outputs.tag }}
+          RELEASE_SHA: ${{ needs.release_preflight.outputs.sha }}
+        run: |
+          set -euo pipefail
+
+          # Listing with contents:write includes drafts; tag-oriented lookup can return 404 for them.
+          releases="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/releases?per_page=100")"
+          matches="$(jq -c --arg tag "$RELEASE_TAG" '[.[][] | select(.tag_name == $tag)]' <<< "$releases")"
+          count="$(jq 'length' <<< "$matches")"
+          if [[ "$count" -gt 1 ]]; then
+            echo "::error::Multiple GitHub Releases identify '$RELEASE_TAG'; resolve the ambiguity before recovery."
+            exit 1
+          fi
+
+          expected_prerelease=false
+          if [[ "$RELEASE_VERSION" == *-* ]]; then expected_prerelease=true; fi
+          if [[ "$count" -eq 1 ]]; then
+            release_json="$(jq -c '.[0]' <<< "$matches")"
+          else
+            notes="$(gh api --method POST "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+              -f tag_name="$RELEASE_TAG" -f target_commitish="$RELEASE_SHA" --jq '.body')"
+            # Capture the ID directly from creation, never rediscover the new draft by tag.
+            release_json="$(gh api --method POST "repos/$GITHUB_REPOSITORY/releases" \
+              -f tag_name="$RELEASE_TAG" -f target_commitish="$RELEASE_SHA" \
+              -f name="$RELEASE_TAG" -f body="$notes" \
+              -F draft=true -F prerelease="$expected_prerelease")"
+          fi
+
+          if ! jq -e --arg tag "$RELEASE_TAG" --argjson prerelease "$expected_prerelease" \
+            '.tag_name == $tag and .draft == true and .prerelease == $prerelease and
+             (.id | type == "number" and . > 0)' <<< "$release_json" >/dev/null; then
+            echo "::error::GitHub Release must be a draft with tag '$RELEASE_TAG' and its expected prerelease identity. Published releases cannot be finalized by recovery."
+            exit 1
+          fi
+          echo "release_id=$(jq -r '.id' <<< "$release_json")" >> "$GITHUB_OUTPUT"
+
+  docfx_oci_build:
+    if: ${{ github.event_name == 'push' }}
+    name: Build multi-platform DocFX OCI artifact once
+    needs: [release_preflight, publish_nuget]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout the released SHA
+        uses: codebeltnet/git-checkout@v1
+        with:
+          ref: ${{ needs.release_preflight.outputs.sha }}
+
+      - name: Download strong-name key for DocFX metadata compilation
+        uses: codebeltnet/gcp-download-file@v1
+        with:
+          serviceAccountKey: ${{ secrets.GCP_TOKEN }}
+          bucketName: ${{ secrets.GCP_BUCKETNAME }}
+          objectName: cuemon.snk
+
+      - name: Verify signing key is present for DocFX metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -s cuemon.snk ]]; then
+            echo "::error::The strong-name key 'cuemon.snk' was not downloaded for DocFX metadata compilation."
+            exit 1
+          fi
+
+      - name: Install .NET
+        uses: codebeltnet/install-dotnet@v3
+
+      - name: Build and verify the multi-platform DocFX OCI artifact
+        uses: codebeltnet/docfx-oci-build@v1
+        with:
+          version: ${{ needs.release_preflight.outputs.version }}
+          revision: ${{ needs.release_preflight.outputs.sha }}
+          output-path: ${{ runner.temp }}/cuemon-docfx-${{ needs.release_preflight.outputs.version }}.oci.tar
+          docfx-version: 2.78.5
+          platforms: linux/amd64,linux/arm64
+
+      - name: Persist OCI image between release jobs
+        uses: actions/upload-artifact@v7
+        with:
+          name: DocFX-OCI-${{ needs.release_preflight.outputs.version }}
+          path: |
+            ${{ runner.temp }}/cuemon-docfx-${{ needs.release_preflight.outputs.version }}.oci.tar
+            ${{ runner.temp }}/cuemon-docfx-${{ needs.release_preflight.outputs.version }}.oci.tar.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+  upload_docfx_release_asset:
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && needs.draft_github_release.result == 'success' && ((github.event_name == 'workflow_dispatch' && inputs.recovery == 'assets') || (github.event_name == 'push' && needs.docfx_oci_build.result == 'success')) }}
+    name: Attach the built DocFX OCI artifact to its release
+    needs: [release_preflight, draft_github_release, docfx_oci_build]
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Download the already-built OCI artifact
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: DocFX-OCI-${{ needs.release_preflight.outputs.version }}
+          path: ${{ runner.temp }}/docfx-release-asset
+
+      - name: Recover the exact OCI artifact from the source release run
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ needs.release_preflight.outputs.artifact_id }}
+          run-id: ${{ needs.release_preflight.outputs.source_run_id }}
+          repository: ${{ github.repository }}
+          github-token: ${{ github.token }}
+          digest-mismatch: error
+          path: ${{ runner.temp }}/docfx-release-asset
+
+      - name: Revalidate transferred OCI artifact
+        uses: codebeltnet/oci-artifact-verify@v1
+        with:
+          archive-path: ${{ runner.temp }}/docfx-release-asset/cuemon-docfx-${{ needs.release_preflight.outputs.version }}.oci.tar
+          checksum-path: ${{ runner.temp }}/docfx-release-asset/cuemon-docfx-${{ needs.release_preflight.outputs.version }}.oci.tar.sha256
+          version: ${{ needs.release_preflight.outputs.version }}
+          revision: ${{ needs.release_preflight.outputs.sha }}
+
+      - name: Upload immutable image and checksum assets to the draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.release_preflight.outputs.version }}
+          RELEASE_TAG: ${{ needs.release_preflight.outputs.tag }}
+          RELEASE_SHA: ${{ needs.release_preflight.outputs.sha }}
+          RELEASE_ID: ${{ needs.draft_github_release.outputs.release_id }}
+        run: |
+          set -euo pipefail
+
+          archive_name="cuemon-docfx-$RELEASE_VERSION.oci.tar"
+          checksum_name="$archive_name.sha256"
+          existing_dir="$RUNNER_TEMP/existing-docfx-assets"
+          mkdir -p "$existing_dir"
+
+          if [[ ! "$RELEASE_ID" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::Missing immutable GitHub Release ID for '$RELEASE_TAG'."
+            exit 1
+          fi
+
+          # Resolve the live tag before mutation; main's dispatch SHA is never product identity.
+          ref_json="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG")"
+          object_type="$(jq -r '.object.type' <<< "$ref_json")"
+          object_sha="$(jq -r '.object.sha' <<< "$ref_json")"
+          while [[ "$object_type" == "tag" ]]; do
+            tag_json="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$object_sha")"
+            object_type="$(jq -r '.object.type' <<< "$tag_json")"
+            object_sha="$(jq -r '.object.sha' <<< "$tag_json")"
+          done
+          if [[ "$object_type" != "commit" || ! "$object_sha" =~ ^[0-9a-fA-F]{40}$ || "$object_sha" != "$RELEASE_SHA" ]]; then
+            echo "::error::Release tag '$RELEASE_TAG' no longer identifies built commit '$RELEASE_SHA'; refusing to attach assets."
+            exit 1
+          fi
+
+          release_json="$(gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID")"
+          if ! jq -e --arg tag "$RELEASE_TAG" --argjson id "$RELEASE_ID" \
+            '.id == $id and .tag_name == $tag and .draft == true' <<< "$release_json" >/dev/null; then
+            echo "::error::Release ID '$RELEASE_ID' must still identify the draft for '$RELEASE_TAG'."
+            exit 1
+          fi
+          assets="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets?per_page=100")"
+          missing_assets=()
+          # Validate every existing asset before uploading anything. Never overwrite different bytes.
+          for asset_name in "$archive_name" "$checksum_name"; do
+            matches="$(jq -c --arg name "$asset_name" '[.[][] | select(.name == $name)]' <<< "$assets")"
+            count="$(jq 'length' <<< "$matches")"
+            if [[ "$count" -gt 1 ]]; then
+              echo "::error::Multiple assets named '$asset_name' exist on release ID '$RELEASE_ID'."
+              exit 1
+            elif [[ "$count" -eq 1 ]]; then
+              asset_id="$(jq -r '.[0].id' <<< "$matches")"
+              gh api -H 'Accept: application/octet-stream' \
+                "repos/$GITHUB_REPOSITORY/releases/assets/$asset_id" > "$existing_dir/$asset_name"
+              if ! cmp -s "$RUNNER_TEMP/docfx-release-asset/$asset_name" "$existing_dir/$asset_name"; then
+                echo "::error::Release asset '$asset_name' already exists with different bytes; refusing to overwrite it."
+                exit 1
+              fi
+              echo "Exact asset '$asset_name' already attached to release ID '$RELEASE_ID'."
+            else
+              missing_assets+=("$asset_name")
+            fi
+          done
+
+          for asset_name in "${missing_assets[@]}"; do
+            gh api --method POST \
+              "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets?name=$asset_name" \
+              -H 'Content-Type: application/octet-stream' \
+              --input "$RUNNER_TEMP/docfx-release-asset/$asset_name" > /dev/null
+          done
+          echo "OCI archive and checksum attached to draft release ID '$RELEASE_ID'; awaiting manual publication."
+
+  # Published packages require proof independently of OCI finalization. Replay invokes only proof.
+  post_release_verification:
+    if: ${{ !cancelled() && needs.release_preflight.result == 'success' && ((github.event_name == 'push' && needs.publish_nuget.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.recovery == 'assurance')) }}
+    name: Reproduce PR proof on canonical main
+    needs: [release_preflight, publish_nuget]
+    uses: ./.github/workflows/verify.yml
+    with:
+      ref: ${{ needs.release_preflight.outputs.sha }}
+      version: ${{ needs.release_preflight.outputs.version }}
+      canonical-main: true
+      run-mac-tests: ${{ github.event_name == 'workflow_dispatch' && inputs.run_mac_tests }}
+    permissions:
+      contents: read
+      security-events: write
+    secrets:
+      GCP_TOKEN: ${{ secrets.GCP_TOKEN }}
+      GCP_BUCKETNAME: ${{ secrets.GCP_BUCKETNAME }}
+      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
+      DB_ADVENTUREWORKS: ${{ secrets.DB_ADVENTUREWORKS }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  release_summary:
+    if: ${{ always() }}
+    name: Release and post-release status
+    needs:
+      - release_preflight
+      - release_build
+      - release_pack
+      - release_packages
+      - publish_nuget
+      - draft_github_release
+      - docfx_oci_build
+      - upload_docfx_release_asset
+      - post_release_verification
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    steps:
+      - name: Report release and assurance status
+        shell: bash
+        env:
+          PREFLIGHT_RESULT: ${{ needs.release_preflight.result }}
+          RELEASE_VERSION: ${{ needs.release_preflight.outputs.version }}
+          RELEASE_SHA: ${{ needs.release_preflight.outputs.sha }}
+          RELEASE_TAG: ${{ needs.release_preflight.outputs.tag }}
+          RELEASE_ID: ${{ needs.draft_github_release.outputs.release_id }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+          REQUESTED_TAG: ${{ inputs.tag }}
+          RECOVERY_MODE: ${{ inputs.recovery || 'assets' }}
+          PRODUCT_BUILD_RESULT: ${{ needs.release_build.result }}
+          PRODUCT_PACK_RESULT: ${{ needs.release_pack.result }}
+          PACKAGE_BUILD_RESULT: ${{ needs.release_packages.result }}
+          NUGET_RESULT: ${{ needs.publish_nuget.result }}
+          DRAFT_RELEASE_RESULT: ${{ needs.draft_github_release.result }}
+          DOCFX_BUILD_RESULT: ${{ needs.docfx_oci_build.result }}
+          DOCFX_ASSET_RESULT: ${{ needs.upload_docfx_release_asset.result }}
+          VERIFICATION_RESULT: ${{ needs.post_release_verification.result }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            if [[ "$RECOVERY_MODE" == "assurance" ]]; then
+              {
+                echo '## Post-release assurance recovery status'
+                echo "- Tag: \`${RELEASE_TAG:-$REQUESTED_TAG}\`"
+                echo "- Released SHA: \`${RELEASE_SHA:-not validated}\`"
+                echo "- Source run: \`$SOURCE_RUN_ID\`"
+                echo "- Recovery validation: \`$PREFLIGHT_RESULT\`"
+                echo '- Reporting identity: SonarCloud/Codecov main; CodeQL refs/heads/main at the released SHA'
+                echo "- Shared PR verification (tests, coverage and analysis): \`$VERIFICATION_RESULT\`"
+                echo '- NuGet publication, OCI build/attachment, GitHub Release and deployment: not invoked'
+              } >> "$GITHUB_STEP_SUMMARY"
+              if [[ "$PREFLIGHT_RESULT" != "success" || "$VERIFICATION_RESULT" != "success" ]]; then
+                echo '::error::Assurance replay did not complete. Inspect the shared verification jobs.'
+                exit 1
+              fi
+              exit 0
+            fi
+            {
+              echo "## Partial-release recovery status"
+              echo
+              echo "- Requested tag: \`${RELEASE_TAG:-$REQUESTED_TAG}\`"
+              echo "- Authoritative SHA: \`${RELEASE_SHA:-not validated}\`"
+              echo "- Source run: \`$SOURCE_RUN_ID\`"
+              echo "- Recovery validation: \`$PREFLIGHT_RESULT\`"
+              if [[ "$PREFLIGHT_RESULT" == "success" ]]; then
+                echo "- Git tag $RELEASE_TAG: valid"
+                echo "- NuGet v$RELEASE_VERSION: already published (source run confirmed); publication not invoked"
+              else
+                echo "- Existing product publication: not changed; source identity/publication not confirmed"
+              fi
+              if [[ "$DRAFT_RELEASE_RESULT" == "success" ]]; then
+                echo "- GitHub draft release: recovered (ID \`$RELEASE_ID\`)"
+              else
+                echo "- GitHub draft resolution: \`$DRAFT_RELEASE_RESULT\`"
+              fi
+              if [[ "$DOCFX_ASSET_RESULT" == "success" ]]; then
+                echo "- DocFX OCI artifact: recovered and verified from run $SOURCE_RUN_ID"
+                echo '- OCI assets: attached (exact existing assets accepted)'
+                echo '- Recovery: complete'
+              else
+                echo "- OCI recovery/attachment orchestration: \`$DOCFX_ASSET_RESULT\`"
+                echo '- Recovery incomplete; inspect the failed step. No immutable products were rebuilt or republished.'
+              fi
+              echo '- GitHub Release: manual publication required; recovery never publishes it'
+              echo '- Deployment: not started by this workflow'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          {
+            echo "## Cuemon release status"
+            echo
+            echo "- Tag: \`${RELEASE_TAG:-not validated}\`"
+            echo "- Version: \`${RELEASE_VERSION:-not validated}\`"
+            echo "- Released SHA: \`${RELEASE_SHA:-not validated}\`"
+            echo '- Repository health identity: SonarCloud/Codecov main; CodeQL refs/heads/main at the released SHA'
+            echo "- Release product build: \`$PRODUCT_BUILD_RESULT\`; pack: \`$PRODUCT_PACK_RESULT\`; package validation: \`$PACKAGE_BUILD_RESULT\`"
+            echo "- NuGet publication: \`$NUGET_RESULT\`"
+            echo "- Draft GitHub Release: \`$DRAFT_RELEASE_RESULT\`"
+            echo "- DocFX OCI build: \`$DOCFX_BUILD_RESULT\`"
+            echo "- DocFX release asset: \`$DOCFX_ASSET_RESULT\`"
+            echo "- GitHub Release ID: \`${RELEASE_ID:-not resolved}\`"
+            echo '- GitHub Release: awaiting manual publication once draft assets and assurance are reviewed'
+            echo "- Shared PR verification: \`$VERIFICATION_RESULT\`"
+            echo '- Deployment: not started by this workflow'
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "$PREFLIGHT_RESULT" != "success" ]]; then
+            {
+              echo "No release was attempted because the triggering tag, SemVer or main ancestry failed preflight validation."
+            } >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$PACKAGE_BUILD_RESULT" != "success" ]]; then
+            {
+              echo "NuGet publication did not start because the Release package build or package validation failed."
+            } >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$NUGET_RESULT" == "skipped" ]]; then
+            {
+              echo "NuGet publication did not start. Check the protected Production environment decision or workflow dependency state."
+            } >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$NUGET_RESULT" != "success" ]]; then
+            {
+              echo "NuGet publication did not complete. If the sequential push started, it may already have published some packages. Re-run the failed NuGet publication job on this workflow run to reuse the validated artifact; do not start a fresh run with the same version unless the packages' SHA-512 values match."
+            } >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$DRAFT_RELEASE_RESULT" != "success" ]]; then
+            {
+              echo "NuGet packages were published, but draft GitHub Release creation did not complete. Check the existing tag and release before retrying; GitHub and NuGet publication cannot be committed transactionally."
+            } >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$DOCFX_BUILD_RESULT" != "success" || "$DOCFX_ASSET_RESULT" != "success" ]]; then
+            {
+              echo "NuGet packages were published for the existing source tag, but DocFX finalization did not complete. If the DocFX-OCI-$RELEASE_VERSION Actions artifact was persisted, dispatch recovery from main with tag '$RELEASE_TAG' and source_run_id '$GITHUB_RUN_ID' to reuse those exact bytes. Do not replay NuGet publication. The GitHub Release awaits finalization and manual publication."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "NuGet packages are published and the verified OCI assets are attached to draft release ID '$RELEASE_ID'. Review/edit the draft and assurance results, then publish it manually to declare it deployable. Production environment approval remains a separate deployment decision."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [[ "$NUGET_RESULT" == "success" && "$VERIFICATION_RESULT" != "success" ]]; then
+            echo "::warning::NuGet publication succeeded; post-release verification did not complete successfully."
+            {
+              echo
+              echo "**NuGet publication succeeded; post-release verification: \`$VERIFICATION_RESULT\`.**"
+              echo "The package and tag remain released. Resolve findings against the recorded SHA; dispatch assurance replay from main with source_run_id '$GITHUB_RUN_ID' and tag '$RELEASE_TAG'."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi

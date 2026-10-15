@@ -8,8 +8,12 @@ on:
         default: ''
       version:
         type: string
-        description: Released SemVer for canonical main; empty uses the build's MinVer version.
+        description: Expected SemVer for release verification; empty uses the build's MinVer version.
         default: ''
+      prerelease:
+        type: boolean
+        description: Verify signed packages for manual prerelease publication from a long-lived branch.
+        default: false
       canonical-main:
         type: boolean
         description: Report main health at ref rather than the triggering PR identity.
@@ -18,6 +22,10 @@ on:
         type: boolean
         description: Opt in to the macOS matrix, consistently for PR and assurance replay.
         default: false
+    outputs:
+      version:
+        description: The MinVer version of the verified packages.
+        value: ${{ jobs.build.outputs.version }}
     secrets:
       GCP_TOKEN:
         required: false
@@ -35,7 +43,7 @@ on:
 permissions:
   contents: read
 
-# One verification definition: production packages and immutable assets are caller-owned.
+# One verification definition; prerelease publication reuses its verified Release package artifact.
 jobs:
   init:
     name: initialize
@@ -58,8 +66,23 @@ jobs:
           CANONICAL_MAIN: ${{ inputs.canonical-main }}
           SOURCE_REF: ${{ inputs.ref }}
           RELEASE_VERSION: ${{ inputs.version }}
+          PRERELEASE: ${{ inputs.prerelease }}
+          WORKFLOW_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+          if [[ "$PRERELEASE" == "true" ]]; then
+            if [[ "$EVENT_NAME" != "workflow_dispatch" || "$WORKFLOW_REF" != refs/heads/* ||
+                  "$WORKFLOW_REF" == "refs/heads/main" || "$SOURCE_REF" != "$WORKFLOW_SHA" ||
+                  "$CANONICAL_MAIN" == "true" || -z "$RELEASE_VERSION" ]]; then
+              echo '::error::Prerelease verification requires a manual non-main branch run at its triggering SHA and an expected version.'
+              exit 1
+            fi
+            # The branch name is passed as a scanner command-line parameter below.
+            if [[ ! "${WORKFLOW_REF#refs/heads/}" =~ ^[0-9A-Za-z._/-]+$ ]]; then
+              echo '::error::Prerelease analysis branch names may contain letters, digits, dots, underscores, slashes and hyphens.'
+              exit 1
+            fi
+          fi
           if [[ "$CANONICAL_MAIN" == "true" ]]; then
             if [[ ! "$SOURCE_REF" =~ ^[0-9a-f]{40}$ || -z "$RELEASE_VERSION" ||
                   ( "$EVENT_NAME" != "push" && "$EVENT_NAME" != "workflow_dispatch" ) ||
@@ -86,7 +109,7 @@ jobs:
             echo "build-switches=" >> "$GITHUB_OUTPUT"
           fi
 
-          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$WORKFLOW_REF" != "refs/heads/main" ]]; then
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$WORKFLOW_REF" != "refs/heads/main" && "$PRERELEASE" != "true" ]]; then
             echo "run-privileged-jobs=false" >> "$GITHUB_OUTPUT"
             echo "strong-name-key-filename=" >> "$GITHUB_OUTPUT"
             echo "build-switches=-p:SkipSignAssembly=true" >> "$GITHUB_OUTPUT"
@@ -434,6 +457,7 @@ jobs:
       parameters: >-
         -d:sonar.exclusions='**/obj/**,**/bin/**'
         ${{ inputs.canonical-main && format('-d:sonar.branch.name=main -d:sonar.scm.revision={0}', inputs.ref) || '' }}
+        ${{ inputs.prerelease && format('-d:sonar.branch.name={0} -d:sonar.scm.revision={1}', github.ref_name, inputs.ref) || '' }}
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -446,8 +470,8 @@ jobs:
       repository: codebeltnet/cuemon
       configuration: .github/codecov.yml
       ref: ${{ inputs.ref }}
-      branch: ${{ inputs.canonical-main && 'main' || '' }}
-      commit: ${{ inputs.canonical-main && inputs.ref || '' }}
+      branch: ${{ inputs.canonical-main && 'main' || inputs.prerelease && github.ref_name || '' }}
+      commit: ${{ (inputs.canonical-main || inputs.prerelease) && inputs.ref || '' }}
       fail-on-error: true
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

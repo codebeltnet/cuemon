@@ -1,0 +1,155 @@
+name: .NET Prerelease Flow
+on:
+  workflow_dispatch:
+    inputs:
+      run_mac_tests:
+        type: boolean
+        description: Run the macOS test matrix despite the additional cost and runtime.
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cuemon-prerelease-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prerelease_preflight:
+    name: Validate tagged prerelease branch
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      tag: ${{ steps.validate.outputs.tag }}
+      sha: ${{ steps.validate.outputs.sha }}
+    steps:
+      - name: Checkout the selected branch's triggering commit
+        uses: codebeltnet/git-checkout@v1
+        with:
+          ref: ${{ github.sha }}
+
+      - id: validate
+        name: Validate the existing prerelease tag
+        shell: bash
+        env:
+          SOURCE_REF: ${{ github.ref }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" != "workflow_dispatch" || "$SOURCE_REF" != refs/heads/* || "$SOURCE_REF" == "refs/heads/main" ]]; then
+            echo '::error::Select the long-lived .NET branch when manually running this workflow; main uses release.yml.'
+            exit 1
+          fi
+          if [[ "$(git rev-parse HEAD)" != "$SOURCE_SHA" ]]; then
+            echo '::error::Checkout does not match the selected branch commit.'
+            exit 1
+          fi
+          if ! tag="$(git describe --tags --exact-match --match 'v*-*' HEAD)"; then
+            echo '::error::Tag and push the selected branch tip first, for example v11.0.0-rc.2 or v12.0.0-preview.1.'
+            exit 1
+          fi
+          version="${tag#v}"
+          prerelease_regex='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-((0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)(\.(0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*))*)$'
+          if [[ ! "$version" =~ $prerelease_regex ]]; then
+            echo "::error::Tag '$tag' must be a SemVer prerelease without build metadata."
+            exit 1
+          fi
+          {
+            echo "version=$version"
+            echo "tag=$tag"
+            echo "sha=$SOURCE_SHA"
+          } >> "$GITHUB_OUTPUT"
+
+  verification:
+    name: Verify prerelease packages
+    needs: [prerelease_preflight]
+    uses: ./.github/workflows/verify.yml
+    with:
+      ref: ${{ needs.prerelease_preflight.outputs.sha }}
+      version: ${{ needs.prerelease_preflight.outputs.version }}
+      prerelease: true
+      run-mac-tests: ${{ inputs.run_mac_tests }}
+    permissions:
+      contents: read
+      security-events: write
+    secrets:
+      GCP_TOKEN: ${{ secrets.GCP_TOKEN }}
+      GCP_BUCKETNAME: ${{ secrets.GCP_BUCKETNAME }}
+      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
+      DB_ADVENTUREWORKS: ${{ secrets.DB_ADVENTUREWORKS }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  validate_packages:
+    name: Validate the verified Release package artifact
+    needs: [prerelease_preflight, verification]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    steps:
+      - name: Install .NET including prerelease SDKs
+        uses: codebeltnet/install-dotnet@v3
+        with:
+          includePreview: true
+
+      - name: Download verified Release packages
+        uses: actions/download-artifact@v8
+        with:
+          name: Verification-NuGet-Release
+          path: ${{ runner.temp }}/.nuget
+
+      - name: Validate package versions and existing NuGet content
+        uses: codebeltnet/nuget-release-validate@v1
+        with:
+          package-directory: ${{ runner.temp }}/.nuget
+          version: ${{ needs.prerelease_preflight.outputs.version }}
+
+  publish_nuget:
+    name: Publish NuGet v${{ needs.prerelease_preflight.outputs.version }}
+    needs: [prerelease_preflight, verification, validate_packages]
+    uses: codebeltnet/jobs-nuget-push/.github/workflows/default.yml@v3
+    with:
+      version: ${{ needs.prerelease_preflight.outputs.version }}
+      environment: Production
+      configuration: Release
+      download-build-artifact-name: Verification-NuGet-Release
+    permissions:
+      contents: read
+      packages: write
+    secrets:
+      NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+
+  prerelease_summary:
+    if: ${{ always() }}
+    name: Prerelease publication status
+    needs: [prerelease_preflight, verification, validate_packages, publish_nuget]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - name: Report prerelease results
+        shell: bash
+        env:
+          SOURCE_BRANCH: ${{ github.ref_name }}
+          SOURCE_SHA: ${{ needs.prerelease_preflight.outputs.sha }}
+          RELEASE_TAG: ${{ needs.prerelease_preflight.outputs.tag }}
+          RELEASE_VERSION: ${{ needs.verification.outputs.version }}
+          PREFLIGHT_RESULT: ${{ needs.prerelease_preflight.result }}
+          VERIFICATION_RESULT: ${{ needs.verification.result }}
+          VALIDATION_RESULT: ${{ needs.validate_packages.result }}
+          PUBLICATION_RESULT: ${{ needs.publish_nuget.result }}
+        run: |
+          set -euo pipefail
+          {
+            echo '## .NET prerelease publication'
+            printf -- '- Branch: `%s`\n' "$SOURCE_BRANCH"
+            printf -- '- Tag: `%s`; commit: `%s`\n' "$RELEASE_TAG" "$SOURCE_SHA"
+            printf -- '- MinVer version: `%s`\n' "$RELEASE_VERSION"
+            printf -- '- Preflight: `%s`; verification: `%s`; package validation: `%s`; NuGet publication: `%s`\n' \
+              "$PREFLIGHT_RESULT" "$VERIFICATION_RESULT" "$VALIDATION_RESULT" "$PUBLICATION_RESULT"
+            echo '- Shared verification reports analysis coverage and any CodeQL exception.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [[ "$PREFLIGHT_RESULT" != "success" || "$VERIFICATION_RESULT" != "success" ||
+                "$VALIDATION_RESULT" != "success" || "$PUBLICATION_RESULT" != "success" ]]; then
+            echo '::error::Prerelease publication did not complete. If a NuGet push partially succeeded, rerun the failed publication job to reuse its validated artifact.'
+            exit 1
+          fi

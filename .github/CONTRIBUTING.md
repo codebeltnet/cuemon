@@ -15,6 +15,7 @@ This repository is part of the Codebelt .NET library estate. The instructions be
 - `test/` contains xUnit v3 test projects.
 - `Cuemon.slnx` is the solution used for local development.
 - `.github/workflows/pr.yml` owns the PR test matrix and blocking quality gates.
+- `.github/workflows/prerelease.yml` publishes tagged NuGet prereleases from long-lived .NET branches through a manual run.
 - `.github/workflows/release.yml` publishes packages from a version-tagged commit in `main` history; post-release assurance and DocFX production run after NuGet publication.
 - `.github/workflows/deploy.yml` promotes the published DocFX image without rebuilding it. See [Release and deployment](#release-and-deployment) for the CI/CD handoff.
 - `testenvironments.json` declares the supported `WSL-Ubuntu` and `Docker-Ubuntu` test environments.
@@ -73,7 +74,19 @@ Package-specific release notes live under `.nuget/<ProjectName>/PackageReleaseNo
 
 ## Release and deployment
 
-After PR validation and merge, a maintainer creates and pushes a `vX.Y.Z` tag (or `vX.Y.Z-prerelease`, without build metadata) for the intended commit in `main` history. The tag push starts `release.yml`, which checks the tag identity and ancestry, builds signed Release packages from that commit, validates their versions and existing NuGet content, and sends the validated package artifact to the protected `Production` publication job.
+### Prereleases from long-lived .NET branches
+
+Use **.NET Prerelease Flow** (`prerelease.yml`) for Preview and Release Candidate packages developed on long-lived branches, such as `v11.0.0/double-digits` and future .NET 12 branches. Keep this workflow and its shared verification inputs/outputs on `main` and in each development branch. GitHub requires the workflow's manual trigger on the default branch before it appears in the Actions UI. The existing `Production` environment's deployment branch rules must also allow the intended development branches.
+
+Tag the intended branch tip and push the branch and tag, for example `v11.0.0-rc.2`. In **Actions → .NET Prerelease Flow → Run workflow**, select that development branch. The workflow checks out the triggering commit, requires an existing SemVer prerelease tag at that commit, and requires MinVer's calculated version to match the tag. The same flow accepts future versions such as `v12.0.0-preview.1`; no workflow version changes are required.
+
+Shared verification builds signed Debug and Release packages, runs the Linux and Windows test matrices and SQL integration tests, and requires SonarCloud and Codecov success. macOS is optional. CodeQL follows the shared workflow's explicit support policy. Analysis retains the selected development branch identity rather than reporting canonical main. After verification, package validation checks the existing `Verification-NuGet-Release` artifact before the protected `Production` job publishes that same artifact to NuGet. No packages are rebuilt for publication.
+
+This workflow does not create tags, GitHub Releases, DocFX release assets, or deployments. Prerelease tag pushes do not start the main-only release flow. If a NuGet push partially succeeds, rerun its failed publication job to reuse the validated artifact; do not move the tag or regenerate replacement packages.
+
+### Releases from main
+
+After PR validation and merge, a maintainer creates and pushes a `vX.Y.Z` tag for the intended commit in `main` history. The tag push starts `release.yml`, which checks the tag identity and ancestry, builds signed Release packages from that commit, validates their versions and existing NuGet content, and sends the validated package artifact to the protected `Production` publication job.
 
 After NuGet publication, the workflow runs post-release tests and analysis and builds the multi-platform DocFX OCI image from the same commit. The verified archive and SHA-256 checksum are attached to a draft GitHub Release using its numeric release ID. The workflow leaves the release as a draft. A maintainer reviews/edits the release and assurance results, then presses **Publish** to declare it deployable. Post-release assurance failures do not roll back published packages; inspect the release summary and resolve failures against its recorded commit.
 

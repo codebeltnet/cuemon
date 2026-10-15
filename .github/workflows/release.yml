@@ -3,6 +3,7 @@ on:
   push:
     tags:
       - 'v*'
+      - '!v*-*' # Branch prereleases are published manually through prerelease.yml.
   workflow_dispatch:
     inputs:
       tag:

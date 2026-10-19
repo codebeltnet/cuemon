@@ -5,8 +5,9 @@
 
 .DESCRIPTION
     During a merge, PackageReleaseNotes.txt files accumulate standard
-    conflict markers. This script resolves all of them by keeping both
-    sides — current branch (A) on top, incoming (B) below — and stages
+    conflict markers. This script resolves all of them. It keeps both
+    sides — current branch (A) on top, incoming (B) below — discards
+    the base section in diff3/zdiff3 conflicts, and stages
     the resolved files with `git add`.
 
 .EXAMPLE
@@ -26,10 +27,14 @@ foreach ($file in $files) {
     $content = Get-Content $file -Raw
     $resolved = $content `
         -replace '(?m)^<<<<<<< .+\r?\n', '' `
+        -replace '(?ms)^\|{7}[^\r\n]*\r?\n.*?(?=^=======\r?$)', '' `
         -replace '(?m)^=======\r?\n', "`n" `
-        -replace '(?m)^>>>>>>> .+\r?\n', ''
+        -replace '(?m)^>>>>>>> .+(?:\r?\n|$)', ''
     [System.IO.File]::WriteAllText((Resolve-Path $file), $resolved)
     git add $file
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to stage '$file'."
+    }
     $count++
     Write-Host "Resolved: $file"
 }

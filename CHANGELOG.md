@@ -20,7 +20,8 @@ The .NET update is straightforward: `net11.0` is now part of the target matrix a
 - Solution, source, test, and benchmark target frameworks now include `net11.0`; `net9.0` has been removed from the supported matrix,
 - Central package management was updated to align `net11.0` and `netstandard2.0` builds with .NET 11 preview package versions, while `net10.0` remains on the .NET 10 package line where applicable,
 - `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, and `TimeUnit` source files now live in `Cuemon.Kernel` as part of the completed kernel split,
-- `Configurable` and `IConfigurable` types now reside in `Cuemon.Kernel`; `Cuemon.Core` maintains backward compatibility through type forwarding,
+- `Configurable` and `IConfigurable` types now reside in the `Cuemon.Kernel` assembly; consumers must reference that assembly directly because type forwarding from `Cuemon.Core` has been removed,
+- `DelimitedString`, `DelimitedStringOptions`, and `FormattingOptions` moved from the `Cuemon.Core` assembly to the `Cuemon.Kernel` assembly; their namespace remains `Cuemon`,
 - `BufferWriterOptions` was updated to follow the new `NET10_0_OR_GREATER` conditional path,
 - Solution organization now groups `Cuemon.Core` and `Cuemon.Kernel` under a dedicated `/src/corelibs/` folder,
 - Test environment definitions now target Docker images for `net10` and `net11`,
@@ -30,17 +31,11 @@ The .NET update is straightforward: `net11.0` is now part of the target matrix a
 ### Added
 
 - Comprehensive unit test suite for XML serialization in `Cuemon.Xml.Tests` covering `XmlConverter`, `DefaultXmlConverter`, `ExceptionConverter`, `FailureConverter`, `DynamicXmlConverter`, and related serializer functionality,
-- Test assets `LinkResponse` and `WrapperResponse` in `Cuemon.Xml.Tests` for XML serialization validation,
-- `DelimitedString` struct added to `Cuemon.Kernel` namespace,
-- `DelimitedStringOptions` class added to `Cuemon.Kernel` namespace,
-- `FormattingOptions` class added to `Cuemon.Kernel` namespace.
+- Test assets `LinkResponse` and `WrapperResponse` in `Cuemon.Xml.Tests` for XML serialization validation.
 
 ### Removed
 
-- `Cuemon.Core` no longer uses `[TypeForwardedTo]` to forward foundational `Cuemon.Kernel` types, making the kernel split a true assembly boundary instead of a compatibility shim,
-- `DelimitedString` struct removed from the Cuemon namespace,
-- `DelimitedStringOptions` class removed from the Cuemon namespace,
-- `FormattingOptions` class removed from the Cuemon namespace.
+- `Cuemon.Core` no longer uses `[TypeForwardedTo]` to forward foundational `Cuemon.Kernel` types, making the kernel split a true assembly boundary instead of a compatibility shim.
 
 ### Fixed
 

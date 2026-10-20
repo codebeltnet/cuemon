@@ -18,7 +18,7 @@ public class AssemblyExtensionsTest : Test
 
         TestOutput.WriteLine(sut2.ToString());
 
-        Assert.Equal("10.0.0.0", sut2.ToString());
+        Assert.Equal("11.0.0.0", sut2.ToString());
         Assert.False(sut2.HasAlphanumericVersion);
         Assert.False(sut2.IsSemanticVersion());
     }

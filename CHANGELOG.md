@@ -6,6 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [11.0.0] - 2026-10-15 (11.0.0-rc.2)
+
+This is a major release centered on three deliberate changes: moving the Cuemon build and test matrix forward to .NET 11, completing the assembly boundary split by removing the compatibility bridge from `Cuemon.Core` to `Cuemon.Kernel`, and relocating configuration primitives (`Configurable` and `IConfigurable`) into the kernel layer. Additionally, comprehensive unit test coverage was added for XML serialization converters.
+
+The .NET update is straightforward: `net11.0` is now part of the target matrix and `net9.0` is no longer supported. The more important part is the assembly boundary change. Version 10.5.0 introduced `Cuemon.Kernel` while keeping `Cuemon.Core` backward compatible through `[TypeForwardedTo]`. Starting with 11.0.0, that forwarding layer is removed and configuration types join the kernel layer.
+
+> [!WARNING]
+> Breaking change from 11.0.0 and forward: applications using foundational APIs that were previously reachable through `Cuemon.Core` must now reference `Cuemon.Kernel` directly. This includes guard, configuration, async, and text primitives such as `Validator`, `Arguments`, `Patterns`, `Disposable`, `Convertible`, `Configurable`, `IConfigurable`, `Awaiter`, and parser/encoding option types, as well as date and range primitives such as `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, and `TimeUnit`.
+
+### Changed
+
+- Solution, source, test, and benchmark target frameworks now include `net11.0`; `net9.0` has been removed from the supported matrix,
+- Central package management was updated to align `net11.0` and `netstandard2.0` builds with .NET 11 preview package versions, while `net10.0` remains on the .NET 10 package line where applicable,
+- `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, and `TimeUnit` source files now live in `Cuemon.Kernel` as part of the completed kernel split,
+- `Configurable` and `IConfigurable` types now reside in the `Cuemon.Kernel` assembly; consumers must reference that assembly directly because type forwarding from `Cuemon.Core` has been removed,
+- `DelimitedString`, `DelimitedStringOptions`, and `FormattingOptions` moved from the `Cuemon.Core` assembly to the `Cuemon.Kernel` assembly; their namespace remains `Cuemon`,
+- `BufferWriterOptions` was updated to follow the new `NET10_0_OR_GREATER` conditional path,
+- Solution organization now groups `Cuemon.Core` and `Cuemon.Kernel` under a dedicated `/src/corelibs/` folder,
+- Test environment definitions now target Docker images for `net10` and `net11`,
+- `XmlConverterDecoratorExtensions` class in the Cuemon.Extensions.Xml.Serialization.Converters namespace was simplified for improved maintainability,
+- `Condition` class updated with `NET10_0_OR_GREATER` conditional compilation paths for `IsBase64` and `HasDifference` methods, reflecting removal of .NET 9 support.
+
+### Added
+
+- Comprehensive unit test suite for XML serialization in `Cuemon.Xml.Tests` covering `XmlConverter`, `DefaultXmlConverter`, `ExceptionConverter`, `FailureConverter`, `DynamicXmlConverter`, and related serializer functionality,
+- Test assets `LinkResponse` and `WrapperResponse` in `Cuemon.Xml.Tests` for XML serialization validation.
+
+### Removed
+
+- `Cuemon.Core` no longer uses `[TypeForwardedTo]` to forward foundational `Cuemon.Kernel` types, making the kernel split a true assembly boundary instead of a compatibility shim.
+
+### Fixed
+
+- `Resolve-PackageReleaseNotesConflicts.ps1` script improved to correctly handle and resolve merge conflict markers in all PackageReleaseNotes.txt files with more robust regex pattern matching,
+- Merge conflict resolution output cleaned up to remove spurious double line breaks and duplicate version entries.
+
 ## [10.8.1] - 2026-10-14
 
 This is a patch release refreshing the test and runtime package references and consolidating contributor guidance into `AGENTS.md`, with no changes to library source code.
@@ -1938,6 +1974,7 @@ This release was primarily focused on adapting a more modern way of performing C
 [10.8.1]: https://github.com/codebeltnet/cuemon/compare/v10.8.0...v10.8.1
 [10.8.0]: https://github.com/codebeltnet/cuemon/compare/v10.7.1...v10.8.0
 [10.7.1]: https://github.com/codebeltnet/cuemon/compare/v10.7.0...v10.7.1
+[11.0.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v11.0.0
 [10.7.0]: https://github.com/codebeltnet/cuemon/compare/v10.6.0...v10.7.0
 [10.6.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v10.6.0
 [10.5.5]: https://github.com/codebeltnet/cuemon/compare/v10.5.4...v10.5.5

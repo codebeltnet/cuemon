@@ -1183,7 +1183,7 @@ public sealed class Validator
     private static bool ContainsAny(string argument, char[] characters, StringComparison comparison)
     {
         if (argument == null) { return false; }
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         var span = argument.AsSpan();
         Span<char> candidate = stackalloc char[1];
         for (var j = 0; j < characters.Length; j++)

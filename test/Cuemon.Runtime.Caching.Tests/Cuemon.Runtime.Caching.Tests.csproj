@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- Had to exclude unit testing using net framework 4.8; look like xunit and xunit priority does not work with this version. -->
-    <TargetFrameworks>net10.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net11.0;net10.0</TargetFrameworks>
     <RootNamespace>Cuemon.Runtime.Caching</RootNamespace>
   </PropertyGroup>
 

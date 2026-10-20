@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using Cuemon.Collections.Generic;
-using Cuemon.Security;
 
 namespace Cuemon;
 /// <summary>
@@ -14,8 +13,8 @@ public readonly struct DateSpan : IEquatable<DateSpan>
     private readonly DateTime _upper;
     private readonly Calendar _calendar;
     private readonly ulong _calendarId;
-    private static readonly ulong Hash = (ulong)new FowlerNollVo64().OffsetBasis;
-    private static readonly ulong Prime = (ulong)new FowlerNollVo64().Prime;
+    private const ulong Hash = 14695981039346656037;
+    private const ulong Prime = 1099511628211;
 
     /// <summary>
 	/// Initializes a new instance of the <see cref="DateSpan"/> structure with a default <see cref="DateTime"/> value set to <see cref="DateTime.Today"/>.
@@ -217,7 +216,7 @@ public readonly struct DateSpan : IEquatable<DateSpan>
     /// Returns a hash code for this instance.
     /// </summary>
     /// <returns>
-    /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+    /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
     /// </returns>
     public override int GetHashCode()
     {
@@ -322,7 +321,7 @@ public readonly struct DateSpan : IEquatable<DateSpan>
     /// Converts the value of the current <see cref="DateSpan"/> object to its equivalent string representation.
     /// </summary>
     /// <returns>
-    /// The <see cref="string"/> representation of the current <see cref="DateSpan"/> value. 
+    /// The <see cref="string"/> representation of the current <see cref="DateSpan"/> value.
     /// </returns>
     /// <remarks>The returned string has the following format: y*:MM:dd:hh:mm:ss.f*, where y* is the actual calculated years and f* is the actual calculated milliseconds.</remarks>
     public override string ToString()

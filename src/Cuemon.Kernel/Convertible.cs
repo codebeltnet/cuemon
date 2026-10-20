@@ -300,7 +300,7 @@ public static class Convertible
     /// <returns>A byte array that represents <paramref name="input"/>.</returns>
     public static byte[] GetBytes(sbyte input, Action<EndianOptions> setup = null)
     {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         return GetBytesCore(input, x => BitConverter.GetBytes((short)x), setup);
 #else
         return GetBytesCore(input, x => BitConverter.GetBytes(x), setup);

@@ -148,6 +148,7 @@ jobs:
         configuration: [Debug, Release]
     uses: codebeltnet/jobs-dotnet-build/.github/workflows/default.yml@v3
     with:
+      include-preview: true
       ref: ${{ inputs.ref }}
       configuration: ${{ matrix.configuration }}
       strong-name-key-filename: ${{ needs.init.outputs.strong-name-key-filename }}
@@ -166,6 +167,7 @@ jobs:
         configuration: [Debug, Release]
     uses: codebeltnet/jobs-dotnet-pack/.github/workflows/default.yml@v3
     with:
+      include-preview: true
       ref: ${{ inputs.ref }}
       configuration: ${{ matrix.configuration }}
       version: ${{ needs.build.outputs.version }}
@@ -183,8 +185,9 @@ jobs:
         configuration: [Debug, Release]
         project: ${{ fromJson(needs.prepare_test.outputs.json) }}
         arch: [X64, ARM64]
-    uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
+    uses: ./.github/workflows/test-net11-workaround.yml
     with:
+      include-preview: true
       ref: ${{ inputs.ref }}
       runs-on: ${{ matrix.arch == 'ARM64' && 'ubuntu-26.04-arm' || 'ubuntu-26.04' }}
       configuration: ${{ matrix.configuration }}
@@ -203,8 +206,9 @@ jobs:
         arch: [X64, ARM64]
         configuration: [Debug, Release]
         project: ${{ fromJson(needs.prepare_test.outputs.json) }}
-    uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
+    uses: ./.github/workflows/test-net11-workaround.yml
     with:
+      include-preview: true
       ref: ${{ inputs.ref }}
       runs-on: ${{ matrix.arch == 'ARM64' && 'windows-11-arm' || 'windows-2025' }}
       configuration: ${{ matrix.configuration }}
@@ -224,8 +228,9 @@ jobs:
         arch: [X64, ARM64]
         configuration: [Debug, Release]
         project: ${{ fromJson(needs.prepare_test.outputs.json) }}
-    uses: codebeltnet/jobs-dotnet-test/.github/workflows/default.yml@v3
+    uses: ./.github/workflows/test-net11-workaround.yml
     with:
+      include-preview: true
       ref: ${{ inputs.ref }}
       runs-on: ${{ matrix.arch == 'ARM64' && 'macos-26' || 'macos-26-intel' }}
       configuration: ${{ matrix.configuration }}
@@ -254,6 +259,8 @@ jobs:
 
       - name: Install .NET
         uses: codebeltnet/install-dotnet@v3
+        with:
+          includePreview: true
 
       - name: Install .NET Tool - Report Generator
         uses: codebeltnet/dotnet-tool-install-reportgenerator@v1
@@ -365,7 +372,9 @@ jobs:
       - name: Test with ${{ matrix.configuration }} build
         uses: codebeltnet/dotnet-test@v4
         with:
-          projects: ${{ matrix.project }}
+          # Temporary .NET 11 RC1 workaround: use absolute project paths.
+          # Remove once CI uses an SDK with https://github.com/dotnet/sdk/issues/56196 fixed.
+          projects: $GITHUB_WORKSPACE/${{ matrix.project }}
           configuration: ${{ matrix.configuration }}
           build: true # apparently we need to due to xUnitv3
           restore: true # we need to restore since we disabled caching
@@ -438,6 +447,7 @@ jobs:
     needs: [init, build, test_qualitygate]
     uses: codebeltnet/jobs-sonarcloud/.github/workflows/default.yml@v3
     with:
+      include-preview: true
       organization: geekle
       projectKey: Cuemon
       version: ${{ inputs.version || needs.build.outputs.version }}
@@ -467,7 +477,9 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   codeql:
-    if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}
+    # Temporarily disabled: CodeQL supports up to .NET 10, while this branch targets .NET 11.
+    # Restore main's condition when .NET 11 is supported.
+    if: ${{ false }}
     name: call-codeql
     needs: [init, build, test_qualitygate]
     uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
@@ -533,15 +545,15 @@ jobs:
             exit 1
           fi
           require_success "test_qualitygate" "$TEST_RESULT"
+          require_skipped "codeql" "$CODEQL_RESULT"
+          echo "::notice::CodeQL is explicitly excluded from .NET 11 verification until supported."
 
           if [[ "$RUN_PRIVILEGED_JOBS" == "true" ]]; then
             require_success "sonarcloud" "$SONAR_RESULT"
             require_success "codecov" "$CODECOV_RESULT"
-            require_success "codeql" "$CODEQL_RESULT"
           else
             require_skipped "sonarcloud" "$SONAR_RESULT"
             require_skipped "codecov" "$CODECOV_RESULT"
-            require_skipped "codeql" "$CODEQL_RESULT"
           fi
 
       - name: Verify service records for main at the released SHA
@@ -557,7 +569,6 @@ jobs:
           for attempt in {1..20}; do
             sonar_ok=false
             codecov_ok=false
-            codeql_ok=false
             # Newer main analyses must not hide the released revision, including on later pages.
             sonar_page=1
             while sonar="$(curl --fail --silent --show-error --connect-timeout 10 --max-time 30 "https://sonarcloud.io/api/project_analyses/search?project=Cuemon&branch=main&ps=100&p=$sonar_page")"; do
@@ -576,24 +587,19 @@ jobs:
                  '.branch == "main" and .commitid == $sha and .state == "complete"' <<< "$codecov" >/dev/null; then
               codecov_ok=true
             fi
-            if codeql="$(gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/code-scanning/analyses?tool_name=CodeQL&ref=refs%2Fheads%2Fmain&per_page=100")" &&
-               jq -e --arg sha "$RELEASE_SHA" \
-                 'any(.[][]; .tool.name == "CodeQL" and .ref == "refs/heads/main" and .commit_sha == $sha and .error == "")' <<< "$codeql" >/dev/null; then
-              codeql_ok=true
-            fi
-            echo "Service identity check $attempt/20 for $RELEASE_SHA: SonarCloud=$sonar_ok; Codecov=$codecov_ok; CodeQL=$codeql_ok"
-            if [[ "$sonar_ok" == true && "$codecov_ok" == true && "$codeql_ok" == true ]]; then
+            echo "Service identity check $attempt/20 for $RELEASE_SHA: SonarCloud=$sonar_ok; Codecov=$codecov_ok; CodeQL=skipped (.NET 11 unsupported)"
+            if [[ "$sonar_ok" == true && "$codecov_ok" == true ]]; then
               {
                 echo '## Post-release service identity verified'
                 echo "- SonarCloud: main; SCM revision \`$RELEASE_SHA\`; project version \`$RELEASE_VERSION\`"
                 echo "- Codecov: main; commit \`$RELEASE_SHA\`"
-                echo "- CodeQL: refs/heads/main; commit \`$RELEASE_SHA\`"
+                echo '- CodeQL: skipped because .NET 11 is not yet supported; no CodeQL assurance is claimed.'
               } >> "$GITHUB_STEP_SUMMARY"
               exit 0
             fi
             if [[ "$attempt" -lt 20 ]]; then sleep 15; fi
           done
-          echo "::error::Services did not confirm canonical main at released SHA '$RELEASE_SHA' (SonarCloud=$sonar_ok; Codecov=$codecov_ok; CodeQL=$codeql_ok). Inspect service records; successful uploads alone do not establish assurance."
+          echo "::error::Services did not confirm canonical main at released SHA '$RELEASE_SHA' (SonarCloud=$sonar_ok; Codecov=$codecov_ok; CodeQL=skipped). Inspect service records; successful uploads alone do not establish assurance."
           exit 1
 
       - name: Report verified success
@@ -603,4 +609,5 @@ jobs:
             echo "## Shared verification passed"
             echo
             echo "Build and package validation passed. Required Linux and Windows tests passed; optional macOS and trusted-repository checks followed the workflow inputs and fork policy."
+            echo "CodeQL was skipped because .NET 11 is not yet supported; no CodeQL assurance is claimed."
           } >> "$GITHUB_STEP_SUMMARY"

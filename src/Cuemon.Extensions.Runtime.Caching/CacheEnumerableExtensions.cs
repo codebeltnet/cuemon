@@ -711,7 +711,7 @@ public static class CacheEnumerableExtensions
         };
     }
 
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
     private readonly static System.Threading.Lock PadLock = new();
 #else
     private readonly static object PadLock = new();

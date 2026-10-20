@@ -11,7 +11,7 @@ public abstract class Dependency : IDependency
 {
     private IEnumerable<IWatcher> _watchers;
     private readonly Func<EventHandler<WatcherEventArgs>, IEnumerable<IWatcher>> _watchersHandler;
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
     private readonly System.Threading.Lock _lock = new();
 #else
     private readonly object _lock = new();

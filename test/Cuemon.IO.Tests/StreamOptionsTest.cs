@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
 using System.Buffers;
 #endif
 using System.IO;
@@ -82,7 +82,7 @@ public class StreamOptionsTest : Test
         Assert.Equal(PreambleSequence.Remove, sut.Preamble);
     }
 
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
 
     [Fact]
     public void BufferWriterOptions_ShouldHaveExpectedDefaultsAndAllowCustomization()

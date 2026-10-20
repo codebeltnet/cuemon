@@ -203,7 +203,7 @@ public static class StreamDecoratorExtensions
         });
     }
 
-#if NETSTANDARD2_1_OR_GREATER || NET9_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET10_0_OR_GREATER
 
     /// <summary>
     /// Compress the enclosed <see cref="Stream"/> of the specified <paramref name="decorator"/> using the <c>Brotli</c> algorithm.
@@ -460,7 +460,7 @@ public static class StreamDecoratorExtensions
     {
         return AsyncPatterns.SafeInvokeAsync<Stream>(() => new MemoryStream(), async (target, ct) =>
         {
-#if NETSTANDARD2_1_OR_GREATER || NET9_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET10_0_OR_GREATER
             await using (var compressed = decompressor(target, options.Level, true))
             {
                 await Decorator.Enclose(decorator.Inner).CopyStreamAsync(compressed, options.BufferSize, ct: ct).ConfigureAwait(false);
@@ -496,7 +496,7 @@ public static class StreamDecoratorExtensions
     {
         return AsyncPatterns.SafeInvokeAsync<Stream>(() => new MemoryStream(), async (target, ct) =>
         {
-#if NETSTANDARD2_1_OR_GREATER || NET9_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET10_0_OR_GREATER
             await using (var uncompressed = compressor(decorator.Inner, CompressionMode.Decompress, true))
             {
                 await Decorator.Enclose(uncompressed).CopyStreamAsync(target, options.BufferSize, ct: ct).ConfigureAwait(false);

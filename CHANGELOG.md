@@ -42,6 +42,18 @@ The .NET update is straightforward: `net11.0` is now part of the target matrix a
 - `Resolve-PackageReleaseNotesConflicts.ps1` script improved to correctly handle and resolve merge conflict markers in all PackageReleaseNotes.txt files with more robust regex pattern matching,
 - Merge conflict resolution output cleaned up to remove spurious double line breaks and duplicate version entries.
 
+## [10.8.2] - 2026-10-25
+
+This is a patch release updating dependency and development tooling versions, moving the WSL test environment to Ubuntu 26.04, and splitting Docker test environments by .NET version.
+
+### Changed
+
+- Updated `Codebelt.Extensions.Xunit`, `Codebelt.Extensions.Xunit.Hosting`, and `Codebelt.Extensions.Xunit.Hosting.AspNetCore` from 12.0.1 to 12.0.2, `Codebelt.Extensions.BenchmarkDotNet.Console` from 1.3.4 to 1.3.5, and `Codebelt.Coverlet.MTP` from 10.1.0 to 10.1.1,
+- Updated the central versions of `Microsoft.Data.Sqlite`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.FileProviders.Physical`, `Microsoft.Extensions.Hosting`, `Microsoft.Extensions.Http`, and `Microsoft.Extensions.Options.ConfigurationExtensions` from 9.0.21 to 9.0.22 for .NET 9 and from 10.0.13 to 10.0.14 for .NET 10 and .NET Standard 2.0; also updated `Microsoft.Data.Sqlite` from 10.0.13 to 10.0.14 for .NET Framework,
+- Updated the central versions of `Microsoft.Bcl.AsyncInterfaces`, `Microsoft.Extensions.Configuration`, `Microsoft.Extensions.Configuration.EnvironmentVariables`, `Microsoft.Extensions.Configuration.FileExtensions`, `Microsoft.Extensions.Configuration.Json`, and `System.Text.Json` from 10.0.13 to 10.0.14 for .NET Standard 2.0,
+- Changed the `WSL-Ubuntu` test environment to use the `Ubuntu-26.04` WSL distribution instead of `Ubuntu-24.04`,
+- Replaced the single `Docker-Ubuntu` test environment using `codebeltnet/ubuntu-testrunner:8-9-10-11` with separate `Docker-Ubuntu (net9.0)`, `Docker-Ubuntu (net10.0)`, and `Docker-Ubuntu (net11.0)` environments using image tags `9`, `10`, and `11`, respectively.
+
 ## [10.8.1] - 2026-10-14
 
 This is a patch release refreshing the test and runtime package references and consolidating contributor guidance into `AGENTS.md`, with no changes to library source code.
@@ -1971,6 +1983,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[10.8.2]: https://github.com/codebeltnet/cuemon/compare/v10.8.1...v10.8.2
 [10.8.1]: https://github.com/codebeltnet/cuemon/compare/v10.8.0...v10.8.1
 [10.8.0]: https://github.com/codebeltnet/cuemon/compare/v10.7.1...v10.8.0
 [10.7.1]: https://github.com/codebeltnet/cuemon/compare/v10.7.0...v10.7.1

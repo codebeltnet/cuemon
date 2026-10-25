@@ -4,12 +4,22 @@
         {
             "name": "WSL-Ubuntu",
             "type": "wsl",
-            "wslDistribution": "Ubuntu-24.04"
+            "wslDistribution": "Ubuntu-26.04"
         },
         {
-            "name": "Docker-Ubuntu",
+            "name": "Docker-Ubuntu (net9.0)",
             "type": "docker",
-            "dockerImage": "codebeltnet/ubuntu-testrunner:8-9-10-11"
+            "dockerImage": "codebeltnet/ubuntu-testrunner:9"
+        },
+        {
+            "name": "Docker-Ubuntu (net10.0)",
+            "type": "docker",
+            "dockerImage": "codebeltnet/ubuntu-testrunner:10"
+        },
+        {
+            "name": "Docker-Ubuntu (net11.0)",
+            "type": "docker",
+            "dockerImage": "codebeltnet/ubuntu-testrunner:11"
         }
     ]
 }

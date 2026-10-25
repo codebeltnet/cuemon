@@ -18,7 +18,7 @@ This repository is part of the Codebelt .NET library estate. The instructions be
 - `.github/workflows/prerelease.yml` publishes tagged NuGet prereleases from long-lived .NET branches through a manual run.
 - `.github/workflows/release.yml` publishes packages from a version-tagged commit in `main` history; post-release assurance and DocFX production run after NuGet publication.
 - `.github/workflows/deploy.yml` promotes the published DocFX image without rebuilding it. See [Release and deployment](#release-and-deployment) for the CI/CD handoff.
-- `testenvironments.json` declares the supported `WSL-Ubuntu` and `Docker-Ubuntu` test environments.
+- `testenvironments.json` declares the supported `WSL-Ubuntu` environment and separate `Docker-Ubuntu (net9.0)`, `Docker-Ubuntu (net10.0)`, and `Docker-Ubuntu (net11.0)` test environments.
 
 ## Build
 
@@ -47,8 +47,10 @@ The CI test plan currently runs **38** project(s) and excludes **1** project(s).
 
 ## Integration and infrastructure
 
-- `WSL-Ubuntu` — WSL distribution `Ubuntu-24.04`.
-- `Docker-Ubuntu` — Docker image `codebeltnet/ubuntu-testrunner:8-9-10-11`.
+- `WSL-Ubuntu` — WSL distribution `Ubuntu-26.04`.
+- `Docker-Ubuntu (net9.0)` — Docker image `codebeltnet/ubuntu-testrunner:9`.
+- `Docker-Ubuntu (net10.0)` — Docker image `codebeltnet/ubuntu-testrunner:10`.
+- `Docker-Ubuntu (net11.0)` — Docker image `codebeltnet/ubuntu-testrunner:11`.
 
 This repository has `docker-compose.yml` with these services: `database`.
 

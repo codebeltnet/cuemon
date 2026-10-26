@@ -5,5 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Performance", "CA1835:Prefer the 'Memory'-based overloads for 'ReadAsync' and 'WriteAsync'", Justification = "Already fixed for .NET 5, but SonarCloud cannot figure out multiple framework support, eg. NETStandard 2.", Scope = "member", Target = "~M:Cuemon.Extensions.AspNetCore.Http.HttpResponseExtensions.WriteBodyAsync(Microsoft.AspNetCore.Http.HttpResponse,System.Func{System.Byte[]})~System.Threading.Tasks.Task")]
 [assembly: SuppressMessage("Globalization", "CA1304:Specify CultureInfo", Justification = "Not relevant in this context.", Scope = "member", Target = "~M:Cuemon.Extensions.AspNetCore.Configuration.AssemblyCacheBusting.#ctor(Microsoft.Extensions.Options.IOptions{Cuemon.Extensions.AspNetCore.Configuration.AssemblyCacheBustingOptions})")]

@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
-## [11.0.0] - 2026-10-15 (11.0.0-rc.2)
+## [11.0.0] - 2026-10-26 (11.0.0-rc.3)
 
 This is a major release centered on three deliberate changes: moving the Cuemon build and test matrix forward to .NET 11, completing the assembly boundary split by removing the compatibility bridge from `Cuemon.Core` to `Cuemon.Kernel`, and relocating configuration primitives (`Configurable` and `IConfigurable`) into the kernel layer. Additionally, comprehensive unit test coverage was added for XML serialization converters.
 

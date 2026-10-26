@@ -148,9 +148,7 @@ public sealed class Patterns
         where TResult : class, new()
     {
         var io = Configure(setup);
-        if (initializer == null)
-        {
-            initializer = (i, o) =>
+        initializer ??= (i, o) =>
             {
                 var match = false;
                 var typeOfInput = typeof(TSource);
@@ -172,7 +170,6 @@ public sealed class Patterns
                     throw new InvalidOperationException(FormattableString.Invariant($"Unable to use default converter for exchange of {nameof(TSource)} ({string.Join(", ", ips.Select(pi => pi.Name))}) with {nameof(TResult)} ({string.Join(", ", ops.Select(pi => pi.Name))}); no match on public read-write properties."));
                 }
             };
-        }
         return oo => initializer(io, oo);
     }
 

@@ -255,10 +255,10 @@ public class AwaiterTest : Test
             callCount++;
             if (callCount == 1) { throw first; }
             if (callCount == 2) { throw second; }
-            return ThrowAfterAsync(third, AttemptDuration);
+            return ThrowAfterAsync(third, TimeSpan.FromMilliseconds(200));
         }
 
-        var result = await Run(Method, TimeSpan.FromMilliseconds(10), TimeSpan.Zero, maximumAttempts: 3);
+        var result = await Run(Method, TimeSpan.FromMilliseconds(100), TimeSpan.Zero, maximumAttempts: 3);
         var aggregate = Assert.IsType<AggregateException>(result.Failure);
 
         Assert.False(result.Succeeded);

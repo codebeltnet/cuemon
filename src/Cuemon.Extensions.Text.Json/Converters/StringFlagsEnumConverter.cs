@@ -57,7 +57,7 @@ internal sealed class FlagsEnumConverter : JsonConverter<Enum>
             switch (reader.TokenType)
             {
                 case JsonTokenType.String:
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
                     result |= (int)Enum.Parse(TypeToConvert, reader.GetString(), true);
 #else
                     result |= (int)Enum.Parse(typeToConvert, reader.GetString(), true);
@@ -65,7 +65,7 @@ internal sealed class FlagsEnumConverter : JsonConverter<Enum>
                     break;
             }
         }
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         return Enum.ToObject(TypeToConvert, result) as Enum;
 #else
         return Enum.ToObject(typeToConvert, result) as Enum;

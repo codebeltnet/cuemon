@@ -48,7 +48,7 @@ public class JsonFormatter : StreamFormatter<JsonFormatterOptions>
         Validator.ThrowIfNull(source);
         Validator.ThrowIfNull(objectType);
 
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         return StreamFactory.Create(writer =>
         {
 

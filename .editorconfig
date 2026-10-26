@@ -13,45 +13,45 @@ tab_width = 2
 
 # This style rule concern the use of the range operator, which is available in C# 8.0 and later.
 # https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0057
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0057.severity = none
 
 # This style rule concerns the use of switch expressions versus switch statements.
 # https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0066
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0066.severity = none
 
 # Performance rules
 # https://docs.microsoft.com/da-dk/dotnet/fundamentals/code-analysis/quality-rules/performance-warnings
-[*.{cs,vb}]
+[*.cs]
 dotnet_analyzer_diagnostic.category-Performance.severity = none # Because many of the suggestions by performance analyzers are not compatible with .NET Standard 2.0
 
 # This style rule concerns the use of using statements without curly braces, also known as using declarations. This alternative syntax was introduced in C# 8.0.
 # https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0063
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0063.severity = none
 
 # This style rule concerns with simplification of interpolated strings to improve code readability. It recommends removal of certain explicit method calls, such as ToString(), when the same method would be implicitly invoked by the compiler if the explicit method call is removed.
 # https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0071
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0071.severity = none
 
 # S3267: Loops should be simplified with "LINQ" expressions
-# https://rules.sonarsource.com/csharp/RSPEC-3267
+# https://sonarcloud.io/organizations/sonarcloud/rules?open=csharpsquid:S3267&rule_key=csharpsquid:S3267
 dotnet_diagnostic.S3267.severity = none
 
 # CA1859: Use concrete types when possible for improved performance
 # This is a violation of Framework Design Guidelines.
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1859
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.CA1859.severity = none
 
 # IDE0008: Use explicit type
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0007-ide0008
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0008.severity = none
 
-[*.{cs,vb}]
+[*.cs]
 indent_style = space
 indent_size = 4
 
@@ -74,75 +74,75 @@ indent_size = 2
 
 # IDE0078: Use pattern matching
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0078
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0078.severity = none
 
 # IDE0290: Use primary constructor
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0290
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0290.severity = none
 
 # IDE0305: Use collection expression for fluent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0305
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0305.severity = none
 
 # IDE0011: Add braces
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0011
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0011.severity = none
 
 # IDE0028: Use collection initializers or expressions
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0028
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0028.severity = none
 
 # IDE0039: Use collection expression for array
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0300
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0300.severity = none
 
 # IDE0031: Use collection expression for empty
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0301
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0301.severity = none
 
 # IDE0046: Use conditional expression for return
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0046
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0046.severity = none
 
 # IDE0047: Parentheses preferences
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0047-ide0048
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0047.severity = none
 
 # CA1716: Identifiers should not match keywords
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1716
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.CA1716.severity = none
 
 # CA1720: Identifiers should not contain type names
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1720
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.CA1720.severity = none
 
 # CA1846: Prefer AsSpan over Substring
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1846
 # Excluded while TFMs include netstandard2.0
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.CA1846.severity = none
 
 # CA1847: Use String.Contains(char) instead of String.Contains(string) with single characters
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1847
 # Excluded while TFMs include netstandard2.0
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.CA1847.severity = none
 
 # CA1865-CA1867: Use 'string.Method(char)' instead of 'string.Method(string)' for string with single char
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1865-ca1867
 # Excluded while TFMs include netstandard2.0
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.CA1865.severity = none
 dotnet_diagnostic.CA1866.severity = none
 dotnet_diagnostic.CA1867.severity = none
@@ -150,27 +150,43 @@ dotnet_diagnostic.CA1867.severity = none
 # CA2263: Prefer generic overload when type is known
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2263
 # Excluded while TFMs include netstandard2.0
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.CA2263.severity = none
 
 # CA2249: Consider using String.Contains instead of String.IndexOf
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2249
 # Excluded while TFMs include netstandard2.0
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.CA2249.severity = none
 
 # IDE0022: Use expression body for methods
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0022
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0022.severity = none
 
 # IDE0032: Use auto-property
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0032
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0032.severity = none
 
 # Order modifiers
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0036
 # Excluded becuase of inconsistency with other analyzers
-[*.{cs,vb}]
+[*.cs]
 dotnet_diagnostic.IDE0036.severity = none
+
+# Use collection expression for new
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0306
+# Excluded becuase of inconsistency with other analyzers
+[*.cs]
+dotnet_diagnostic.IDE0306.severity = none
+
+# CA1016: Mark assemblies with AssemblyVersionAttribute
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1016
+[*.cs]
+dotnet_diagnostic.CA1016.severity = none
+
+# Sonar rule csharpsquid:S8970
+# https://sonarcloud.io/organizations/sonarcloud/rules?open=csharpsquid:S8970&rule_key=csharpsquid:S8970
+[*.cs]
+dotnet_diagnostic.S8970.severity = none

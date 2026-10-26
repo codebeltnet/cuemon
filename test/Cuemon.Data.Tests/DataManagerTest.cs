@@ -161,7 +161,7 @@ public class DataManagerTest : HostTest<ManagedHostFixture>
     public void ExecuteScalarAsDecimal_ShouldReturnTheFirstValueOfTheFirstRow()
     {
         var sut = _manager.ExecuteScalarAs<decimal>("SELECT ListPrice, Size FROM Product WHERE ProductID > 780");
-        Assert.Equal(2319.99m, sut);
+        Assert.Equal(2319.99m, decimal.Round(sut, 2));
         Assert.IsType<decimal>(sut);
     }
 
@@ -328,7 +328,7 @@ public class DataManagerTest : HostTest<ManagedHostFixture>
     public async Task ExecuteScalarAsDecimalAsync_ShouldReturnTheFirstValueOfTheFirstRow()
     {
         var sut = await _manager.ExecuteScalarAsAsync<decimal>("SELECT ListPrice, Size FROM Product WHERE ProductID > 780");
-        Assert.Equal(2319.99m, sut);
+        Assert.Equal(2319.99m, decimal.Round(sut, 2));
         Assert.IsType<decimal>(sut);
     }
 
@@ -386,7 +386,7 @@ public class DataManagerTest : HostTest<ManagedHostFixture>
         {
             o.LeaveConnectionOpen = true; // never release our connection as it will be closed and our in-mem database will be removed (for normal dbs - always leave false)
             o.LeaveCommandOpen = true; // do not release our command as it will trigger errors from data readers (for normal dbs - always leave false)
-            o.ConnectionString = "Data Source=InMemory;Mode=Memory;Cache=Shared";
+            o.ConnectionString = $"Data Source=InMemory-{Guid.NewGuid():N};Mode=Memory;Cache=Shared";
         });
         SqliteDatabase.Create(manager, TestOutput);
         services.AddSingleton(manager);

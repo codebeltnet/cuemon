@@ -196,7 +196,7 @@ public static class StreamExtensions
         return Decorator.Enclose(value).ToEncodedStringAsync(setup);
     }
 
-#if NETSTANDARD2_1_OR_GREATER || NET9_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET10_0_OR_GREATER
 
     /// <summary>
     /// Compresses the <paramref name="value"/> using the BROTLI algorithm.
@@ -311,7 +311,7 @@ public static class StreamExtensions
         return Decorator.Enclose(value).CompressGZipAsync(setup);
     }
 
-#if NETSTANDARD2_1_OR_GREATER || NET9_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET10_0_OR_GREATER
 
     /// <summary>
     /// Decompresses the <paramref name="value"/> using the BROTLI data format specification.

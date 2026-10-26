@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //  SHA512/256 Implementation for .NET - Cuemon.Security.Cryptography
 // -----------------------------------------------------------------------------
 //  This implementation provides a pure .NET version of SHA-512/256
@@ -67,9 +67,9 @@ public sealed class SHA512256 : HashAlgorithm
             0x2B0199FC2C85B8AA, 0x0EB72DDC81C52CA2
     };
 
-    private ulong[] _H = new ulong[8];
-    private ulong[] _W = new ulong[80];
-    private byte[] _buffer = new byte[BlockSize];
+    private readonly ulong[] _H = new ulong[8];
+    private readonly ulong[] _W = new ulong[80];
+    private readonly byte[] _buffer = new byte[BlockSize];
     private int _bufferPos;
     private ulong _bitCountHigh;
     private ulong _bitCountLow;

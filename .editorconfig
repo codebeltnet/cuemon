@@ -174,3 +174,9 @@ dotnet_diagnostic.IDE0032.severity = none
 # Excluded becuase of inconsistency with other analyzers
 [*.{cs,vb}]
 dotnet_diagnostic.IDE0036.severity = none
+
+# Use collection expression for new
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0306
+# Excluded becuase of inconsistency with other analyzers
+[*.{cs,vb}]
+dotnet_diagnostic.IDE0306.severity = none

@@ -2,8 +2,10 @@ Version: 11.0.0
 Availability: .NET 11 and .NET 10
 
 # ALM
-- ADDED Support for TFM .NET 11 (LTS)
-- REMOVED Support for TFM .NET 9 (STS)
+- CHANGED Target frameworks by adding .NET 11 (net11.0) and removing .NET 9 (net9.0), so the package now targets .NET 11 and .NET 10
+
+# Breaking Changes
+- REMOVED .NET 9 support; consumers must target .NET 10 or later
 
 Version: 10.8.2
 Availability: .NET 10 and .NET 9
@@ -113,10 +115,10 @@ Availability: .NET 10 and .NET 9
 
 Version 10.1.2
 Availability: .NET 10 and .NET 9
- 
+
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
- 
+
 Version 10.1.1
 Availability: .NET 10 and .NET 9
 

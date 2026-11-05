@@ -2,8 +2,8 @@ Version: 11.0.0
 Availability: .NET 11, .NET 10 and .NET Standard 2.0
 
 # ALM
-- ADDED Support for TFM .NET 11 (LTS)
-- REMOVED Support for TFM .NET 9 (STS)
+- CHANGED Target frameworks by adding .NET 11 (net11.0) and removing .NET 9 (net9.0), so the package now targets .NET 11, .NET 10 and .NET Standard 2.0
+- CHANGED .NET 9 consumers may resolve a .NET Standard asset when their API and dependencies are compatible
 
 Version: 10.8.2
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
@@ -117,10 +117,10 @@ Availability: .NET 10, .NET 9 and .NET Standard 2.0
 
 Version 10.1.2
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
- 
+
 # ALM
 - CHANGED Dependencies have been upgraded to the latest compatible versions for all supported target frameworks (TFMs)
- 
+
 Version 10.1.1
 Availability: .NET 10, .NET 9 and .NET Standard 2.0
 

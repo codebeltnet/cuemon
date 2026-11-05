@@ -8,39 +8,33 @@ For more details, please refer to `PackageReleaseNotes.txt` on a per assembly ba
 
 ## [11.0.0] - 2026-10-26 (11.0.0-rc.3)
 
-This is a major release centered on three deliberate changes: moving the Cuemon build and test matrix forward to .NET 11, completing the assembly boundary split by removing the compatibility bridge from `Cuemon.Core` to `Cuemon.Kernel`, and relocating configuration primitives (`Configurable` and `IConfigurable`) into the kernel layer. Additionally, comprehensive unit test coverage was added for XML serialization converters.
-
-The .NET update is straightforward: `net11.0` is now part of the target matrix and `net9.0` is no longer supported. The more important part is the assembly boundary change. Version 10.5.0 introduced `Cuemon.Kernel` while keeping `Cuemon.Core` backward compatible through `[TypeForwardedTo]`. Starting with 11.0.0, that forwarding layer is removed and configuration types join the kernel layer.
+This major release adds .NET 11 targets, removes .NET 9-specific targets, and changes the boundary between `Cuemon.Core` and `Cuemon.Kernel`. Packages that retain .NET Standard assets can still support compatible consumers through those assets; modern-only packages now require .NET 10 or later.
 
 > [!WARNING]
-> Breaking change from 11.0.0 and forward: applications using foundational APIs that were previously reachable through `Cuemon.Core` must now reference `Cuemon.Kernel` directly. This includes guard, configuration, async, and text primitives such as `Validator`, `Arguments`, `Patterns`, `Disposable`, `Convertible`, `Configurable`, `IConfigurable`, `Awaiter`, and parser/encoding option types, as well as date and range primitives such as `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, and `TimeUnit`.
-
-### Changed
-
-- Solution, source, test, and benchmark target frameworks now include `net11.0`; `net9.0` has been removed from the supported matrix,
-- Central package management was updated to align `net11.0` and `netstandard2.0` builds with .NET 11 preview package versions, while `net10.0` remains on the .NET 10 package line where applicable,
-- `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, and `TimeUnit` source files now live in `Cuemon.Kernel` as part of the completed kernel split,
-- `Configurable` and `IConfigurable` types now reside in the `Cuemon.Kernel` assembly; consumers must reference that assembly directly because type forwarding from `Cuemon.Core` has been removed,
-- `DelimitedString`, `DelimitedStringOptions`, and `FormattingOptions` moved from the `Cuemon.Core` assembly to the `Cuemon.Kernel` assembly; their namespace remains `Cuemon`,
-- `BufferWriterOptions` was updated to follow the new `NET10_0_OR_GREATER` conditional path,
-- Solution organization now groups `Cuemon.Core` and `Cuemon.Kernel` under a dedicated `/src/corelibs/` folder,
-- Test environment definitions now target Docker images for `net10` and `net11`,
-- `XmlConverterDecoratorExtensions` class in the Cuemon.Extensions.Xml.Serialization.Converters namespace was simplified for improved maintainability,
-- `Condition` class updated with `NET10_0_OR_GREATER` conditional compilation paths for `IsBase64` and `HasDifference` methods, reflecting removal of .NET 9 support.
+> `Cuemon.Core` no longer forwards kernel types, and several types move from the Core assembly to Kernel. Existing binaries that depend on the former assembly identities should be rebuilt and their references checked. `TimeRange` also replaces its two-argument constructor with a three-argument constructor whose duration delegate is optional at the source level.
 
 ### Added
 
-- Comprehensive unit test suite for XML serialization in `Cuemon.Xml.Tests` covering `XmlConverter`, `DefaultXmlConverter`, `ExceptionConverter`, `FailureConverter`, `DynamicXmlConverter`, and related serializer functionality,
-- Test assets `LinkResponse` and `WrapperResponse` in `Cuemon.Xml.Tests` for XML serialization validation.
+- A temporary .NET 11 test workflow accepts preview SDKs and uses absolute project paths to work around the SDK test-runner issue,
+- `Resolve-PackageReleaseNotesConflicts.ps1` resolves package release-note conflict markers and stages the resolved files when run,
+- Central transitive pins for `System.Security.Cryptography.Pkcs` use 10.0.14 for .NET 10 and 11.0.0-rc.3.26522.148 for .NET 11,
+- `SonarAnalyzer.CSharp` 10.35.0.4138 is configured for source projects,
+- `TimeRange` accepts an optional duration delegate, allowing callers to supply the duration calculation.
+
+### Changed
+
+- Source, test, and benchmark projects replace .NET 9-specific targets with .NET 11 targets while retaining their applicable .NET 10 and .NET Standard targets; package release notes specify each package's availability,
+- `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, `TimeUnit`, `DelimitedString`, `DelimitedStringOptions`, and `FormattingOptions` move from the `Cuemon.Core` assembly to `Cuemon.Kernel`,
+- `Cuemon.Core` removes type forwarding for foundational Kernel types, including `Configurable`, `IConfigurable`, `Validator`, `Arguments`, `Patterns`, `Disposable`, `Convertible`, and `Awaiter`,
+- The .NET Standard 2.0 central versions of `Microsoft.Bcl.AsyncInterfaces`, `Microsoft.Data.Sqlite`, `Microsoft.Extensions.Configuration`, `Microsoft.Extensions.Configuration.EnvironmentVariables`, `Microsoft.Extensions.Configuration.FileExtensions`, `Microsoft.Extensions.Configuration.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.FileProviders.Physical`, `Microsoft.Extensions.Hosting`, `Microsoft.Extensions.Http`, `Microsoft.Extensions.Options.ConfigurationExtensions`, and `System.Text.Json` move from 10.0.14 to 11.0.0-rc.3.26522.148; applicable .NET 11 dependencies use the same release candidate,
+- `Microsoft.Testing.Extensions.HangDump` moves from 2.5.1 to 2.5.2,
+- The DocFX image uses `dhi.io/nginx`; fingerprinted assets cache successful and revalidation responses but use `no-store` for other responses, and range requests are disabled for those assets,
+- Test environments retain separate .NET 10 and .NET 11 Docker runners and remove the .NET 9 runner,
+- Verification temporarily skips CodeQL and excludes it from post-release service identity checks while the branch targets .NET 11; the workflow does not claim CodeQL assurance.
 
 ### Removed
 
-- `Cuemon.Core` no longer uses `[TypeForwardedTo]` to forward foundational `Cuemon.Kernel` types, making the kernel split a true assembly boundary instead of a compatibility shim.
-
-### Fixed
-
-- `Resolve-PackageReleaseNotesConflicts.ps1` script improved to correctly handle and resolve merge conflict markers in all PackageReleaseNotes.txt files with more robust regex pattern matching,
-- Merge conflict resolution output cleaned up to remove spurious double line breaks and duplicate version entries.
+- The .NET 9-specific central package versions for `Microsoft.Data.Sqlite`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.FileProviders.Physical`, `Microsoft.Extensions.Hosting`, `Microsoft.Extensions.Http`, and `Microsoft.Extensions.Options.ConfigurationExtensions`.
 
 ## [10.8.2] - 2026-10-25
 
@@ -345,8 +339,7 @@ This is a minor release that introduces support for flattening items in enumerab
 
 - `World` class in the Cuemon.Globalization namespace to exclude redundancies in `RegionInfo` handling,
 - `XmlConverterExtensions` class in the Cuemon.Extensions.Xml.Serialization.Converters namespace to support flattening items when serializing in the `AddEnumerableConverter` method,
-- `XmlSerializerOptions` class in the `Cuemon.Xml.Serialization` namespace was extended with `FlattenCollectionItems` property to control item flattening during enumerable XML serialization,
-- 
+- `XmlSerializerOptions` class in the `Cuemon.Xml.Serialization` namespace was extended with `FlattenCollectionItems` property to control item flattening during enumerable XML serialization.
 
 ## [10.3.0] - 2026-02-19
 
@@ -537,9 +530,9 @@ This is a service update that focuses on package dependencies.
 
 ## [9.0.1] - 2024-01-28
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > The following projects has been removed with this release and migrated to [Codebelt](https://github.com/codebeltnet):
-> 
+>
 > - Cuemon.Extensions.Globalization was removed from the solution and migrated to [Codebelt.Extensions.Globalization](https://github.com/codebeltnet/globalization)
 >
 > Dependencies used for targeting .NET Standard 2.0 has been updated to use .NET 8.0 (LTS) instead of .NET Core 2.1.
@@ -552,9 +545,9 @@ This is a service update that primarily focuses on package dependencies and mino
 
 ## [9.0.0] - 2024-11-13
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > The following projects has been removed with this release and migrated to [Codebelt](https://github.com/codebeltnet):
-> 
+>
 > - Cuemon.Extensions.Xunit, Cuemon.Extensions.Xunit.Hosting and Cuemon.Extensions.Xunit.Hosting.AspNetCore was removed from the solution and migrated to [Codebelt.Extensions.Xunit](https://github.com/codebeltnet/xunit)
 > - Cuemon.Extensions.YamlDotNet was removed from the solution and migrated to [Codebelt.Extensions.YamlDotNet](https://github.com/codebeltnet/yamldotnet)
 > - Cuemon.Extensions.AspNetCore, Cuemon.Extensions.AspNetCore.Mvc and Cuemon.Extensions.Diagnostics was inflicted with a breaking change as a result of this migration due to removal of YAML related code
@@ -1496,7 +1489,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - FaultHandler class into Cuemon.Diagnostics namespace that provides a generic way to implement a fault resolver that evaluate an exception and provide details about it in a developer friendly way
 - FaultResolver class into Cuemon.Diagnostics namespace that a way to evaluate an exception and provide details about it in a developer friendly way
 - Int32Extensions class in the Cuemon.Extensions.AspNetCore.Http namespace that consist of extension methods for the Int32 struct: IsInformationStatusCode, IsSuccessStatusCode, IsRedirectionStatusCode, IsNotModifiedStatusCode, IsClientErrorStatusCode, IsServerErrorStatusCode
-- ApplicationBuilderExtensions class in the Cuemon.Extensions.AspNetCore.Authentication namespace that consist of extension methods for the IApplicationBuilder interface: UseBasicAuthentication, UseDigestAccessAuthentication, UseHmacAuthentication 
+- ApplicationBuilderExtensions class in the Cuemon.Extensions.AspNetCore.Authentication namespace that consist of extension methods for the IApplicationBuilder interface: UseBasicAuthentication, UseDigestAccessAuthentication, UseHmacAuthentication
 - ServiceCollectionExtensions class in the Cuemon.Extensions.AspNetCore.Authentication namespace that consist of extension methods for the IServiceCollection interface: AddInMemoryDigestAuthenticationNonceTracker
 - CollectionExtensions class in the Cuemon.Extensions.Collections.Generic namespace that consist of extension methods for the ICollection{T} interface: ToPartitioner{T}, AddRange{T}
 - DictionaryExtensions class in the Cuemon.Extensions.Collections.Generic namespace that consist of extension methods for the IDictionary{TKey, TValue} interface: GetValueOrDefault{TKey, TValue}, TryGetValueOrFallback{TKey, TValue}, ToEnumerable{TKey, TValue}, TryAdd{TKey, TValue}, TryAddOrUpdate{TKey, TValue}
@@ -1987,7 +1980,7 @@ This release was primarily focused on adapting a more modern way of performing C
 [10.8.1]: https://github.com/codebeltnet/cuemon/compare/v10.8.0...v10.8.1
 [10.8.0]: https://github.com/codebeltnet/cuemon/compare/v10.7.1...v10.8.0
 [10.7.1]: https://github.com/codebeltnet/cuemon/compare/v10.7.0...v10.7.1
-[11.0.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v11.0.0
+[11.0.0]: https://github.com/codebeltnet/cuemon/compare/v10.8.2...v11.0.0
 [10.7.0]: https://github.com/codebeltnet/cuemon/compare/v10.6.0...v10.7.0
 [10.6.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v10.6.0
 [10.5.5]: https://github.com/codebeltnet/cuemon/compare/v10.5.4...v10.5.5

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Reflection;
 using Cuemon.AspNetCore.Diagnostics;

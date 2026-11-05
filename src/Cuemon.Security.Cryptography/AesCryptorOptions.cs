@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using Cuemon.Configuration;
 
 namespace Cuemon.Security.Cryptography;

@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Extensions.AspNetCore.Http.Headers
 summary: *content
 ---

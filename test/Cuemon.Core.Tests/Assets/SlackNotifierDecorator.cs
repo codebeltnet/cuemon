@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Assets;
+namespace Cuemon.Assets;
 public class SlackNotifierDecorator : NotifierDecorator
 {
     public SlackNotifierDecorator(INotifier notifier) : base(notifier)

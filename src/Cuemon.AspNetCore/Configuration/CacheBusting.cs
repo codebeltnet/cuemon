@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Configuration;
+namespace Cuemon.AspNetCore.Configuration;
 /// <summary>
 /// Represents a way to provide cache-busting capabilities.
 /// </summary>

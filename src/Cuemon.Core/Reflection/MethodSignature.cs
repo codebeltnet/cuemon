@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Reflection;
+namespace Cuemon.Reflection;
 /// <summary>
 /// Represent the signature of a method in a lightweight format.
 /// </summary>

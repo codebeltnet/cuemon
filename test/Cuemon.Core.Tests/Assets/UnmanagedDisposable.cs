@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 #if NET48_OR_GREATER
 using NativeLibraryLoader;

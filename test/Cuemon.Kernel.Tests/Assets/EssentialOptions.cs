@@ -1,4 +1,4 @@
-﻿using Cuemon.Configuration;
+using Cuemon.Configuration;
 
 namespace Cuemon.Assets;
 public class EssentialOptions : IParameterObject

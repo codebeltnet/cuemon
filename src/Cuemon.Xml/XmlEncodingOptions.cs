@@ -1,4 +1,4 @@
-﻿using Cuemon.Text;
+using Cuemon.Text;
 
 namespace Cuemon.Xml;
 /// <summary>

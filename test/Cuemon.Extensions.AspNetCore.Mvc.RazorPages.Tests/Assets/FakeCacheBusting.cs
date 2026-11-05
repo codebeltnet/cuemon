@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.AspNetCore.Configuration;
 
 namespace Cuemon.Extensions.AspNetCore.Mvc.RazorPages.Assets;

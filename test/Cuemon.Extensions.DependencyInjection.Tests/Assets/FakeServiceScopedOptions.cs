@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Extensions.DependencyInjection.Assets;
+namespace Cuemon.Extensions.DependencyInjection.Assets;
 public class FakeServiceScopedOptions : FakeOptions
 {
     public FakeServiceScopedOptions()

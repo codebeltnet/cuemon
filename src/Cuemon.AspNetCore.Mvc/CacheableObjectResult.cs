@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Mvc;
+namespace Cuemon.AspNetCore.Mvc;
 /// <summary>
 /// Provides a base class for <see cref="ICacheableObjectResult"/> related operations.
 /// </summary>

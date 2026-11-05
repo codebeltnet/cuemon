@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Cuemon.AspNetCore.Configuration;
 using Codebelt.Extensions.Xunit;
 using Microsoft.Extensions.DependencyInjection;

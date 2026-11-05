@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.AspNetCore.Configuration;
 using Cuemon.Extensions.Data.Integrity;
 using Cuemon.Security.Cryptography;

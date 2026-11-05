@@ -1,4 +1,4 @@
-﻿using Codebelt.Extensions.Xunit;
+using Codebelt.Extensions.Xunit;
 using Xunit;
 
 namespace Cuemon.Security.Cryptography;

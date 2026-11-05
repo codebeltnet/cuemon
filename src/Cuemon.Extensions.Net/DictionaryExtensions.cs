@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Cuemon.Collections.Specialized;
 
 namespace Cuemon.Extensions.Net;

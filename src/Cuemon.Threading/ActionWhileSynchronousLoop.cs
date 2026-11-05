@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Cuemon.Threading;
 internal sealed class ActionWhileSynchronousLoop<TReader, TSource> : WhileSynchronousLoop<TReader, TSource>

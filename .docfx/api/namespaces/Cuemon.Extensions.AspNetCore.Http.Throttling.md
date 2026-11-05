@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Extensions.AspNetCore.Http.Throttling
 summary: *content
 ---

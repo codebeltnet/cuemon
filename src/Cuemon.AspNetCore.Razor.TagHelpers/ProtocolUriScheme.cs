@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Razor.TagHelpers;
+namespace Cuemon.AspNetCore.Razor.TagHelpers;
 /// <summary>
 /// Defines protocol URI schemes for static resource related operations.
 /// </summary>

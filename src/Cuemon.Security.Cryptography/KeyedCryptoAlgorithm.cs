@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Security.Cryptography;
+namespace Cuemon.Security.Cryptography;
 /// <summary>
 /// Specifies the different implementations for generating hash-based message authentication code values.
 /// </summary>

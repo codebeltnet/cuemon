@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Authentication.Hmac;
+namespace Cuemon.AspNetCore.Authentication.Hmac;
 /// <summary>
 /// A collection of constants for <see cref="HmacAuthorizationHeaderBuilder"/> and related.
 /// </summary>

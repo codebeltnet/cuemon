@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Cuemon.Configuration;
 
 namespace Cuemon.Data;

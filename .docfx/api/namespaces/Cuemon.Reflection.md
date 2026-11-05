@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Reflection
 summary: *content
 ---

@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Data.Integrity;
+namespace Cuemon.Data.Integrity;
 /// <summary>
 /// An interface that represents the integrity of data that is normally associated with an entity/resource.
 /// </summary>

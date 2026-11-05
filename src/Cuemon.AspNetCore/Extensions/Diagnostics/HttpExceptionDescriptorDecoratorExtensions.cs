@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Cuemon.Diagnostics;
 using Microsoft.AspNetCore.Mvc;

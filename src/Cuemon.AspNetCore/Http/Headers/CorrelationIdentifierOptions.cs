@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Configuration;
 using Cuemon.Messaging;
 using Cuemon.Net.Http;

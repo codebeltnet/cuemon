@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Codebelt.Extensions.Xunit.Hosting;
 using Codebelt.Extensions.Xunit.Hosting.AspNetCore;

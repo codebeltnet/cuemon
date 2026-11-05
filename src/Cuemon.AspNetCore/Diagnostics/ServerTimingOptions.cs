@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Configuration;
 using Cuemon.Diagnostics;
 using Microsoft.Extensions.Hosting;

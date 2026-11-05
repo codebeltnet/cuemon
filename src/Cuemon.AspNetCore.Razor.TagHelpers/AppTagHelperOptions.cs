@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Razor.TagHelpers;
+namespace Cuemon.AspNetCore.Razor.TagHelpers;
 /// <summary>
 /// Configuration options for <see cref="AppImageTagHelper"/>, <see cref="AppLinkTagHelper"/> and <see cref="AppScriptTagHelper"/>.
 /// </summary>

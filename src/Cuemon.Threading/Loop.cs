@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Cuemon.Threading;
 internal abstract class Loop<TOptions> where TOptions : AsyncOptions, new()

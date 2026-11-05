@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Extensions.Hosting;
+namespace Cuemon.Extensions.Hosting;
 /// <summary>
 /// Provides a set of constants for commonly used environment names.
 /// </summary>

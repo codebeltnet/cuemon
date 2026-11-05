@@ -1,4 +1,4 @@
-﻿using Cuemon.AspNetCore.Http;
+using Cuemon.AspNetCore.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

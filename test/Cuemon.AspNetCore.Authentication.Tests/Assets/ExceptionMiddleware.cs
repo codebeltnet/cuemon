@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Cuemon.AspNetCore.Builder;
 using Microsoft.AspNetCore.Builder;

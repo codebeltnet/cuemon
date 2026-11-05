@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 
 namespace Cuemon.Extensions.Net.Http;
 internal sealed class TrackingHttpMessageHandler : DelegatingHandler

@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Authentication.Basic;
+namespace Cuemon.AspNetCore.Authentication.Basic;
 /// <summary>
 /// Provides a way to fluently represent a HTTP Basic Authentication header.
 /// </summary>

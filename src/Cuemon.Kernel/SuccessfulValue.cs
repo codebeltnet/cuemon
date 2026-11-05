@@ -1,4 +1,4 @@
-﻿namespace Cuemon;
+namespace Cuemon;
 /// <summary>
 /// Provides a way to indicate a successful operation. This class cannot be inherited.
 /// </summary>

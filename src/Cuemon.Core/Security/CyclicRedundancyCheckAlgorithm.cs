@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Security;
+namespace Cuemon.Security;
 /// <summary>
 /// Different models of the CRC algorithm family.
 /// </summary>

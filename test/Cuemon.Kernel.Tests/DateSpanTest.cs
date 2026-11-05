@@ -1,4 +1,4 @@
-﻿using Codebelt.Extensions.Xunit;
+using Codebelt.Extensions.Xunit;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

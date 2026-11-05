@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Cuemon.AspNetCore.Mvc.Filters.Cacheable;
 /// <summary>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Claims;
 using Cuemon.AspNetCore.Authentication.Basic;
 using Codebelt.Extensions.Xunit;

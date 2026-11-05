@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Text;
 
 namespace Cuemon.Extensions.Text;

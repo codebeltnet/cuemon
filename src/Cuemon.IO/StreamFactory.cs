@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 #if NETSTANDARD2_1_OR_GREATER || NET10_0_OR_GREATER
 using System.Buffers;
 #endif

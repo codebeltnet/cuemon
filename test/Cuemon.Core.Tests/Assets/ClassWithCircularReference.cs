@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Assets;
+namespace Cuemon.Assets;
 public class ClassWithCircularReference
 {
     public ClassWithCircularReference()

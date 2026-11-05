@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Cuemon.AspNetCore.Http;
 using Cuemon.Collections.Generic;

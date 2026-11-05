@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Configuration;
+namespace Cuemon.Configuration;
 /// <summary>
 /// Denotes a Parameter Object that supports post-configuration logic after its public properties have been set.
 /// </summary>

@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Runtime.Serialization.Formatters
 summary: *content
 ---

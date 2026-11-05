@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.AspNetCore.Configuration
 summary: *content
 ---

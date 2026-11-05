@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Data.Integrity;
 using Codebelt.Extensions.Xunit;
 using Xunit;

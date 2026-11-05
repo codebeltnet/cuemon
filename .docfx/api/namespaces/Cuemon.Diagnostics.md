@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Diagnostics
 summary: *content
 ---

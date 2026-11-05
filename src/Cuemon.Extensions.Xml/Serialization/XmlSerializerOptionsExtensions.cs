@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Xml.Serialization;
 
 namespace Cuemon.Extensions.Xml.Serialization;

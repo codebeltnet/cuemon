@@ -1,4 +1,4 @@
-﻿using Cuemon.Extensions.IO;
+using Cuemon.Extensions.IO;
 using Cuemon.Extensions.Xml.Assets;
 using Codebelt.Extensions.Xunit;
 using Cuemon.Xml.Serialization.Formatters;

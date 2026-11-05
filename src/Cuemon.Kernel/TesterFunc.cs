@@ -1,4 +1,4 @@
-﻿namespace Cuemon;
+namespace Cuemon;
 /// <summary>
 /// Encapsulates a method and returns a value that indicates success of the type specified by the <typeparamref name="TSuccess" /> parameter and returns a out result value of the type specified by the <typeparamref name="TResult" /> parameter.
 /// </summary>

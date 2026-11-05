@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Cuemon.Configuration;
 using Cuemon.Text;
 using Microsoft.AspNetCore.Http;

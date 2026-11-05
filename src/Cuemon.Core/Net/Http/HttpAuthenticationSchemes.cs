@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Net.Http;
+namespace Cuemon.Net.Http;
 /// <summary>
 /// Defines constants for well-known HTTP authentication schemes.
 /// </summary>

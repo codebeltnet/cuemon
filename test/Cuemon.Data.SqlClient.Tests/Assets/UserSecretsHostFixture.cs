@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Cuemon.Collections.Generic;
 using Codebelt.Extensions.Xunit;
 using Codebelt.Extensions.Xunit.Hosting;

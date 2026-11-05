@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Extensions;
+namespace Cuemon.Extensions;
 /// <summary>
 /// Specifies a set of values defining a vertical direction.
 /// </summary>

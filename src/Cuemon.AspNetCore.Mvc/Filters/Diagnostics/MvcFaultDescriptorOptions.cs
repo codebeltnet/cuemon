@@ -1,4 +1,4 @@
-﻿using Cuemon.AspNetCore.Diagnostics;
+using Cuemon.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Cuemon.AspNetCore.Mvc.Filters.Diagnostics;

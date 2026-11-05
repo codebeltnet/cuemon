@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
 using Cuemon.Data;
 using Cuemon.Extensions.Reflection;

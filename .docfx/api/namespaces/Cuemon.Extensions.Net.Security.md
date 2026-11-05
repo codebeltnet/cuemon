@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Extensions.Net.Security
 summary: *content
 ---

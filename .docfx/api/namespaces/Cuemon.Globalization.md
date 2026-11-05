@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Globalization
 summary: *content
 ---

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Cuemon.Collections.Generic;
 using Cuemon.Extensions.AspNetCore.Mvc.Models;
 using Microsoft.AspNetCore.Mvc;

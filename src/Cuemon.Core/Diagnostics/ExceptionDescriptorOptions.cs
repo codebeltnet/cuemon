@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Diagnostics;
+namespace Cuemon.Diagnostics;
 /// <summary>
 /// Specifies options that is related to <see cref="ExceptionDescriptor"/> operations.
 /// </summary>

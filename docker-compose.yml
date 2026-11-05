@@ -1,4 +1,4 @@
-﻿services:
+services:
   database:
     image: gimlichael/aw-mssql-server:2022-latest.20240920.1
     container_name: "awsql"

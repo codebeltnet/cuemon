@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Security.Cryptography;
+namespace Cuemon.Security.Cryptography;
 /// <summary>
 /// Specifies the size of the Advanced Encryption Standard (AES) symmetric algorithm.
 /// </summary>

@@ -1,4 +1,4 @@
-﻿using Cuemon.Configuration;
+using Cuemon.Configuration;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Cuemon.AspNetCore.Mvc.Formatters;

@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Assets;
+namespace Cuemon.Assets;
 public class TwitterNotifierDecorator : NotifierDecorator
 {
     public TwitterNotifierDecorator(INotifier notifier) : base(notifier)

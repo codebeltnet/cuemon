@@ -1,4 +1,4 @@
-﻿using Cuemon.Extensions.Text.Json.Formatters;
+using Cuemon.Extensions.Text.Json.Formatters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 

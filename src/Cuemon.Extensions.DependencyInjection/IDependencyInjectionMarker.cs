@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Extensions.DependencyInjection;
+namespace Cuemon.Extensions.DependencyInjection;
 /// <summary>
 /// Defines a generic way to support multiple implementations of a given service for Microsoft Dependency Injection.
 /// </summary>

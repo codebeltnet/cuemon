@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Cuemon.AspNetCore.Http;

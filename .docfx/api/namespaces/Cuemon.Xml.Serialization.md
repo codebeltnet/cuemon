@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Xml.Serialization
 summary: *content
 ---

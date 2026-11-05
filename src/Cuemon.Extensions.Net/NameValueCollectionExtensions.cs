@@ -1,4 +1,4 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using Cuemon.Net;
 using Cuemon.Net.Collections.Specialized;
 

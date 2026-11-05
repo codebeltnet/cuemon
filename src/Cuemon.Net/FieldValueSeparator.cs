@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Net;
+namespace Cuemon.Net;
 /// <summary>
 /// Specifies a range of key-value separators.
 /// </summary>

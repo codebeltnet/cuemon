@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Cuemon.IO;
 
 namespace Cuemon.Data.Integrity;

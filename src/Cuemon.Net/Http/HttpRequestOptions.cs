@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using Cuemon.Threading;
 
 namespace Cuemon.Net.Http;

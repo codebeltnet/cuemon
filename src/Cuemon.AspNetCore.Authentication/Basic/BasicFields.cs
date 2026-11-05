@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Authentication.Basic;
+namespace Cuemon.AspNetCore.Authentication.Basic;
 /// <summary>
 /// A collection of constants for <see cref="BasicAuthorizationHeaderBuilder"/>.
 /// </summary>

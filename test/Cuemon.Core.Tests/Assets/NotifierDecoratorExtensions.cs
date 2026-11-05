@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Assets;
+namespace Cuemon.Assets;
 public static class NotifierDecoratorExtensions
 {
     public static string Send(this IDecorator<INotifier> decorator, bool facebook = false, bool slack = false, bool twitter = false)

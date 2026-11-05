@@ -96,9 +96,7 @@ docker compose down
 - Keep existing style in files; many modern analyzers are explicitly disabled.
 
 ### Namespace Style
-- **Prefer file-scoped namespaces** (`namespace Cuemon.Foo;`) for new files.
-- The current majority of the codebase uses **block-scoped namespaces** — do not convert existing files unless explicitly asked.
-- When editing an existing file, follow whichever style that file already uses.
+- **Use file-scoped namespaces** (`namespace Cuemon.Foo;`) for new and existing C# files.
 - **Never use top-level statements.** Always use explicit class declarations with a proper namespace.
 
 ### Disabled Analyzers (key rules — do NOT introduce these patterns)

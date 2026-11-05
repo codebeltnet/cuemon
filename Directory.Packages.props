@@ -12,8 +12,8 @@
     <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting" Version="12.0.2" />
     <PackageVersion Include="Codebelt.Extensions.Xunit.Hosting.AspNetCore" Version="12.0.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
-    <PackageVersion Include="Codebelt.Coverlet.MTP" Version="10.1.1" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.5.1" />
+    <PackageVersion Include="Codebelt.Coverlet.MTP" Version="10.1.2" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.5.2" />
     <PackageVersion Include="MinVer" Version="8.0.0" />
     <PackageVersion Include="NativeLibraryLoader" Version="1.0.13" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" Condition="'$(MSBuildProjectName)' == 'Cuemon.Core.Tests'" />
@@ -25,7 +25,7 @@
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.35.0.4138" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.14" />
     <!-- Broken from 11.0.0-preview.7.26381.103 where MS decided to only support modern .net (worked previously in preview.6) -->
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard2'))">

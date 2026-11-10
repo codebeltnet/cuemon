@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Xunit.v3.Priority" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\src\Cuemon.Runtime.Caching\Cuemon.Runtime.Caching.csproj" />
   </ItemGroup>
 

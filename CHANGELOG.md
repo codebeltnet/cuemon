@@ -8,26 +8,28 @@ For more details, please refer to `PackageReleaseNotes.txt` on a per assembly ba
 
 ## [11.0.0] - 2026-11-10
 
-This major release adds .NET 11 targets, removes .NET 9-specific targets, and changes the boundary between `Cuemon.Core` and `Cuemon.Kernel`. Packages that retain .NET Standard assets can still support compatible consumers through those assets; modern-only packages now require .NET 10 or later.
+This major release adds .NET 11 targets, removes .NET 9-specific targets, and changes the assembly boundary between `Cuemon.Core` and `Cuemon.Kernel`. It also updates dependencies and uses asynchronous cleanup for commands and streams on .NET 10 and later.
 
 > [!WARNING]
-> `Cuemon.Core` no longer forwards kernel types, and several types move from the Core assembly to Kernel. Existing binaries that depend on the former assembly identities should be rebuilt and their references checked. `TimeRange` also replaces its two-argument constructor with a three-argument constructor whose duration delegate is optional at the source level.
+> `Cuemon.Core` no longer forwards Kernel types, and several types move from Core to Kernel. Existing binaries that depend on the former assembly identities should be rebuilt and their references checked. `TimeRange` replaces its two-argument constructor with a three-argument constructor whose duration delegate is optional at the source level.
 
 ### Added
 
-- A temporary .NET 11 test workflow accepts preview SDKs and uses absolute project paths to work around the SDK test-runner issue,
-- `Resolve-PackageReleaseNotesConflicts.ps1` resolves package release-note conflict markers and stages the resolved files when run,
-- Central transitive pins for `System.Security.Cryptography.Pkcs` use 10.0.15 for .NET 10 and 11.0.0 for .NET 11,
+- `TimeRange` accepts an optional duration delegate, allowing callers to supply the duration calculation,
 - `SonarAnalyzer.CSharp` 10.35.0.4138 is configured for source projects,
-- `TimeRange` accepts an optional duration delegate, allowing callers to supply the duration calculation.
+- Central transitive pins for `System.Security.Cryptography.Pkcs` use 10.0.15 for .NET 10 and 11.0.0 for .NET 11,
+- A .NET 11 test workflow accepts preview SDKs and uses absolute project paths as a workaround for an SDK test-runner issue,
+- `Resolve-PackageReleaseNotesConflicts.ps1` resolves package release-note conflict markers and stages the resolved files when run.
 
 ### Changed
 
-- Source, test, and benchmark projects replace .NET 9-specific targets with .NET 11 targets while retaining their applicable .NET 10 and .NET Standard targets; package release notes specify each package's availability,
+- Source, test, and benchmark projects replace .NET 9-specific targets with .NET 11 targets while retaining their applicable .NET 10, .NET Standard, and .NET Framework targets,
 - `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, `TimeUnit`, `DelimitedString`, `DelimitedStringOptions`, and `FormattingOptions` move from the `Cuemon.Core` assembly to `Cuemon.Kernel`,
 - `Cuemon.Core` removes type forwarding for foundational Kernel types, including `Configurable`, `IConfigurable`, `Validator`, `Arguments`, `Patterns`, `Disposable`, `Convertible`, and `Awaiter`,
-- The .NET Standard 2.0 central versions of `Microsoft.Bcl.AsyncInterfaces`, `Microsoft.Data.Sqlite`, `Microsoft.Extensions.Configuration`, `Microsoft.Extensions.Configuration.EnvironmentVariables`, `Microsoft.Extensions.Configuration.FileExtensions`, `Microsoft.Extensions.Configuration.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.FileProviders.Physical`, `Microsoft.Extensions.Hosting`, `Microsoft.Extensions.Http`, `Microsoft.Extensions.Options.ConfigurationExtensions`, and `System.Text.Json` move from 10.0.14 to 11.0.0-rc.3.26522.148; applicable .NET 11 dependencies use the same release candidate,
-- `Microsoft.Testing.Extensions.HangDump` moves from 2.5.1 to 2.5.2,
+- `DataManager` asynchronously disposes commands after asynchronous execution, and `StreamDecoratorExtensions.ToByteArrayAsync` asynchronously disposes its input stream when configured to close it, on .NET 10 and later,
+- The .NET Standard 2.0 central versions of `Microsoft.Bcl.AsyncInterfaces`, `Microsoft.Data.Sqlite`, `Microsoft.Extensions.Configuration`, `Microsoft.Extensions.Configuration.EnvironmentVariables`, `Microsoft.Extensions.Configuration.FileExtensions`, `Microsoft.Extensions.Configuration.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.FileProviders.Physical`, `Microsoft.Extensions.Hosting`, `Microsoft.Extensions.Http`, `Microsoft.Extensions.Options.ConfigurationExtensions`, and `System.Text.Json` move from 10.0.14 to 11.0.0; applicable .NET 11 declarations also use 11.0.0,
+- The .NET 10 central versions of `Microsoft.Data.Sqlite`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.FileProviders.Physical`, `Microsoft.Extensions.Hosting`, `Microsoft.Extensions.Http`, and `Microsoft.Extensions.Options.ConfigurationExtensions` move from 10.0.14 to 10.0.15; the .NET Framework `Microsoft.Data.Sqlite` version also moves to 10.0.15,
+- Test tooling updates `Codebelt.Coverlet.MTP` from 10.1.1 to 10.1.2, `Microsoft.Testing.Extensions.HangDump` from 2.5.1 to 2.5.2, and `xunit.v3`, `xunit.v3.extensibility.core`, and `xunit.v3.runner.console` from 4.0.2 to 4.0.3,
 - The DocFX image uses `dhi.io/nginx`; fingerprinted assets cache successful and revalidation responses but use `no-store` for other responses, and range requests are disabled for those assets,
 - Test environments retain separate .NET 10 and .NET 11 Docker runners and remove the .NET 9 runner,
 - Verification temporarily skips CodeQL and excludes it from post-release service identity checks while the branch targets .NET 11; the workflow does not claim CodeQL assurance.

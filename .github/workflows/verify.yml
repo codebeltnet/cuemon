@@ -467,9 +467,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   codeql:
-    # Temporarily disabled: CodeQL supports up to .NET 10, while this branch targets .NET 11.
-    # Restore main's condition when .NET 11 is supported.
-    if: ${{ false }}
+    if: ${{always() && needs.init.outputs.run-privileged-jobs == 'true' && needs.build.result == 'success' && needs.test_qualitygate.result == 'success'}}
     name: call-codeql
     needs: [init, build, test_qualitygate]
     uses: codebeltnet/jobs-codeql/.github/workflows/default.yml@v3
@@ -535,15 +533,14 @@ jobs:
             exit 1
           fi
           require_success "test_qualitygate" "$TEST_RESULT"
-          require_skipped "codeql" "$CODEQL_RESULT"
-          echo "::notice::CodeQL is explicitly excluded from .NET 11 verification until supported."
-
           if [[ "$RUN_PRIVILEGED_JOBS" == "true" ]]; then
             require_success "sonarcloud" "$SONAR_RESULT"
             require_success "codecov" "$CODECOV_RESULT"
+            require_success "codeql" "$CODEQL_RESULT"
           else
             require_skipped "sonarcloud" "$SONAR_RESULT"
             require_skipped "codecov" "$CODECOV_RESULT"
+            require_skipped "codeql" "$CODEQL_RESULT"
           fi
 
       - name: Verify service records for main at the released SHA

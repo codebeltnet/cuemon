@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
-## [11.0.0] - 2026-10-26 (11.0.0-rc.3)
+## [11.0.0] - 2026-11-10
 
 This major release adds .NET 11 targets, removes .NET 9-specific targets, and changes the boundary between `Cuemon.Core` and `Cuemon.Kernel`. Packages that retain .NET Standard assets can still support compatible consumers through those assets; modern-only packages now require .NET 10 or later.
 
@@ -17,7 +17,7 @@ This major release adds .NET 11 targets, removes .NET 9-specific targets, and ch
 
 - A temporary .NET 11 test workflow accepts preview SDKs and uses absolute project paths to work around the SDK test-runner issue,
 - `Resolve-PackageReleaseNotesConflicts.ps1` resolves package release-note conflict markers and stages the resolved files when run,
-- Central transitive pins for `System.Security.Cryptography.Pkcs` use 10.0.14 for .NET 10 and 11.0.0-rc.3.26522.148 for .NET 11,
+- Central transitive pins for `System.Security.Cryptography.Pkcs` use 10.0.15 for .NET 10 and 11.0.0 for .NET 11,
 - `SonarAnalyzer.CSharp` 10.35.0.4138 is configured for source projects,
 - `TimeRange` accepts an optional duration delegate, allowing callers to supply the duration calculation.
 

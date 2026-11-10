@@ -72,7 +72,7 @@ public static class Awaiter
             attemptToken.ThrowIfCancellationRequested();
             attemptCount++;
             TimeSpan retryDelay;
-            var stopAfterDelay = false;
+            bool stopAfterDelay;
 
             ConditionalValue conditionalValue;
             try

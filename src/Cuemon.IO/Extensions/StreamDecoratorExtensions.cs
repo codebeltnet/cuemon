@@ -113,7 +113,11 @@ public static class StreamDecoratorExtensions
         {
             if (!options.LeaveOpen)
             {
+#if NET10_0_OR_GREATER
+                if (decorator.Inner != null) { await decorator.Inner.DisposeAsync().ConfigureAwait(false); }
+#else
                 decorator.Inner.Dispose();
+#endif
             }
         }
     }

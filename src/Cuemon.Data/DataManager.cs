@@ -354,7 +354,11 @@ public abstract class DataManager : Configurable<DataManagerOptions>
         {
             if (!Options.LeaveCommandOpen)
             {
+#if NET10_0_OR_GREATER
+                if (command != null) { await command.DisposeAsync().ConfigureAwait(false); }
+#else
                 command?.Dispose();
+#endif
             }
         }
         return result;

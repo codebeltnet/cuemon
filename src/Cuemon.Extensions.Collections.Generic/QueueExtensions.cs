@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0_OR_GREATER
+#if NETSTANDARD2_0_OR_GREATER
 using System.Collections.Generic;
 
 namespace Cuemon.Extensions.Collections.Generic;

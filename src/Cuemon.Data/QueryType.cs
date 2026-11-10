@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Data;
+namespace Cuemon.Data;
 /// <summary>
 /// Identifies the type of data operation performed by a query against a data source.
 /// </summary>

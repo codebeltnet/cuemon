@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using Cuemon.Extensions.AspNetCore.Xml.Converters;
 using Cuemon.Xml.Serialization.Formatters;
 

@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Configuration
 summary: *content
 ---

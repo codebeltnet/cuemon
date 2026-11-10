@@ -1,4 +1,4 @@
-﻿namespace Cuemon;
+namespace Cuemon;
 /// <summary>
 /// Defines the order in which a sequence of bytes are represented.
 /// </summary>

@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Data.Xml
 summary: *content
 ---

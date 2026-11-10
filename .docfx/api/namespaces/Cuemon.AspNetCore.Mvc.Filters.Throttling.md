@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.AspNetCore.Mvc.Filters.Throttling
 summary: *content
 ---

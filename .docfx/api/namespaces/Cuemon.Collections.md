@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Collections
 summary: *content
 ---

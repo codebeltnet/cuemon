@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Extensions.DependencyInjection
 summary: *content
 ---

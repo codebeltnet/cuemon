@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Extensions.AspNetCore.Xml.Converters
 summary: *content
 ---

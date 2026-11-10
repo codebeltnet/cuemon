@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Cuemon.AspNetCore.Http.Throttling;
 using Cuemon.AspNetCore.Mvc.Assets;

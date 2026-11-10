@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Net;
+namespace Cuemon.Net;
 internal static class Infrastructure
 {
     internal static bool NotEncoded(char c)

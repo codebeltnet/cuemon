@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Collections.Generic;
 using Cuemon.Globalization;
 

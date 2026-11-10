@@ -72,7 +72,7 @@ public static class Awaiter
             attemptToken.ThrowIfCancellationRequested();
             attemptCount++;
             TimeSpan retryDelay;
-            var stopAfterDelay = false;
+            bool stopAfterDelay;
 
             ConditionalValue conditionalValue;
             try
@@ -134,7 +134,7 @@ public static class Awaiter
 
     private static TimeSpan GetElapsedTime(long startedAt)
     {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         return Stopwatch.GetElapsedTime(startedAt);
 #else
         var elapsedTimestamp = Stopwatch.GetTimestamp() - startedAt;

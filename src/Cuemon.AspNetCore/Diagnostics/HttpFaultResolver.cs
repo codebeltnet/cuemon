@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Diagnostics;
 
 namespace Cuemon.AspNetCore.Diagnostics;

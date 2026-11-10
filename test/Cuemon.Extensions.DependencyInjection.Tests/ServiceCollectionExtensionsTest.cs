@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Cuemon.Configuration;
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
 using Cuemon.AspNetCore.Diagnostics;
 using Cuemon.AspNetCore.Mvc.Filters.Diagnostics;
 using Cuemon.Extensions.Text.Json.Formatters;
@@ -1327,7 +1327,7 @@ public class ServiceCollectionExtensionsTest : Test
         Assert.Null(sut9);
     }
 
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
 
     [Fact]
     public void TryConfigure_ShouldAddConfigureOptions()

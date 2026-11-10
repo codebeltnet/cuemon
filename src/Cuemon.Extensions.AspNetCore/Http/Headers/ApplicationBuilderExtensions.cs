@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.AspNetCore.Builder;
 using Cuemon.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Builder;

@@ -5,7 +5,7 @@ This repository is part of the Codebelt .NET library estate. The instructions be
 ## Before you start
 
 - Read the repository `README.md` and open an issue before starting a non-trivial feature or behavioral change.
-- Use an installed .NET SDK that can build the target frameworks listed below. This repository currently targets: **net10.0, net48, net9.0, netstandard2.0, netstandard2.1**.
+- Use an installed .NET SDK that can build the target frameworks listed below. This repository currently targets: **net11.0, net10.0, net48, netstandard2.0, netstandard2.1**.
 - The solution is `Cuemon.slnx`. Central package versions are maintained in `Directory.Packages.props`.
 - The shared build behavior is in `Directory.Build.props` and `Directory.Build.targets`; repository-specific TFMs, package references and metadata remain local to this library.
 
@@ -18,7 +18,7 @@ This repository is part of the Codebelt .NET library estate. The instructions be
 - `.github/workflows/prerelease.yml` publishes tagged NuGet prereleases from long-lived .NET branches through a manual run.
 - `.github/workflows/release.yml` publishes packages from a version-tagged commit in `main` history; post-release assurance and DocFX production run after NuGet publication.
 - `.github/workflows/deploy.yml` promotes the published DocFX image without rebuilding it. See [Release and deployment](#release-and-deployment) for the CI/CD handoff.
-- `testenvironments.json` declares the supported `WSL-Ubuntu` environment and separate `Docker-Ubuntu (net9.0)`, `Docker-Ubuntu (net10.0)`, and `Docker-Ubuntu (net11.0)` test environments.
+- `testenvironments.json` declares the supported `WSL-Ubuntu` environment and separate `Docker-Ubuntu (net10.0)` and `Docker-Ubuntu (net11.0)` test environments.
 
 ## Build
 
@@ -48,7 +48,6 @@ The CI test plan currently runs **38** project(s) and excludes **1** project(s).
 ## Integration and infrastructure
 
 - `WSL-Ubuntu` — WSL distribution `Ubuntu-26.04`.
-- `Docker-Ubuntu (net9.0)` — Docker image `codebeltnet/ubuntu-testrunner:9`.
 - `Docker-Ubuntu (net10.0)` — Docker image `codebeltnet/ubuntu-testrunner:10`.
 - `Docker-Ubuntu (net11.0)` — Docker image `codebeltnet/ubuntu-testrunner:11`.
 
@@ -78,9 +77,9 @@ Package-specific release notes live under `.nuget/<ProjectName>/PackageReleaseNo
 
 ### Prereleases from long-lived .NET branches
 
-Use **.NET Prerelease Flow** (`prerelease.yml`) for Preview and Release Candidate packages developed on long-lived branches, such as `v11.0.0/double-digits` and future .NET 12 branches. Keep this workflow and its shared verification inputs/outputs on `main` and in each development branch. GitHub requires the workflow's manual trigger on the default branch before it appears in the Actions UI. The existing `Production` environment's deployment branch rules must also allow the intended development branches.
+Use **.NET Prerelease Flow** (`prerelease.yml`) for Preview and Release Candidate packages developed on long-lived branches for upcoming .NET releases, such as .NET 12. Keep this workflow and its shared verification inputs/outputs on `main` and in each development branch. GitHub requires the workflow's manual trigger on the default branch before it appears in the Actions UI. The existing `Production` environment's deployment branch rules must also allow the intended development branches.
 
-Tag the intended branch tip and push the branch and tag, for example `v11.0.0-rc.2`. In **Actions → .NET Prerelease Flow → Run workflow**, select that development branch. The workflow checks out the triggering commit, requires an existing SemVer prerelease tag at that commit, and requires MinVer's calculated version to match the tag. The same flow accepts future versions such as `v12.0.0-preview.1`; no workflow version changes are required.
+Tag the intended branch tip and push the branch and tag, for example `v12.0.0-preview.1` or `v12.0.0-rc.1`. In **Actions → .NET Prerelease Flow → Run workflow**, select that development branch. The workflow checks out the triggering commit, requires an existing SemVer prerelease tag at that commit, and requires MinVer's calculated version to match the tag. No workflow version changes are required for future package versions. SDK installation uses stable releases by default; branches targeting a preview SDK must opt in to preview SDK installation in their workflows.
 
 Shared verification builds signed Debug and Release packages, runs the Linux and Windows test matrices and SQL integration tests, and requires SonarCloud and Codecov success. macOS is optional. CodeQL follows the shared workflow's explicit support policy. Analysis retains the selected development branch identity rather than reporting canonical main. After verification, package validation checks the existing `Verification-NuGet-Release` artifact before the protected `Production` job publishes that same artifact to NuGet. No packages are rebuilt for publication.
 

@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Data;
+namespace Cuemon.Data;
 /// <summary>
 /// Identifies the format for a query fragment.
 /// </summary>

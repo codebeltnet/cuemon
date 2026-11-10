@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Http.Headers;
+namespace Cuemon.AspNetCore.Http.Headers;
 /// <summary>
 /// The exception that is thrown when the requirements of an API key header is not meet.
 /// </summary>

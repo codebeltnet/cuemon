@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Assets;
+namespace Cuemon.Assets;
 public class FacebookNotifierDecorator : NotifierDecorator
 {
     public FacebookNotifierDecorator(INotifier notifier) : base(notifier)

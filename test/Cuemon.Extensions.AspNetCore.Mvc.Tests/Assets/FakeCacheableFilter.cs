@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Cuemon.AspNetCore.Mvc.Filters.Cacheable;
 using Cuemon.Configuration;

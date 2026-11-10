@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Runtime.Caching
 summary: *content
 ---

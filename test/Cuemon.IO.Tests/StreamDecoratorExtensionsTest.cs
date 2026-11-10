@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,7 +15,7 @@ public class StreamDecoratorExtensionsTest : Test
     {
     }
 
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
 
     [Fact]
     public void CompressBrotli_ShouldCompressAndDecompress()

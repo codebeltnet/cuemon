@@ -5,9 +5,9 @@
 An open-source project (MIT license) that enhances and complements the Microsoft .NET platform. It provides powerful capabilities for developers across modern, cross-platform, and legacy environments.
 
 Your versatile companion for:
-- Modern development with `.NET 9` and `.NET 10`,
-- Cross-platform libraries with `.NET Standard 2` (where applicable),
-- Legacy applications on `.NET Framework 4.6.2` and newer.
+- Modern development with `.NET 10` and `.NET 11`,
+- Cross-platform libraries targeting `.NET Standard 2.0` and `.NET Standard 2.1` where applicable,
+- Legacy applications on `.NET Framework 4.6.2` and newer through packages that target `.NET Standard 2.0`.
 
 It is (by heart) free, flexible and built to extend and boost your agile codebelt.
 
@@ -17,9 +17,9 @@ It is (by heart) free, flexible and built to extend and boost your agile codebel
 
 ## State of the Union
 
-Cuemon for .NET (formerly Cuemon .NET Standard) has been completely refactored and updated to support .NET 10 (LTS) and .NET 9 (STS).
+Cuemon for .NET packages target `.NET 11` and `.NET 10`; target-framework coverage varies by package. Many packages also target `.NET Standard 2.0`, and `Cuemon.IO` and `Cuemon.Extensions.IO` also target `.NET Standard 2.1.
 
-Support for .NET Core 3.0, .NET Core 3.1, .NET 5, .NET 6, .NET 7 and .NET 8 has been deprecated as these are either out of [support](https://endoflife.date/dotnet) or superseded by newer LTS and STS releases.
+Dedicated `.NET 9` targets have been removed. Packages with a `.NET Standard` target may still be consumed by `.NET 9` projects when their APIs and dependencies are compatible. Support for .NET Core 3.0, .NET Core 3.1, and .NET 5 through .NET 8 has been retired because those runtimes are out of [support](https://endoflife.date/dotnet).
 
 This aligns with our strategy of supporting only the latest LTS and STS versions of .NET to ensure access to the most current features, performance improvements, and security updates, while keeping our libraries modern and maintainable.
 

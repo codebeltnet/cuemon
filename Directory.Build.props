@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsSourceProject)' == 'true'">
-    <TargetFrameworks>net10.0;net9.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net11.0;net10.0;netstandard2.0</TargetFrameworks>
     <Copyright>Copyright © Geekle 2009-2026. All rights reserved.</Copyright>
     <Authors>gimlichael</Authors>
     <Company>Geekle</Company>
@@ -53,16 +53,17 @@
 
   <ItemGroup Condition="'$(IsSourceProject)' == 'true'">
     <PackageReference Include="MinVer" PrivateAssets="all" />
+    <PackageReference Include="SonarAnalyzer.CSharp" PrivateAssets="all" />
     <None Include="..\..\.nuget\icon.png" Pack="true" Visible="false" PackagePath="icon.png" />
     <None Include="..\..\.nuget\$(MSBuildProjectName)\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(IsTestProject)' == 'true' AND ('$(IsLinux)' == 'true' OR '$(IsMacOS)' == 'true')">
-    <TargetFrameworks>net10.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net11.0;net10.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsTestProject)' == 'true' AND '$(IsWindows)' == 'true'">
-    <TargetFrameworks>net10.0;net9.0;net48</TargetFrameworks>
+    <TargetFrameworks>net11.0;net10.0;net48</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
@@ -74,13 +75,10 @@
     <SonarQubeExclude>true</SonarQubeExclude>
     <AnalysisLevel>none</AnalysisLevel>
     <NoWarn>NU1701,NU1902,NU1903</NoWarn>
+    <WarningLevel>0</WarningLevel>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <NuGetAudit>false</NuGetAudit>
     <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(IsTestProject)' == 'true' AND '$(BuildingInsideVisualStudio)' != 'true'">
-    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsToolingProject)' == 'true'">
@@ -106,7 +104,7 @@
   </ItemGroup>
 
   <PropertyGroup Condition="'$(IsBenchmarkProject)' == 'true'">
-    <TargetFrameworks>net10.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net11.0;net10.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <RunAnalyzers>false</RunAnalyzers>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>

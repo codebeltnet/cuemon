@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.AspNetCore.Authentication.Basic;
 using Cuemon.AspNetCore.Authentication.Digest;
 using Cuemon.AspNetCore.Authentication.Hmac;

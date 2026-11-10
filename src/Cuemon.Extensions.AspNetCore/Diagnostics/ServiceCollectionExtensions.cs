@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.AspNetCore.Diagnostics;
 using Cuemon.Diagnostics;
 using Cuemon.Extensions.DependencyInjection;

@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.AspNetCore.Mvc.Filters.Diagnostics
 summary: *content
 ---

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Cuemon.Configuration;
 using Cuemon.Extensions.Runtime.Serialization;

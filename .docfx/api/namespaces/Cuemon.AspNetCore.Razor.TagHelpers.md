@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.AspNetCore.Razor.TagHelpers
 summary: *content
 ---

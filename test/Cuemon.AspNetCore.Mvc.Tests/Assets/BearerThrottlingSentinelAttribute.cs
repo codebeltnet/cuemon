@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Cuemon.AspNetCore.Mvc.Filters.Throttling;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;

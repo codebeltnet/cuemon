@@ -1,4 +1,4 @@
-﻿namespace Cuemon;
+namespace Cuemon;
 /// <summary>
 /// Defines a decorator that exposes the inner wrapped type.
 /// </summary>

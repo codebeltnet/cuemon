@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;

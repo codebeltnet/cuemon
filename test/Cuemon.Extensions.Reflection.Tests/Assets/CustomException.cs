@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Cuemon.Extensions.Reflection.Assets;
 public class CustomException : AggregateException

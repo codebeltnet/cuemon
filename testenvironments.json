@@ -1,25 +1,20 @@
 {
-    "version": "1",
-    "environments": [
-        {
-            "name": "WSL-Ubuntu",
-            "type": "wsl",
-            "wslDistribution": "Ubuntu-26.04"
-        },
-        {
-            "name": "Docker-Ubuntu (net9.0)",
-            "type": "docker",
-            "dockerImage": "codebeltnet/ubuntu-testrunner:9"
-        },
-        {
-            "name": "Docker-Ubuntu (net10.0)",
-            "type": "docker",
-            "dockerImage": "codebeltnet/ubuntu-testrunner:10"
-        },
-        {
-            "name": "Docker-Ubuntu (net11.0)",
-            "type": "docker",
-            "dockerImage": "codebeltnet/ubuntu-testrunner:11"
-        }
-    ]
+  "version": "1",
+  "environments": [
+    {
+      "name": "WSL-Ubuntu",
+      "type": "wsl",
+      "wslDistribution": "Ubuntu-26.04"
+    },
+    {
+      "name": "Docker-Ubuntu (net10.0)",
+      "type": "docker",
+      "dockerImage": "codebeltnet/ubuntu-testrunner:10"
+    },
+    {
+      "name": "Docker-Ubuntu (net11.0)",
+      "type": "docker",
+      "dockerImage": "codebeltnet/ubuntu-testrunner:11"
+    }
+  ]
 }

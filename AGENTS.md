@@ -16,9 +16,9 @@ Keep all shared repository instructions in `AGENTS.md`.
 ## Toolchain
 
 - .NET SDK with `LangVersion=latest`.
-- Source TFMs: `net10.0;net9.0;netstandard2.0`.
-- Test TFMs: `net10.0;net9.0` on Linux; adds `net48` on Windows.
-- Benchmark TFMs: `net10.0;net9.0`.
+- Source TFMs: `net11.0;net10.0;netstandard2.0`.
+- Test TFMs: `net11.0;net10.0` on Linux; adds `net48` on Windows.
+- Benchmark TFMs: `net11.0;net10.0`.
 - Central package management via `Directory.Packages.props` (`ManagePackageVersionsCentrally=true`).
 - CI runs on Linux (ubuntu-26.04) and Windows (windows-2025), both X64 and ARM64.
 - TFM compatibility is mandatory: proposals and code changes must work for all source TFMs. Do not assume `net9.0`/`net10.0` APIs exist in `netstandard2.0`; use conditional compilation (`#if NET9_0_OR_GREATER`) or compatible fallbacks where needed.
@@ -96,9 +96,7 @@ docker compose down
 - Keep existing style in files; many modern analyzers are explicitly disabled.
 
 ### Namespace Style
-- **Prefer file-scoped namespaces** (`namespace Cuemon.Foo;`) for new files.
-- The current majority of the codebase uses **block-scoped namespaces** — do not convert existing files unless explicitly asked.
-- When editing an existing file, follow whichever style that file already uses.
+- **Use file-scoped namespaces** (`namespace Cuemon.Foo;`) for new and existing C# files.
 - **Never use top-level statements.** Always use explicit class declarations with a proper namespace.
 
 ### Disabled Analyzers (key rules — do NOT introduce these patterns)

@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Threading;
+namespace Cuemon.Threading;
 /// <summary>
 /// Defines the most common numerical relational operators.
 /// </summary>

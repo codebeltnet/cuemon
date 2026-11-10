@@ -23,7 +23,7 @@ public static class StringFactory
     public static string CreateHexadecimal(byte[] value)
     {
         Validator.ThrowIfNull(value);
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         return Convert.ToHexString(value).Replace("-", "").ToLowerInvariant();
 #else
         return BitConverter.ToString(value).Replace("-", "").ToLowerInvariant();

@@ -1,4 +1,4 @@
-﻿namespace Cuemon;
+namespace Cuemon;
 /// <summary>
 /// Specifies the direction of a sort operation.
 /// </summary>

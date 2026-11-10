@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Cuemon.AspNetCore.Authentication.Basic;
 using Cuemon.AspNetCore.Authentication.Digest;
 using Cuemon.AspNetCore.Authentication.Hmac;

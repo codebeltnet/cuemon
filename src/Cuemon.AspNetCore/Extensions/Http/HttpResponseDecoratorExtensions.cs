@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using Cuemon.AspNetCore.Http.Headers;
 using Cuemon.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿using Cuemon.Data.Integrity;
+using Cuemon.Data.Integrity;
 using Microsoft.Net.Http.Headers;
 
 namespace Cuemon.Extensions.AspNetCore.Data.Integrity;

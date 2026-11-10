@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using Cuemon.AspNetCore.Diagnostics;
 using Cuemon.Extensions.AspNetCore.Xml.Converters;

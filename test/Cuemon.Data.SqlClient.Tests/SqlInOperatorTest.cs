@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Cuemon.Collections.Generic;
 using Cuemon.Data.SqlClient.Assets;
 using Cuemon.Extensions.Data;

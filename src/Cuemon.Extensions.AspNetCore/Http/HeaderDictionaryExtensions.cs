@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using Cuemon.AspNetCore.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;

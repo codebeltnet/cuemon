@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.AspNetCore.Http;
 using Cuemon.Configuration;
 using Cuemon.Data.Integrity;

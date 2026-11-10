@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Cuemon.Extensions.Net.Http;
 internal sealed class ActiveHandler

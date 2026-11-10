@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Codebelt.Extensions.Xunit;
 using Xunit;

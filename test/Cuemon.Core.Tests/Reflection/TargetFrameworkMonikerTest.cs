@@ -165,10 +165,10 @@ public class TargetFrameworkMonikerTest : Test
 
     private static string GetExpectedTargetFrameworkMoniker()
     {
-#if NET10_0
+#if NET11_0
+        return "net11.0";
+#elif NET10_0
         return "net10.0";
-#elif NET9_0
-        return "net9.0";
 #elif NET48
         return "net48";
 #else

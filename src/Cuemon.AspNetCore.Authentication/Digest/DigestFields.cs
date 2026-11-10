@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Authentication.Digest;
+namespace Cuemon.AspNetCore.Authentication.Digest;
 /// <summary>
 /// A collection of constants for <see cref="DigestAuthorizationHeaderBuilder"/>.
 /// </summary>

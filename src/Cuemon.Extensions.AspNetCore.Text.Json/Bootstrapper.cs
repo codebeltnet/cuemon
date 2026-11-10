@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using Cuemon.Extensions.AspNetCore.Text.Json.Converters;
 using Cuemon.Extensions.Text.Json.Formatters;
 

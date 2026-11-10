@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cuemon.Extensions.AspNetCore.Mvc.Assets;

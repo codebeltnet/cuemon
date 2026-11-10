@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Cuemon.Data.Integrity;
 using Codebelt.Extensions.Xunit;
 using Cuemon.Security;

@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
   <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec" Condition="'$(IsTestProject)' == 'false' AND Exists('$(PackageReleaseNotesFile)')">
     <PropertyGroup>
       <PackageReleaseNotes>$([System.IO.File]::ReadAllText('$(PackageReleaseNotesFile)'))</PackageReleaseNotes>

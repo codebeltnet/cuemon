@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Security.Claims;
 using Cuemon.AspNetCore.Authentication.Basic;
 using Cuemon.AspNetCore.Authentication.Digest;

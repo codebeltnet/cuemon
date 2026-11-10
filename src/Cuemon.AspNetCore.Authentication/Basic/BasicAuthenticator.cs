@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 
 namespace Cuemon.AspNetCore.Authentication.Basic;
 /// <summary>

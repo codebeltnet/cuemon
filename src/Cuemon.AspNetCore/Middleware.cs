@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Cuemon.AspNetCore.Infrastructure;
 using Microsoft.AspNetCore.Http;
 

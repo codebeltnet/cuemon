@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon
 summary: *content
 ---

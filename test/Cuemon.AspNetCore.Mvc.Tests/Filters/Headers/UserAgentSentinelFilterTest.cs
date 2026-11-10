@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Cuemon.AspNetCore.Http.Headers;
 using Cuemon.AspNetCore.Mvc.Assets;

@@ -1,4 +1,4 @@
-﻿using Cuemon.Extensions.IO;
+using Cuemon.Extensions.IO;
 using Codebelt.Extensions.Xunit;
 using Cuemon.Extensions.Text.Json.Formatters;
 using Xunit;

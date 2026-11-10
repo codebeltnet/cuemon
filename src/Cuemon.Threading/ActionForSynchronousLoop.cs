@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Cuemon.Threading;
 internal sealed class ActionForSynchronousLoop<TOperand> : ForSynchronousLoop<TOperand> where TOperand : struct, IComparable<TOperand>, IEquatable<TOperand>, IConvertible

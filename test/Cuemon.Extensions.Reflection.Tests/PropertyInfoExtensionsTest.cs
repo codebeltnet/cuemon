@@ -1,4 +1,4 @@
-﻿using Cuemon.Extensions.Reflection.Assets;
+using Cuemon.Extensions.Reflection.Assets;
 using Codebelt.Extensions.Xunit;
 using Cuemon.Reflection;
 using Xunit;

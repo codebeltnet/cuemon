@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Cuemon.AspNetCore.Authentication.Assets;

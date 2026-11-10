@@ -1,4 +1,4 @@
-﻿using Cuemon.AspNetCore.Configuration;
+using Cuemon.AspNetCore.Configuration;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Options;
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Security;
 
 namespace Cuemon.Data.Integrity;

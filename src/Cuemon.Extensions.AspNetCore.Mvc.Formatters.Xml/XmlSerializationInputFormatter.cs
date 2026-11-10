@@ -1,4 +1,4 @@
-﻿using Cuemon.AspNetCore.Mvc.Formatters;
+using Cuemon.AspNetCore.Mvc.Formatters;
 using Cuemon.Extensions.AspNetCore.Xml.Converters;
 using Cuemon.Xml.Serialization.Formatters;
 

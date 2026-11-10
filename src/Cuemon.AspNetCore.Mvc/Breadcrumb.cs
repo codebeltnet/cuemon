@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Mvc;
+namespace Cuemon.AspNetCore.Mvc;
 /// <summary>
 /// Represents a breadcrumb that can be used for navigation purposes on a website.
 /// </summary>

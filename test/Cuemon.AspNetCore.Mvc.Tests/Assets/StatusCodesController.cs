@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Cuemon.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

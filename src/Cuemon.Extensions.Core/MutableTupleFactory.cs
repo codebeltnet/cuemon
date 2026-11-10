@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Extensions;
+namespace Cuemon.Extensions;
 /// <summary>
 /// Provides access to factory methods for creating <see cref="MutableTuple"/> objects.
 /// </summary>

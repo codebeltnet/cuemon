@@ -10,7 +10,7 @@ Successful lookups are cached for the lifetime of the provider by using case-ins
 
 ## Supported Frameworks
 
-This package targets `.NET 10`, `.NET 9`, and `.NET Standard 2.0`.
+This package targets `.NET 11`, `.NET 10`, and `.NET Standard 2.0`.
 
 ## Why Pick This Package
 

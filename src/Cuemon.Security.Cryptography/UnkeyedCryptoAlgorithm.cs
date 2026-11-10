@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Security.Cryptography;
+namespace Cuemon.Security.Cryptography;
 /// <summary>
 /// Specifies the different implementations of a cryptographic hashing algorithm.
 /// </summary>

@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Security.Cryptography
 summary: *content
 ---

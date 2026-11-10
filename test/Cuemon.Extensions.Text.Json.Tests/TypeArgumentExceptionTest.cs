@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using Cuemon.Extensions.IO;
 using Cuemon.Extensions.Text.Json.Formatters;

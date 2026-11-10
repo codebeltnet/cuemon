@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
@@ -7,10 +7,9 @@ using Codebelt.Extensions.Xunit.Hosting;
 using Cuemon.Runtime.Caching.Assets;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using Xunit.v3.Priority;
 
 namespace Cuemon.Runtime.Caching;
-[TestCaseOrderer(typeof(PriorityOrderer))]
+[TestMethodOrderer(typeof(PriorityTestMethodOrderer))]
 public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
 {
     private readonly SlimMemoryCache _cache;
@@ -31,7 +30,7 @@ public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
         _cache = hostFixture.Host.Services.GetRequiredService<SlimMemoryCache>();
     }
 
-    [Fact, Priority(-1)]
+    [Fact, Trait("Priority", "-1")]
     public void Add_ShouldBeThreadSafeWhenAddingSameKeyInParallel()
     {
         var items = NumberOfItemsToCache;
@@ -58,7 +57,7 @@ public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
         Assert.Equal(0, _cache.ToList().Count);
     }
 
-    [Fact, Priority(0)]
+    [Fact, Trait("Priority", "0")]
     public void Add_ShouldUpdateUsingPropertyIndexer()
     {
         var key = "cuemon";
@@ -79,7 +78,7 @@ public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
         Assert.False(_cache.Contains(key));
     }
 
-    [Fact, Priority(1)]
+    [Fact, Trait("Priority", "1")]
     public void Clear_ShouldRemoveAllCacheEntriesBothLogicalAndActual()
     {
         var values = Enumerable.Range(0, 10000).ToList();
@@ -99,7 +98,7 @@ public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
         Assert.Equal(0, _cache.ToList().Count);
     }
 
-    [Fact, Priority(2)]
+    [Fact, Trait("Priority", "2")]
     public void Add_ShouldHandleLargeLoadWithoutCollisionUsingSlidingExpirationOfOneMinute()
     {
         var items = NumberOfItemsToCache;
@@ -120,7 +119,7 @@ public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
         Assert.True(bag.OrderBy(l => l).SequenceEqual(_cache.Where(pair => pair.Value.Namespace == Sliding60Namespace).Select(pair => pair.Key).OrderBy(l => l))); // insure thread safety validation
     }
 
-    [Fact, Priority(3)]
+    [Fact, Trait("Priority", "3")]
     public void Add_ShouldHandleLargeLoadWithoutCollisionUsingSlidingExpirationOfThirtySecondsWithNamespaceSpecification()
     {
         var items = NumberOfItemsToCache;
@@ -141,7 +140,7 @@ public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
         Assert.True(bag.OrderBy(l => l).SequenceEqual(_cache.Where(pair => pair.Value.Namespace == Sliding30Namespace).Select(pair => pair.Key).OrderBy(l => l))); // insure thread safety validation
     }
 
-    [Fact, Priority(4)]
+    [Fact, Trait("Priority", "4")]
     public void Add_ShouldHandleLargeLoadWithoutCollisionUsingAbsoluteExpirationOfOneMinute()
     {
         var items = NumberOfItemsToCache;
@@ -162,7 +161,7 @@ public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
         Assert.True(bag.OrderBy(l => l).SequenceEqual(_cache.Where(pair => pair.Value.Namespace == Absolute60Namespace).Select(pair => pair.Key).OrderBy(l => l))); // insure thread safety validation
     }
 
-    [Fact, Priority(5)]
+    [Fact, Trait("Priority", "5")]
     public void Add_ShouldHandleLargeLoadWithoutCollisionUsingAbsoluteExpirationOfThirtySecondsWithNamespaceSpecification()
     {
         var items = NumberOfItemsToCache;
@@ -183,7 +182,7 @@ public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
         Assert.True(bag.OrderBy(l => l).SequenceEqual(_cache.Where(pair => pair.Value.Namespace == Absolute30Namespace).Select(pair => pair.Key).OrderBy(l => l))); // insure thread safety validation
     }
 
-    [Fact, Priority(6)]
+    [Fact, Trait("Priority", "6")]
     public void Add_ShouldHandleLargeLoadWithoutCollisionUsingDependencyExpirationOfOneMinute()
     {
         var items = NumberOfItemsToCache;
@@ -204,7 +203,7 @@ public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
         Assert.True(bag.OrderBy(l => l).SequenceEqual(_cache.Where(pair => pair.Value.Namespace == Dependency60Namespace).Select(pair => pair.Key).OrderBy(l => l))); // insure thread safety validation
     }
 
-    [Fact, Priority(7)]
+    [Fact, Trait("Priority", "7")]
     public void Add_ShouldHandleLargeLoadWithoutCollisionUsingDependencyExpirationOfThirtySecondsWithNamespaceSpecification()
     {
         var items = NumberOfItemsToCache;
@@ -225,13 +224,13 @@ public class SlimMemoryCacheTest : HostTest<ManagedHostFixture>
         Assert.True(bag.OrderBy(l => l).SequenceEqual(_cache.Where(pair => pair.Value.Namespace == Dependency30Namespace).Select(pair => pair.Key).OrderBy(l => l))); // insure thread safety validation
     }
 
-    [Fact, Priority(8)]
+    [Fact, Trait("Priority", "8")]
     public void Add_VerifyBothLogicalAndActualCacheRemovalUponExpirationForThirtySecondsNamespaceSpecification()
     {
         VerifyBothLogicalAndActualCacheRemovalUponExpiration(Dependency30Namespace, Sliding30Namespace, Absolute30Namespace);
     }
 
-    [Fact, Priority(9)]
+    [Fact, Trait("Priority", "9")]
     public void Add_VerifyBothLogicalAndActualCacheRemovalUponExpirationForSixtySecondsNamespaceSpecification()
     {
         VerifyBothLogicalAndActualCacheRemovalUponExpiration(Dependency60Namespace, Sliding60Namespace, Absolute60Namespace);

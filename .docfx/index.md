@@ -1,4 +1,4 @@
-﻿---
+---
 uid: concept-md
 title: Concept Reference
 ---

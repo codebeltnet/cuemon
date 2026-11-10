@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Configuration;
+namespace Cuemon.Configuration;
 /// <summary>
 /// A marker interface that denotes a Parameter Object.
 /// </summary>

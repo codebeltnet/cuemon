@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Xml.Linq
 summary: *content
 ---

@@ -1,4 +1,4 @@
-﻿using Cuemon.AspNetCore.Http.Headers;
+using Cuemon.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cuemon.AspNetCore.Mvc.Filters.Headers;

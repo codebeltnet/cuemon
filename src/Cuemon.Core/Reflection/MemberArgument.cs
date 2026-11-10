@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace Cuemon.Reflection;
 /// <summary>
 /// Represent the argument given to a member in the context of reflection.

@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Extensions;
+namespace Cuemon.Extensions;
 /// <summary>
 /// The accuracy of a rounding for a computed number.
 /// </summary>

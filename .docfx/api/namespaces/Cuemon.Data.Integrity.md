@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Data.Integrity
 summary: *content
 ---

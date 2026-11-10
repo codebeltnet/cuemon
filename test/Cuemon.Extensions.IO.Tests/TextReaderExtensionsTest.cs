@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Codebelt.Extensions.Xunit;
@@ -24,7 +24,7 @@ public class TextReaderExtensionsTest : Test
 
         sut2.Dispose();
 
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         await sut3.DisposeAsync();
         await sut4.DisposeAsync();
 #else

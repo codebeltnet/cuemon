@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Text;
+namespace Cuemon.Text;
 /// <summary>
 /// Specifies what action to take in regards to encoding preamble sequences.
 /// </summary>

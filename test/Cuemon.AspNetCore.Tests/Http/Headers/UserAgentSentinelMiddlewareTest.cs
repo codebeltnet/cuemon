@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Cuemon.Extensions.AspNetCore.Diagnostics;
 using Cuemon.Extensions.AspNetCore.Http.Headers;

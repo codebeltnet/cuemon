@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Extensions.AspNetCore.Mvc.RazorPages
 summary: *content
 ---

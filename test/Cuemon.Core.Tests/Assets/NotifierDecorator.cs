@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Assets;
+namespace Cuemon.Assets;
 public class NotifierDecorator : INotifier
 {
     private readonly INotifier _notifier;

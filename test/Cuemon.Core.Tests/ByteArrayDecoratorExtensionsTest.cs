@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Threading.Tasks;
 using Codebelt.Extensions.Xunit;
 using Xunit;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Cuemon.Threading;
 public static partial class ParallelFactory

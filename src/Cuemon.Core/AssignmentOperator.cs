@@ -1,4 +1,4 @@
-﻿namespace Cuemon;
+namespace Cuemon;
 /// <summary>
 /// Defines the most common assignment operators for numeric operands.
 /// </summary>

@@ -1,4 +1,4 @@
-﻿namespace Cuemon;
+namespace Cuemon;
 /// <summary>
 /// Defines the default pattern to use when formatting date- and time values.
 /// </summary>

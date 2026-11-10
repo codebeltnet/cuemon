@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Messaging
 summary: *content
 ---

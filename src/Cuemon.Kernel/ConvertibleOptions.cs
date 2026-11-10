@@ -1,4 +1,4 @@
-﻿namespace Cuemon;
+namespace Cuemon;
 /// <summary>
 /// Configuration options for <see cref="Convertible"/>.
 /// </summary>

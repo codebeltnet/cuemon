@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Text.Encodings.Web;
@@ -15,7 +15,7 @@ namespace Cuemon.Extensions.Text.Json.Formatters;
 /// </summary>
 public class JsonFormatterOptions : IContentNegotiation, IExceptionDescriptorOptions, IValidatableParameterObject
 {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
     private readonly System.Threading.Lock _lock = new();
 #else
     private readonly object _lock = new();

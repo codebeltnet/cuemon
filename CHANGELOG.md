@@ -6,6 +6,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 For more details, please refer to `PackageReleaseNotes.txt` on a per assembly basis in the `.nuget` folder.
 
+## [11.0.0] - 2026-11-10
+
+This major release adds .NET 11 targets, removes .NET 9-specific targets, and changes the assembly boundary between `Cuemon.Core` and `Cuemon.Kernel`. It also updates dependencies and uses asynchronous cleanup for commands and streams on .NET 10 and later.
+
+> [!WARNING]
+> `Cuemon.Core` no longer forwards Kernel types, and several types move from Core to Kernel. Existing binaries that depend on the former assembly identities should be rebuilt and their references checked. `TimeRange` replaces its two-argument constructor with a three-argument constructor whose duration delegate is optional at the source level.
+
+### Added
+
+- `TimeRange` accepts an optional duration delegate, allowing callers to supply the duration calculation,
+- `SonarAnalyzer.CSharp` 10.35.0.4138 is configured for source projects,
+- Central transitive pins for `System.Security.Cryptography.Pkcs` use 10.0.15 for .NET 10 and 11.0.0 for .NET 11,
+- A .NET 11 test workflow accepts preview SDKs and uses absolute project paths as a workaround for an SDK test-runner issue,
+- `Resolve-PackageReleaseNotesConflicts.ps1` resolves package release-note conflict markers and stages the resolved files when run.
+
+### Changed
+
+- Source, test, and benchmark projects replace .NET 9-specific targets with .NET 11 targets while retaining their applicable .NET 10, .NET Standard, and .NET Framework targets,
+- `DateSpan`, `DateTimeRange`, `Range`, `TimeRange`, `TimeUnit`, `DelimitedString`, `DelimitedStringOptions`, and `FormattingOptions` move from the `Cuemon.Core` assembly to `Cuemon.Kernel`,
+- `Cuemon.Core` removes type forwarding for foundational Kernel types, including `Configurable`, `IConfigurable`, `Validator`, `Arguments`, `Patterns`, `Disposable`, `Convertible`, and `Awaiter`,
+- `DataManager` asynchronously disposes commands after asynchronous execution, and `StreamDecoratorExtensions.ToByteArrayAsync` asynchronously disposes its input stream when configured to close it, on .NET 10 and later,
+- The .NET Standard 2.0 central versions of `Microsoft.Bcl.AsyncInterfaces`, `Microsoft.Data.Sqlite`, `Microsoft.Extensions.Configuration`, `Microsoft.Extensions.Configuration.EnvironmentVariables`, `Microsoft.Extensions.Configuration.FileExtensions`, `Microsoft.Extensions.Configuration.Json`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.FileProviders.Physical`, `Microsoft.Extensions.Hosting`, `Microsoft.Extensions.Http`, `Microsoft.Extensions.Options.ConfigurationExtensions`, and `System.Text.Json` move from 10.0.14 to 11.0.0; applicable .NET 11 declarations also use 11.0.0,
+- The .NET 10 central versions of `Microsoft.Data.Sqlite`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.FileProviders.Physical`, `Microsoft.Extensions.Hosting`, `Microsoft.Extensions.Http`, and `Microsoft.Extensions.Options.ConfigurationExtensions` move from 10.0.14 to 10.0.15; the .NET Framework `Microsoft.Data.Sqlite` version also moves to 10.0.15,
+- Test tooling updates `Codebelt.Coverlet.MTP` from 10.1.1 to 11.0.0, `Microsoft.Testing.Extensions.HangDump` from 2.5.1 to 2.5.2, and `xunit.v3`, `xunit.v3.extensibility.core`, and `xunit.v3.runner.console` from 4.0.2 to 4.0.3,
+- The DocFX image uses `dhi.io/nginx`; fingerprinted assets cache successful and revalidation responses but use `no-store` for other responses, and range requests are disabled for those assets,
+- Test environments retain separate .NET 10 and .NET 11 Docker runners and remove the .NET 9 runner,
+- Verification temporarily skips CodeQL and excludes it from post-release service identity checks while the branch targets .NET 11; the workflow does not claim CodeQL assurance.
+
+### Removed
+
+- The .NET 9-specific central package versions for `Microsoft.Data.Sqlite`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.FileProviders.Physical`, `Microsoft.Extensions.Hosting`, `Microsoft.Extensions.Http`, and `Microsoft.Extensions.Options.ConfigurationExtensions`.
+
 ## [10.8.2] - 2026-10-25
 
 This is a patch release updating dependency and development tooling versions, moving the WSL test environment to Ubuntu 26.04, and splitting Docker test environments by .NET version.
@@ -309,8 +341,7 @@ This is a minor release that introduces support for flattening items in enumerab
 
 - `World` class in the Cuemon.Globalization namespace to exclude redundancies in `RegionInfo` handling,
 - `XmlConverterExtensions` class in the Cuemon.Extensions.Xml.Serialization.Converters namespace to support flattening items when serializing in the `AddEnumerableConverter` method,
-- `XmlSerializerOptions` class in the `Cuemon.Xml.Serialization` namespace was extended with `FlattenCollectionItems` property to control item flattening during enumerable XML serialization,
-- 
+- `XmlSerializerOptions` class in the `Cuemon.Xml.Serialization` namespace was extended with `FlattenCollectionItems` property to control item flattening during enumerable XML serialization.
 
 ## [10.3.0] - 2026-02-19
 
@@ -501,9 +532,9 @@ This is a service update that focuses on package dependencies.
 
 ## [9.0.1] - 2024-01-28
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > The following projects has been removed with this release and migrated to [Codebelt](https://github.com/codebeltnet):
-> 
+>
 > - Cuemon.Extensions.Globalization was removed from the solution and migrated to [Codebelt.Extensions.Globalization](https://github.com/codebeltnet/globalization)
 >
 > Dependencies used for targeting .NET Standard 2.0 has been updated to use .NET 8.0 (LTS) instead of .NET Core 2.1.
@@ -516,9 +547,9 @@ This is a service update that primarily focuses on package dependencies and mino
 
 ## [9.0.0] - 2024-11-13
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > The following projects has been removed with this release and migrated to [Codebelt](https://github.com/codebeltnet):
-> 
+>
 > - Cuemon.Extensions.Xunit, Cuemon.Extensions.Xunit.Hosting and Cuemon.Extensions.Xunit.Hosting.AspNetCore was removed from the solution and migrated to [Codebelt.Extensions.Xunit](https://github.com/codebeltnet/xunit)
 > - Cuemon.Extensions.YamlDotNet was removed from the solution and migrated to [Codebelt.Extensions.YamlDotNet](https://github.com/codebeltnet/yamldotnet)
 > - Cuemon.Extensions.AspNetCore, Cuemon.Extensions.AspNetCore.Mvc and Cuemon.Extensions.Diagnostics was inflicted with a breaking change as a result of this migration due to removal of YAML related code
@@ -1460,7 +1491,7 @@ This release was primarily focused on adapting a more modern way of performing C
 - FaultHandler class into Cuemon.Diagnostics namespace that provides a generic way to implement a fault resolver that evaluate an exception and provide details about it in a developer friendly way
 - FaultResolver class into Cuemon.Diagnostics namespace that a way to evaluate an exception and provide details about it in a developer friendly way
 - Int32Extensions class in the Cuemon.Extensions.AspNetCore.Http namespace that consist of extension methods for the Int32 struct: IsInformationStatusCode, IsSuccessStatusCode, IsRedirectionStatusCode, IsNotModifiedStatusCode, IsClientErrorStatusCode, IsServerErrorStatusCode
-- ApplicationBuilderExtensions class in the Cuemon.Extensions.AspNetCore.Authentication namespace that consist of extension methods for the IApplicationBuilder interface: UseBasicAuthentication, UseDigestAccessAuthentication, UseHmacAuthentication 
+- ApplicationBuilderExtensions class in the Cuemon.Extensions.AspNetCore.Authentication namespace that consist of extension methods for the IApplicationBuilder interface: UseBasicAuthentication, UseDigestAccessAuthentication, UseHmacAuthentication
 - ServiceCollectionExtensions class in the Cuemon.Extensions.AspNetCore.Authentication namespace that consist of extension methods for the IServiceCollection interface: AddInMemoryDigestAuthenticationNonceTracker
 - CollectionExtensions class in the Cuemon.Extensions.Collections.Generic namespace that consist of extension methods for the ICollection{T} interface: ToPartitioner{T}, AddRange{T}
 - DictionaryExtensions class in the Cuemon.Extensions.Collections.Generic namespace that consist of extension methods for the IDictionary{TKey, TValue} interface: GetValueOrDefault{TKey, TValue}, TryGetValueOrFallback{TKey, TValue}, ToEnumerable{TKey, TValue}, TryAdd{TKey, TValue}, TryAddOrUpdate{TKey, TValue}
@@ -1951,6 +1982,7 @@ This release was primarily focused on adapting a more modern way of performing C
 [10.8.1]: https://github.com/codebeltnet/cuemon/compare/v10.8.0...v10.8.1
 [10.8.0]: https://github.com/codebeltnet/cuemon/compare/v10.7.1...v10.8.0
 [10.7.1]: https://github.com/codebeltnet/cuemon/compare/v10.7.0...v10.7.1
+[11.0.0]: https://github.com/codebeltnet/cuemon/compare/v10.8.2...v11.0.0
 [10.7.0]: https://github.com/codebeltnet/cuemon/compare/v10.6.0...v10.7.0
 [10.6.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v10.6.0
 [10.5.5]: https://github.com/codebeltnet/cuemon/compare/v10.5.4...v10.5.5

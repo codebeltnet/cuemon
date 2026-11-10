@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace Cuemon.Data;
 /// <summary>
 /// Represents the column meta information of a table-row in a database. This class cannot be inherited.

@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Net.Http
 summary: *content
 ---

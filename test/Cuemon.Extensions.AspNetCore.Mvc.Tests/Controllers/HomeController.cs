@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Cuemon.Extensions.AspNetCore.Mvc.Controllers;
 public class HomeController : Controller

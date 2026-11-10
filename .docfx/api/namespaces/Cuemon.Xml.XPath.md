@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Xml.XPath
 summary: *content
 ---

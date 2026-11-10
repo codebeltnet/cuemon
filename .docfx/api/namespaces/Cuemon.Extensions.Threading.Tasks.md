@@ -1,4 +1,4 @@
-﻿---
+---
 uid: Cuemon.Extensions.Threading.Tasks
 summary: *content
 ---

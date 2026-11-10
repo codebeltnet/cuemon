@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Reflection;
+namespace Cuemon.Reflection;
 /// <summary>
 /// Specifies the way of finding and returning an embedded resource.
 /// </summary>

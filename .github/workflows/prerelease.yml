@@ -46,7 +46,7 @@ jobs:
             exit 1
           fi
           if ! tag="$(git describe --tags --exact-match --match 'v*-*' HEAD)"; then
-            echo '::error::Tag and push the selected branch tip first, for example v11.0.0-rc.2 or v12.0.0-preview.1.'
+            echo '::error::Tag and push the selected branch tip first, for example v12.0.0-preview.1 or v12.0.0-rc.1.'
             exit 1
           fi
           version="${tag#v}"
@@ -87,10 +87,8 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
-      - name: Install .NET including prerelease SDKs
+      - name: Install .NET
         uses: codebeltnet/install-dotnet@v3
-        with:
-          includePreview: true
 
       - name: Download verified Release packages
         uses: actions/download-artifact@v8

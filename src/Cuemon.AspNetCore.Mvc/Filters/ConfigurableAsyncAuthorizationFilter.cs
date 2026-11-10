@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Cuemon.Configuration;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;

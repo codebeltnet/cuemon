@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Cuemon.Xml.Serialization;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

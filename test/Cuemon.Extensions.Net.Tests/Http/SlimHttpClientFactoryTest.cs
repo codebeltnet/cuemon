@@ -36,7 +36,7 @@ public class SlimHttpClientFactoryTest : Test
         Assert.NotNull(client);
     }
 
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
     [Fact]
     public void SlimHttpClientFactory_ShouldReuseHandlersAndProtectInnerHandlerOnDispose()
     {

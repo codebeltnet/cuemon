@@ -1,4 +1,4 @@
-﻿using Cuemon.Configuration;
+using Cuemon.Configuration;
 
 namespace Cuemon.Extensions.AspNetCore.Mvc.Assets;
 public class FakeCacheableOptions : IParameterObject

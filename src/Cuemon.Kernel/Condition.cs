@@ -277,7 +277,7 @@ public sealed class Condition
     public static bool IsBase64(string value)
     {
         if (string.IsNullOrEmpty(value)) { return false; }
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         return System.Buffers.Text.Base64.IsValid(value.AsSpan());
 #else
         return Patterns.TryInvoke(() => Convert.FromBase64String(value), out _);
@@ -884,7 +884,7 @@ public sealed class Condition
     {
         first ??= string.Empty;
         second ??= string.Empty;
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
         return HasDifferenceCore(first, second, out difference);
 #else
         difference = string.Concat(second.Except(first));
@@ -892,7 +892,7 @@ public sealed class Condition
 #endif
     }
 
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
     private static bool HasDifferenceCore(string first, string second, out string difference)
     {
         if (second.Length == 0)

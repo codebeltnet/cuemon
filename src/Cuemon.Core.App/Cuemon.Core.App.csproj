@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <ProjectGuid>230bdf91-e7c7-4cb4-a39d-e1a5374c5602</ProjectGuid>
@@ -8,7 +8,7 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <Description>Provides a convenient set of default API additions for building a .NET application.</Description>
-    <NoWarn>NU5128</NoWarn>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

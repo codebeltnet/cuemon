@@ -1,4 +1,4 @@
-﻿namespace Cuemon.AspNetCore.Authentication.Digest;
+namespace Cuemon.AspNetCore.Authentication.Digest;
 /// <summary>
 /// Specifies the cryptographic algorithms used in Digest authentication.
 /// </summary>

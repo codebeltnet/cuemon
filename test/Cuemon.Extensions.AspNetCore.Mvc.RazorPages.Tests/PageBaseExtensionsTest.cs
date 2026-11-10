@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Cuemon.AspNetCore.Razor.TagHelpers;
 using Cuemon.Extensions.AspNetCore.Configuration;
 using Cuemon.Extensions.AspNetCore.Mvc.RazorPages.Assets;

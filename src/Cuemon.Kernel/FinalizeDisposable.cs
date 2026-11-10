@@ -1,4 +1,4 @@
-﻿namespace Cuemon;
+namespace Cuemon;
 /// <summary>
 /// Provides a mechanism for releasing both managed and unmanaged resources with focus on the latter.
 /// Implements the <see cref="Disposable" />

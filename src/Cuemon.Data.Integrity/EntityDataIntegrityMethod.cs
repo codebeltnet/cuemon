@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Data.Integrity;
+namespace Cuemon.Data.Integrity;
 /// <summary>
 /// Specifies ways for a checksum of data to be computed.
 /// </summary>

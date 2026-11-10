@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.Extensions.DependencyInjection.Assets;
 using Codebelt.Extensions.Xunit;
 using Microsoft.Extensions.DependencyInjection;

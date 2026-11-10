@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cuemon.AspNetCore.Mvc.Filters.Cacheable;
 using Cuemon.Data.Integrity;
 

@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Configuration;
+namespace Cuemon.Configuration;
 /// <summary>
 /// Denotes a Parameter Object where one or more conditions can be verified that they are in a valid state.
 /// </summary>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Cuemon.Collections.Generic;
@@ -7,7 +7,7 @@ using Cuemon.Reflection;
 namespace Cuemon.Resilience;
 internal abstract class Transient<TOptions> where TOptions : TransientOperationOptions, new()
 {
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
     protected readonly System.Threading.Lock _lock = new();
 #else
     protected readonly object _lock = new();

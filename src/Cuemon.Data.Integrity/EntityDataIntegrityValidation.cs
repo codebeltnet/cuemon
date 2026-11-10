@@ -1,4 +1,4 @@
-﻿namespace Cuemon.Data.Integrity;
+namespace Cuemon.Data.Integrity;
 /// <summary>
 /// Specifies the validation strength of a data checksum.
 /// </summary>

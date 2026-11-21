@@ -2275,6 +2275,98 @@
           "Cuemon.Core@11.0.0"
         ]
       }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Http.Int32DecoratorExtensions",
+      "sourceSha256": "D05E098698B068272A3DE372620D87027F9869EABEF4EE72AC76A15248B920B1",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Data.Integrity.ChecksumBuilderDecoratorExtensions",
+      "sourceSha256": "C2E378AA3863B22C0DEB8457B0FA2A678BC252C68A57660E6D5795C1AD289905",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Data.Integrity@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Data.TokenBuilder",
+      "sourceSha256": "85CEC0F2CBE487441FEE558E7153CAB34EC1BCBF317752C3A14F8DF1568A6E13",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Data@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.AspNetCore.Http.Int32Extensions",
+      "sourceSha256": "0932FA42B32C886E305FC91BD263F79D1457DC4CF72494E8F2921994CA6C7817",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Data.Integrity.ChecksumBuilderExtensions",
+      "sourceSha256": "2FE1603B3CE508312C92CA031C6C62D9CE816B797B45BE5449646887850562EA",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Data.Integrity@11.0.0",
+          "Cuemon.Extensions.Data.Integrity@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Globalization.StatisticalRegionExtensions",
+      "sourceSha256": "CC17BA51F9A1769F362771FF5DAF218CDF3D75C9637354673E21DB41CDE492D8",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Xml.StringDecoratorExtensions",
+      "sourceSha256": "93687ED3E471F61088D3FCFD56394B5329391DD7427F746966F5C43BC6FFE9CB",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Xml@11.0.0"
+        ]
+      }
     }
   ]
 }

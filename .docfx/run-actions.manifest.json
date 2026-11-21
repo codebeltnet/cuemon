@@ -635,6 +635,25 @@
       }
     },
     {
+      "id": "37f40b9fa3c262d6ee82d474",
+      "strategy": "standalone",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "image": "codebeltnet/csrun:10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Data@11.0.0"
+        ],
+        "source": "// Program.cs\nusing System;\nusing Cuemon.Data;\n\n// Build a token string with 4 fields, comma-delimited, double-quote qualified\nvar builder = new TokenBuilder(',', '\"', 4);\n\nbuilder.Append(\"Alice\");\nbuilder.Append(\",30,\");\nbuilder.Append(\"New York\");\n\nConsole.WriteLine($\"Is valid: {builder.IsValid}\");  // false - only 3 of 4 tokens\nConsole.WriteLine($\"Current:  '{builder}'\");\n\n// Append the last field to complete the token row\nbuilder.Append(\"Engineer\");\nConsole.WriteLine($\"Is valid: {builder.IsValid}\");  // true\nConsole.WriteLine($\"Complete: '{builder}'\");\n\n// TokenBuilder is used internally by DsvDataReader for multi-line quoted fields\n// It accumulates input until the expected number of tokens is reached\nvar csvBuilder = new TokenBuilder(';', '\\\"', 3);\ncsvBuilder.Append(\"Product A\");\ncsvBuilder.Append(\"Description with ; semicolon\");\ncsvBuilder.Append(\"$49.99\");\n\nConsole.WriteLine($\"CSV line: '{csvBuilder}'\");\nConsole.WriteLine($\"Tokens:   {csvBuilder.Tokens}\");"
+      }
+    },
+    {
       "id": "3b28b53c450a6c66e223b00a",
       "strategy": "standalone",
       "transports": [
@@ -800,6 +819,25 @@
           "Cuemon.Extensions.DependencyInjection@11.0.0"
         ],
         "source": "using System;\nusing Cuemon.Configuration;\nusing Cuemon.Extensions.DependencyInjection;\nusing Microsoft.Extensions.DependencyInjection;\nusing Microsoft.Extensions.Options;\n\nnamespace Delivery.Configuration;\n\npublic static class DeliveryApplication\n{\n    public static void Main()\n    {\n        Action<DeliveryOptions> setup = options =>\n        {\n            options.MaxAttempts = 3;\n            options.RetryDelay = TimeSpan.FromSeconds(5);\n        };\n        var services = new ServiceCollection();\n        services.AddConfiguredOptions(setup);\n        services.Configure<DeliveryOptions>(options => options.MaxAttempts = 4);\n\n        using (var provider = services.BuildServiceProvider())\n        {\n            var delivery = provider.GetRequiredService<DeliveryOptions>();\n            var microsoftOptions = provider.GetRequiredService<IOptions<DeliveryOptions>>().Value;\n            Console.WriteLine($\"Attempts: {delivery.MaxAttempts}; retry budget: {delivery.RetryBudget.TotalSeconds} seconds\");\n            Console.WriteLine($\"Shared default instance: {ReferenceEquals(delivery, microsoftOptions)}\");\n\n            var configure = provider.GetRequiredService<Action<DeliveryOptions>>();\n            var fresh = new DeliveryOptions();\n            configure(fresh);\n            Console.WriteLine($\"Primary configurator attempts: {fresh.MaxAttempts}\");\n        }\n    }\n}\n\npublic sealed class DeliveryOptions : IPostConfigurableParameterObject, IValidatableParameterObject\n{\n    public int MaxAttempts { get; set; }\n\n    public TimeSpan RetryDelay { get; set; }\n\n    public TimeSpan RetryBudget { get; private set; }\n\n    public void PostConfigureOptions()\n    {\n        RetryBudget = TimeSpan.FromTicks(RetryDelay.Ticks * (MaxAttempts - 1));\n    }\n\n    public void ValidateOptions()\n    {\n        if (MaxAttempts < 1 || RetryDelay < TimeSpan.Zero)\n        {\n            throw new InvalidOperationException(\"Delivery requires at least one attempt and a nonnegative retry delay.\");\n        }\n    }\n}"
+      }
+    },
+    {
+      "id": "43e15cf103357bbad8066400",
+      "strategy": "standalone",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "image": "codebeltnet/csrun:10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ],
+        "source": "// Program.cs\nusing System;\nusing System.Globalization;\nusing System.Linq;\nusing Cuemon.Extensions.Globalization;\nusing Cuemon.Globalization;\n\n// Access regions via the World class\nvar world = World.GetStatisticalRegion(\"001\");\nvar europe = World.GetStatisticalRegion(\"150\");\nvar westernEurope = World.GetStatisticalRegion(\"155\");\nvar denmark = World.GetCountry(\"208\");     // Denmark M.49 code\nvar usa = World.GetCountry(\"840\");         // United States M.49 code\n\n// Classify by kind using the extension methods\nbool isWorld = world.IsWorld();                       // true\nbool isRegion = europe.IsRegion();                    // true (continent)\nbool isSubregion = westernEurope.IsSubregion();       // true\nbool isCountry = denmark.IsCountryOrTerritory();      // true\nbool isArea = europe.IsArea();                        // true (not a country)\nbool isCountryArea = denmark.IsArea();                // false (is a country)\n\n// Check intermediate regions (sub-Saharan Africa, Latin America)\nvar subSaharanAfrica = World.GetStatisticalRegion(\"202\");\nbool isIntermediate = subSaharanAfrica.IsIntermediateRegion(); // true\n\n// Verify hierarchy\nbool denmarkIsInEurope = denmark.Parent.IsSubregion(); // true (Northern Europe, M.49: 154)\n\n// Check if a country has associated .NET RegionInfo\nbool hasRegionInfo = usa.HasRegionInfo();  // true (US has RegionInfo)\nbool noRegionInfo = world.HasRegionInfo(); // false (World is not a country)\n\n// Check if a region has ISO codes\nbool hasIso = denmark.HasIsoCodes(); // true\n\n// Iterate all countries\nint countryCount = world.Countries.Count();\nConsole.WriteLine($\"Total countries/territories: {countryCount}\");\n\n// Find a country by RegionInfo\nvar regionInfo = new RegionInfo(\"US\");\nvar usaByRegion = World.GetCountry(regionInfo);\nConsole.WriteLine(usaByRegion.IsCountryOrTerritory()); // True\n\n// Traverse the hierarchy\nforeach (var ancestor in denmark.GetAncestors())\n{\n    Console.WriteLine($\"{ancestor.Name} ({ancestor.Kind})\");\n// \"Northern Europe (Subregion)\"\n// \"Europe (Region)\"\n// \"World (World)\"\n\n}"
       }
     },
     {
@@ -1119,6 +1157,26 @@
       }
     },
     {
+      "id": "5c8b0178a5de2eefb03e41f0",
+      "strategy": "standalone",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "image": "codebeltnet/csrun:10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Data.Integrity@11.0.0",
+          "Cuemon.Extensions.Data.Integrity@11.0.0"
+        ],
+        "source": "// Program.cs\nusing System;\nusing Cuemon.Data.Integrity;\nusing Cuemon.Extensions.Data.Integrity;\nusing Cuemon.Security;\n\n// Create a ChecksumBuilder and use extension methods directly\nvar builder = new ChecksumBuilder(() => HashFactory.CreateFnv128());\n\n// Extension methods allow combining typed values without a Decorator wrapper\nbuilder.CombineWith(42);             // int overload\nbuilder.CombineWith(3.14);           // double overload\nbuilder.CombineWith(\"data\");         // string overload\n\nConsole.WriteLine($\"Combined checksum: {builder}\");\n\n// Works with all numeric types\nvar checksum = new ChecksumBuilder(() => HashFactory.CreateFnv32())\n    .CombineWith((short)1)\n    .CombineWith(2u)\n    .CombineWith(3L)\n    .CombineWith(4.0f)\n    .CombineWith(5ul);\n\nConsole.WriteLine($\"All types: {checksum}\");\n\n// Combine with byte arrays\nvar withBytes = new ChecksumBuilder(() => HashFactory.CreateFnv32())\n    .CombineWith(new byte[] { 0x01, 0x02, 0x03 });\n\nConsole.WriteLine($\"With bytes: {withBytes}\");\n    "
+      }
+    },
+    {
       "id": "5df55e61c12b1592c4725f96",
       "strategy": "standalone",
       "transports": [
@@ -1342,6 +1400,25 @@
           "Cuemon.Core@11.0.0"
         ],
         "source": "// Program.cs\nusing System;\nusing System.Text;\nusing Cuemon.Text;\n\nvar options = new EncodingOptions\n{\n    Encoding = Encoding.UTF8,\n    Preamble = PreambleSequence.Keep\n};\n\nvar preambleAction = options.Preamble;\nvar encoding = options.Encoding;\n\nConsole.WriteLine(preambleAction); // outputs: Keep"
+      }
+    },
+    {
+      "id": "666a8d716451feb4d647a1ea",
+      "strategy": "standalone",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "image": "codebeltnet/csrun:10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Xml@11.0.0"
+        ],
+        "source": "// Program.cs\nusing System;\nusing Cuemon;\nusing Cuemon.Xml;\n\n// Escape XML characters in a string\nvar raw = \"<hello & 'world' \\\"test\\\">\";\nvar escaped = Decorator.Enclose(raw).EscapeXml();\nConsole.WriteLine($\"Escaped:   {escaped}\");\n// Output: &lt;hello &amp; &apos;world&apos; &quot;test&quot;&gt;\n\n// Unescape back to original\nvar unescaped = Decorator.Enclose(escaped).UnescapeXml();\nConsole.WriteLine($\"Unescaped: {unescaped}\");\n// Output: <hello & 'world' \"test\">\n\n// Sanitize a string to be a valid XML element name\nvar invalidName = \"123order-details!.xml\";\nvar sanitizedName = Decorator.Enclose(invalidName).SanitizeXmlElementName();\nConsole.WriteLine($\"Sanitized element name: {sanitizedName}\");\n// Output: order-details.xml\n\n// Sanitize XML element text (remove control characters)\nvar textWithControlChars = \"Hello\\x0001\\x0002World\";\nvar cleanText = Decorator.Enclose(textWithControlChars).SanitizeXmlElementText();\nConsole.WriteLine($\"Clean text: {cleanText}\");\n// Output: HelloWorld\n\n// Sanitize with CDATA section rules (removes ]]> sequences)\nvar cdataText = \"Some data with ]]> embedded\";\nvar safeCdata = Decorator.Enclose(cdataText).SanitizeXmlElementText(cdataSection: true);\nConsole.WriteLine($\"Safe CDATA: {safeCdata}\");\n// Output: Some data with  embedded"
       }
     },
     {
@@ -1844,6 +1921,25 @@
           "Cuemon.Xml@11.0.0"
         ],
         "source": "// Program.cs\nusing System;\nusing System.Xml;\nusing Cuemon.Xml;\n\nvar xml = \"<?xml version=\\\"1.0\\\"?><books><book title=\\\"1984\\\" author=\\\"Orwell\\\"/></books>\";\nvar doc = XmlDocumentFactory.CreateDocument(xml);\n\nvar root = doc.DocumentElement;\nConsole.WriteLine($\"Root element: {root?.Name}\");\n\nvar book = root?.SelectSingleNode(\"book\");\nConsole.WriteLine($\"Title: {book?.Attributes?[\"title\"]?.Value}\");"
+      }
+    },
+    {
+      "id": "976a19c257adeb1ca001acf4",
+      "strategy": "standalone",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "image": "codebeltnet/csrun:10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Data.Integrity@11.0.0"
+        ],
+        "source": "// Program.cs\nusing System;\nusing Cuemon;\nusing Cuemon.Data.Integrity;\nusing Cuemon.Security;\n\n// Create a ChecksumBuilder wrapped in a Decorator\nvar builder = new ChecksumBuilder(() => HashFactory.CreateFnv128());\nvar decorator = Decorator.Enclose(builder);\n\n// Combine various typed values using the decorator extensions\ndecorator.CombineWith(42);             // int\ndecorator.CombineWith(3.14);           // double\ndecorator.CombineWith(\"tag\");          // string\n\nConsole.WriteLine($\"Combined checksum: {builder}\");\n\n// The extensions return the inner builder for chaining\nvar combined = decorator.CombineWith(12345L); // long\nConsole.WriteLine($\"Returned type: {combined.GetType().Name}\");\n\n// Extension methods also work with short, float, ushort, uint, ulong\nvar shortDecorator = Decorator.Enclose(new ChecksumBuilder(() => HashFactory.CreateFnv32()));\nshortDecorator.CombineWith((short)100);\nshortDecorator.CombineWith(3.14f);\nshortDecorator.CombineWith(42u);\n\nConsole.WriteLine($\"Short builder: {shortDecorator.Inner}\");\n    "
       }
     },
     {
@@ -2928,6 +3024,25 @@
       }
     },
     {
+      "id": "e6c441a1a44682b3077c0dfe",
+      "strategy": "standalone",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "image": "codebeltnet/csrun:10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ],
+        "source": "// Program.cs\nusing System;\nusing Cuemon;\nusing Cuemon.AspNetCore.Http;\n\nint statusCode = 500;\n\n// Wrap the int in a Decorator and use the extension methods\nvar decorator = Decorator.Enclose(statusCode);\n\nbool isInfo = decorator.IsInformationStatusCode();\nbool isSuccess = decorator.IsSuccessStatusCode();\nbool isRedirect = decorator.IsRedirectionStatusCode();\nbool isClientError = decorator.IsClientErrorStatusCode();\nbool isServerError = decorator.IsServerErrorStatusCode();\nbool isNotModified = decorator.IsNotModifiedStatusCode();\n\nConsole.WriteLine($\"HTTP {statusCode}:\");\nConsole.WriteLine($\"  Informational (100-199): {isInfo}\");\nConsole.WriteLine($\"  Successful (200-299): {isSuccess}\");\nConsole.WriteLine($\"  Redirection (300-399): {isRedirect}\");\nConsole.WriteLine($\"  Client Error (400-499): {isClientError}\");\nConsole.WriteLine($\"  Server Error (500-599): {isServerError}\");\nConsole.WriteLine($\"  Not Modified (304): {isNotModified}\");\n\n// Use with a success status code\nint ok = 200;\nvar okDecorator = Decorator.Enclose(ok);\nConsole.WriteLine($\"\\n{ok} is success: {okDecorator.IsSuccessStatusCode()}\");   // True\nConsole.WriteLine($\"404 is client error: {Decorator.Enclose(404).IsClientErrorStatusCode()}\"); // True"
+      }
+    },
+    {
       "id": "e72ce3328f2222abe30fa1ac",
       "strategy": "standalone",
       "transports": [
@@ -3109,6 +3224,25 @@
           "Cuemon.Core@11.0.0"
         ],
         "source": "// Program.cs\nusing System;\nusing Cuemon.AspNetCore.Mvc.Filters.Headers;\nusing Microsoft.AspNetCore.Mvc;\n\nvar attribute = new ApiKeySentinelAttribute();\n\nConsole.WriteLine(attribute.ServiceType == typeof(ApiKeySentinelFilter));\nConsole.WriteLine(attribute.IsReusable);"
+      }
+    },
+    {
+      "id": "f111ba3a93cd78316117d884",
+      "strategy": "standalone",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "image": "codebeltnet/csrun:10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore@11.0.0"
+        ],
+        "source": "// Program.cs\nusing System;\nusing Cuemon.Extensions.AspNetCore.Http;\n\nint statusCode = 404;\n\n// Check the status code range\nbool isInfo = statusCode.IsInformationStatusCode();\nbool isSuccess = statusCode.IsSuccessStatusCode();\nbool isRedirect = statusCode.IsRedirectionStatusCode();\nbool isClientError = statusCode.IsClientErrorStatusCode();\nbool isServerError = statusCode.IsServerErrorStatusCode();\nbool isNotModified = statusCode.IsNotModifiedStatusCode();\n\nConsole.WriteLine($\"HTTP {statusCode}:\");\nConsole.WriteLine($\"  Informational: {isInfo}\");\nConsole.WriteLine($\"  Success: {isSuccess}\");\nConsole.WriteLine($\"  Redirection: {isRedirect}\");\nConsole.WriteLine($\"  Client Error: {isClientError}\");\nConsole.WriteLine($\"  Server Error: {isServerError}\");\nConsole.WriteLine($\"  Not Modified: {isNotModified}\");\n\n// Use with common HTTP status codes\nint ok = 200;\nint notFound = 404;\nint serverError = 500;\n\nConsole.WriteLine($\"\\n{ok} is success: {ok.IsSuccessStatusCode()}\");\nConsole.WriteLine($\"{notFound} is client error: {notFound.IsClientErrorStatusCode()}\");\nConsole.WriteLine($\"{serverError} is server error: {serverError.IsServerErrorStatusCode()}\");"
       }
     },
     {

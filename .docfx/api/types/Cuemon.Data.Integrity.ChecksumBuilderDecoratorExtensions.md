@@ -39,5 +39,5 @@ Console.WriteLine($"Short builder: {shortDecorator.Inner}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="976a19c257adeb1ca001acf4"><a href="~/run-actions/976a19c257adeb1ca001acf4/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/976a19c257adeb1ca001acf4/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="396a26c3c4044f3f7f24a942"><a href="~/run-actions/396a26c3c4044f3f7f24a942/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/396a26c3c4044f3f7f24a942/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

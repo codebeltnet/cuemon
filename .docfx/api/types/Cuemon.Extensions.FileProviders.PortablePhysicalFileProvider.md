@@ -13,9 +13,14 @@ Misses and collisions are deliberately re-evaluated on every call. If callers ca
 ```csharp
 // Program.cs
 using System;
+using System.IO;
 using Cuemon.Extensions.FileProviders;
 
-var contentRoot = @"C:\app\wwwroot";
+var contentRoot = Path.Combine(Path.GetTempPath(), "cuemon-docs", "wwwroot");
+var imageDirectory = Path.Combine(contentRoot, "assets", "images");
+Directory.CreateDirectory(imageDirectory);
+File.WriteAllText(Path.Combine(imageDirectory, "logo.svg"), "<svg/>");
+
 using var files = new PortablePhysicalFileProvider(contentRoot);
 
 var logo = files.GetFileInfo("assets/images/logo.svg");
@@ -33,5 +38,5 @@ Console.WriteLine($"Change callbacks active: {changeToken.ActiveChangeCallbacks}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="0920bc57f33f971c7ec138c0"><a href="~/run-actions/0920bc57f33f971c7ec138c0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0920bc57f33f971c7ec138c0/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="72a8627aec108def85fa2cc3"><a href="~/run-actions/72a8627aec108def85fa2cc3/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/72a8627aec108def85fa2cc3/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

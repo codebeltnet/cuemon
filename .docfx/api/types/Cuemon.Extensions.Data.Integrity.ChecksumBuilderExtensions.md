@@ -42,5 +42,5 @@ Console.WriteLine($"With bytes: {withBytes}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="5c8b0178a5de2eefb03e41f0"><a href="~/run-actions/5c8b0178a5de2eefb03e41f0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/5c8b0178a5de2eefb03e41f0/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="82c8bdf830073f26aa783121"><a href="~/run-actions/82c8bdf830073f26aa783121/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/82c8bdf830073f26aa783121/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

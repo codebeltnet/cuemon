@@ -7,23 +7,32 @@ example:
 The following example demonstrates how to return a <xref cref="Cuemon.AspNetCore.Mvc.TooManyRequestsObjectResult"/> with a descriptive error object to produce a 429 HTTP response.
 
 ```csharp
+// Program.cs
 using Cuemon.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using MyApp.Examples;
 
-namespace MyApp.Examples;
+Console.WriteLine(new RateLimitController().GetData());
 
-public class RateLimitController : Controller
+namespace MyApp.Examples
 {
-    [HttpGet("/api/rate-limited")]
-    public IActionResult GetData()
+    public class RateLimitController : Controller
     {
-        return new TooManyRequestsObjectResult(new
+        [HttpGet("/api/rate-limited")]
+        public IActionResult GetData()
         {
-            error = "API rate limit exceeded. Please try again later.",
-            retryAfter = 60
-        });
+            return new TooManyRequestsObjectResult(new
+            {
+                error = "API rate limit exceeded. Please try again later.",
+                retryAfter = 60
+            });
 
+    }
+    }
 }
-}
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="874cda674becce3e326a75b8"><a href="~/run-actions/874cda674becce3e326a75b8/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/874cda674becce3e326a75b8/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

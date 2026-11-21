@@ -7,17 +7,12 @@ example:
 `StringDecoratorExtensions` in the `Xml.Linq` namespace provides extension methods on `Decorator.Enclose` for validating and parsing XML strings into `XElement` objects. This example checks valid XML (`"<root><item id=\"1\">value</item></root>"`) with `IsXmlString` returning `True`, parses it via `TryParseXElement` and navigates to read the root name, item attribute, and value. Invalid XML (`"not xml at all"`) returns `False` for `IsXmlString` and `TryParseXElement` returns `false` with `null`. It also demonstrates `TryParseXElement` with `LoadOptions.PreserveWhitespace` to retain whitespace in the parsed output. Console output confirms each validation and parsing result.
 
 ```csharp
+// Program.cs
 using System;
 using System.Xml.Linq;
 using Cuemon;
 using Cuemon.Xml.Linq;
 
-namespace MyApp.Xml
-{
-    public class StringDecoratorExtensionsExample
-    {
-        public void Demonstrate()
-        {
             // Valid XML string
             var validXml = "<root><item id=\"1\">value</item></root>";
 
@@ -54,7 +49,9 @@ namespace MyApp.Xml
             {
                 Console.WriteLine($"Preserved whitespace element: '{preserveElement}'");
 
-}}}}}
-}
-
+}}}
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="4f305536e3671135d7db80d5"><a href="~/run-actions/4f305536e3671135d7db80d5/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/4f305536e3671135d7db80d5/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

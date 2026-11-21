@@ -7,10 +7,14 @@ example:
 `DataStatement` represents a database command with support for text queries, stored procedures, and parameterized commands. This example creates three different statements: a text query via implicit conversion from `"SELECT * FROM Product"`, a stored procedure `"dbo.GetOrdersByDate"` with a 120-second timeout configured through an options delegate, and a parameterized `UPDATE` command with two `IDataParameter` inputs (`@qty` and `@id`). Console output shows each statement's text, `CommandType`, timeout, parameter count, and parameter names.
 
 ```csharp
+// Program.cs
 using System;
 using System.Data;
 using System.Linq;
 using Cuemon.Data;
+using MyApp.DataAccess;
+
+new DataStatementExample().Demonstrate();
 
 namespace MyApp.DataAccess
 {
@@ -67,3 +71,7 @@ namespace MyApp.DataAccess
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="9d4e7595528c9d2aa17730fe"><a href="~/run-actions/9d4e7595528c9d2aa17730fe/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/9d4e7595528c9d2aa17730fe/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

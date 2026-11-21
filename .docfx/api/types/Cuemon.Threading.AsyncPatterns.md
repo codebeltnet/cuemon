@@ -7,37 +7,46 @@ example:
 `AsyncPatterns` provides safe asynchronous patterns for resource management, including `SafeInvokeAsync` that ensures proper disposal of `IDisposable` resources (CA2000 compliant). This example calls `SafeInvokeAsync` with a factory delegate creating a `MemoryStream`, an invocation delegate that writes `"Cuemon"` bytes to it and returns the stream, and a `CancellationToken`. The resulting stream is read back via `StreamReader` to confirm the content, and the `AsyncPatterns.Use` sentinel is compared with itself to verify static reference identity. Console output displays `"Cuemon"` and `True` for the reference comparison.
 
 ```csharp
+// Program.cs
 using System;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Cuemon.Threading;
+using Contoso.Streaming;
 
-namespace Contoso.Streaming;
+await AsyncPatternsExample.RunAsync();
 
-public sealed class AsyncPatternsExample
+namespace Contoso.Streaming
 {
-    public static async Task RunAsync()
+    public sealed class AsyncPatternsExample
     {
-        var result = await AsyncPatterns.SafeInvokeAsync(
-            () => new MemoryStream(),
-            async (stream, ct) =>
-            {
-                byte[] buffer = Encoding.UTF8.GetBytes("Cuemon");
-                await stream.WriteAsync(buffer, 0, buffer.Length, ct);
-                stream.Position = 0;
-                return stream;
-            },
-            ct: CancellationToken.None);
-
-        using (result)
-        using (var reader = new StreamReader(result, Encoding.UTF8, true, 1024, true))
+        public static async Task RunAsync()
         {
-            Console.WriteLine(await reader.ReadToEndAsync());
-        }
+            var result = await AsyncPatterns.SafeInvokeAsync(
+                () => new MemoryStream(),
+                async (stream, ct) =>
+                {
+                    byte[] buffer = Encoding.UTF8.GetBytes("Cuemon");
+                    await stream.WriteAsync(buffer, 0, buffer.Length, ct);
+                    stream.Position = 0;
+                    return stream;
+                },
+                ct: CancellationToken.None);
 
-        Console.WriteLine(ReferenceEquals(AsyncPatterns.Use, AsyncPatterns.Use));
+            using (result)
+            using (var reader = new StreamReader(result, Encoding.UTF8, true, 1024, true))
+            {
+                Console.WriteLine(await reader.ReadToEndAsync());
+            }
+
+            Console.WriteLine(ReferenceEquals(AsyncPatterns.Use, AsyncPatterns.Use));
+        }
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="d288d1da3282f8bdef8a22df"><a href="~/run-actions/d288d1da3282f8bdef8a22df/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/d288d1da3282f8bdef8a22df/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

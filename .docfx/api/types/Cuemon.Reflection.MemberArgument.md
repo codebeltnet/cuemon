@@ -7,15 +7,10 @@ example:
 The following example demonstrates how to create and use MemberArgument instances to represent method parameters and their values, with priority support for ordering.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Reflection;
 
-namespace MyApp.Reflection
-{
-    public static class MemberArgumentExamples
-    {
-        public static void Demonstrate()
-        {
             // Create a MemberArgument to represent a method parameter and its value.
             var arg = new MemberArgument("id", 42);
             Console.WriteLine("Name: {0}", arg.Name);       // id
@@ -23,7 +18,7 @@ namespace MyApp.Reflection
             Console.WriteLine("Priority: {0}", arg.Priority); // 0
 
             // Create arguments for use with MemberParser rehydration.
-            var args = new[]
+            var memberArguments = new[]
             {
                 new MemberArgument("name", "Widget"),
                 new MemberArgument("price", 19.99m),
@@ -31,11 +26,11 @@ namespace MyApp.Reflection
             };
 
             // Priority can control the order of processing.
-            args[0].Priority = 2;
-            args[1].Priority = 1;
-            args[2].Priority = 0;
+            memberArguments[0].Priority = 2;
+            memberArguments[1].Priority = 1;
+            memberArguments[2].Priority = 0;
 
-            foreach (var a in args)
+            foreach (var a in memberArguments)
             {
                 Console.WriteLine("{0} = {1} (priority {2})", a.Name, a.Value, a.Priority);
 
@@ -45,7 +40,9 @@ namespace MyApp.Reflection
             updatable.Priority = 5;
             Console.WriteLine("Updated: {0}", updatable); // [status, shipped, 5]
 
-}}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="4408680283ba9c5ceec80e59"><a href="~/run-actions/4408680283ba9c5ceec80e59/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/4408680283ba9c5ceec80e59/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

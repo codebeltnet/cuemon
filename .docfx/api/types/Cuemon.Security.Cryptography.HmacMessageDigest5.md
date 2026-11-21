@@ -7,12 +7,16 @@ example:
 `HmacMessageDigest5` computes and verifies HMAC-MD5 message authentication codes with support for custom byte order and direct string input. This example creates a 64-byte secret key, computes the HMAC of `"Important: Transfer $100 to account 12345"`, then verifies it by recomputing with the same secret. A tampered message with a different account number produces a different HMAC, confirming tamper detection. It also demonstrates options-based construction with `Endianness.LittleEndian` and direct `ComputeHash(string)` overload. Console output shows the hex and base64 HMAC values, verification status (`True`), tamper detection (`False`), and options-based result.
 
 ```csharp
+// Program.cs
 using System;
 using System.Text;
 using Cuemon.Security;
 using Cuemon.Security.Cryptography;
-
 using Cuemon;
+using MyApp.Security;
+
+HmacMessageDigest5Examples.Demonstrate();
+
 namespace MyApp.Security
 {
     public static class HmacMessageDigest5Examples
@@ -62,3 +66,7 @@ namespace MyApp.Security
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="4a207fae86885e2e8c2a151a"><a href="~/run-actions/4a207fae86885e2e8c2a151a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/4a207fae86885e2e8c2a151a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

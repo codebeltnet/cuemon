@@ -7,35 +7,43 @@ example:
 The following example demonstrates how to create `CdnLinkTagHelper` with CDN-specific options.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Options;
+using MyApp.Examples;
 
-namespace MyApp.Examples;
+CdnLinkTagHelperExample.Demonstrate();
 
-public static class CdnLinkTagHelperExample
+namespace MyApp.Examples
 {
-    public static void Demonstrate()
+    public static class CdnLinkTagHelperExample
     {
-        var options = Options.Create(CreateStylesheetOptions("nblcdn.net"));
-
-        var tagHelper = new CdnLinkTagHelper(options)
+        public static void Demonstrate()
         {
-            Href = "packages/fontawesome/5.15.3/css/all.css"
-        };
-        var stylesheetHref = tagHelper.Options.GetFormattedBaseUrl() + tagHelper.Href;
+            var options = Options.Create(CreateStylesheetOptions("nblcdn.net"));
 
-        Console.WriteLine(stylesheetHref);
-    }
+            var tagHelper = new CdnLinkTagHelper(options)
+            {
+                Href = "packages/fontawesome/5.15.3/css/all.css"
+            };
+            var stylesheetHref = tagHelper.Options.GetFormattedBaseUrl() + tagHelper.Href;
 
-    private static CdnTagHelperOptions CreateStylesheetOptions(string baseUrl)
-    {
-        return new CdnTagHelperOptions
+            Console.WriteLine(stylesheetHref);
+        }
+
+        private static CdnTagHelperOptions CreateStylesheetOptions(string baseUrl)
         {
-            Scheme = ProtocolUriScheme.Https,
-            BaseUrl = baseUrl
-        };
+            return new CdnTagHelperOptions
+            {
+                Scheme = ProtocolUriScheme.Https,
+                BaseUrl = baseUrl
+            };
+        }
     }
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="70fca55c7c1fa818b79defb9"><a href="~/run-actions/70fca55c7c1fa818b79defb9/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/70fca55c7c1fa818b79defb9/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

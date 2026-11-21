@@ -7,25 +7,21 @@ example:
 The following example demonstrates how to await a task with or without flowing the captured synchronization context.
 
 ```csharp
+// Program.cs
 using System;
 using System.Threading.Tasks;
 using Cuemon.Extensions.Threading.Tasks;
 
-namespace MyApp.Examples
-{
-    public static class TaskExtensionsExample
-    {
-        public static async Task DemonstrateAsync()
-        {
-            await Task.Delay(10).ContinueWithCapturedContext();
-            await Task.Delay(10).ContinueWithSuppressedContext();
+await Task.Delay(10).ContinueWithCapturedContext();
+await Task.Delay(10).ContinueWithSuppressedContext();
 
-            var captured = await Task.FromResult(42).ContinueWithCapturedContext();
-            var suppressed = await Task.FromResult(42).ContinueWithSuppressedContext();
+var captured = await Task.FromResult(42).ContinueWithCapturedContext();
+var suppressed = await Task.FromResult(42).ContinueWithSuppressedContext();
 
-            Console.WriteLine(captured);
-            Console.WriteLine(suppressed);
-        }
-    }
-}
+Console.WriteLine(captured);
+Console.WriteLine(suppressed);
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="e6e487eb8bf31e471a681057"><a href="~/run-actions/e6e487eb8bf31e471a681057/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/e6e487eb8bf31e471a681057/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

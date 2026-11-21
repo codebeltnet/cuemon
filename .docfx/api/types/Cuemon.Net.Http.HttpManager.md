@@ -7,36 +7,45 @@ example:
 `HttpManager` provides HTTP operation methods backed by a configurable `IHttpClientFactory`. This example creates an `HttpManager` with a custom `EchoHandler` that returns `200 OK` for all requests, then calls `HttpGetAsync` on a test URI. Key setup includes passing a factory delegate that returns `HttpClient` instances backed by the echo handler. Console output confirms the response status code (`OK`) and that `Timeout` is greater than `TimeSpan.Zero`.
 
 ```csharp
+// Program.cs
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Cuemon.Net.Http;
+using MyApp.Examples;
 
-namespace MyApp.Examples;
+await HttpManagerExample.DemonstrateAsync();
 
-public static class HttpManagerExample
+namespace MyApp.Examples
 {
-    public static async Task DemonstrateAsync()
+    public static class HttpManagerExample
     {
-        using var manager = new HttpManager(() => new HttpClient(new EchoHandler(), false));
-        using var response = await manager.HttpGetAsync(new Uri("https://example.com/health"));
-
-        Console.WriteLine(response.StatusCode);
-        Console.WriteLine(manager.Timeout > TimeSpan.Zero);
-    }
-
-    private sealed class EchoHandler : HttpMessageHandler
-    {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        public static async Task DemonstrateAsync()
         {
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            using var manager = new HttpManager(() => new HttpClient(new EchoHandler(), false));
+            using var response = await manager.HttpGetAsync(new Uri("https://example.com/health"));
+
+            Console.WriteLine(response.StatusCode);
+            Console.WriteLine(manager.Timeout > TimeSpan.Zero);
+        }
+
+        private sealed class EchoHandler : HttpMessageHandler
+        {
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
-                RequestMessage = request,
-                Content = new StringContent("OK")
-            });
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    RequestMessage = request,
+                    Content = new StringContent("OK")
+                });
+            }
         }
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="52102929cfa14d7ce0300f90"><a href="~/run-actions/52102929cfa14d7ce0300f90/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/52102929cfa14d7ce0300f90/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

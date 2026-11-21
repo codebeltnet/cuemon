@@ -7,45 +7,54 @@ example:
 The following example demonstrates how to use <see cref="Cuemon.DisposableOptions"/> to control whether a disposable resource is released when the owning wrapper is disposed.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon;
+using Contoso.IO;
 
-namespace Contoso.IO;
+DisposableOptionsExample.Run();
 
-public sealed class DisposableOptionsExample
+namespace Contoso.IO
 {
-    public static void Run()
+    public sealed class DisposableOptionsExample
     {
-        var resource = new TrackedDisposable();
-        var options = new DisposableOptions
+        public static void Run()
         {
-            LeaveOpen = true
-        };
+            var resource = new TrackedDisposable();
+            var options = new DisposableOptions
+            {
+                LeaveOpen = true
+            };
 
-        DisposeWhenAllowed(resource, options);
-        Console.WriteLine($"Disposed after leave-open: {resource.IsDisposed}");
+            DisposeWhenAllowed(resource, options);
+            Console.WriteLine($"Disposed after leave-open: {resource.IsDisposed}");
 
-        options.LeaveOpen = false;
-        DisposeWhenAllowed(resource, options);
-        Console.WriteLine($"Disposed after close: {resource.IsDisposed}");
-    }
-
-    private static void DisposeWhenAllowed(TrackedDisposable resource, DisposableOptions options)
-    {
-        if (!options.LeaveOpen)
-        {
-            resource.Dispose();
+            options.LeaveOpen = false;
+            DisposeWhenAllowed(resource, options);
+            Console.WriteLine($"Disposed after close: {resource.IsDisposed}");
         }
-    }
 
-    private sealed class TrackedDisposable : IDisposable
-    {
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
+        private static void DisposeWhenAllowed(TrackedDisposable resource, DisposableOptions options)
         {
-            IsDisposed = true;
+            if (!options.LeaveOpen)
+            {
+                resource.Dispose();
+            }
+        }
+
+        private sealed class TrackedDisposable : IDisposable
+        {
+            public bool IsDisposed { get; private set; }
+
+            public void Dispose()
+            {
+                IsDisposed = true;
+            }
         }
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="971dec3e05c07ac80a9873c1"><a href="~/run-actions/971dec3e05c07ac80a9873c1/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/971dec3e05c07ac80a9873c1/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

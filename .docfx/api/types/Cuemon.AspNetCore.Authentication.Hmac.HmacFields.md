@@ -7,32 +7,28 @@ example:
 The following example demonstrates how to reference the field constants of `HmacFields` when building an HMAC authorization header.
 
 ```csharp
+// Program.cs
 using System;
 using System.Net.Http;
 using Cuemon.AspNetCore.Authentication.Hmac;
 
-namespace MyApp.Examples;
+using var request = new HttpRequestMessage(HttpMethod.Get, "https://api.example.com/resource");
+request.Headers.Date = DateTimeOffset.UtcNow;
+request.Headers.Host = "api.example.com";
 
-public static class HmacFieldsExample
-{
-    public static void Demonstrate()
-    {
-        using var request = new HttpRequestMessage(HttpMethod.Get, "https://api.example.com/resource");
-        request.Headers.Date = DateTimeOffset.UtcNow;
-        request.Headers.Host = "api.example.com";
+var builder = new HmacAuthorizationHeaderBuilder()
+    .AddFromRequest(request)
+    .AddClientId("my-client")
+    .AddClientSecret("my-secret")
+    .AddCredentialScope("20250101/us-east-1/service/aws4_request");
 
-        var builder = new HmacAuthorizationHeaderBuilder()
-            .AddFromRequest(request)
-            .AddClientId("my-client")
-            .AddClientSecret("my-secret")
-            .AddCredentialScope("20250101/us-east-1/service/aws4_request");
+var header = builder.Build();
 
-        var header = builder.Build();
-
-        Console.WriteLine(HmacFields.Scheme);
-        Console.WriteLine(HmacFields.SignedHeaders);
-        Console.WriteLine(HmacFields.CanonicalRequest);
-    }
-}
-
+Console.WriteLine(HmacFields.Scheme);
+Console.WriteLine(HmacFields.SignedHeaders);
+Console.WriteLine(HmacFields.CanonicalRequest);
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="f8d73f39bc8e190257b57d33"><a href="~/run-actions/f8d73f39bc8e190257b57d33/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f8d73f39bc8e190257b57d33/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

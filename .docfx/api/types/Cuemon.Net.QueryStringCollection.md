@@ -7,16 +7,11 @@ example:
 `QueryStringCollection` provides creation, parsing, and manipulation of URI query string parameters, extending `NameValueCollection` with URL decoding support. This example creates an empty collection and adds `"search"`, `"page"`, and `"sort"` parameters, parses an existing query string (`"?category=books&author=tolkien"`) with and without URL decoding, and iterates key-value pairs. It also demonstrates cloning the collection and modifying the clone independently to verify they are separate instances. Console output shows the query string representation, decoded values, keys, clone independence, and entry counts.
 
 ```csharp
+// Program.cs
 using System;
 using System.Linq;
 using Cuemon.Net;
 
-namespace MyApp.Net
-{
-    public static class QueryStringCollectionExamples
-    {
-        public static void Demonstrate()
-        {
             // Create an empty query string collection and add parameters.
             var qsc = new QueryStringCollection();
             qsc.Add("search", "dotnet");
@@ -50,7 +45,9 @@ namespace MyApp.Net
             // Count entries.
             Console.WriteLine("Count: {0}", qsc.Count);
 
-}}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="6636f10992cec8203b8df199"><a href="~/run-actions/6636f10992cec8203b8df199/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/6636f10992cec8203b8df199/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

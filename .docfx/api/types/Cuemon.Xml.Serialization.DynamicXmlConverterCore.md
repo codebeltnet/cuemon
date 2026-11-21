@@ -7,10 +7,14 @@ example:
 `DynamicXmlConverterCore` enables creating custom XML converters using read and write delegates, supporting both read/write and write-only scenarios. This example creates a `Person` class and builds a `DynamicXmlConverter` with a writer delegate that serializes `FirstName`, `LastName`, and `Age` as child elements and a reader delegate that deserializes them back. A `Person` instance is serialized to XML and deserialized to confirm round-trip fidelity, and a write-only converter is also demonstrated for scenarios where only serialization is needed. Console output displays the serialized XML, deserialized property values, and the converter's `CanRead`/`CanWrite` capabilities.
 
 ```csharp
+// Program.cs
 using System;
 using System.IO;
 using System.Xml;
 using Cuemon.Xml.Serialization;
+using MyApp.Xml;
+
+DynamicXmlConverterCoreExamples.Demonstrate();
 
 namespace MyApp.Xml
 {
@@ -57,8 +61,9 @@ namespace MyApp.Xml
             Console.WriteLine(xml.ToString());
 
             // Read the Person back from XML.
-            using (var xmlReader = XmlReader.Create(new StringReader(xml.ToString())))
+            using (var xmlReader = XmlReader.Create(new StringReader(xml.ToString()), new XmlReaderSettings { IgnoreWhitespace = true }))
             {
+                xmlReader.MoveToContent();
                 var deserialized = (Person)converter.ReadXml(xmlReader, typeof(Person));
                 Console.WriteLine("Deserialized: {0} {1}, Age {2}",
                     deserialized.FirstName, deserialized.LastName, deserialized.Age);
@@ -97,3 +102,7 @@ namespace MyApp.Xml
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="309a745320819cef16751645"><a href="~/run-actions/309a745320819cef16751645/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/309a745320819cef16751645/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

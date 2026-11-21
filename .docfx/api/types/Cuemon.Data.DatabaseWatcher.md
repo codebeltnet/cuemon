@@ -7,12 +7,16 @@ example:
 `DatabaseWatcher` monitors a database for data changes by comparing checksums computed from `IDataReader` results over time. This example creates a `SampleDatabaseWatcher` subclass with an in-memory `InMemoryConnection` and a factory that returns a `DataTable`'s contents as a reader, then subscribes to the `Changed` event. Key steps include calling `SignalAsync` to capture the initial checksum, modifying the data table, and signaling again to detect the change. Console output shows the initial checksum value, the number of change signals raised (1), and the updated checksum that differs from the original, confirming modification detection.
 
 ```csharp
+// Program.cs
 using System;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Cuemon.Data;
 using Cuemon.Runtime;
+using MyApp.Data;
+
+await new DatabaseWatcherExample().DemonstrateAsync();
 
 namespace MyApp.Data
 {
@@ -110,3 +114,7 @@ namespace MyApp.Data
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="2c19882a597c57df7fe45532"><a href="~/run-actions/2c19882a597c57df7fe45532/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/2c19882a597c57df7fe45532/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

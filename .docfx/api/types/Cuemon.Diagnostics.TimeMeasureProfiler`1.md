@@ -7,31 +7,39 @@ example:
 `TimeMeasureProfiler<TResult>` extends `TimeMeasureProfiler` by providing typed access to the result of a timed function via `TimeMeasure.WithFunc`. This example wraps a `Thread.Sleep(100)` followed by returning `42`, then inspects the profiler's `Result` (`42`), `Elapsed` (~100ms), `IsRunning` (`False`), and `Member` properties. Key setup includes capturing the profiler and checking each property after execution. Console output shows the result value, the elapsed duration, the running state, the member name, and the `ToString()` output like `<anonymous method> took 00:00:00.100 to execute.`.
 
 ```csharp
+// Program.cs
 using System;
 using System.Threading;
 using Cuemon.Diagnostics;
+using MyApp.Examples;
 
-namespace MyApp.Examples;
+new TimeMeasureProfilerOfTExample().Demonstrate();
 
-public class TimeMeasureProfilerOfTExample
+namespace MyApp.Examples
 {
-    public void Demonstrate()
+    public class TimeMeasureProfilerOfTExample
     {
-        // TimeMeasure.WithFunc returns a TimeMeasureProfiler<int>
-        TimeMeasureProfiler<int> profiler = TimeMeasure.WithFunc(() =>
+        public void Demonstrate()
         {
-            Thread.Sleep(100);
-            return 42;
-        });
+            // TimeMeasure.WithFunc returns a TimeMeasureProfiler<int>
+            TimeMeasureProfiler<int> profiler = TimeMeasure.WithFunc(() =>
+            {
+                Thread.Sleep(100);
+                return 42;
+            });
 
-        Console.WriteLine($"Result: {profiler.Result}");       // 42
-        Console.WriteLine($"Elapsed: {profiler.Elapsed}");     // ~00:00:00.100
-        Console.WriteLine($"IsRunning: {profiler.IsRunning}");  // False
-        Console.WriteLine($"Member: {profiler.Member}");        // <anonymous method>
-        Console.WriteLine(profiler.ToString());
-        // Output: <anonymous method> took 00:00:00.100 to execute.
+            Console.WriteLine($"Result: {profiler.Result}");       // 42
+            Console.WriteLine($"Elapsed: {profiler.Elapsed}");     // ~00:00:00.100
+            Console.WriteLine($"IsRunning: {profiler.IsRunning}");  // False
+            Console.WriteLine($"Member: {profiler.Member}");        // <anonymous method>
+            Console.WriteLine(profiler.ToString());
+            // Output: <anonymous method> took 00:00:00.100 to execute.
 
+    }
+    }
 }
-}
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="3f32907bd26e45c902b55415"><a href="~/run-actions/3f32907bd26e45c902b55415/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/3f32907bd26e45c902b55415/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

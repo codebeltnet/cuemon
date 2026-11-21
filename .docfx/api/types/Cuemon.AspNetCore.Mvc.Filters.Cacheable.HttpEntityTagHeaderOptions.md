@@ -4,9 +4,10 @@ example:
 - *content
 ---
 
-The following example uses <xref cref="Cuemon.AspNetCore.Mvc.Filters.Cacheable.HttpEntityTagHeaderOptions"/> the same way the unit tests exercise its default delegates: by applying an ETag from entity integrity data and then from a response-body fallback parser.
+The following example uses <xref cref="Cuemon.AspNetCore.Mvc.Filters.Cacheable.HttpEntityTagHeaderOptions"/> the same way the unit tests exercise its default delegates: by applying an ETag from entity integrity data and then from a response-body fallback parser. The sample applies an integrity-backed ETag first, exercises the response-body parser second, and prints whether each provider is configured and whether the response ETag header was populated.
 
 ```csharp
+// Program.cs
 using System;
 using System.IO;
 using System.Text;
@@ -15,36 +16,44 @@ using Cuemon.Data.Integrity;
 using Cuemon.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
+using MyApp.Examples;
 
-namespace MyApp.Examples;
+HttpEntityTagHeaderOptionsExample.Demonstrate();
 
-public static class HttpEntityTagHeaderOptionsExample
+namespace MyApp.Examples
 {
-    public static void Demonstrate()
+    public static class HttpEntityTagHeaderOptionsExample
     {
-        var options = new HttpEntityTagHeaderOptions
+        public static void Demonstrate()
         {
-            UseEntityTagResponseParser = true
-        };
+            var options = new HttpEntityTagHeaderOptions
+            {
+                UseEntityTagResponseParser = true
+            };
 
-        var context = new DefaultHttpContext();
-        context.Request.Method = HttpMethods.Get;
+            var context = new DefaultHttpContext();
+            context.Request.Method = HttpMethods.Get;
 
-        options.EntityTagProvider(new SampleEntityDataIntegrity(), context);
+            options.EntityTagProvider(new SampleEntityDataIntegrity(), context);
 
-        using var body = new MemoryStream(Encoding.UTF8.GetBytes("payload"));
-        options.EntityTagResponseParser(body, context.Request, context.Response);
+            using var body = new MemoryStream(Encoding.UTF8.GetBytes("payload"));
+            options.EntityTagResponseParser(body, context.Request, context.Response);
 
-        Console.WriteLine(options.HasEntityTagProvider);
-        Console.WriteLine(options.HasEntityTagResponseParser);
-        Console.WriteLine(context.Response.Headers.ContainsKey(HeaderNames.ETag));
-    }
+            Console.WriteLine(options.HasEntityTagProvider);
+            Console.WriteLine(options.HasEntityTagResponseParser);
+            Console.WriteLine(context.Response.Headers.ContainsKey(HeaderNames.ETag));
+        }
 
-    private sealed class SampleEntityDataIntegrity : IEntityDataIntegrity
-    {
-        public HashResult Checksum => new HashResult(new byte[] { 1, 2, 3 });
+        private sealed class SampleEntityDataIntegrity : IEntityDataIntegrity
+        {
+            public HashResult Checksum => new HashResult(new byte[] { 1, 2, 3 });
 
-        public EntityDataIntegrityValidation Validation => EntityDataIntegrityValidation.Strong;
+            public EntityDataIntegrityValidation Validation => EntityDataIntegrityValidation.Strong;
+        }
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="fecb58b2357d4f41b14c6984"><a href="~/run-actions/fecb58b2357d4f41b14c6984/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/fecb58b2357d4f41b14c6984/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

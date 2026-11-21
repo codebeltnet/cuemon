@@ -7,36 +7,33 @@ example:
 The following example demonstrates how to configure AsyncOptions to provide a cancellation token for asynchronous operations.
 
 ```csharp
+// Program.cs
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Cuemon.Threading;
 
-namespace Contoso.BackgroundJobs;
+var defaults = new AsyncOptions();
+Console.WriteLine(defaults.CancellationToken == CancellationToken.None);
 
-public sealed class AsyncOptionsExample
+using var cts = new CancellationTokenSource();
+var options = new AsyncOptions
 {
-    public static async Task RunAsync()
-    {
-        var defaults = new AsyncOptions();
-        Console.WriteLine(defaults.CancellationToken == CancellationToken.None);
+    CancellationTokenProvider = () => cts.Token
+};
 
-        using var cts = new CancellationTokenSource();
-        var options = new AsyncOptions
-        {
-            CancellationTokenProvider = () => cts.Token
-        };
+cts.Cancel();
 
-        cts.Cancel();
-
-        try
-        {
-            await Task.Delay(10, options.CancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            Console.WriteLine("Cancelled as expected.");
-        }
-    }
+try
+{
+    await Task.Delay(10, options.CancellationToken);
+}
+catch (OperationCanceledException)
+{
+    Console.WriteLine("Cancelled as expected.");
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="2490d13995181c455228acbf"><a href="~/run-actions/2490d13995181c455228acbf/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/2490d13995181c455228acbf/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

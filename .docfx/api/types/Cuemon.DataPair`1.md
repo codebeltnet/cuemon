@@ -7,16 +7,11 @@ example:
 The following example demonstrates how to use the generic <xref cref="Cuemon.DataPair{T}"/> class to represent typed metadata.
 
 ```csharp
+// Program.cs
 using System;
 using System.Collections.Generic;
 using Cuemon;
 
-namespace MyApp.Examples;
-
-public class DataPairOfTExample
-{
-    public void Demonstrate()
-    {
         // Create a strongly typed DataPair<T> for an integer value
         var age = new DataPair<int>("Age", 30);
         Console.WriteLine(age.HasValue); // True
@@ -45,7 +40,9 @@ public class DataPairOfTExample
         {
             Console.WriteLine(pair);
 
-}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="518c1f9c16336835d4a1b1db"><a href="~/run-actions/518c1f9c16336835d4a1b1db/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/518c1f9c16336835d4a1b1db/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

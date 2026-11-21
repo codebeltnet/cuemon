@@ -7,8 +7,12 @@ example:
 `DependencyEventArgs` provides event data for dependency change notifications, carrying the UTC timestamp of the last modification. This example creates event args with `DateTime.UtcNow`, a specific past timestamp (`2026-06-01T12:00:00Z`), and the `Empty` sentinel representing no change. It also demonstrates raising a `DependencyChanged` event from a custom `DependencyMonitor` class and handling it to print the UTC timestamp. Console output displays the last modified timestamp in ISO 8601 format, confirms the `Empty` sentinel returns `MinValue`, and shows event-driven output.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Runtime;
+using MyApp.Runtime;
+
+DependencyEventArgsExamples.CreateEventArgs();
 
 namespace MyApp.Runtime
 {
@@ -59,3 +63,7 @@ namespace MyApp.Runtime
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="af1f226a232e1c7816b2412a"><a href="~/run-actions/af1f226a232e1c7816b2412a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/af1f226a232e1c7816b2412a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

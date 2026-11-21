@@ -7,39 +7,48 @@ example:
 The following example configures the same cache-filter collection patterns exercised by the unit tests: use the convenience methods for the default pipeline, or switch to the generic overloads when you need explicit ordering and option control.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.AspNetCore.Mvc.Filters.Cacheable;
 using Cuemon.Extensions.AspNetCore.Mvc.Filters.Cacheable;
+using Cuemon.Extensions.AspNetCore.Mvc.Filters.Cacheable.DocExamples;
 
-namespace Cuemon.Extensions.AspNetCore.Mvc.Filters.Cacheable.DocExamples;
+Console.WriteLine(new CacheableAsyncResultFilterExtensionsExample().CreateDefaultProfile());
 
-public sealed class CacheableAsyncResultFilterExtensionsExample
+namespace Cuemon.Extensions.AspNetCore.Mvc.Filters.Cacheable.DocExamples
 {
-    public HttpCacheableOptions CreateDefaultProfile()
+    public sealed class CacheableAsyncResultFilterExtensionsExample
     {
-        var options = new HttpCacheableOptions();
-        options.Filters.AddLastModifiedHeader();
-        options.Filters.AddEntityTagHeader();
-        return options;
-    }
-
-    public HttpCacheableOptions CreateCustomProfile()
-    {
-        var options = new HttpCacheableOptions();
-        options.Filters.AddFilter<HttpEntityTagHeaderFilter, HttpEntityTagHeaderOptions>(entityTag =>
+        public HttpCacheableOptions CreateDefaultProfile()
         {
-            entityTag.UseEntityTagResponseParser = true;
-        });
-        options.Filters.InsertFilter<HttpLastModifiedHeaderFilter>(0);
-        return options;
-    }
+            var options = new HttpCacheableOptions();
+            options.Filters.AddLastModifiedHeader();
+            options.Filters.AddEntityTagHeader();
+            return options;
+        }
 
-    public void Describe()
-    {
-        var defaultProfile = CreateDefaultProfile();
-        var customProfile = CreateCustomProfile();
+        public HttpCacheableOptions CreateCustomProfile()
+        {
+            var options = new HttpCacheableOptions();
+            options.Filters.AddFilter<HttpEntityTagHeaderFilter, HttpEntityTagHeaderOptions>(entityTag =>
+            {
+                entityTag.UseEntityTagResponseParser = true;
+            });
+            options.Filters.InsertFilter<HttpLastModifiedHeaderFilter>(0);
+            return options;
+        }
 
-        Console.WriteLine($"{defaultProfile.Filters.Count} default filters, {customProfile.Filters.Count} custom filters.");
+        public void Describe()
+        {
+            var defaultProfile = CreateDefaultProfile();
+            var customProfile = CreateCustomProfile();
+
+            Console.WriteLine($"{defaultProfile.Filters.Count} default filters, {customProfile.Filters.Count} custom filters.");
+        }
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="0baf760afd2a06d6f6ad4d4e"><a href="~/run-actions/0baf760afd2a06d6f6ad4d4e/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0baf760afd2a06d6f6ad4d4e/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

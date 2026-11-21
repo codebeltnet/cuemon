@@ -7,15 +7,10 @@ example:
 `ServerTimingMetric` records performance data points for the HTTP `Server-Timing` header, supporting metrics with or without duration and description. This example constructs three metrics — `"db-query"` with 135.2ms duration and a description, `"cache-hit"` as a marker-only metric, and `"redis-get"` with a 3.7ms duration — then integrates them with `IServerTiming` via `AddServerTiming` to build a complete server-timing collection. Key steps include creating metrics with various constructor overloads and iterating the final list. Console output shows header-value strings such as `db-query;dur=135.2;desc="Customer order lookup"` and `cache-hit`.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.AspNetCore.Diagnostics;
 
-namespace MyApp.Diagnostics
-{
-    public class ServerTimingMetricExample
-    {
-        public void Demonstrate()
-        {
             // Record a metric for a database query
             var dbMetric = new ServerTimingMetric("db-query",
                 TimeSpan.FromMilliseconds(135.2),
@@ -48,7 +43,9 @@ namespace MyApp.Diagnostics
             {
                 Console.WriteLine(metric);
 
-}}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="f5353e66d277406435d5b620"><a href="~/run-actions/f5353e66d277406435d5b620/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f5353e66d277406435d5b620/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

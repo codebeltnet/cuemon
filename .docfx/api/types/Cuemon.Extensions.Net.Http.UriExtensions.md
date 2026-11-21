@@ -7,6 +7,7 @@ example:
 `UriExtensions` provides HTTP extension methods directly on `Uri` covering GET, POST, PUT, DELETE, HEAD, OPTIONS, PATCH, and TRACE with support for custom headers, content types, and cancellation. This example assigns a stub `IHttpClientFactory` that returns a fixed `200 OK` response, then calls each HTTP method variant including `HttpGetAsync`, `HttpDeleteAsync`, `HttpPostAsync` with JSON content, `HttpPutAsync` with a stream body, `HttpPatchAsync`, `HttpTraceAsync`, and the generic `HttpAsync` overload for full `HttpRequestOptions` control with custom headers. It also demonstrates passing a `CancellationToken` with a timeout that triggers a `TaskCanceledException`. Console output confirms that each request returns `200 OK` and that cancellation is handled gracefully.
 
 ```csharp
+// Program.cs
 using System.Text;
 using System;
 using System.IO;
@@ -16,6 +17,9 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Cuemon.Extensions.Net.Http;
+using MyApp.Http;
+
+await new UriExtensionsExample().DemonstrateAsync();
 
 namespace MyApp.Http
 {
@@ -175,5 +179,8 @@ namespace MyApp.Http
         }
     }
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="31f27abdd71359ad7af83a56"><a href="~/run-actions/31f27abdd71359ad7af83a56/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/31f27abdd71359ad7af83a56/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

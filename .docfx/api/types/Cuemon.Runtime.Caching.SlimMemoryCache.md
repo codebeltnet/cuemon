@@ -7,15 +7,9 @@ example:
 `SlimMemoryCache` provides in-memory caching with absolute and sliding expiration, namespace grouping, and automatic cleanup. This example creates a cache with cleanup enabled (`FirstSweep = 30s`, `SucceedingSweep = 10s`), adds a config entry with absolute expiration, a session entry with sliding expiration under the `"sessions"` namespace, and updates the config entry via the indexer. It demonstrates safe retrieval with `TryGet`, key-based removal with `Remove`, namespace-based counting with `Count("data")`, and bulk namespace removal with `RemoveAll("data")`. Console output confirms the cached values, update status, removal success, and namespace counts before and after removal.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Runtime.Caching;
-
-namespace MyApp.Examples;
-
-public class Example
-{
-    public void Run()
-    {
 
         // Create a cache with automatic cleanup
         var cache = new SlimMemoryCache(o =>
@@ -59,7 +53,9 @@ public class Example
 
         cache.Dispose();
 
-}}}
-}
-
+}}
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="f8bbfdc259cd20e8f7ffa98f"><a href="~/run-actions/f8bbfdc259cd20e8f7ffa98f/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f8bbfdc259cd20e8f7ffa98f/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

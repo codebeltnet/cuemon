@@ -7,18 +7,13 @@ example:
 The following example demonstrates how to use the `Condition` class to perform common validation checks, equality comparisons, conditional branching, and range assertions. It exercises `AreEqual`, `AreNotEqual`, and `AreSame` for equality, `FlipFlop` and `TernaryIf` for conditional execution, and validation helpers such as `IsEmail`, `IsGuid`, `IsNumeric`, `IsPrime`, and `IsWithinRange`. An async flip-flop variant confirms the API works with task-based delegates. Each result is written to the console, illustrating the full validation utility surface.
 
 ```csharp
+// Program.cs
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Cuemon;
 
-namespace MyApp.Validation
-{
-    public class ConditionExamples
-    {
-        public void DemonstrateConditions()
-        {
             // AreEqual / AreNotEqual with default and custom comparers
             if (Condition.AreEqual("hello", "hello"))
             {
@@ -110,7 +105,9 @@ namespace MyApp.Validation
             task.Wait();
             Console.WriteLine(string.Join(", ", asyncLog)); // "async:true"
 
-}}}}}
-}
-
+}}}
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="cd129cf1f6aca8ba5492e9c6"><a href="~/run-actions/cd129cf1f6aca8ba5492e9c6/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/cd129cf1f6aca8ba5492e9c6/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

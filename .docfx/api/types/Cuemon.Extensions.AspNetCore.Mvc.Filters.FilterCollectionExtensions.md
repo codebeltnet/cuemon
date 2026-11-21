@@ -7,39 +7,30 @@ example:
 The following example demonstrates how to use the <xref:Cuemon.Extensions.AspNetCore.Mvc.Filters.FilterCollectionExtensions> extension methods to register common ASP.NET Core MVC filters.
 
 ```csharp
+// Program.cs
+using System;
 using Cuemon.Extensions.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
-namespace MyAspNetCoreApp
+var services = new ServiceCollection();
+services.AddLogging();
+services.AddControllers(options =>
 {
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddControllers(options =>
-            {
-                // Add HTTP cacheable filter for response caching
-                options.Filters.AddHttpCacheable();
+    options.Filters.AddHttpCacheable();
+    options.Filters.AddFaultDescriptor();
+    options.Filters.AddServerTiming();
+    options.Filters.AddUserAgentSentinel();
+    options.Filters.AddThrottlingSentinel();
+    options.Filters.AddApiKeySentinel();
+});
 
-                // Add developer-friendly fault descriptor
-                options.Filters.AddFaultDescriptor();
-
-                // Add server timing header for performance profiling
-                options.Filters.AddServerTiming();
-
-                // Add User-Agent sentinel filter
-                options.Filters.AddUserAgentSentinel();
-
-                // Add API throttling sentinel
-                options.Filters.AddThrottlingSentinel();
-
-                // Add API key sentinel
-                options.Filters.AddApiKeySentinel();
-            });
-
-}}
-}
-
+using var provider = services.BuildServiceProvider();
+var options = provider.GetRequiredService<IOptions<MvcOptions>>().Value;
+Console.WriteLine(options.Filters.Count);
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="76c72a695fb0fd1607163e3d"><a href="~/run-actions/76c72a695fb0fd1607163e3d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/76c72a695fb0fd1607163e3d/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

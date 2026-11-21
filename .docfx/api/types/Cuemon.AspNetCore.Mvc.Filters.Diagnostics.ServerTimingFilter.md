@@ -7,6 +7,7 @@ example:
 The following example shows the constructor dependencies used when creating <xref cref="Cuemon.AspNetCore.Mvc.Filters.Diagnostics.ServerTimingFilter"/> directly.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.AspNetCore.Diagnostics;
 using Cuemon.AspNetCore.Mvc.Filters.Diagnostics;
@@ -14,38 +15,46 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MyApp.Examples;
 
-namespace MyApp.Examples;
+ServerTimingFilterExample.Demonstrate();
 
-public static class ServerTimingFilterExample
+namespace MyApp.Examples
 {
-    public static void Demonstrate()
+    public static class ServerTimingFilterExample
     {
-        var options = Options.Create(new ServerTimingOptions
+        public static void Demonstrate()
         {
-            UseTimeMeasureProfiler = true,
-            SuppressHeaderPredicate = _ => false
-        });
+            var options = Options.Create(new ServerTimingOptions
+            {
+                UseTimeMeasureProfiler = true,
+                SuppressHeaderPredicate = _ => false
+            });
 
-        using var loggerFactory = LoggerFactory.Create(_ => { });
-        var filter = new ServerTimingFilter(
-            options,
-            new SampleHostEnvironment(),
-            loggerFactory.CreateLogger<ServerTimingFilter>());
+            using var loggerFactory = LoggerFactory.Create(_ => { });
+            var filter = new ServerTimingFilter(
+                options,
+                new SampleHostEnvironment(),
+                loggerFactory.CreateLogger<ServerTimingFilter>());
 
-        Console.WriteLine(filter.Options.UseTimeMeasureProfiler);
-        Console.WriteLine(filter.Options.SuppressHeaderPredicate is not null);
-    }
+            Console.WriteLine(filter.Options.UseTimeMeasureProfiler);
+            Console.WriteLine(filter.Options.SuppressHeaderPredicate is not null);
+        }
 
-    private sealed class SampleHostEnvironment : IHostEnvironment
-    {
-        public string EnvironmentName { get; set; } = Environments.Development;
+        private sealed class SampleHostEnvironment : IHostEnvironment
+        {
+            public string EnvironmentName { get; set; } = Environments.Development;
 
-        public string ApplicationName { get; set; } = nameof(ServerTimingFilterExample);
+            public string ApplicationName { get; set; } = nameof(ServerTimingFilterExample);
 
-        public string ContentRootPath { get; set; } = AppContext.BaseDirectory;
+            public string ContentRootPath { get; set; } = AppContext.BaseDirectory;
 
-        public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
+            public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
+        }
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="07cb1b2ab9859c94b3bcb30f"><a href="~/run-actions/07cb1b2ab9859c94b3bcb30f/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/07cb1b2ab9859c94b3bcb30f/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

@@ -7,23 +7,32 @@ example:
 The following example demonstrates how to return a `GoneException` from a deprecated API endpoint that has been removed.
 
 ```csharp
+// Program.cs
 using System;
+using Cuemon.AspNetCore.Http;
 
-namespace Cuemon.AspNetCore.Http;
+GoneExceptionExample.Demonstrate();
 
-public static class GoneExceptionExample
+namespace Cuemon.AspNetCore.Http
 {
-    public static void Demonstrate()
+    public static class GoneExceptionExample
     {
-        var exception = CreateArchivedEndpointException("/v1/orders");
+        public static void Demonstrate()
+        {
+            var exception = CreateArchivedEndpointException("/v1/orders");
 
-        Console.WriteLine(exception.Message);
-        Console.WriteLine(exception.StatusCode);
-    }
+            Console.WriteLine(exception.Message);
+            Console.WriteLine(exception.StatusCode);
+        }
 
-    private static GoneException CreateArchivedEndpointException(string route)
-    {
-        return new GoneException($"The resource at '{route}' has been retired.");
+        private static GoneException CreateArchivedEndpointException(string route)
+        {
+            return new GoneException($"The resource at '{route}' has been retired.");
+        }
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="3a45aa3985c05f063c7c9208"><a href="~/run-actions/3a45aa3985c05f063c7c9208/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/3a45aa3985c05f063c7c9208/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

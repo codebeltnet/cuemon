@@ -7,9 +7,13 @@ example:
 The following example customizes `TypeForwardServiceOptions` so only one nested contract is forwarded when a concrete implementation is added to the dependency-injection container.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Cuemon.Docs.Samples.DependencyInjection;
+
+TypeForwardServiceOptionsExample.Demonstrate();
 
 namespace Cuemon.Docs.Samples.DependencyInjection
 {
@@ -71,3 +75,7 @@ namespace Cuemon.Docs.Samples.DependencyInjection
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="aa20d15c123168d422065d85"><a href="~/run-actions/aa20d15c123168d422065d85/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/aa20d15c123168d422065d85/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

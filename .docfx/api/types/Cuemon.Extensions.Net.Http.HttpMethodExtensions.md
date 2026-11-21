@@ -7,17 +7,12 @@ example:
 The following example demonstrates how to convert between System.Net.Http.HttpMethod and the Cuemon HttpMethods enum using HttpMethodExtensions.
 
 ```csharp
+// Program.cs
 using System;
 using System.Net.Http;
 using Cuemon.Extensions.Net.Http;
 using Cuemon.Net.Http;
 
-namespace MyApp.Net
-{
-    public class HttpMethodExtensionsExample
-    {
-        public void Demonstrate()
-        {
             // Convert System.Net.Http.HttpMethod to the Cuemon HttpMethods enum
             HttpMethod getMethod = HttpMethod.Get;
             HttpMethods method = getMethod.ToHttpMethod();
@@ -37,7 +32,9 @@ namespace MyApp.Net
             {
                 Console.WriteLine("This is a GET request.");
 
-}}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="140d6619210398202cf76197"><a href="~/run-actions/140d6619210398202cf76197/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/140d6619210398202cf76197/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

@@ -7,11 +7,15 @@ example:
 `MemberInfoDecoratorExtensions` provides extension methods on `Decorator.Enclose` for checking whether a `MemberInfo` has one or more custom attributes via `HasAttribute`. This example gets `MemberInfo` for a method without attributes and another decorated with `[Obsolete]`, then calls `HasAttribute` with single (`ObsoleteAttribute`) and multiple attribute types on each. Console output shows `False` for the method without `ObsoleteAttribute`, `False` for `Obsolete` or `EditorBrowsable`, and `True` for the deprecated method, confirming correct attribute detection through the decorator pattern.
 
 ```csharp
+// Program.cs
 using System;
 using System.ComponentModel;
 using System.Reflection;
 using Cuemon;
 using Cuemon.Reflection;
+using MyApp.Reflection;
+
+new MemberInfoDecoratorExtensionsExample().Demonstrate();
 
 namespace MyApp.Reflection
 {
@@ -49,3 +53,7 @@ namespace MyApp.Reflection
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="d663e6d4312fed07eb976d3d"><a href="~/run-actions/d663e6d4312fed07eb976d3d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/d663e6d4312fed07eb976d3d/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

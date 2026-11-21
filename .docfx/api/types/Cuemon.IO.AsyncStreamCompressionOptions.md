@@ -7,6 +7,7 @@ example:
 `AsyncStreamCompressionOptions` configures compression level and buffer size for asynchronous stream compression operations. This example creates default options with `CompressionLevel.Optimal` and an `81920` buffer size, fast options with `CompressionLevel.Fastest` and a `4096` buffer for CPU-sensitive scenarios, and no-compression options for testing or passthrough use. Key steps include compressing sample data using `DeflateStream` with the configured options and comparing original vs. compressed byte sizes. Console output shows the default level (`Optimal`), buffer size, and the compression ratio between original and compressed sizes.
 
 ```csharp
+// Program.cs
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -14,12 +15,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Cuemon.IO;
 
-namespace MyApp.IO
-{
-    public class AsyncStreamCompressionOptionsExample
-    {
-        public async Task DemonstrateAsync()
-        {
             // Default compression: Optimal balance of speed and size
             var defaultOptions = new AsyncStreamCompressionOptions();
             Console.WriteLine($"Default level: {defaultOptions.Level}"); // Optimal
@@ -51,7 +46,9 @@ namespace MyApp.IO
             };
             Console.WriteLine($"No compression level: {noCompressionOptions.Level}");
 
-}}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="fc5bc2b379d6ad6e5386b6b5"><a href="~/run-actions/fc5bc2b379d6ad6e5386b6b5/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/fc5bc2b379d6ad6e5386b6b5/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

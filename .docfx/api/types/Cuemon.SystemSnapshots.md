@@ -7,15 +7,10 @@ example:
 The following example demonstrates how to use the `SystemSnapshots` flags enum to specify which system information categories to capture in a diagnostics snapshot.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon;
 
-namespace MyApp.Examples
-{
-    public class SystemSnapshotsExample
-    {
-        public void Demonstrate()
-        {
             // SystemSnapshots is a flags enum controlling which system
             // information categories to capture.
 
@@ -39,7 +34,9 @@ namespace MyApp.Examples
             Console.WriteLine($"Flags: {flags}");                           // CaptureThreadInfo | CaptureProcessInfo
             Console.WriteLine($"Has thread info: {flags.HasFlag(SystemSnapshots.CaptureThreadInfo)}");   // True
 
-}}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="0a3f204ebac75cfb9b9d91e1"><a href="~/run-actions/0a3f204ebac75cfb9b9d91e1/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0a3f204ebac75cfb9b9d91e1/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

@@ -7,10 +7,14 @@ example:
 The following example shows how to create default and custom `ThrottlingSentinelOptions` to configure rate-limiting behavior. It demonstrates setting the quota, context resolver, header names, and retry-after scope, then validates the configuration and prints the selected values.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.AspNetCore.Http.Headers;
 using Cuemon.AspNetCore.Http.Throttling;
 using Microsoft.AspNetCore.Http;
+using MyApp.Http.Throttling;
+
+Console.WriteLine(new ThrottlingSentinelOptionsExample().CreateDefault());
 
 namespace MyApp.Http.Throttling
 {
@@ -56,3 +60,7 @@ namespace MyApp.Http.Throttling
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="57b87d3a247429bade8c6308"><a href="~/run-actions/57b87d3a247429bade8c6308/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/57b87d3a247429bade8c6308/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

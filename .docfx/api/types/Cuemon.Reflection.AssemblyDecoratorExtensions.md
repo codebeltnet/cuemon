@@ -7,6 +7,7 @@ example:
 `AssemblyDecoratorExtensions` provides extension methods on `Decorator.Enclose` for inspecting assembly metadata, loading embedded resources, and filtering types. This example wraps the entry assembly and calls `IsDebugBuild`, `GetAssemblyVersion`, `GetFileVersion`, and `GetProductVersion` to retrieve version information. It also demonstrates `GetTypes` with optional namespace and interface filters, and `GetManifestResources` with various match modes including `ContainsName`, `Extension`, and `Name`. Console output displays each version string, boolean flags, and resource character counts.
 
 ```csharp
+// Program.cs
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -14,13 +15,6 @@ using System.Linq;
 using System.Reflection;
 using Cuemon;
 using Cuemon.Reflection;
-
-namespace MyApp.Examples;
-
-public class Example
-{
-    public void Run()
-    {
 
         // Get the entry assembly to inspect
         var assembly = Assembly.GetExecutingAssembly();
@@ -57,7 +51,9 @@ public class Example
         // Get a resource by exact name
         var singleResource = decorator.GetManifestResources("MyApp.Resources.data.xml", ManifestResourceMatch.Name);
 
-}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="8b025d6616f341d7929ce679"><a href="~/run-actions/8b025d6616f341d7929ce679/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/8b025d6616f341d7929ce679/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

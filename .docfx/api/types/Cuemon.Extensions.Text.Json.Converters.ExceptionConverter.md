@@ -7,43 +7,29 @@ example:
 `ExceptionConverter` serializes `Exception` instances to JSON, including optional stack trace and `Data` dictionary content. This example configures `JsonSerializerOptions` with `WriteIndented = true` and adds the converter with `includeStackTrace: true` and `includeData: true`, then creates a nested `InvalidOperationException("Outer operation failed.")` with an inner `InvalidOperationException("Inner operation failed.")` and a `CorrelationId` data entry. The resulting JSON includes top-level fields (`Type`, `Source`, `Message`, `Stack`, `Data`) and a nested `Inner` section for the inner exception with its own `Type` and `Message`. Console output displays the complete JSON structure.
 
 ```csharp
+// Program.cs
 using System;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Cuemon.Extensions.Text.Json.Converters;
 
-namespace MyApp.Examples;
-
-public class ExceptionConverterExample
+var options = new JsonSerializerOptions
 {
-    public void Demonstrate()
-    {
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = true
-        };
+    TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
+    WriteIndented = true
+};
 
-        // Include both stack trace and exception data
-        options.Converters.Add(new ExceptionConverter(includeStackTrace: true, includeData: true));
+// Include both stack trace and exception data
+options.Converters.Add(new ExceptionConverter(includeStackTrace: true, includeData: true));
 
-        var inner = new InvalidOperationException("Inner operation failed.");
-        var ex = new InvalidOperationException("Outer operation failed.", inner);
-        ex.Data["CorrelationId"] = "abc-123";
+var inner = new InvalidOperationException("Inner operation failed.");
+var ex = new InvalidOperationException("Outer operation failed.", inner);
+ex.Data["CorrelationId"] = "abc-123";
 
-        string json = JsonSerializer.Serialize(ex, options);
-        Console.WriteLine(json);
-        // {
-        //   "Type": "System.InvalidOperationException",
-        //   "Source": "...",
-        //   "Message": "Outer operation failed.",
-        //   "Stack": [ "   at ..." ],
-        //   "Data": { "CorrelationId": "abc-123" },
-        //   "Inner": {
-        //     "Type": "System.InvalidOperationException",
-        //     "Message": "Inner operation failed."
-        //   }
-        // }
-
-}
-}
-
+string json = JsonSerializer.Serialize(ex, options);
+Console.WriteLine(json);
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="f436f13f63d1ee614757bcf3"><a href="~/run-actions/f436f13f63d1ee614757bcf3/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f436f13f63d1ee614757bcf3/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

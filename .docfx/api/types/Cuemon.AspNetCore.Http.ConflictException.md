@@ -7,48 +7,44 @@ example:
 The following example demonstrates how to use <xref cref="Cuemon.AspNetCore.Http.ConflictException"/> to signal HTTP 409 Conflict responses. It compares the default, custom-message, inner-exception, and status-code parsing paths before applying a timestamp check that represents optimistic concurrency in an application service. The console output exposes the status code, reason phrase, and caller-facing message that an API exception handler can return to a client.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.AspNetCore.Http;
 
-namespace MyApp.Examples;
+// Create a ConflictException with default message
+var ex = new ConflictException();
+Console.WriteLine(ex.StatusCode);  // 409
+Console.WriteLine(ex.ReasonPhrase); // Conflict
+Console.WriteLine(ex.Message);     // The request could not be completed due to a conflict...
 
-public class ConflictExceptionExample
+// Create with a custom message
+var custom = new ConflictException("A record with the same email address already exists.");
+Console.WriteLine(custom.Message);
+
+// Create with inner exception
+var inner = new InvalidOperationException("Duplicate key violation.");
+var withInner = new ConflictException("Resource update conflict.", inner);
+Console.WriteLine(withInner.InnerException?.Message); // Duplicate key violation.
+
+// Use TryParse from the base class to resolve by status code
+if (HttpStatusCodeException.TryParse(409, out var parsed))
 {
-    public void Demonstrate()
-    {
-        // Create a ConflictException with default message
-        var ex = new ConflictException();
-        Console.WriteLine(ex.StatusCode);  // 409
-        Console.WriteLine(ex.ReasonPhrase); // Conflict
-        Console.WriteLine(ex.Message);     // The request could not be completed due to a conflict...
-
-        // Create with a custom message
-        var custom = new ConflictException("A record with the same email address already exists.");
-        Console.WriteLine(custom.Message);
-
-        // Create with inner exception
-        var inner = new InvalidOperationException("Duplicate key violation.");
-        var withInner = new ConflictException("Resource update conflict.", inner);
-        Console.WriteLine(withInner.InnerException?.Message); // Duplicate key violation.
-
-        // Use TryParse from the base class to resolve by status code
-        if (HttpStatusCodeException.TryParse(409, out var parsed))
-        {
-            Console.WriteLine(parsed.Message);          // The request could not be completed due to a conflict.
-            Console.WriteLine(parsed.StatusCode);     // 409
-        }
-
-        // Simulate a conflict check without throwing
-        var dbTimestamp = DateTime.UtcNow;
-        var clientTimestamp = dbTimestamp.AddHours(-1);
-        if (clientTimestamp < dbTimestamp)
-        {
-            var conflict = new ConflictException(
-                "The resource was modified by another user. Please refresh and retry.");
-            Console.WriteLine(conflict.Message); // The resource was modified by another user...
-
-        }
-    }
+    Console.WriteLine(parsed.Message);          // The request could not be completed due to a conflict.
+    Console.WriteLine(parsed.StatusCode);     // 409
 }
 
+// Simulate a conflict check without throwing
+var dbTimestamp = DateTime.UtcNow;
+var clientTimestamp = dbTimestamp.AddHours(-1);
+if (clientTimestamp < dbTimestamp)
+{
+    var conflict = new ConflictException(
+        "The resource was modified by another user. Please refresh and retry.");
+    Console.WriteLine(conflict.Message); // The resource was modified by another user...
+
+}
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="61e2178dda82cae907fc131d"><a href="~/run-actions/61e2178dda82cae907fc131d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/61e2178dda82cae907fc131d/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

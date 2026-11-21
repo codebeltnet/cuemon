@@ -28,6 +28,7 @@ public class AsyncDisposableOptionsExample
         if (!options.LeaveOpen)
         {
             stream.Dispose();
+        }
 
         Console.WriteLine("LeaveOpen: {0}", options.LeaveOpen);
         Console.WriteLine("Stream still open: {0}", stream.CanWrite);
@@ -35,8 +36,11 @@ public class AsyncDisposableOptionsExample
         // Output:
         // LeaveOpen: True
         // Stream still open: True
-
-}}
+    }
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="f6fde2bb005cea9e7e460361"><a href="~/run-actions/f6fde2bb005cea9e7e460361/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f6fde2bb005cea9e7e460361/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

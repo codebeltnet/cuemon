@@ -7,71 +7,66 @@ example:
 The following example demonstrates how to configure AesCryptorOptions to specify cipher mode and padding when performing AES encryption and decryption.
 
 ```csharp
+// Program.cs
 using System;
 using System.Security.Cryptography;
 using System.Text;
 using Cuemon.Security.Cryptography;
 
-namespace MyApp.Security;
+// Generate a key and initialization vector
+byte[] key = AesCryptor.GenerateKey();
+byte[] iv = AesCryptor.GenerateInitializationVector();
 
-public class AesCryptorOptionsExample
+// Create an AES cryptor with the key and IV
+var cryptor = new AesCryptor(key, iv);
+
+// Encrypt data using default options (CBC mode, PKCS7 padding)
+byte[] plaintext = Encoding.UTF8.GetBytes("Secret message.");
+byte[] encrypted = cryptor.Encrypt(plaintext);
+Console.WriteLine($"Encrypted ({encrypted.Length} bytes): {Convert.ToBase64String(encrypted)}");
+
+// Decrypt with default options
+byte[] decrypted = cryptor.Decrypt(encrypted);
+Console.WriteLine($"Decrypted: {Encoding.UTF8.GetString(decrypted)}"); // Secret message.
+
+// Create options explicitly and copy settings via delegate
+var defaultOptions = new AesCryptorOptions();
+defaultOptions.Mode = CipherMode.CBC;
+defaultOptions.Padding = PaddingMode.PKCS7;
+
+// Encrypt with explicit cipher mode and padding via delegate from AesCryptorOptions
+byte[] plaintext2 = Encoding.UTF8.GetBytes("Configured encryption.");
+byte[] encrypted2 = cryptor.Encrypt(plaintext2, o =>
 {
-    public void Demonstrate()
-    {
-        // Generate a key and initialization vector
-        byte[] key = AesCryptor.GenerateKey();
-        byte[] iv = AesCryptor.GenerateInitializationVector();
+    o.Mode = defaultOptions.Mode;
+    o.Padding = defaultOptions.Padding;
+});
 
-        // Create an AES cryptor with the key and IV
-        var cryptor = new AesCryptor(key, iv);
+// Decrypt using the same options
+byte[] decrypted2 = cryptor.Decrypt(encrypted2, o =>
+{
+    o.Mode = defaultOptions.Mode;
+    o.Padding = defaultOptions.Padding;
+});
+Console.WriteLine($"Decrypted: {Encoding.UTF8.GetString(decrypted2)}"); // Configured encryption.
 
-        // Encrypt data using default options (CBC mode, PKCS7 padding)
-        byte[] plaintext = Encoding.UTF8.GetBytes("Secret message.");
-        byte[] encrypted = cryptor.Encrypt(plaintext);
-        Console.WriteLine($"Encrypted ({encrypted.Length} bytes): {Convert.ToBase64String(encrypted)}");
-
-        // Decrypt with default options
-        byte[] decrypted = cryptor.Decrypt(encrypted);
-        Console.WriteLine($"Decrypted: {Encoding.UTF8.GetString(decrypted)}"); // Secret message.
-
-        // Create options explicitly and copy settings via delegate
-        var defaultOptions = new AesCryptorOptions();
-        defaultOptions.Mode = CipherMode.CBC;
-        defaultOptions.Padding = PaddingMode.PKCS7;
-
-        // Encrypt with explicit cipher mode and padding via delegate from AesCryptorOptions
-        byte[] plaintext2 = Encoding.UTF8.GetBytes("Configured encryption.");
-        byte[] encrypted2 = cryptor.Encrypt(plaintext2, o =>
-        {
-            o.Mode = defaultOptions.Mode;
-            o.Padding = defaultOptions.Padding;
-        });
-
-        // Decrypt using the same options
-        byte[] decrypted2 = cryptor.Decrypt(encrypted2, o =>
-        {
-            o.Mode = defaultOptions.Mode;
-            o.Padding = defaultOptions.Padding;
-        });
-        Console.WriteLine($"Decrypted: {Encoding.UTF8.GetString(decrypted2)}"); // Configured encryption.
-
-        // Using ECB mode with Zeros padding (not recommended for production)
-        defaultOptions.Mode = CipherMode.ECB;
-        defaultOptions.Padding = PaddingMode.Zeros;
-        byte[] plaintext3 = Encoding.UTF8.GetBytes("Alternative mode.");
-        byte[] encrypted3 = cryptor.Encrypt(plaintext3, o =>
-        {
-            o.Mode = defaultOptions.Mode;
-            o.Padding = defaultOptions.Padding;
-        });
-        byte[] decrypted3 = cryptor.Decrypt(encrypted3, o =>
-        {
-            o.Mode = defaultOptions.Mode;
-            o.Padding = defaultOptions.Padding;
-        });
-        Console.WriteLine($"Decrypted: {Encoding.UTF8.GetString(decrypted3)}"); // Alternative mode.
-
-}
-}
-
+// Using ECB mode with Zeros padding (not recommended for production)
+defaultOptions.Mode = CipherMode.ECB;
+defaultOptions.Padding = PaddingMode.Zeros;
+byte[] plaintext3 = Encoding.UTF8.GetBytes("Alternative mode.");
+byte[] encrypted3 = cryptor.Encrypt(plaintext3, o =>
+{
+    o.Mode = defaultOptions.Mode;
+    o.Padding = defaultOptions.Padding;
+});
+byte[] decrypted3 = cryptor.Decrypt(encrypted3, o =>
+{
+    o.Mode = defaultOptions.Mode;
+    o.Padding = defaultOptions.Padding;
+});
+Console.WriteLine($"Decrypted: {Encoding.UTF8.GetString(decrypted3)}"); // Alternative mode.
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="5fccb59e120c32b707d3e338"><a href="~/run-actions/5fccb59e120c32b707d3e338/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/5fccb59e120c32b707d3e338/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

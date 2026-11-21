@@ -44,3 +44,7 @@ namespace DocExamples
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="2efa476c04f95b3dce4fb775"><a href="~/run-actions/2efa476c04f95b3dce4fb775/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/2efa476c04f95b3dce4fb775/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

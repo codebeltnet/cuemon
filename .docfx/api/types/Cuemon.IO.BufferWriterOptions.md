@@ -40,3 +40,7 @@ public class BufferWriterOptionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="99c89ff0aaf28ac8c13df795"><a href="~/run-actions/99c89ff0aaf28ac8c13df795/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/99c89ff0aaf28ac8c13df795/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

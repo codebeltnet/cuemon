@@ -42,3 +42,7 @@ public class NonCryptoAlgorithmExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="40ffa641c4095bb1836c0463"><a href="~/run-actions/40ffa641c4095bb1836c0463/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/40ffa641c4095bb1836c0463/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

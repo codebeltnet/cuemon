@@ -7,35 +7,31 @@ example:
 The following example demonstrates how to configure `BasicAuthenticationOptions` with a realm and authenticator delegate.
 
 ```csharp
+// Program.cs
 using System;
 using System.Security.Claims;
 using Cuemon.AspNetCore.Authentication.Basic;
 
-namespace MyApp.Examples;
-
-public static class BasicAuthenticationOptionsExample
+var options = new BasicAuthenticationOptions
 {
-    public static void Demonstrate()
+    Realm = "docs-example",
+    RequireSecureConnection = false,
+    Authenticator = (username, password) =>
     {
-        var options = new BasicAuthenticationOptions
+        if (username == "Agent" && password == "Test")
         {
-            Realm = "docs-example",
-            RequireSecureConnection = false,
-            Authenticator = (username, password) =>
-            {
-                if (username == "Agent" && password == "Test")
-                {
-                    return new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }, BasicAuthorizationHeader.Scheme));
-                }
+            return new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }, BasicAuthorizationHeader.Scheme));
+        }
 
-                return null;
-            }
-        };
-
-        options.ValidateOptions();
-
-        Console.WriteLine(options.Realm);
+        return null;
     }
-}
+};
 
+options.ValidateOptions();
+
+Console.WriteLine(options.Realm);
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="617841890b44fc101e61a831"><a href="~/run-actions/617841890b44fc101e61a831/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/617841890b44fc101e61a831/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

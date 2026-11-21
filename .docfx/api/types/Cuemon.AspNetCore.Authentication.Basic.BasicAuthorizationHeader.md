@@ -7,21 +7,17 @@ example:
 The following example demonstrates how to serialize and parse a Basic authorization header.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.AspNetCore.Authentication.Basic;
 
-namespace MyApp.Examples;
+var header = new BasicAuthorizationHeader("Agent", "Test");
+var parsed = BasicAuthorizationHeader.Create(header.ToString());
 
-public static class BasicAuthorizationHeaderExample
-{
-    public static void Demonstrate()
-    {
-        var header = new BasicAuthorizationHeader("Agent", "Test");
-        var parsed = BasicAuthorizationHeader.Create(header.ToString());
-
-        Console.WriteLine(parsed.UserName);
-        Console.WriteLine(parsed.Password);
-    }
-}
-
+Console.WriteLine(parsed.UserName);
+Console.WriteLine(parsed.Password);
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="3b5f060e17513c9295871392"><a href="~/run-actions/3b5f060e17513c9295871392/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/3b5f060e17513c9295871392/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

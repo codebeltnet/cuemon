@@ -47,3 +47,7 @@ public class EncodingOptionsExtensionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="11f6aa21babd2163ff0c5418"><a href="~/run-actions/11f6aa21babd2163ff0c5418/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/11f6aa21babd2163ff0c5418/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

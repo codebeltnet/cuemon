@@ -34,3 +34,7 @@ public class DbTypeExtensionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="da7732ce6ecff5ecd0e14c47"><a href="~/run-actions/da7732ce6ecff5ecd0e14c47/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/da7732ce6ecff5ecd0e14c47/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

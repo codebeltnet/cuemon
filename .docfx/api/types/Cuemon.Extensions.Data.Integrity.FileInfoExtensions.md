@@ -47,3 +47,7 @@ public class FileInfoExtensionsExample
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="001da6f3e474ea17d273b61a"><a href="~/run-actions/001da6f3e474ea17d273b61a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/001da6f3e474ea17d273b61a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

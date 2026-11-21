@@ -11,30 +11,27 @@ Successful logical paths are cached for the lifetime of the provider by using ca
 Misses and collisions are deliberately re-evaluated on every call. If callers can supply arbitrary paths, add the surrounding controls that fit the application boundary, such as request validation, response caching, or rate limiting.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Extensions.FileProviders;
 
-namespace MyApp.Examples;
+var contentRoot = @"C:\app\wwwroot";
+using var files = new PortablePhysicalFileProvider(contentRoot);
 
-public static class PortablePhysicalFileProviderExample
+var logo = files.GetFileInfo("assets/images/logo.svg");
+if (logo.Exists)
 {
-    public static void Demonstrate()
-    {
-        var contentRoot = @"C:\app\wwwroot";
-        using var files = new PortablePhysicalFileProvider(contentRoot);
-
-        var logo = files.GetFileInfo("assets/images/logo.svg");
-        if (logo.Exists)
-        {
-            Console.WriteLine($"Resolved file: {logo.Name}");
-            Console.WriteLine($"Physical path: {logo.PhysicalPath}");
-        }
-
-        var images = files.GetDirectoryContents("ASSETS/IMAGES");
-        Console.WriteLine($"Image directory found: {images.Exists}");
-
-        var changeToken = files.Watch("assets/images/logo.svg");
-        Console.WriteLine($"Change callbacks active: {changeToken.ActiveChangeCallbacks}");
-    }
+    Console.WriteLine($"Resolved file: {logo.Name}");
+    Console.WriteLine($"Physical path: {logo.PhysicalPath}");
 }
+
+var images = files.GetDirectoryContents("ASSETS/IMAGES");
+Console.WriteLine($"Image directory found: {images.Exists}");
+
+var changeToken = files.Watch("assets/images/logo.svg");
+Console.WriteLine($"Change callbacks active: {changeToken.ActiveChangeCallbacks}");
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="0920bc57f33f971c7ec138c0"><a href="~/run-actions/0920bc57f33f971c7ec138c0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0920bc57f33f971c7ec138c0/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

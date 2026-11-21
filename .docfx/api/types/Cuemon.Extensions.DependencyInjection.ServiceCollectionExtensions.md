@@ -156,3 +156,7 @@ public sealed class DeliveryOptions : IPostConfigurableParameterObject, IValidat
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="42a26341576df948b9bb2430"><a href="~/run-actions/42a26341576df948b9bb2430/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/42a26341576df948b9bb2430/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

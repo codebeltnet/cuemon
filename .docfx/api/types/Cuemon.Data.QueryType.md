@@ -43,3 +43,7 @@ public class QueryTypeExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="05809c54a9f1c09bb1c5903c"><a href="~/run-actions/05809c54a9f1c09bb1c5903c/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/05809c54a9f1c09bb1c5903c/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

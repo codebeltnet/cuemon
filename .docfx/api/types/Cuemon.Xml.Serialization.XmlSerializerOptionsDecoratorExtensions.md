@@ -34,3 +34,7 @@ public class XmlSerializerOptionsDecoratorExtensionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="7842d58b92f3cbdc3abfd2a0"><a href="~/run-actions/7842d58b92f3cbdc3abfd2a0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/7842d58b92f3cbdc3abfd2a0/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

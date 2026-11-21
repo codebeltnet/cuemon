@@ -37,3 +37,7 @@ public class AssemblyExtensionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="ace8a96789e27dbc32d5ba88"><a href="~/run-actions/ace8a96789e27dbc32d5ba88/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/ace8a96789e27dbc32d5ba88/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

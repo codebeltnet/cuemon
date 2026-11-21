@@ -7,28 +7,25 @@ example:
 The following example shows how to compute non-cryptographic hashes using `HashFactory`. It demonstrates FNV-1a 32-bit, CRC-32, and FNV-1a 256-bit hashing of a sample input, printing each hexadecimal digest.
 
 ```csharp
+// Program.cs
 using System;
 using System.Text;
 using Cuemon.Security;
 
-namespace Cuemon.Security;
+var fnvHash = HashFactory.CreateFnv32();
+var input = "Hello World";
+var hash = fnvHash.ComputeHash(Encoding.UTF8.GetBytes(input));
+Console.WriteLine($"FNV-1a 32-bit: {BitConverter.ToString(hash.To<byte[]>(bytes => bytes)).Replace("-", "")}");
 
-public class HashFactoryExample
-{
-    public void Demonstrate()
-    {
-        var fnvHash = HashFactory.CreateFnv32();
-        var input = "Hello World";
-        var hash = fnvHash.ComputeHash(Encoding.UTF8.GetBytes(input));
-        Console.WriteLine($"FNV-1a 32-bit: {BitConverter.ToString(hash.To<byte[]>(bytes => bytes)).Replace("-", "")}");
+var crcHash = HashFactory.CreateCrc32();
+hash = crcHash.ComputeHash(Encoding.UTF8.GetBytes(input));
+Console.WriteLine($"CRC-32: {BitConverter.ToString(hash.To<byte[]>(bytes => bytes)).Replace("-", "")}");
 
-        var crcHash = HashFactory.CreateCrc32();
-        hash = crcHash.ComputeHash(Encoding.UTF8.GetBytes(input));
-        Console.WriteLine($"CRC-32: {BitConverter.ToString(hash.To<byte[]>(bytes => bytes)).Replace("-", "")}");
-
-        var fnv256Hash = HashFactory.CreateFnv256();
-        hash = fnv256Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
-        Console.WriteLine($"FNV-1a 256-bit: {BitConverter.ToString(hash.To<byte[]>(bytes => bytes)).Replace("-", "")}");
-    }
-}
+var fnv256Hash = HashFactory.CreateFnv256();
+hash = fnv256Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+Console.WriteLine($"FNV-1a 256-bit: {BitConverter.ToString(hash.To<byte[]>(bytes => bytes)).Replace("-", "")}");
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="b4d86e97733b6444844a05d4"><a href="~/run-actions/b4d86e97733b6444844a05d4/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b4d86e97733b6444844a05d4/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

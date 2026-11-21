@@ -234,3 +234,4 @@ ModelManifest.xml
 # Bot workspace (local-only AI agent ideation, PRDs, and agentic loop state)
 .bot/*
 !.bot/README.md
+/.docfx/run-actions/

@@ -10,8 +10,6 @@ Successful logical paths are cached for the lifetime of the provider by using ca
 
 Misses and collisions are deliberately re-evaluated on every call. If callers can supply arbitrary paths, add the surrounding controls that fit the application boundary, such as request validation, response caching, or rate limiting.
 
-[!INCLUDE [availability-default](../../includes/availability-default.md)]
-
 ```csharp
 using System;
 using Cuemon.Extensions.FileProviders;

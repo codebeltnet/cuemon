@@ -132,25 +132,6 @@
       }
     },
     {
-      "id": "0920bc57f33f971c7ec138c0",
-      "strategy": "standalone",
-      "transports": [
-        "native",
-        "docker"
-      ],
-      "image": "codebeltnet/csrun:10",
-      "manifest": {
-        "schemaVersion": 1,
-        "mode": "console",
-        "framework": "net10.0",
-        "dependsOn": [
-          "Cuemon.Core@11.0.0",
-          "Cuemon.Extensions.FileProviders.Physical@11.0.0"
-        ],
-        "source": "// Program.cs\nusing System;\nusing Cuemon.Extensions.FileProviders;\n\nvar contentRoot = @\"C:\\app\\wwwroot\";\nusing var files = new PortablePhysicalFileProvider(contentRoot);\n\nvar logo = files.GetFileInfo(\"assets/images/logo.svg\");\nif (logo.Exists)\n{\n    Console.WriteLine($\"Resolved file: {logo.Name}\");\n    Console.WriteLine($\"Physical path: {logo.PhysicalPath}\");\n}\n\nvar images = files.GetDirectoryContents(\"ASSETS/IMAGES\");\nConsole.WriteLine($\"Image directory found: {images.Exists}\");\n\nvar changeToken = files.Watch(\"assets/images/logo.svg\");\nConsole.WriteLine($\"Change callbacks active: {changeToken.ActiveChangeCallbacks}\");"
-      }
-    },
-    {
       "id": "0935da97633b9761817c0697",
       "strategy": "standalone",
       "transports": [
@@ -651,6 +632,25 @@
           "Cuemon.Data@11.0.0"
         ],
         "source": "// Program.cs\nusing System;\nusing Cuemon.Data;\n\n// Build a token string with 4 fields, comma-delimited, double-quote qualified\nvar builder = new TokenBuilder(',', '\"', 4);\n\nbuilder.Append(\"Alice\");\nbuilder.Append(\",30,\");\nbuilder.Append(\"New York\");\n\nConsole.WriteLine($\"Is valid: {builder.IsValid}\");  // false - only 3 of 4 tokens\nConsole.WriteLine($\"Current:  '{builder}'\");\n\n// Append the last field to complete the token row\nbuilder.Append(\"Engineer\");\nConsole.WriteLine($\"Is valid: {builder.IsValid}\");  // true\nConsole.WriteLine($\"Complete: '{builder}'\");\n\n// TokenBuilder is used internally by DsvDataReader for multi-line quoted fields\n// It accumulates input until the expected number of tokens is reached\nvar csvBuilder = new TokenBuilder(';', '\\\"', 3);\ncsvBuilder.Append(\"Product A\");\ncsvBuilder.Append(\"Description with ; semicolon\");\ncsvBuilder.Append(\"$49.99\");\n\nConsole.WriteLine($\"CSV line: '{csvBuilder}'\");\nConsole.WriteLine($\"Tokens:   {csvBuilder.Tokens}\");"
+      }
+    },
+    {
+      "id": "396a26c3c4044f3f7f24a942",
+      "strategy": "standalone",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "image": "codebeltnet/csrun:10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Data.Integrity@11.0.0"
+        ],
+        "source": "// Program.cs\nusing System;\nusing Cuemon;\nusing Cuemon.Data.Integrity;\nusing Cuemon.Security;\n\n// Create a ChecksumBuilder wrapped in a Decorator\nvar builder = new ChecksumBuilder(() => HashFactory.CreateFnv128());\nvar decorator = Decorator.Enclose(builder);\n\n// Combine various typed values using the decorator extensions\ndecorator.CombineWith(42);             // int\ndecorator.CombineWith(3.14);           // double\ndecorator.CombineWith(\"tag\");          // string\n\nConsole.WriteLine($\"Combined checksum: {builder}\");\n\n// The extensions return the inner builder for chaining\nvar combined = decorator.CombineWith(12345L); // long\nConsole.WriteLine($\"Returned type: {combined.GetType().Name}\");\n\n// Extension methods also work with short, float, ushort, uint, ulong\nvar shortDecorator = Decorator.Enclose(new ChecksumBuilder(() => HashFactory.CreateFnv32()));\nshortDecorator.CombineWith((short)100);\nshortDecorator.CombineWith(3.14f);\nshortDecorator.CombineWith(42u);\n\nConsole.WriteLine($\"Short builder: {shortDecorator.Inner}\");"
       }
     },
     {
@@ -1157,26 +1157,6 @@
       }
     },
     {
-      "id": "5c8b0178a5de2eefb03e41f0",
-      "strategy": "standalone",
-      "transports": [
-        "native",
-        "docker"
-      ],
-      "image": "codebeltnet/csrun:10",
-      "manifest": {
-        "schemaVersion": 1,
-        "mode": "console",
-        "framework": "net10.0",
-        "dependsOn": [
-          "Cuemon.Core@11.0.0",
-          "Cuemon.Data.Integrity@11.0.0",
-          "Cuemon.Extensions.Data.Integrity@11.0.0"
-        ],
-        "source": "// Program.cs\nusing System;\nusing Cuemon.Data.Integrity;\nusing Cuemon.Extensions.Data.Integrity;\nusing Cuemon.Security;\n\n// Create a ChecksumBuilder and use extension methods directly\nvar builder = new ChecksumBuilder(() => HashFactory.CreateFnv128());\n\n// Extension methods allow combining typed values without a Decorator wrapper\nbuilder.CombineWith(42);             // int overload\nbuilder.CombineWith(3.14);           // double overload\nbuilder.CombineWith(\"data\");         // string overload\n\nConsole.WriteLine($\"Combined checksum: {builder}\");\n\n// Works with all numeric types\nvar checksum = new ChecksumBuilder(() => HashFactory.CreateFnv32())\n    .CombineWith((short)1)\n    .CombineWith(2u)\n    .CombineWith(3L)\n    .CombineWith(4.0f)\n    .CombineWith(5ul);\n\nConsole.WriteLine($\"All types: {checksum}\");\n\n// Combine with byte arrays\nvar withBytes = new ChecksumBuilder(() => HashFactory.CreateFnv32())\n    .CombineWith(new byte[] { 0x01, 0x02, 0x03 });\n\nConsole.WriteLine($\"With bytes: {withBytes}\");\n    "
-      }
-    },
-    {
       "id": "5df55e61c12b1592c4725f96",
       "strategy": "standalone",
       "transports": [
@@ -1667,6 +1647,25 @@
       }
     },
     {
+      "id": "72a8627aec108def85fa2cc3",
+      "strategy": "standalone",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "image": "codebeltnet/csrun:10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.FileProviders.Physical@11.0.0"
+        ],
+        "source": "// Program.cs\nusing System;\nusing System.IO;\nusing Cuemon.Extensions.FileProviders;\n\nvar contentRoot = Path.Combine(Path.GetTempPath(), \"cuemon-docs\", \"wwwroot\");\nvar imageDirectory = Path.Combine(contentRoot, \"assets\", \"images\");\nDirectory.CreateDirectory(imageDirectory);\nFile.WriteAllText(Path.Combine(imageDirectory, \"logo.svg\"), \"<svg/>\");\n\nusing var files = new PortablePhysicalFileProvider(contentRoot);\n\nvar logo = files.GetFileInfo(\"assets/images/logo.svg\");\nif (logo.Exists)\n{\n    Console.WriteLine($\"Resolved file: {logo.Name}\");\n    Console.WriteLine($\"Physical path: {logo.PhysicalPath}\");\n}\n\nvar images = files.GetDirectoryContents(\"ASSETS/IMAGES\");\nConsole.WriteLine($\"Image directory found: {images.Exists}\");\n\nvar changeToken = files.Watch(\"assets/images/logo.svg\");\nConsole.WriteLine($\"Change callbacks active: {changeToken.ActiveChangeCallbacks}\");"
+      }
+    },
+    {
       "id": "7548b33e2c766577b35482b3",
       "strategy": "standalone",
       "transports": [
@@ -1792,6 +1791,26 @@
           "Cuemon.Core@11.0.0"
         ],
         "source": "using System;\nusing System.Collections.Generic;\nusing System.Collections.Specialized;\nusing Cuemon;\nusing Cuemon.Collections.Specialized;\n\nnamespace MyApp.Examples;\n\npublic class DictionaryDecoratorExtensionsExample\n{\n    public static void Main()\n    {\n        var input = new Dictionary<string, string[]>\n        {\n            [\"colors\"] = new[] { \"red\", \"green\", \"blue\" },\n            [\"sizes\"] = new[] { \"small\", \"medium\", \"large\" }\n        };\n\n        // Wrap the dictionary with Decorator and call the extension method.\n        NameValueCollection nvc = Decorator.Enclose(input).ToNameValueCollection();\n\n        foreach (string key in nvc)\n        {\n            Console.WriteLine(\"{0} = {1}\", key, nvc[key]);\n\n        // Output:\n        // colors = red,green,blue\n        // sizes = small,medium,large\n\n}}\n}"
+      }
+    },
+    {
+      "id": "82c8bdf830073f26aa783121",
+      "strategy": "standalone",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "image": "codebeltnet/csrun:10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Data.Integrity@11.0.0",
+          "Cuemon.Extensions.Data.Integrity@11.0.0"
+        ],
+        "source": "// Program.cs\nusing System;\nusing Cuemon.Data.Integrity;\nusing Cuemon.Extensions.Data.Integrity;\nusing Cuemon.Security;\n\n// Create a ChecksumBuilder and use extension methods directly\nvar builder = new ChecksumBuilder(() => HashFactory.CreateFnv128());\n\n// Extension methods allow combining typed values without a Decorator wrapper\nbuilder.CombineWith(42);             // int overload\nbuilder.CombineWith(3.14);           // double overload\nbuilder.CombineWith(\"data\");         // string overload\n\nConsole.WriteLine($\"Combined checksum: {builder}\");\n\n// Works with all numeric types\nvar checksum = new ChecksumBuilder(() => HashFactory.CreateFnv32())\n    .CombineWith((short)1)\n    .CombineWith(2u)\n    .CombineWith(3L)\n    .CombineWith(4.0f)\n    .CombineWith(5ul);\n\nConsole.WriteLine($\"All types: {checksum}\");\n\n// Combine with byte arrays\nvar withBytes = new ChecksumBuilder(() => HashFactory.CreateFnv32())\n    .CombineWith(new byte[] { 0x01, 0x02, 0x03 });\n\nConsole.WriteLine($\"With bytes: {withBytes}\");"
       }
     },
     {
@@ -1921,25 +1940,6 @@
           "Cuemon.Xml@11.0.0"
         ],
         "source": "// Program.cs\nusing System;\nusing System.Xml;\nusing Cuemon.Xml;\n\nvar xml = \"<?xml version=\\\"1.0\\\"?><books><book title=\\\"1984\\\" author=\\\"Orwell\\\"/></books>\";\nvar doc = XmlDocumentFactory.CreateDocument(xml);\n\nvar root = doc.DocumentElement;\nConsole.WriteLine($\"Root element: {root?.Name}\");\n\nvar book = root?.SelectSingleNode(\"book\");\nConsole.WriteLine($\"Title: {book?.Attributes?[\"title\"]?.Value}\");"
-      }
-    },
-    {
-      "id": "976a19c257adeb1ca001acf4",
-      "strategy": "standalone",
-      "transports": [
-        "native",
-        "docker"
-      ],
-      "image": "codebeltnet/csrun:10",
-      "manifest": {
-        "schemaVersion": 1,
-        "mode": "console",
-        "framework": "net10.0",
-        "dependsOn": [
-          "Cuemon.Core@11.0.0",
-          "Cuemon.Data.Integrity@11.0.0"
-        ],
-        "source": "// Program.cs\nusing System;\nusing Cuemon;\nusing Cuemon.Data.Integrity;\nusing Cuemon.Security;\n\n// Create a ChecksumBuilder wrapped in a Decorator\nvar builder = new ChecksumBuilder(() => HashFactory.CreateFnv128());\nvar decorator = Decorator.Enclose(builder);\n\n// Combine various typed values using the decorator extensions\ndecorator.CombineWith(42);             // int\ndecorator.CombineWith(3.14);           // double\ndecorator.CombineWith(\"tag\");          // string\n\nConsole.WriteLine($\"Combined checksum: {builder}\");\n\n// The extensions return the inner builder for chaining\nvar combined = decorator.CombineWith(12345L); // long\nConsole.WriteLine($\"Returned type: {combined.GetType().Name}\");\n\n// Extension methods also work with short, float, ushort, uint, ulong\nvar shortDecorator = Decorator.Enclose(new ChecksumBuilder(() => HashFactory.CreateFnv32()));\nshortDecorator.CombineWith((short)100);\nshortDecorator.CombineWith(3.14f);\nshortDecorator.CombineWith(42u);\n\nConsole.WriteLine($\"Short builder: {shortDecorator.Inner}\");\n    "
       }
     },
     {

@@ -1413,7 +1413,7 @@
     },
     {
       "uid": "Cuemon.Extensions.FileProviders.PortablePhysicalFileProvider",
-      "sourceSha256": "4456F9C5BA2102111033FA9498E11D476B7A8EEA8F112A0255DF349D2706847A",
+      "sourceSha256": "1C4938D8C2F85B97D96309839103C5C6224414BCCEC63A2644AF59600C7C197B",
       "manifest": {
         "schemaVersion": 1,
         "mode": "console",
@@ -2291,7 +2291,7 @@
     },
     {
       "uid": "Cuemon.Data.Integrity.ChecksumBuilderDecoratorExtensions",
-      "sourceSha256": "C2E378AA3863B22C0DEB8457B0FA2A678BC252C68A57660E6D5795C1AD289905",
+      "sourceSha256": "5275CF5E9E070F6EB5DDCB98AA6FCFF5AA8916AB499906C93BB4690EACA64C96",
       "manifest": {
         "schemaVersion": 1,
         "mode": "console",
@@ -2330,7 +2330,7 @@
     },
     {
       "uid": "Cuemon.Extensions.Data.Integrity.ChecksumBuilderExtensions",
-      "sourceSha256": "2FE1603B3CE508312C92CA031C6C62D9CE816B797B45BE5449646887850562EA",
+      "sourceSha256": "2FC27E9C843A26094A9F3257E91F04330ABDE678C413E7DA8567C300EFC4728C",
       "manifest": {
         "schemaVersion": 1,
         "mode": "console",

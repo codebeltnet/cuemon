@@ -51,6 +51,7 @@ function Get-MetadataFiles {
 
 $totalTimer = [Diagnostics.Stopwatch]::StartNew()
 Push-Location $PSScriptRoot
+& (Join-Path $PSScriptRoot 'BuildRunActions.ps1')
 try {
     $docfxRoot = $PSScriptRoot
     $repoRoot = Split-Path -Parent $docfxRoot
@@ -168,4 +169,7 @@ try {
     Write-Host ('Docker image: {0:N2}s; total: {1:N2}s' -f $imageTimer.Elapsed.TotalSeconds, $totalTimer.Elapsed.TotalSeconds)
 } finally {
     Pop-Location
+    if (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'run-actions')) {
+        Remove-Item -LiteralPath (Join-Path $PSScriptRoot 'run-actions') -Recurse -Force
+    }
 }

@@ -1,0 +1,2280 @@
+{
+  "examples": [
+    {
+      "uid": "Cuemon.AspNetCore.Razor.TagHelpers.AppTagHelperOptions",
+      "sourceSha256": "2D0879DBE31F041DD0B37DE186C02FBBD8087F92D294C850C7D35033CBC91E55",
+      "intrinsicLimitation": "Starts a blocking ASP.NET Core host with app.Run() and no shutdown signal, so a one-shot wrapper cannot terminate deterministically; the page keeps the complete WebApplication setup without a run-action pair."
+    },
+    {
+      "uid": "Cuemon.Collections.Specialized.DictionaryDecoratorExtensions",
+      "sourceSha256": "56FD1F9FFE7B92079BAB359D421C6FE9A46FC595974F8989D361B8D18D06160D",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Data.DbTypeDecoratorExtensions",
+      "sourceSha256": "54F5B7FB3229C4334DDF28AEE08D8B9C1A188B25A3D5B2975B2A07F42EC3A2E2",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Data@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Data.InOperatorResult",
+      "sourceSha256": "C69B0398D41DBD3A28ACC399B9AE65C316AC49291AB443DF8F6D4A38C7642CC0",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Data@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Data.QueryType",
+      "sourceSha256": "2FBDBCE1AB4D53F7EF2F9DD7D55A36E401E49266D6BE7AB58DC650C687552679",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Data@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Collections.Generic.ListExtensions",
+      "sourceSha256": "0AAE5D909CE69E2301CE86C82D7E33AC85D1C21ABD86C4351C44C635A7428C21",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Collections.Generic@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Data.DbTypeExtensions",
+      "sourceSha256": "60E6C13BB555EEA9B80AEC290B2DC35741576A9834EF638404E2A10CF22A45C2",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Data@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Data.Integrity.AssemblyExtensions",
+      "sourceSha256": "77FFF51D035B17FFDC11FE3802104DBED5B21FF2D808BA5CDB0061FEF3AB6E52",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Data.Integrity@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Data.Integrity.DateTimeExtensions",
+      "sourceSha256": "1017644D9D8FB9AE713EEF9E6A5A169FED2173053C4C71E4FA2DCE8E670CCC29",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Data.Integrity@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Data.Integrity.FileInfoExtensions",
+      "sourceSha256": "F1289EE377CC0E75DCEF446352D1A3075DA18D05FEF538E534C51B7AB7C72501",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Data.Integrity@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Data.QueryFormatExtensions",
+      "sourceSha256": "B5E7E71F69855D304FC03CC23CA576163122431F8AE2DA4A09CAB25A9FD61415",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Data@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.DependencyInjection.ServiceCollectionExtensions",
+      "sourceSha256": "FA9AFB3644833D7EFC101EB60FD80EBA1B430E08C17FDEBF05FC28FEA6AD77E5",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.DependencyInjection@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Net.HttpStatusCodeExtensions",
+      "sourceSha256": "949138C1E5CCA936115F9B0E86B976FF3CF0E939043ED3C896B58FF28D1BEC93",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Net@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Reflection.MemberInfoExtensions",
+      "sourceSha256": "8BDAC24E9B4B4B674501150F8AECFBC60767A273BFFA7ABC32E7A09451AEAA7F",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Reflection@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Text.EncodingOptionsExtensions",
+      "sourceSha256": "DB4368F303580602282348DA2C40CFA32BFC83EF2BC14E9065C5CCB228076414",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Text@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Text.Json.JsonNamingPolicyExtensions",
+      "sourceSha256": "8C856FFA2DB124B1AC114BD23188B14DED5092563E540169F16D8C7950DAC6E8",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Text.Json@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Text.Json.JsonSerializerOptionsExtensions",
+      "sourceSha256": "ACF75C11A8D99F696975A74E338C5C14E800AF29473680A59A18BF3DA2802BC9",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Text.Json@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Text.Json.Utf8JsonWriterExtensions",
+      "sourceSha256": "A5196A5454BED2C675407BC433CC8F30BD0D00D9132A6B25A2C5DA25D0618879",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Extensions.Text.Json@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.IO.AsyncDisposableOptions",
+      "sourceSha256": "75CC193DF082CBE38D387BC06A62986C5D1A5CEA6E42A838E41E565EBCF82BA5",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.IO@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.IO.AsyncStreamEncodingOptions",
+      "sourceSha256": "4F0E379BA277286723C85E59532F16F00CA1DF2C3B7D6945E6267715D1A94B59",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.IO@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.IO.BufferWriterOptions",
+      "sourceSha256": "AD32CD53FAA7A8CA91DE3DAD9CE572EA491F562162EC51445F569BAEE9D2B67A",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.IO@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Net.Collections.Specialized.NameValueCollectionDecoratorExtensions",
+      "sourceSha256": "5D3D85B234D4CBB7E8916E48D61AC32DB27DA9AE0DD5E5046CC00C6AC9263425",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Net@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.ObjectDecoratorExtensions",
+      "sourceSha256": "D7AFADE7CC4F9D91132FCA5EA4237725FFAF76767FCACAE2C0EF8DF4A45FF6CC",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.FowlerNollVoAlgorithm",
+      "sourceSha256": "F774169CA6ABC38767EDE7854A1B321C029F88B214DA9DF79D0F2CA33FD1AF7B",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.FowlerNollVoOptions",
+      "sourceSha256": "6436B4FF5FB18063F4A7D1602EE22E23C274486058F8C049A1E362187B0044B2",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.HashResult",
+      "sourceSha256": "EBA078C65B51DF30A4CC085251BEB4C637E98B65B5D2E85CBB291EB3DA6A3B8F",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.NonCryptoAlgorithm",
+      "sourceSha256": "851D6F4109AB15BE691729D271EAF6439076E4163D2A329C3A30E8E4022C48AC",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Xml.Serialization.XmlSerializerOptionsDecoratorExtensions",
+      "sourceSha256": "398D831103BFBFD741FB92B30BD1FBD30E325179FD47D2DDD5B8BC8AD50620F6",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Xml@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Alphanumeric",
+      "sourceSha256": "9AB15EE6803B62DA918899949B01B6DBBBE87869546800B38C39DCED9A6C650F",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.AuthenticationHandlerFeature",
+      "sourceSha256": "2064475CF7E0814CD5207725F05E2795A921851651AC211E76C83B7E03FB41FC",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Authenticator",
+      "sourceSha256": "CC5F13E944A654724D520D2B46470A57686182CE2A0F8C7FA27AA88DBB686FF5",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.AuthorizationHeaderOptions",
+      "sourceSha256": "390D74DA21A30E7575DF19C4455F12D4748FD9F3D75A2881B681790FF24B5A75",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Basic.BasicAuthenticationOptions",
+      "sourceSha256": "F3F8ACA7E39B6260FE81C7DB1CC33806F77A828D8BE168BCE39B1E700C2BF29F",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Basic.BasicAuthenticator",
+      "sourceSha256": "51008DBF4EED08F848EA8660DDAA1A67ABB5A4C3BBF097FA66432D737E3C7410",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Basic.BasicAuthorizationHeader",
+      "sourceSha256": "E43A7496461C1559E3594F8616F754E93F8627EA494FFBD19FAE85380E02EE8A",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Basic.BasicFields",
+      "sourceSha256": "9E4E6929C72042BEA6C6C93121740D119AB37D5964BDEAF8F65354DF24641623",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Digest.DigestAuthenticationOptions",
+      "sourceSha256": "6DEE14D5D501C3F328075C310B817EE3549323EB9FCD307D49203D47DD661C5D",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Digest.DigestAuthenticator",
+      "sourceSha256": "B4DAD83741EC7FDA591947331A9B29B9D022CC4749CBD8BB9FAAD05E54F06862",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Digest.DigestAuthorizationHeader",
+      "sourceSha256": "3441239AA82E8B5054720F8A46F90FEAD05F44F269696D164B1A7C23FED54292",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Digest.DigestAuthorizationHeaderBuilder",
+      "sourceSha256": "65713B31CAA93DC2695F6A699DA65C5E48836D8E0187D8B02F069EE586CB0C78",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Digest.DigestCryptoAlgorithm",
+      "sourceSha256": "68322AC7E43DDD05CFE13CD317DD901F3B73C3CDC688E7DA9E839D1BE9614EBF",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Digest.DigestHashFactory",
+      "sourceSha256": "51F55B68605D1A13B85C7DB07DBF00EFF07FD8A6A95C1461C5AF9A56EAF6B832",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Hmac.HmacAuthenticationOptions",
+      "sourceSha256": "72FDF1DABC271B4882E6A738DF706E32B60324856C0FA9FBAA96B5135DD2D65F",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.Hmac.HmacAuthenticator",
+      "sourceSha256": "4BA7CA37288FE016343F7005CF76178A414C70C1400C893C66E8C2BBBC9CD7E0",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Authentication.MemoryNonceTracker",
+      "sourceSha256": "66678F1F7BB3D570FFFBE3C59CDB31088C76FFCD5F978C9DC93B43D7438BC8B0",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Authentication@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Configuration.DynamicCacheBusting",
+      "sourceSha256": "69A2072F571A482F3E6D8AD7472B4C7E972955BE4C2150B292B578003DBF7AAF",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Diagnostics.HttpFaultResolver",
+      "sourceSha256": "72F57187D74B682E636D2D513619B81989035F6D38B22F7A476A71DEE126DBC3",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Http.ForbiddenException",
+      "sourceSha256": "0209E4B7CC46EAD7E12608A5B5D21414E68D9B5F7F28D52EF3AAA1691C6B1B70",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Http.Headers.ExpiresHeaderValue",
+      "sourceSha256": "55F0AD2BA43235BE9EF2BA55072C7580755EFB8B4104373EFC2B56F962EFBAFD",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Http.TooManyRequestsException",
+      "sourceSha256": "41FEADFC9E87D625E2973783BF257A008A916B701F3045D07280E9FA3833D8F1",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Http.UnsupportedMediaTypeException",
+      "sourceSha256": "39477C9A6806E0FEB366D9C3B07DE9B3F79076948FED14A2642D8E73190F3373",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Breadcrumb",
+      "sourceSha256": "F035EA1B50BA764DBC26EFD3207C74A5D9DDB291ED8FB5D2E2240C9DFDF0D1EC",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.ContentBasedObjectResultOptions`1",
+      "sourceSha256": "2BC101CF3F6593617CE52FE44AF129260D08EE22821D2902FA1CEC7583BAF825",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.ExceptionDescriptorResult",
+      "sourceSha256": "0BA2C7CBBFE7E23F474E24E458A5F85CF41F240AF4606CA9E2510A7210A60EC1",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Filters.Cacheable.HttpCacheableFilter",
+      "sourceSha256": "95C4134B416C0209725BA7FD5D48964F4F7B29836E83682D638630983A39EB45",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Filters.Cacheable.HttpCacheableOptions",
+      "sourceSha256": "C421CB8B97E524AAA61972F56DFB90506D8F076646BDFDCB76CE4D6DCF492102",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Filters.Cacheable.HttpEntityTagHeaderFilter",
+      "sourceSha256": "10AF126CC091811A03DFE2300D29F0BB2950D4513F09D69C46C8520AB059C98E",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Filters.Cacheable.HttpLastModifiedHeaderFilter",
+      "sourceSha256": "3B42AE120F5E18EF1FAE0E1480325A2F2A1B5A4DAB2C9BA4003ED0E1D69A377E",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Filters.Diagnostics.FaultDescriptorFilter",
+      "sourceSha256": "D392F65CC34EE75FDCCCFA93B995CD18BB7D2CC5635375F13AD48CADB9D4103F",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Filters.Diagnostics.MvcFaultDescriptorOptions",
+      "sourceSha256": "0FED3D8E818B318AEE57D9F4AA37FF1E48675672B69D24547D92C5D983AFBEFD",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Filters.Headers.ApiKeySentinelAttribute",
+      "sourceSha256": "F23E48B8494D85AD723881925E47803278A1A4F24B2B29533EB0512EFA4AFAE7",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Filters.Headers.UserAgentSentinelFilter",
+      "sourceSha256": "F590EC99F9FF4AA0C95848D44260AE66784A82715CC18CE9432A89BB5D0AF1A0",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Filters.ModelBinding.DisableModelBindingAttribute",
+      "sourceSha256": "7B999456E87C931D6C1F9B763503D2A5E03F983A054B3BCBF8350D5F36BAD545",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.Filters.Throttling.ThrottlingSentinelFilter",
+      "sourceSha256": "DE57EC376FD5D403F5D7A3531EA83603357F64918376C9351C88B7BEBAF5B043",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore@11.0.0",
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.ForbiddenResult",
+      "sourceSha256": "4BCE8976FBF3979B18A4C06C5991BEFF592F9F3DA519D2AAC71397911DABEBEB",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.GoneResult",
+      "sourceSha256": "D64C6E528490FD7DF40B4FFB7CB5738242FD09985576B6F353E74AB55CC11F20",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.SeeOtherResult",
+      "sourceSha256": "B89E747B748B7F9B99F5B2436A096CEC68CD0062C0DC9B52D9E246B2B81B6EF3",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Mvc.TimeBasedObjectResultOptions`1",
+      "sourceSha256": "CD1F4A79DD3DE6F5AF3F18694D35808B683FF4FFCBABAB377399DA50713BBF7F",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Mvc@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Razor.TagHelpers.AppScriptTagHelper",
+      "sourceSha256": "DA0F3F28340CA4CF12DDAB0ED44B392090CF7CCFFD245E12DF6524FAE4E8E8E3",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Razor.TagHelpers@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Razor.TagHelpers.CdnTagHelperOptions",
+      "sourceSha256": "85869DA3760EC5AB8B47F2BC6D118C3D9749EC05CBE6C155635EB2301ECD88D1",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Razor.TagHelpers@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Razor.TagHelpers.ProtocolUriScheme",
+      "sourceSha256": "2A1A0780C9AFEC6B6B7354519C7B9EB4EDA5DDBA0D609D2929F482D9BEC6A92D",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Razor.TagHelpers@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.AspNetCore.Razor.TagHelpers.TagHelperBaseUrlMode",
+      "sourceSha256": "CC84929A0AFB003AB0F20AC7588C45C81C35F5C56DE7723DD0B0C1D8F58B1BB5",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Razor.TagHelpers@11.0.0",
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Calculator",
+      "sourceSha256": "B5CCFE32F7FCA4C50FB4C3443BE4702430BDCB9B545A3C16041627CD64BA2973",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.CasingMethod",
+      "sourceSha256": "2AF214D903C12BE48905A830D76D8C802E5113EA013470469056F643DF0C3DD2",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Collections.Generic.Arguments",
+      "sourceSha256": "B3597F5C04628EEEF5CAF5546F778FB6B0DAA83DB046B2C9A22DFD4831357E1D",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Collections.Generic.DynamicComparer",
+      "sourceSha256": "AC2AB351AD7FF3D9E72E31CB4FEC7E6743D9DBB3EE55E3D672AEB826CFEB57E3",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Collections.Generic.DynamicEqualityComparer",
+      "sourceSha256": "99B8E80B067D88B169E15C58925E425193330AAA9C01EC0898FEA4FD2780ED4E",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Collections.Generic.EnumReadOnlyDictionary`1",
+      "sourceSha256": "974C856C260C2DB546B18D79D559C45F8378B1E4E37EA65A0CFEDFC2001A85A8",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Collections.Generic.PaginationOptions",
+      "sourceSha256": "4DFEF6F7EC27D1529CC1608791FFE1186D5F4CD65FBCAB5A9418812EB864D95D",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Collections.Generic.PartitionerEnumerable`1",
+      "sourceSha256": "170B056D1A6CC0F67983A0983CFC780F35574382874FE96BCCC5FD142FC6099B",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Collections.Generic.ReferenceComparer`1",
+      "sourceSha256": "D1F5A621080AA1E183133F6FA05864CD3E58E0BE98569300040F43C20A5F825A",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Collections.Generic.StackDecoratorExtensions",
+      "sourceSha256": "1525C38F5AF4CD1632C9394F3C4422ED4BBC6C0BE58965DC2CABFACD16EBF4B2",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Convertible",
+      "sourceSha256": "4B8698E8D29B16CA391490A8137976AD5E0EAF34D88A74DDC028D91A6199FD08",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Data.Integrity.EntityDataIntegrityMethod",
+      "sourceSha256": "A7CA77841F15F9C45EF497365CDFC7B4CED7E11BE39807B2525CD5634F1F98FF",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Data.Integrity@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Decorator`1",
+      "sourceSha256": "32DE58B8C7F6799C574BD46C9E3A7DAAE7D6583D9972203AFE2E03AE752274E3",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Decorator",
+      "sourceSha256": "5AC17098ED829DD3FF64A90CC3A15373FDAFF09172C55326A78ABDFC99D20881",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.DelimitedString",
+      "sourceSha256": "8E210DBF770A1CB8911D4639B6704BFDF9F54F525E2BC32269E36CAF3EE76966",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.DelimitedStringOptions",
+      "sourceSha256": "E39A5481D40CFC0CF3AC41DB0AFACAA834FE0E30D334B85691BC39A07B5FC737",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Diagnostics.ExceptionDescriptor",
+      "sourceSha256": "A92E505BD0254D14261E14C797D2BB074064AE17C6727AA6608156BC147EEED0",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Diagnostics.ExceptionDescriptorOptions",
+      "sourceSha256": "6FD1D578C5727CE47119462B5CAA60ACEEFF2973C211848878DB12C52EDCAF4C",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Diagnostics.Failure",
+      "sourceSha256": "F6CF29D6AE9FF7786325853E9AF21C82A89E138C83D3A28B30F5AAA0DA1AF86C",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Diagnostics.FaultSensitivityDetails",
+      "sourceSha256": "D90E3E5F7E5D4A5B8C6C955D521D68374DEF02ADC186DB8F9C8F10FB9FCDC4A0",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Endianness",
+      "sourceSha256": "F8BDEC9801C7C41D01A770D33A3E82F2AD9323528FF5A9FBF022C78925B601F9",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.EndianOptions",
+      "sourceSha256": "CF081BDE8F6E88DED0E71421F584677A35E8EADE0D8DD57796542F4A012A4F56",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.ExceptionInvoker`1",
+      "sourceSha256": "7D7689977F52C102CEAEC69074DB71702535A610C4DE281D941AAC63B5B88F7A",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.ActionFactory",
+      "sourceSha256": "97984BD5246619087B39742832738497AA98F49DE937E3DBC7763ABACABF20A8",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.AspNetCore.Authentication.ApplicationBuilderExtensions",
+      "sourceSha256": "F580ED4ABD73B10BE84998CE0633B1394FBAF1FF7CA69D6FD08879D4FC77D872",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore.Authentication@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.AspNetCore.Authentication.AuthorizationResponseHandler",
+      "sourceSha256": "5AA1FF9CAA13A162C5E81FC6B9628A8CB4CB48E1A0A6CA65F00999CEBA0D3165",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore.Authentication@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.AspNetCore.Configuration.AssemblyCacheBusting",
+      "sourceSha256": "EA94711B9E9D82503C8D57D60072B98A3F885B4CB8A4AA458A334873633830E5",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.AspNetCore.Mvc.Formatters.Text.Json.JsonSerializationInputFormatter",
+      "sourceSha256": "5CA621EC436086C35A6FB28067E8E2006300372477B895E41AA5FA12385321E2",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore.Mvc.Formatters.Text.Json@11.0.0",
+          "Cuemon.Extensions.Text.Json@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.AspNetCore.Mvc.Formatters.Text.Json.JsonSerializationOutputFormatter",
+      "sourceSha256": "7E653CE725FBA43E1B6CC447A0109539F0414F63C59F05159777DA2D59CB65FC",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore.Mvc.Formatters.Text.Json@11.0.0",
+          "Cuemon.Extensions.Text.Json@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.AspNetCore.Mvc.Formatters.Xml.XmlSerializationInputFormatter",
+      "sourceSha256": "6A2DAEE54F68F33445EDB8C89BB79F73F07497A06E9A6C568B221B53E761DE74",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore.Mvc.Formatters.Xml@11.0.0",
+          "Cuemon.Xml@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.AspNetCore.Mvc.Formatters.Xml.XmlSerializationOutputFormatter",
+      "sourceSha256": "6F34B34169E943CC7765AC9613BA590D48CC2874CFB2D9A96577FE034835ED45",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore.Mvc.Formatters.Xml@11.0.0",
+          "Cuemon.Xml@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.AspNetCore.Text.Json.MinimalJsonOptions",
+      "sourceSha256": "406D9206813717BEE2CCBA13DC323BF637DD6A063CC7DAB83C0A290A2624DFC0",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore.Text.Json@11.0.0",
+          "Cuemon.Extensions.Text.Json@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.AspNetCore.Xml.Converters.XmlConverterExtensions",
+      "sourceSha256": "7C3026559EBB0604192590C8733574434C3DB85A7124DB4A48A6FB82F3AD34F0",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.AspNetCore.Xml@11.0.0",
+          "Cuemon.Xml@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.ByteExtensions",
+      "sourceSha256": "36929335829974EB019393B219F75134D2F52C457D1B2C887EFEC90BE539A93C",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.CharExtensions",
+      "sourceSha256": "445AF4F0CF388CB6CA618AAC9FA58131722E379046DB7877E02F12FA332655F2",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Collections.Generic.CollectionExtensions",
+      "sourceSha256": "6CA6561CA6CF7634E6E51D341F32D4F9C9B9450022E301517338FCAA9D5EDFC3",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Collections.Generic@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Collections.Generic.QueueExtensions",
+      "sourceSha256": "4B1F10FEB3D0850C52D9AFD6B07DC2D2A0775AA4C531B0058D4467B3D1A6F1B1",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Collections.Generic@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Collections.Generic.StackExtensions",
+      "sourceSha256": "60746152528C6BBD0D2480274F8F38FC29884DC4EB1B289D89CA8CEC6DAD1187",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Collections.Generic@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.DateTimeExtensions",
+      "sourceSha256": "C76B4FBC386E469BBA027F9BC133619F805A6E369AEC3A61A8C30ACB2FB54CEE",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.DoubleExtensions",
+      "sourceSha256": "199686E96925C9EC275E5A3BCC974782B3EB07651442E790DF5841C0BC09531B",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.FileProviders.PortablePhysicalFileProvider",
+      "sourceSha256": "4456F9C5BA2102111033FA9498E11D476B7A8EEA8F112A0255DF349D2706847A",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.FileProviders.Physical@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.FuncFactory",
+      "sourceSha256": "254F8AE602BC157E3AB3977A4F34A430251DE835AC41E4E0653CBD40B8236CE8",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Hosting.HostBuilderExtensions",
+      "sourceSha256": "7A24E6B848624FAFAF7900BAAB4E902399A25D9809722EFB724E128006738536",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Hosting@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.IntegerExtensions",
+      "sourceSha256": "7B5471897D5DFB54E42655A4846C7AE1651448A1E2FE4353C5DDDF4F5EB4559C",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.MutableTupleFactory",
+      "sourceSha256": "43F0B1986F50D8BB30322E10272990F1E8AD73F0C8E13CBEC3DF2C050E3AE9F4",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.RoundOffAccuracy",
+      "sourceSha256": "A78F5F0BCA3798CD67DFBFD8ABFFFB3016EC1708D3B9C11DE84BDBB1E01EB1A5",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Runtime.Hierarchy",
+      "sourceSha256": "CC82646EBEC4683401C9E58CA6124D8082409A83AB7BEE70C49FEA856AB8EBAB",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Runtime.HierarchyOptions",
+      "sourceSha256": "57B76E186E6CDA0527769169AC636A11FB11C9DC81214B9940D65A4785DD43F3",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Runtime.Hierarchy`1",
+      "sourceSha256": "30C20294D8EB14F26A7D899079187F60956CB7388AEECA1B35F7491A779DFA18",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.TesterFuncFactory",
+      "sourceSha256": "D57EFF3CD4346E4C41E6ABCB9A3537466A6BB1836289560F027B76D343F3CC01",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.TimeSpanExtensions",
+      "sourceSha256": "733B9CD95222FEF93D294D5AC46F947D72D84AFEDC4891C5BCF65E497D3A2792",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.VerticalDirection",
+      "sourceSha256": "B54981B7E5D0CCACCF6E6A0F601413B787B5F900D69C5CE2A5081842BB1E46D8",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Wrapper",
+      "sourceSha256": "65381E786FE6E0BF810671AA93F3FBCE3ACAB25CD2F34A495C8625E8B5021D10",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Xml.ByteArrayExtensions",
+      "sourceSha256": "B9C6AFDB0D8B99E6DC315BB6E9B0FA57805E1064CB26E855D9783E95066C053B",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Xml@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Extensions.Xml.Linq.StringExtensions",
+      "sourceSha256": "62AF2BFCD6CA71D635938592845CD98641C73EAC0773FF4A53B46DE546493819",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Extensions.Xml@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.FormattingOptions",
+      "sourceSha256": "F37F4F8B00448AEFDDC9CEAAC3B7C91FB31C994B1EE14F9C8EFCCD7BB6DE1C1E",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Globalization.StatisticalRegionInfo",
+      "sourceSha256": "363DA77E0A0E8925EB347583D92F75BC44A1EDFD34BB941C08082753EBC98F53",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Globalization.StatisticalRegionKind",
+      "sourceSha256": "7591C87ED5204E5F7FE5F77A7806B59D95ACACE865CB73917EF2415F53C8E69F",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Globalization.World",
+      "sourceSha256": "12C944DC59C7352346618B5B5F157BFFB94735FC2A374E6986AB7BDA221C66BD",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.GuidFormats",
+      "sourceSha256": "7FA1F3FE53408D432A1897F92C94A75B7F27FA753EB90FEA1DC9987A8B7863F4",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Messaging.RequestToken",
+      "sourceSha256": "0D2A225184D799DF1E5FCA2A9155051BEE09389FBCCA06ED6BEBE736D56A14F9",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.MutableTuple`1",
+      "sourceSha256": "1D3B8A4F6AE0526471175C1DFA2D2F2636D026C8DB54AC06F6294AE8EA2D3362",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Net.FieldValueSeparator",
+      "sourceSha256": "66635D02B3EC6170C1EE6B64979BD85AF3FE54FCD0535ABBD6A85291C99769D0",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Net@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.ObjectFormattingOptions",
+      "sourceSha256": "7F48C176FD091279A6E4F8BCCF86ABD46F010D4D2BF35A010D32E646FACD31FE",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Reflection.ActivatorFactory",
+      "sourceSha256": "100E3BF01B07F67AE0DD9DC79BCF57584E27A0EBA197923E4670F70BB8085645",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Reflection.AssemblyContext",
+      "sourceSha256": "26E60C5A032C02A472F4DF62F925FFAA0B79B2694355EE92532B2F5BBA6DD946",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Reflection.ManifestResourceMatch",
+      "sourceSha256": "D8047A8C6A239DF7281A2D98D39CA875826FF323B43B846A9A0F08EE5B6955BE",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Reflection.VersionResult",
+      "sourceSha256": "BBFC15CC349F6FF09E1FD3FF2EFF11D19F5345BFBDEA0BFCE36D5349A64A6FBE",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Runtime.Caching.CacheEntry",
+      "sourceSha256": "C8A100F45270519709998138BAEC51D7432F144D1C8A5AD015E25AABD5362E0F",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Runtime.Caching@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Runtime.Caching.CacheInvalidation",
+      "sourceSha256": "4474047C34A1302ED9EB63A9BB7167C8C981B6A15F01197C2985337A574272FD",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Runtime.Caching@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Runtime.Caching.SlimMemoryCacheOptions",
+      "sourceSha256": "A42DD71A074B108DB0F186C6BD1F79B7F37E2DDEB137FAA08323DA236007441B",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Runtime.Caching@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Runtime.Serialization.Formatters.Formatter",
+      "sourceSha256": "244DAA99E4B5427334CDBEC1400B5D864828531F1761D80480ECAA4685F92F90",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.AesCryptorOptions",
+      "sourceSha256": "749ED5DAC48D64725011182184CAB2C6B35EB5EA1B929B7B8397F0533B8AFE4B",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.AesSize",
+      "sourceSha256": "DE0829EC12CF7F97D3AC253FD84E8686B697E9226C98674AB24C470491342EFF",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.HmacSecureHashAlgorithm256",
+      "sourceSha256": "472FB862E97DE13CD8C644B21AAEF216867592443FCFC5EFEC74A39948A47EEA",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.HmacSecureHashAlgorithm384",
+      "sourceSha256": "CC0A44FAF6BB5C4F4780CB8DBF199898A7AC8A6DFB18A4684BA09B235CA6DF54",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.HmacSecureHashAlgorithm512",
+      "sourceSha256": "B3269621478CA44D0F53C83BD6C3B40E136FB23521C9FC848869FBE58FA4EBA7",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.KeyedHashFactory",
+      "sourceSha256": "F489155F2E548A8FEA63E6C455006856C116201145B87B8F6A8A2C851C0CE0EF",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.MessageDigest5",
+      "sourceSha256": "81813DB3B9490472BF012DBD851636A664E0D2133E213884789D41E96E569E93",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.SecureHashAlgorithm1",
+      "sourceSha256": "67238F44658FDA52A1EBBD58E5488F4695A36F4B858AB0028F8D1ACAB2513311",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.SecureHashAlgorithm256",
+      "sourceSha256": "7D03804546E5DE5C6908F15292E27633971A839269BDB5148CCC09680DCB45D2",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.SecureHashAlgorithm384",
+      "sourceSha256": "02AAB8B966CD1701EDD07256C8A60CBD867DD771456B532E0189F60098FC368A",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.SecureHashAlgorithm512",
+      "sourceSha256": "CD1CBDD90FBA5EC17E5E53537C80CC4D7AB4D8A31074E451E18CB5C52512B0E4",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.SecureHashAlgorithm512256",
+      "sourceSha256": "268BE417A561E0CECE3F113983C5674B7E9973B9BACCE843BC74CF1B6C54C62A",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.SHA512256",
+      "sourceSha256": "28BF592846669F213E607ABC0533F2B8C5C8F68B13518F537C1824EFF8BE0B6A",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.Cryptography.UnkeyedHashFactory",
+      "sourceSha256": "690577B43957BB2B4349CEBB65CB338751D93DF59AAAD77650C0C9CB67822F60",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Security.Cryptography@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.CyclicRedundancyCheck32",
+      "sourceSha256": "83A65A26FEE49F39D6E66210F79C0BC2F71C936942C7B1F97F7DF630D6AC070A",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.CyclicRedundancyCheck64",
+      "sourceSha256": "0B64CB4DEC49F0464FA2F417B209CDE25358865912FA8DFB147A9E188867B444",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.CyclicRedundancyCheckAlgorithm",
+      "sourceSha256": "D67681ACE048ECA107E2840E777BB7B4733E11026911E26E44EBD770F7EB2BE6",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.CyclicRedundancyCheckOptions",
+      "sourceSha256": "DC1398D73C910652E2225899533442B06AAC7420ED9F9B48B2F0A3C1D917FE40",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.FowlerNollVo1024",
+      "sourceSha256": "4452F6CF30E5CC478C62ABDA2DD5E9B85659FA1884B3A408CC10E84A87763CF2",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.FowlerNollVo32",
+      "sourceSha256": "0575462C28C7EC6869BD17C95B689B7DE74688A6225F94C65A96088CB7104044",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.FowlerNollVo64",
+      "sourceSha256": "0114710110D84EA66FF56785C766C569E04111264FA83BC60AFDF80296BDFC30",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Security.HashFactory",
+      "sourceSha256": "A5F8B8885E2892347DADA03F9ECCB9823F25485DA757B4FABAEE935D1316B915",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.StringReplacePair",
+      "sourceSha256": "C01D1C0C388CDE5144EBC21BA247E06DE0DD6EE74E3A0BB35F8AD38D1B5D6B6C",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.TesterFunc`2",
+      "sourceSha256": "7A153664980E6609FFC906FEB9084DF9AFF8FF60DE409E9A58C482B81383E622",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Text.EncodingOptions",
+      "sourceSha256": "3F9C59294EE2A1AC4983ED91E39F15B3FCE06F76998825915EEE6EE4818A28E0",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Text.EnumStringOptions",
+      "sourceSha256": "67B4CD7F246806933483ADBA5AF344C94B5BC5E07C9B0F4BB3EB0430EA44EF06",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Text.GuidStringOptions",
+      "sourceSha256": "F8B784AC4F65EBB1A1BA5A95E0B923AB9CBB2C9D4D46446743F8A2E89B357AFA",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Text.ParserFactory",
+      "sourceSha256": "119046A46B2CFC3A38246A3B236FC1F5D580FA804A020B7994A0A160708EBCCE",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Text.PreambleSequence",
+      "sourceSha256": "DBBF1D424C848150A13FB55153B15627C207B5D26DA8E6BFEA4D252697E28041",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.TimeRange",
+      "sourceSha256": "65792AA41547F253C427C4A2D85FFF73640F62325159F3DFC1F450C12316180D",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.TimeUnit",
+      "sourceSha256": "B6B16025439E8CA757A9807E014F1684B9D7D97A4CABFAB76767064E7D63A981",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.UriScheme",
+      "sourceSha256": "D50A5E52C1F252F709FAFD84A6EF319C0ECBD8BEA814BE17A1BC18744DD7CCD5",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Xml.Serialization.Converters.XmlConverterDecoratorExtensions",
+      "sourceSha256": "3C55D492470344695B15DC5725A6EFAB4ACAB645B1D1261E9AB3E8772595AF63",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Xml@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Xml.Serialization.XmlSerializerOptions",
+      "sourceSha256": "41386D1CFDC7722AA4E3F20D77F966B9435B798EB8031CBB97BEFC60124D0FEA",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Xml@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Xml.XmlDocumentFactory",
+      "sourceSha256": "ECA17DF87E9DF86D75DD1EAA971598A6B9B6736DA326595ECFE10F7951830A3D",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Xml@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.Xml.XPath.XPathDocumentFactory",
+      "sourceSha256": "9013FD0073EBF73AB515FB5F95402A714D7309FAB3BB3FBECCC7C560C7815120",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0",
+          "Cuemon.Xml@11.0.0"
+        ]
+      }
+    },
+    {
+      "uid": "Cuemon.ActionFactory`1",
+      "sourceSha256": "4E98085752E0D0B3078F18DA5A54AD53E0EF8DE3C38A653C8BA349F1DC5A406E",
+      "manifest": {
+        "schemaVersion": 1,
+        "mode": "console",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.Core@11.0.0"
+        ]
+      }
+    }
+  ]
+}

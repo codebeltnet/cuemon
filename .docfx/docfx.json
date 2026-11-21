@@ -131,6 +131,11 @@
         "files": [
           "images/**"
         ]
+      },
+      {
+        "files": [
+          "run-actions/**"
+        ]
       }
     ],
     "globalMetadata": {

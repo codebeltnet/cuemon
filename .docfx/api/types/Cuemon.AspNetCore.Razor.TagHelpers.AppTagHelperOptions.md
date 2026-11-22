@@ -32,3 +32,7 @@ public class AppTagHelperOptionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="8d2c5e4633bbb19e93f6a5f9"><a href="~/run-actions/8d2c5e4633bbb19e93f6a5f9/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/8d2c5e4633bbb19e93f6a5f9/docker.ps1" data-transport="docker">View Docker Script</a><p>Starts the host with a timeout, performs the demonstrated action, and shuts down cleanly.</p></div>
+<!-- docfx-run-actions:end -->

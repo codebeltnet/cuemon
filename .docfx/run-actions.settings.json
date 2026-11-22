@@ -2,8 +2,21 @@
  "examples": [
   {
    "uid": "Cuemon.AspNetCore.Razor.TagHelpers.AppTagHelperOptions",
+   "exampleId": "Cuemon.AspNetCore.Razor.TagHelpers.AppTagHelperOptions#1",
+   "fenceOrdinal": 1,
    "sourceSha256": "2D0879DBE31F041DD0B37DE186C02FBBD8087F92D294C850C7D35033CBC91E55",
-   "intrinsicLimitation": "Starts a blocking ASP.NET Core host with app.Run() and no shutdown signal, so a one-shot wrapper cannot terminate deterministically; the page keeps the complete WebApplication setup without a run-action pair."
+   "mode": "host",
+   "hostHarness": {
+    "sdk": "Microsoft.NET.Sdk.Web",
+    "framework": "net10.0",
+    "dependsOn": [
+     "Cuemon.AspNetCore.Razor.TagHelpers@11.0.0"
+    ],
+    "probePath": "/",
+    "probeMethod": "GET",
+    "timeoutSeconds": 60,
+    "expectedStatusCode": 404
+   }
   },
   {
    "uid": "Cuemon.Collections.Specialized.DictionaryDecoratorExtensions",

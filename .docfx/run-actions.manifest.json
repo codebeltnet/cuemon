@@ -6790,6 +6790,33 @@
       }
     },
     {
+      "id": "8d2c5e4633bbb19e93f6a5f9",
+      "exampleId": "Cuemon.AspNetCore.Razor.TagHelpers.AppTagHelperOptions#1",
+      "uid": "Cuemon.AspNetCore.Razor.TagHelpers.AppTagHelperOptions",
+      "fenceOrdinal": 1,
+      "strategy": "host",
+      "transports": [
+        "native",
+        "docker"
+      ],
+      "framework": "net10.0",
+      "image": "codebeltnet/csrun:10",
+      "source": "using Cuemon.AspNetCore.Razor.TagHelpers;\nusing Microsoft.AspNetCore.Builder;\nusing Microsoft.Extensions.DependencyInjection;\n\nnamespace MyApp.Examples;\n\npublic class AppTagHelperOptionsExample\n{\n    public static void Main(string[] args)\n    {\n        var builder = WebApplication.CreateBuilder(args);\n\n        builder.Services.AddRazorPages();\n        builder.Services.Configure<AppTagHelperOptions>(o =>\n        {\n            o.Scheme = ProtocolUriScheme.Https;\n            o.BaseUrl = \"static.example.com\";\n        });\n\n        var app = builder.Build();\n        app.Run();\n    }\n}",
+      "hostHarness": {
+        "sdk": "Microsoft.NET.Sdk.Web",
+        "framework": "net10.0",
+        "dependsOn": [
+          "Cuemon.AspNetCore.Razor.TagHelpers@11.0.0"
+        ],
+        "probePath": "/",
+        "probeMethod": "GET",
+        "timeoutSeconds": 60,
+        "expectedStatusCode": 404,
+        "expectedBodyContains": "",
+        "startupDelayMs": 1000
+      }
+    },
+    {
       "id": "8ddfd23fa92558e3b81d76b0",
       "exampleId": "Cuemon.Extensions.Hosting.Environments#1",
       "uid": "Cuemon.Extensions.Hosting.Environments",

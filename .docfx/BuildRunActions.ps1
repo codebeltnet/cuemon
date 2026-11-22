@@ -40,6 +40,7 @@ function Assert-CsrunTestOutput([string] $Output) {
 
 function Normalize([string] $Text) { $Text.Replace("`r`n", "`n").TrimEnd("`n", "`r") }
 function Quote-Literal([string] $Value) { "'" + $Value.Replace("'", "''") + "'" }
+function Test-NetFrameworkTfm([string] $Framework) { return (-not [string]::IsNullOrWhiteSpace($Framework) -and $Framework -match '^net4\d+$') }
 
 function Sort-ManifestValue($Value) {
     if ($Value -is [System.Collections.IDictionary]) {
@@ -56,8 +57,9 @@ function Sort-ManifestValue($Value) {
 function New-StandalonePair {
     param(
         [Parameter(Mandatory)][hashtable] $Manifest,
-        [Parameter(Mandatory)][string] $Image
+        [string] $Image = 'codebeltnet/csrun:10'
     )
+    if ([string]::IsNullOrWhiteSpace($Image)) { $Image = 'codebeltnet/csrun:10' }
     $ordered = Sort-ManifestValue $Manifest
     $manifestJson = ConvertTo-Json -InputObject $ordered -Depth 100
     $verifyTests = $ordered.mode -eq 'test'
@@ -150,7 +152,7 @@ function New-RepositoryPair {
     )
     if ($Repository -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$' -or $Commit -notmatch '^[a-fA-F0-9]{40}$' -or
         $Project -notmatch '^[A-Za-z0-9_./-]+\.csproj$' -or $Project.Split('/') -contains '..' -or $Project.StartsWith('/') -or
-        $Test -notmatch '^[A-Za-z0-9_.+]+$' -or $Framework -notmatch '^net\d+\.\d+$' -or
+        $Test -notmatch '^[A-Za-z0-9_.+]+$' -or $Framework -notmatch '^(?:net\d+\.\d+|net4\d+)$' -or
         $Image -notmatch '^mcr\.microsoft\.com/dotnet/sdk:[A-Za-z0-9_.-]+$') {
         throw 'Expected a pinned GitHub repository, relative project, exact xUnit method, TFM and official SDK image.'
     }
@@ -243,10 +245,11 @@ function New-HostPair {
         [int] $StartupDelayMs = 1000,
         [string] $Image = 'codebeltnet/csrun:10'
     )
-    if ($Framework -notmatch '^net\d+\.\d+$') { throw "Invalid host framework: $Framework" }
+    if ($Framework -notmatch '^(?:net\d+\.\d+|net4\d+)$') { throw "Invalid host framework: $Framework" }
     if ($Sdk -notmatch '^[A-Za-z0-9_.]+$') { throw "Invalid host SDK: $Sdk" }
     if ($ProbeMethod -notmatch '^(GET|HEAD|POST|PUT|DELETE|OPTIONS|PATCH)$') { throw "Invalid host probeMethod: $ProbeMethod" }
     if ($TimeoutSeconds -lt 3 -or $TimeoutSeconds -gt 300) { throw "Host timeoutSeconds must be between 3 and 300." }
+    $isNetFramework = Test-NetFrameworkTfm $Framework
     $cleanDependsOn = @($DependsOn | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
     foreach ($pin in $cleanDependsOn) {
         if ($pin -notmatch '^[A-Za-z0-9_.-]+@[A-Za-z0-9_.-]+$') { throw "Invalid host dependsOn pin: $pin" }
@@ -255,8 +258,12 @@ function New-HostPair {
         $parts = $_ -split '@', 2
         "    <PackageReference Include=""$($parts[0])"" Version=""$($parts[1])"" />"
     })
+    if ($isNetFramework -and -not ($cleanDependsOn | Where-Object { $_ -like 'Microsoft.NETFramework.ReferenceAssemblies@*' })) {
+        $pkgLines += '    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="[1.0.3]" PrivateAssets="All" />'
+    }
     $itemGroup = if ($pkgLines.Count) { "`n  <ItemGroup>`n" + ($pkgLines -join "`n") + "`n  </ItemGroup>" } else { '' }
-    $csproj = "<Project Sdk=""$Sdk"">`n  <PropertyGroup>`n    <OutputType>Exe</OutputType>`n    <TargetFramework>$Framework</TargetFramework>`n    <ImplicitUsings>enable</ImplicitUsings>`n    <Nullable>enable</Nullable>`n  </PropertyGroup>$itemGroup`n</Project>`n"
+    $langVersionLine = if ($isNetFramework) { "`n    <LangVersion>latest</LangVersion>" } else { '' }
+    $csproj = "<Project Sdk=""$Sdk"">`n  <PropertyGroup>`n    <OutputType>Exe</OutputType>`n    <TargetFramework>$Framework</TargetFramework>`n    <ImplicitUsings>enable</ImplicitUsings>`n    <Nullable>enable</Nullable>$langVersionLine`n  </PropertyGroup>$itemGroup`n</Project>`n"
     $payloadJson = ([ordered]@{
         csproj = $csproj
         source = $Source.Replace("`r`n", "`n").TrimEnd("`r", "`n") + "`n"
@@ -466,9 +473,18 @@ foreach ($example in $examples) {
     } else {
         throw "Unsupported run-action strategy '$($example.strategy)' for $id"
     }
+    $effectiveFramework = if ($example.strategy -ceq 'standalone' -and $example.ContainsKey('manifest') -and $example.manifest -and $example.manifest.ContainsKey('framework') -and $example.manifest.framework) {
+        [string]$example.manifest.framework
+    } elseif ($example.strategy -ceq 'host' -and $example.ContainsKey('hostHarness') -and $example.hostHarness -and $example.hostHarness.ContainsKey('framework') -and $example.hostHarness.framework) {
+        [string]$example.hostHarness.framework
+    } elseif ($example.ContainsKey('framework') -and $example.framework) {
+        [string]$example.framework
+    } else { '' }
+    $isNetFrameworkExample = Test-NetFrameworkTfm $effectiveFramework
     $dir = Join-Path $OutputRoot $id
     foreach ($transport in @($example.transports)) {
         if ($transport -notin @('native', 'docker')) { throw "Unsupported transport '$transport' for $id" }
+        if ($isNetFrameworkExample -and $transport -ceq 'docker') { continue }
         $scriptText = Normalize $pair[$transport]
         $tokens = $null; $errors = $null
         $null = [Management.Automation.Language.Parser]::ParseInput($scriptText, [ref]$tokens, [ref]$errors)

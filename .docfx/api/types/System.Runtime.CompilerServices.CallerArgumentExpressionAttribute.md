@@ -42,5 +42,5 @@ namespace System.Runtime.CompilerServices
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="a8659fe8339088b7b883c517"><a href="~/run-actions/a8659fe8339088b7b883c517/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/a8659fe8339088b7b883c517/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="a8659fe8339088b7b883c517"><a href="~/run-actions/a8659fe8339088b7b883c517/native.ps1" data-transport="native">View Native Script</a></div>
 <!-- docfx-run-actions:end -->

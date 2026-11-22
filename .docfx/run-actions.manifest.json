@@ -7894,14 +7894,13 @@
       "fenceOrdinal": 1,
       "strategy": "standalone",
       "transports": [
-        "native",
-        "docker"
+        "native"
       ],
       "image": "codebeltnet/csrun:10",
       "manifest": {
         "schemaVersion": 1,
         "mode": "console",
-        "framework": "net10.0",
+        "framework": "net48",
         "dependsOn": [
           "Cuemon.Kernel@11.0.0"
         ],

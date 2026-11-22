@@ -6878,7 +6878,7 @@
    "manifest": {
     "schemaVersion": 1,
     "mode": "console",
-    "framework": "net10.0",
+    "framework": "net48",
     "dependsOn": [
      "Cuemon.Kernel@11.0.0"
     ]

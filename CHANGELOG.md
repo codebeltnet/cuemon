@@ -19,7 +19,8 @@ This major release adds .NET 11 targets, removes .NET 9-specific targets, and ch
 - `SonarAnalyzer.CSharp` 10.35.0.4138 is configured for source projects,
 - Central transitive pins for `System.Security.Cryptography.Pkcs` use 10.0.15 for .NET 10 and 11.0.0 for .NET 11,
 - A .NET 11 test workflow accepts preview SDKs and uses absolute project paths as a workaround for an SDK test-runner issue,
-- `Resolve-PackageReleaseNotesConflicts.ps1` resolves package release-note conflict markers and stages the resolved files when run.
+- `Resolve-PackageReleaseNotesConflicts.ps1` resolves package release-note conflict markers and stages the resolved files when run,
+- DocFX run-actions build script, manifest, settings, and template integration for generating native and Docker run scripts for API example pages.
 
 ### Changed
 
@@ -32,7 +33,9 @@ This major release adds .NET 11 targets, removes .NET 9-specific targets, and ch
 - Test tooling updates `Codebelt.Coverlet.MTP` from 10.1.1 to 11.0.0, `Microsoft.Testing.Extensions.HangDump` from 2.5.1 to 2.5.2, and `xunit.v3`, `xunit.v3.extensibility.core`, and `xunit.v3.runner.console` from 4.0.2 to 4.0.3,
 - The DocFX image uses `dhi.io/nginx`; fingerprinted assets cache successful and revalidation responses but use `no-store` for other responses, and range requests are disabled for those assets,
 - Test environments retain separate .NET 10 and .NET 11 Docker runners and remove the .NET 9 runner,
-- Verification temporarily skips CodeQL and excludes it from post-release service identity checks while the branch targets .NET 11; the workflow does not claim CodeQL assurance.
+- Verification temporarily skips CodeQL and excludes it from post-release service identity checks while the branch targets .NET 11; the workflow does not claim CodeQL assurance,
+- Updated DocFX API namespace and type overwrite examples, removed redundant availability includes, wired run-actions content and templates into `docfx.json` and `BuildDocfxImage.ps1`, and updated DocFX maintenance guidance in `AGENTS.md`,
+- Added `Cuemon.Kernel` to the package table in `README.md` and ignored generated `.docfx/run-actions/` output in `.gitignore`.
 
 ### Removed
 

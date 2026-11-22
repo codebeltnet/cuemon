@@ -272,16 +272,39 @@ function New-HostPair {
 $payload = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($payloadB64)) | ConvertFrom-Json
 $work = Join-Path ([IO.Path]::GetTempPath()) ('dx-host-' + [guid]::NewGuid().ToString('N').Substring(0, 8))
 $null = New-Item -ItemType Directory -Path $work
+$buildProcess = $null
 $hostProcess = $null
+$deadline = [DateTimeOffset]::UtcNow.AddSeconds([int]$payload.timeoutSeconds)
 try {
     $utf8NoBom = [Text.UTF8Encoding]::new($false)
-    [IO.File]::WriteAllText((Join-Path $work 'HostSample.csproj'), $payload.csproj, $utf8NoBom)
+    $csprojPath = Join-Path $work 'HostSample.csproj'
+    [IO.File]::WriteAllText($csprojPath, $payload.csproj, $utf8NoBom)
     [IO.File]::WriteAllText((Join-Path $work 'Program.cs'), $payload.source, $utf8NoBom)
-    $buildLog = Join-Path $work 'build.log'
-    & dotnet build (Join-Path $work 'HostSample.csproj') -c Release --nologo -v quiet *> $buildLog
-    if ($LASTEXITCODE -ne 0) {
-        $buildText = Get-Content -LiteralPath $buildLog -Raw -ErrorAction SilentlyContinue
-        throw "Host sample build failed (exit $LASTEXITCODE): $buildText"
+    $buildStartInfo = [Diagnostics.ProcessStartInfo]::new('dotnet')
+    foreach ($a in @('build', $csprojPath, '-c', 'Release', '--nologo', '-v', 'quiet')) { $buildStartInfo.ArgumentList.Add($a) }
+    $buildStartInfo.WorkingDirectory = $work
+    $buildStartInfo.RedirectStandardOutput = $true
+    $buildStartInfo.RedirectStandardError = $true
+    $buildStartInfo.UseShellExecute = $false
+    $buildProcess = [Diagnostics.Process]::new()
+    $buildProcess.StartInfo = $buildStartInfo
+    if (-not $buildProcess.Start()) { throw 'Could not start host sample build.' }
+    $buildStdoutTask = $buildProcess.StandardOutput.ReadToEndAsync()
+    $buildStderrTask = $buildProcess.StandardError.ReadToEndAsync()
+    $buildRemainingMs = [int][Math]::Ceiling(($deadline - [DateTimeOffset]::UtcNow).TotalMilliseconds)
+    if ($buildRemainingMs -le 0 -or -not $buildProcess.WaitForExit($buildRemainingMs)) {
+        try { if (-not $buildProcess.HasExited) { $buildProcess.Kill($true) } } catch {}
+        $null = $buildProcess.WaitForExit(5000)
+        throw "Host sample build timed out after $($payload.timeoutSeconds)s."
+    }
+    $buildOut = $buildStdoutTask.GetAwaiter().GetResult()
+    $buildErr = $buildStderrTask.GetAwaiter().GetResult()
+    if ($buildProcess.ExitCode -ne 0) {
+        $buildText = ($buildOut + "`n" + $buildErr).Trim()
+        throw "Host sample build failed (exit $($buildProcess.ExitCode)): $buildText"
+    }
+    if ([DateTimeOffset]::UtcNow -ge $deadline) {
+        throw "Host sample timed out after $($payload.timeoutSeconds)s before starting host."
     }
     $listener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
     $listener.Start()
@@ -289,7 +312,7 @@ try {
     $listener.Stop()
     $baseUrl = "http://127.0.0.1:$port"
     $startInfo = [Diagnostics.ProcessStartInfo]::new('dotnet')
-    foreach ($a in @('run','--no-build','-c','Release','--project',(Join-Path $work 'HostSample.csproj'))) { $startInfo.ArgumentList.Add($a) }
+    foreach ($a in @('run','--no-build','-c','Release','--project',$csprojPath)) { $startInfo.ArgumentList.Add($a) }
     $startInfo.Environment['ASPNETCORE_URLS'] = $baseUrl
     $startInfo.Environment['DOTNET_ENVIRONMENT'] = 'Development'
     $startInfo.RedirectStandardOutput = $true
@@ -300,7 +323,6 @@ try {
     if (-not $hostProcess.Start()) { throw 'Could not start host process.' }
     $stdoutTask = $hostProcess.StandardOutput.ReadToEndAsync()
     $stderrTask = $hostProcess.StandardError.ReadToEndAsync()
-    $deadline = [DateTimeOffset]::UtcNow.AddSeconds([int]$payload.timeoutSeconds)
     if ($payload.probePath) {
         $probeUrl = $baseUrl + $payload.probePath
         $probed = $false
@@ -314,11 +336,14 @@ try {
                     $errOut = $stderrTask.GetAwaiter().GetResult()
                     throw "Host exited before probe succeeded (exit $($hostProcess.ExitCode)). $stdOut $errOut"
                 }
+                $probeRemainingMs = [int][Math]::Ceiling(($deadline - [DateTimeOffset]::UtcNow).TotalMilliseconds)
+                if ($probeRemainingMs -le 0) { break }
+                $cts = [Threading.CancellationTokenSource]::new([Math]::Min(3000, $probeRemainingMs))
                 try {
                     $req = [Net.Http.HttpRequestMessage]::new([Net.Http.HttpMethod]::new([string]$payload.probeMethod), $probeUrl)
-                    $resp = $httpClient.Send($req)
+                    $resp = $httpClient.Send($req, $cts.Token)
                     $statusCode = [int]$resp.StatusCode
-                    $body = $resp.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+                    $body = $resp.Content.ReadAsStringAsync($cts.Token).GetAwaiter().GetResult()
                     if ([int]$payload.expectedStatusCode -gt 0 -and $statusCode -ne [int]$payload.expectedStatusCode) {
                         throw "Expected HTTP $($payload.expectedStatusCode) from $($payload.probePath), got HTTP $statusCode. Body: $body"
                     }
@@ -335,6 +360,11 @@ try {
                 } catch [Threading.Tasks.TaskCanceledException] {
                     $lastError = $_.Exception.Message
                     Start-Sleep -Milliseconds 200
+                } catch [OperationCanceledException] {
+                    $lastError = $_.Exception.Message
+                    Start-Sleep -Milliseconds 200
+                } finally {
+                    $cts.Dispose()
                 }
             }
         } finally {
@@ -342,15 +372,28 @@ try {
         }
         if (-not $probed) { throw "Host probe '$($payload.probeMethod) $($payload.probePath)' timed out after $($payload.timeoutSeconds)s. Last error: $lastError" }
     } else {
-        Start-Sleep -Milliseconds ([int]$payload.startupDelayMs)
+        $requiredDelayMs = [Math]::Max([int]$payload.startupDelayMs, 0)
+        $delayRemainingMs = [int][Math]::Floor(($deadline - [DateTimeOffset]::UtcNow).TotalMilliseconds)
+        $sleepMs = [Math]::Min($requiredDelayMs, [Math]::Max($delayRemainingMs, 0))
+        if ($sleepMs -gt 0) { $null = $hostProcess.WaitForExit($sleepMs) }
         if ($hostProcess.HasExited -and $hostProcess.ExitCode -ne 0) {
             $stdOut = $stdoutTask.GetAwaiter().GetResult()
             $errOut = $stderrTask.GetAwaiter().GetResult()
             throw "Host exited with code $($hostProcess.ExitCode). $stdOut $errOut"
         }
-        Write-Output "Host started cleanly and ran for $($payload.startupDelayMs)ms."
+        if ($delayRemainingMs -lt $requiredDelayMs) {
+            throw "Host startup observation (${requiredDelayMs}ms) timed out after $($payload.timeoutSeconds)s with only $([Math]::Max($delayRemainingMs, 0))ms remaining."
+        }
+        Write-Output "Host started cleanly and ran for ${requiredDelayMs}ms."
     }
 } finally {
+    if ($buildProcess) {
+        try {
+            if (-not $buildProcess.HasExited) { $buildProcess.Kill($true) }
+            $null = $buildProcess.WaitForExit(5000)
+        } catch {}
+        $buildProcess.Dispose()
+    }
     if ($hostProcess) {
         try {
             if (-not $hostProcess.HasExited) { $hostProcess.Kill($true) }

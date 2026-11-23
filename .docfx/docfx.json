@@ -52,10 +52,7 @@
       ],
       "dest": "api/extensions/dotnet",
       "memberLayout": "separatePages",
-      "filter": "filterConfig.yml",
-      "properties": {
-        "TargetFramework": "net10.0"
-      }
+      "filter": "filterConfig.yml"
     },
     {
       "src": [
@@ -71,10 +68,7 @@
       ],
       "dest": "api/aspnet",
       "memberLayout": "separatePages",
-      "filter": "filterConfig.yml",
-      "properties": {
-        "TargetFramework": "net10.0"
-      }
+      "filter": "filterConfig.yml"
     },
     {
       "src": [
@@ -94,10 +88,7 @@
       ],
       "dest": "api/extensions/aspnet",
       "memberLayout": "separatePages",
-      "filter": "filterConfig.yml",
-      "properties": {
-        "TargetFramework": "net10.0"
-      }
+      "filter": "filterConfig.yml"
     }
   ],
   "build": {

@@ -607,6 +607,15 @@ Agents must never automatically commit code changes or push to remote repositori
 5. Run targeted tests when changing logic.
 6. Keep changes minimal and consistent with existing local style.
 
+## DocFX Build Entry Points
+
+DocFX run-action scripts under `.docfx/run-actions/` and generated API metadata under `.docfx/api/**/*.yml` are Git-ignored and must be generated before building the site image:
+
+- **Scripted local image build (recommended):** `pwsh .docfx/BuildDocfxImage.ps1` — generates `.docfx/run-actions/` via `.docfx/BuildRunActions.ps1`, validates manifest/Markdown/scripts via `.docfx/TestRunActions.ps1`, generates or reuses DocFX metadata, builds `Dockerfile.docfx`, and verifies the built container image.
+- **Direct Docker build:** Run `pwsh .docfx/BuildRunActions.ps1`, `pwsh .docfx/TestRunActions.ps1`, and `docfx metadata .docfx/docfx.json` first, then run `docker build -f .docfx/Dockerfile.docfx .docfx`. Direct Docker builds validate the build context and rendered `wwwroot` via `.docfx/verify-docfx-site.sh` and fail immediately if run-action scripts are missing or incomplete.
+- **CI release build:** `.github/workflows/release.yml` runs `.docfx/BuildRunActions.ps1` and `.docfx/TestRunActions.ps1` before `codebeltnet/docfx-oci-build@v1`, and validates the exported OCI archive with `.docfx/TestRunActions.ps1 -OciArchivePath ...`.
+- **PR validation:** `.github/workflows/pr.yml` runs `.docfx/BuildRunActions.ps1`, `.docfx/TestRunActions.ps1 -CheckDeterminism`, and a Docker build context check against `.docfx/.dockerignore`.
+
 <!-- dotnet-docfx-digest:start -->
 ## DocFX Documentation Maintenance
 

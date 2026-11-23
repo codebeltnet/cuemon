@@ -33,19 +33,52 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  docfx_validation:
+    name: DocFX run-actions
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: codebeltnet/git-checkout@v1
+
+      - name: Generate, validate, and verify deterministic run-action scripts
+        shell: pwsh
+        run: |
+          & ./.docfx/BuildRunActions.ps1
+          & ./.docfx/TestRunActions.ps1 -CheckDeterminism
+
+      - name: Verify Docker build context preserves run-action scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp_dockerfile="$(mktemp)"
+          trap 'rm -f "$tmp_dockerfile"' EXIT
+          cat <<'EOF' > "$tmp_dockerfile"
+          FROM dhi.io/nginx:1.31-alpine
+          WORKDIR /build/docfx
+          COPY . .
+          RUN test ! -e BuildRunActions.ps1 && test ! -e BuildDocfxImage.ps1 && sh ./verify-docfx-site.sh --context .
+          EOF
+          docker build --no-cache -f "$tmp_dockerfile" .docfx
+
   # Keep the existing aggregate required-check name for branch protection.
   pr_quality_gate:
     if: ${{ always() }}
     name: PR quality gate
-    needs: [verification]
+    needs: [verification, docfx_validation]
     runs-on: ubuntu-26.04
     steps:
       - name: Evaluate PR proof
         shell: bash
         env:
           VERIFICATION_RESULT: ${{ needs.verification.result }}
+          DOCFX_VALIDATION_RESULT: ${{ needs.docfx_validation.result }}
         run: |
           if [[ "$VERIFICATION_RESULT" != "success" ]]; then
             echo "::error::PR verification finished with '$VERIFICATION_RESULT'."
+            exit 1
+          fi
+          if [[ "$DOCFX_VALIDATION_RESULT" != "success" ]]; then
+            echo "::error::DocFX run-actions validation finished with '$DOCFX_VALIDATION_RESULT'."
             exit 1
           fi

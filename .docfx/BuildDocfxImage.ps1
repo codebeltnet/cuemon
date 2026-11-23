@@ -1,3 +1,10 @@
+#requires -Version 7.0
+<#
+.SYNOPSIS
+Generates run-action scripts and DocFX metadata, validates generated assets,
+builds the multi-platform DocFX container image, and verifies the published site
+inside the built image.
+#>
 [CmdletBinding()]
 param(
     # Regenerate metadata even when the inputs and generated files are unchanged.
@@ -51,8 +58,9 @@ function Get-MetadataFiles {
 
 $totalTimer = [Diagnostics.Stopwatch]::StartNew()
 Push-Location $PSScriptRoot
-& (Join-Path $PSScriptRoot 'BuildRunActions.ps1')
 try {
+    & (Join-Path $PSScriptRoot 'BuildRunActions.ps1')
+    & (Join-Path $PSScriptRoot 'TestRunActions.ps1')
     $docfxRoot = $PSScriptRoot
     $repoRoot = Split-Path -Parent $docfxRoot
     $sourceRoot = Join-Path $repoRoot 'src'
@@ -166,6 +174,9 @@ try {
     $imageTimer = [Diagnostics.Stopwatch]::StartNew()
     docker buildx build -t cuemon-docfx:$version --platform linux/arm64,linux/amd64 --load -f Dockerfile.docfx .
     Assert-CommandSucceeded 'docker buildx build'
+
+    docker run --rm --entrypoint sh --mount "type=bind,source=$docfxRoot,target=/verify,readonly" cuemon-docfx:$version /verify/verify-docfx-site.sh --site /usr/share/nginx/html --source /verify --manifest /verify/run-actions.manifest.json
+    Assert-CommandSucceeded 'docker run verify-docfx-site'
     Write-Host ('Docker image: {0:N2}s; total: {1:N2}s' -f $imageTimer.Elapsed.TotalSeconds, $totalTimer.Elapsed.TotalSeconds)
 } finally {
     Pop-Location

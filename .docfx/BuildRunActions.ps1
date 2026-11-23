@@ -9,11 +9,7 @@ $PSNativeCommandUseErrorActionPreference = $false
 Set-StrictMode -Version Latest
 
 if (-not (Test-Path -LiteralPath $ManifestPath -PathType Leaf)) {
-    if ($PSBoundParameters.ContainsKey('ManifestPath')) {
-        throw "Run-actions manifest not found: $ManifestPath"
-    }
-    Write-Host "No run-actions manifest found at $ManifestPath; skipping."
-    return
+    throw "Run-actions manifest not found: $ManifestPath"
 }
 
 $CsrunTestVerificationTemplate = @'
@@ -441,20 +437,45 @@ try {
 }
 
 $doc = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json -AsHashtable
-if ($doc.schemaVersion -ne 1) { throw "Unsupported run-actions manifest schemaVersion: $($doc.schemaVersion)" }
+if (-not ($doc -is [System.Collections.IDictionary])) {
+    throw "Malformed run-actions manifest at ${ManifestPath}: root JSON value must be an object."
+}
+if (-not $doc.ContainsKey('schemaVersion') -or $doc.schemaVersion -ne 1) {
+    throw "Unsupported run-actions manifest schemaVersion: $($doc['schemaVersion'])"
+}
+if (-not $doc.ContainsKey('examples') -or $null -eq $doc['examples'] -or ($doc['examples'] -is [string]) -or ($doc['examples'] -is [System.Collections.IDictionary])) {
+    throw "Malformed run-actions manifest at ${ManifestPath}: 'examples' must be an array."
+}
 $examples = @($doc.examples)
+if ($examples.Count -eq 0) {
+    throw "Run-actions manifest at $ManifestPath contains no examples."
+}
 $utf8NoBom = [Text.UTF8Encoding]::new($false)
+$seenIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 $expectedScripts = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 $written = 0
 
 foreach ($example in $examples) {
-    $id = [string] $example.id
+    if (-not ($example -is [System.Collections.IDictionary])) {
+        throw "Malformed run-actions manifest at ${ManifestPath}: each example entry must be an object."
+    }
+    $id = [string] $example['id']
     if ($id -cnotmatch '^[a-f0-9]{24}$') { throw "Invalid run-action id: $id" }
-    $pair = if ($example.strategy -ceq 'repository') {
+    if (-not $seenIds.Add($id)) { throw "Duplicate run-action id in manifest: $id" }
+    $strategy = [string] $example['strategy']
+    $pair = if ($strategy -ceq 'repository') {
         New-RepositoryPair -Repository $example.repository -Commit $example.commit -Project $example.project -Test $example.test -Framework $example.framework -Image $example.image
-    } elseif ($example.strategy -ceq 'standalone') {
+    } elseif ($strategy -ceq 'standalone') {
+        if (-not $example.ContainsKey('manifest') -or -not ($example.manifest -is [System.Collections.IDictionary]) -or
+            -not $example.manifest.ContainsKey('mode') -or [string]::IsNullOrWhiteSpace([string]$example.manifest.mode) -or
+            -not $example.manifest.ContainsKey('source') -or [string]::IsNullOrWhiteSpace([string]$example.manifest.source)) {
+            throw "Malformed standalone manifest entry for $id"
+        }
         New-StandalonePair -Manifest $example.manifest -Image $example.image
-    } elseif ($example.strategy -ceq 'host') {
+    } elseif ($strategy -ceq 'host') {
+        if (-not $example.ContainsKey('source') -or [string]::IsNullOrWhiteSpace([string]$example.source)) {
+            throw "Malformed host entry for ${id}: missing 'source'."
+        }
         $hh = if ($example.ContainsKey('hostHarness') -and $example.hostHarness) { $example.hostHarness } else { @{} }
         $hostParams = @{
             Source = [string]$example.source
@@ -471,31 +492,54 @@ foreach ($example in $examples) {
         }
         New-HostPair @hostParams
     } else {
-        throw "Unsupported run-action strategy '$($example.strategy)' for $id"
+        throw "Unsupported run-action strategy '$strategy' for $id"
     }
-    $effectiveFramework = if ($example.strategy -ceq 'standalone' -and $example.ContainsKey('manifest') -and $example.manifest -and $example.manifest.ContainsKey('framework') -and $example.manifest.framework) {
+    $effectiveFramework = if ($strategy -ceq 'standalone' -and $example.ContainsKey('manifest') -and $example.manifest -and $example.manifest.ContainsKey('framework') -and $example.manifest.framework) {
         [string]$example.manifest.framework
-    } elseif ($example.strategy -ceq 'host' -and $example.ContainsKey('hostHarness') -and $example.hostHarness -and $example.hostHarness.ContainsKey('framework') -and $example.hostHarness.framework) {
+    } elseif ($strategy -ceq 'host' -and $example.ContainsKey('hostHarness') -and $example.hostHarness -and $example.hostHarness.ContainsKey('framework') -and $example.hostHarness.framework) {
         [string]$example.hostHarness.framework
     } elseif ($example.ContainsKey('framework') -and $example.framework) {
         [string]$example.framework
     } else { '' }
     $isNetFrameworkExample = Test-NetFrameworkTfm $effectiveFramework
+    if (-not $example.ContainsKey('transports') -or $null -eq $example['transports'] -or ($example['transports'] -is [string])) {
+        throw "Missing or invalid 'transports' list for $id"
+    }
+    $transports = @($example.transports)
+    if ($transports.Count -eq 0) {
+        throw "Empty 'transports' list for $id"
+    }
+    $seenTransports = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
     $dir = Join-Path $OutputRoot $id
-    foreach ($transport in @($example.transports)) {
-        if ($transport -notin @('native', 'docker')) { throw "Unsupported transport '$transport' for $id" }
+    $writtenForExample = 0
+    foreach ($transportValue in $transports) {
+        $transport = [string] $transportValue
+        if ($transport -cnotin @('native', 'docker')) { throw "Unsupported transport '$transport' for $id" }
+        if (-not $seenTransports.Add($transport)) { throw "Duplicate transport '$transport' for $id" }
         if ($isNetFrameworkExample -and $transport -ceq 'docker') { continue }
         $scriptText = Normalize $pair[$transport]
         $tokens = $null; $errors = $null
         $null = [Management.Automation.Language.Parser]::ParseInput($scriptText, [ref]$tokens, [ref]$errors)
         if ($errors.Count) { throw "Materialized $transport script for $id has syntax errors: $errors" }
         $path = Join-Path $dir "$transport.ps1"
-        if (-not (Test-Path -LiteralPath $path) -or [IO.File]::ReadAllText($path) -cne $scriptText) {
+        $scriptBytes = $utf8NoBom.GetBytes($scriptText)
+        $needsWrite = $true
+        if (Test-Path -LiteralPath $path -PathType Leaf) {
+            $existingBytes = [IO.File]::ReadAllBytes($path)
+            if ([System.Linq.Enumerable]::SequenceEqual($existingBytes, $scriptBytes)) {
+                $needsWrite = $false
+            }
+        }
+        if ($needsWrite) {
             $null = [IO.Directory]::CreateDirectory($dir)
-            [IO.File]::WriteAllText($path, $scriptText, $utf8NoBom)
+            [IO.File]::WriteAllBytes($path, $scriptBytes)
         }
         $null = $expectedScripts.Add("$id/$transport.ps1")
         $written++
+        $writtenForExample++
+    }
+    if ($writtenForExample -eq 0) {
+        throw "No runnable transports materialized for $id"
     }
 }
 

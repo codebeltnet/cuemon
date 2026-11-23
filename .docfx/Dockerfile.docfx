@@ -1,3 +1,12 @@
+# Supported entry points (run from .docfx/ or pass .docfx as build context):
+#   1. pwsh .docfx/BuildDocfxImage.ps1   (recommended: generates run-actions, metadata, and Docker image)
+#   2. Direct docker build:
+#        pwsh .docfx/BuildRunActions.ps1
+#        pwsh .docfx/TestRunActions.ps1
+#        docfx metadata .docfx/docfx.json
+#        docker build -f .docfx/Dockerfile.docfx .docfx
+# Direct builds fail immediately if generated run-actions/ scripts are missing or incomplete.
+
 ARG NGINX_VERSION=1.31-alpine
 
 FROM --platform=$BUILDPLATFORM dhi.io/nginx:${NGINX_VERSION} AS base
@@ -7,8 +16,11 @@ FROM --platform=$BUILDPLATFORM codebeltnet/docfx:2 AS build
 
 ADD [".", "docfx"]
 
-RUN cd docfx; \
-    docfx build
+RUN set -eu; \
+    cd docfx; \
+    sh ./verify-docfx-site.sh --context .; \
+    docfx build; \
+    sh ./verify-docfx-site.sh --site wwwroot --source . --manifest run-actions.manifest.json
 
 FROM dhi.io/nginx:${NGINX_VERSION} AS final
 WORKDIR /usr/share/nginx/html

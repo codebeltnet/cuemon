@@ -3,3 +3,4 @@ wwwroot/
 obj/
 bin/
 *.ps1
+!run-actions/**/*.ps1

@@ -1,4 +1,92 @@
-# Multi-target DocFX proof of concept
+# Native DocFX framework views
+
+The PoC builds the Cuemon.Kernel and Cuemon.IO API reference independently for each framework. NGINX serves the selected build under the same public API pathname. The default is .NET 11.
+
+## Run
+
+Use PowerShell 7, the repository's .NET 11 SDK, DocFX 2.81.0 on the host, and a Linux Docker engine. The script reads the shared `ms-style` template from the local `codebeltnet/docfx:2` image. Pass `-BuildInContainer` to render HTML with that builder. Project metadata always runs on the host so DocFX can use the .NET 11 SDK, restored graph, and Git checkout. For a host-only build, pass `-SharedTemplatePath` pointing to a checkout of `templates/ms-style`.
+
+```powershell
+& tooling/docfx-multi-tfm/Build-DocfxFrameworkViews.ps1 -BuildInContainer
+$work = '<Artifacts path printed by the build>'
+& tooling/docfx-multi-tfm/Test-DocfxFrameworkViews.ps1 -Workspace $work
+```
+
+Pass `-Framework net11.0,netstandard2.0` to run the initial pair, or `-Framework net11.0` to build a single view. The default must be in the selected matrix. Build again and pass `-CompareWorkspace` with the other artifacts directory to compare isolated metadata and the packaged site. The comparison normalizes text line endings, the build directory and file-record order in DocFX's manifest, and the search index record order. `Test-DocfxFrameworkViews.ps1` also accepts `-Origin` for an already running NGINX instance.
+
+To run the browser regression, install Playwright and Chromium outside the checkout, make the Playwright module available to Node, and add `-Browser` to the test command.
+
+```powershell
+$deps = Join-Path ([IO.Path]::GetTempPath()) 'cuemon-docfx-browser'
+npm install --prefix $deps playwright@1.61.1
+node "$deps/node_modules/playwright/cli.js" install chromium
+$env:NODE_PATH = "$deps/node_modules"
+& tooling/docfx-multi-tfm/Test-DocfxFrameworkViews.ps1 -Workspace $work -Browser
+```
+
+For manual browsing, mount the packaged site and generated configuration into a disposable NGINX container. The sample URLs use the actual DocFX member page as well as a shared type pathname.
+
+```powershell
+$mounts = @('--mount', "type=bind,source=$work/site,target=/usr/share/nginx/html,readonly",
+    '--mount', "type=bind,source=$work/nginx.conf,target=/etc/nginx/conf.d/default.conf,readonly")
+docker run --rm -p 127.0.0.1:8080:8080 @mounts dhi.io/nginx:1.31-alpine
+```
+
+- [Default StreamFactory](http://localhost:8080/api/dotnet/Cuemon.IO.StreamFactory.html)
+- [Create overloads on .NET 10](http://localhost:8080/api/dotnet/Cuemon.IO.StreamFactory.Create.html?view=net-10.0)
+- [Create overloads on .NET Standard 2.0](http://localhost:8080/api/dotnet/Cuemon.IO.StreamFactory.Create.html?view=netstandard-2.0)
+- [BufferWriterOptions on .NET Standard 2.1](http://localhost:8080/api/dotnet/Cuemon.IO.BufferWriterOptions.html?view=netstandard-2.1)
+
+## Framework discovery and metadata
+
+| MSBuild TFM | Public view | Staging directory | Metadata UIDs | Buffer writer overloads |
+|---|---|---|---:|---:|
+| net11.0 | net-11.0 | net11 | 557 | 6 |
+| net10.0 | net-10.0 | net10 | 557 | 6 |
+| netstandard2.1 | netstandard-2.1 | netstandard2.1 | 76 | 6 |
+| netstandard2.0 | netstandard-2.0 | netstandard2.0 | 548 | 0 |
+
+The PoC derives the table's framework matrix from MSBuild's `TargetFrameworks` and `TargetFramework` properties. It maps dotted `net`, `netstandard`, and `netcoreapp` TFMs to public view IDs. It narrows the authored `api/dotnet` group to the two opted-in projects, retains its destination, filter and separate member-page layout, and stages namespace and type overwrites by UID. Each metadata extraction and HTML build uses a fresh DocFX process. The conceptual scope is the authored home page and a two-entry PoC navigation. The build omits sitemap and remote xref inputs so the production Cuemon xref cannot link a missing API to a different build. DocFX still emits its native Microsoft Learn links. Authored availability text continues to describe the packages across targets.
+
+Cuemon.IO directly targets .NET Standard 2.1. Cuemon.Kernel has no such target, so it contributes no pages in that view. The ordinary .NET Standard 2.1 IO build resolves compatible .NET Standard 2.0 dependencies through MSBuild. DocFX's project workspace can retain both the design-time Cuemon.Kernel symbol (observed at version 1.0.0.0) and an on-disk dependency (observed at 11.0.0.0), producing CS0433. A normal Release build followed by MSBuild's GetAssemblyVersion gives the PoC the version to pass to DocFX for Cuemon's mixed graph. This retained project-source links, native declarations and all 76 IO UIDs on Windows and Linux. The original Roslyn project-reference diagnostics remain in the logs. Compilation errors fail the build. The workaround relies on Cuemon's common assembly version and needs additional validation for independently versioned project graphs. [DocFX project compilation](https://github.com/dotnet/docfx/blob/ba844df625370a6bd7c1ecab0d0ec4d1d9128ac4/src/Docfx.Dotnet/DotnetApiCatalog.Compile.cs)
+
+## Routing, links and search
+
+The default site sits at the web root. Each additional view contributes its native API subtree, xref map and search index under `_frameworks/<directory>`. The package verifies that shared public assets, images and run-action scripts are byte-identical before sharing them. It publishes conceptual HTML and the root navigation once.
+
+NGINX maps exact view IDs to a static root prefix and checks the selected file at the original URI depth. The default applies when view is missing or empty. Unknown IDs receive HTTP 400. A known view with an unavailable page receives HTTP 404. Physical API copies are internal. The visible pathname keeps relative CSS, JavaScript, image, run-action and page links at the depth DocFX generated. Stable responses use the existing no-store policy and fingerprinted public assets keep their immutable policy. [NGINX try_files](https://nginx.org/en/docs/http/ngx_http_core_module.html#try_files)
+
+A small staged template hook loads framework-view.js before the native DocFX module. It sets the API TOC metadata to the selected TOC JSON URL and adds the view to same-origin API links, including links rendered later by DocFX. It retains fragments and existing query parameters. External and conceptual navigation use their regular URLs. Native TOC rendering, filtering, active-page detection and history retain their usual browser behavior. Without JavaScript, direct API requests still select the correct HTML. Native dynamic navigation and carrying the view between API links require JavaScript.
+
+DocFX 2.81.0 creates a module worker from `docfx:rel`. The worker fetches `../index.json` relative to its own URL and has no access to the page's query. The PoC sets `docfx:rel` to `/_framework-search/<directory>/` for explicitly selected API views. NGINX routes that worker and its imports to the shared assets and exposes the matching native index at the worker's relative path. The link enhancement maps search result links back to their public URLs. The secondary URL text under each result still shows the internal search prefix. Unqualified API and conceptual pages use the ordinary DocFX search entry point. Each view searches its own API inventory and the shared concept page. The workaround depends on the template's current search metadata, worker URL and result-link behavior. Upgrades should run the browser regression. A supported worker/index URL option and a native result-link hook would remove that coupling. [Modern search code](https://github.com/dotnet/docfx/blob/ba844df625370a6bd7c1ecab0d0ec4d1d9128ac4/templates/modern/src/search.ts) · [Search worker](https://github.com/dotnet/docfx/blob/ba844df625370a6bd7c1ecab0d0ec4d1d9128ac4/templates/modern/src/search-worker.ts)
+
+## Selector contract
+
+The versioned `/framework-views.json` manifest exposes `apiPath`, `defaultView`, and `views` keyed by public view ID. Each view records its TFM, physical directory, configured projects and the URL of the native xref map for that view. Availability comes from an exact UID lookup in that map. The browser can resolve the destination `href` against the map URL, set `view`, and retain the fragment for the matching member. If the UID is absent, the selector can keep the reader in place and show available views, or offer the containing type when that UID exists. The contract uses native maps as its per-view inventory.
+
+## Verification and cost
+
+The acceptance scripts use the actual HTTP responses for xref inventory, all pages and anchors, unavailable APIs, native overload and inheritance differences, TOCs, search indexes, source links, overwrite examples, MIME types and caching. The browser test exercises generated sidebar links, in-page cross-references, native search results, refresh, and back/forward between API pages. DocFX's raw TOC HTML is a legacy partial. The interactive sidebar uses the view-specific JSON.
+
+Two four-view builds matched on Windows and two matched on Ubuntu 26.04 under the comparison rules above. The packaged site also matched across the two hosts. The HTTP regression passed against the hardened NGINX image with both Windows- and Linux-built output. Chromium passed all four views, and the unqualified URL used the standard DocFX search entry point. A single-view build and the original consolidation regression also passed.
+
+The four-view run performs four metadata extractions and four builds, with one ordinary Release project build for the mixed graph. The deployed sample uses 53.29 MiB across 2,794 files, with 11.47 MiB for the three alternate API subtrees and their xrefs and indexes. The shared public assets use 30.00 MiB and shared run actions use 5.53 MiB. The historical consolidated sample used about 41.66 MiB across 1,867 files for three frameworks. These are uncompressed file sizes, with different view and template scope. The implementation adds about 190 lines of PowerShell orchestration, 65 lines of NGINX configuration including the cache policy, and 52 lines of JavaScript. Each API request uses a static NGINX map and file check. Each page loads a 2.3 KB adapter, and search continues to load one native index. Request throughput was not benchmarked.
+
+| Approach | Generation and delivery | Tradeoff |
+|---|---|---|
+| Native query views | One extraction and one HTML build per view, one shared static site and one small browser adapter | Keeps existing default URLs and a stable shared pathname. Requires query-aware hosting and navigation and search integration. |
+| Native TFM-prefixed URLs | Same independent builds, served at physical per-view roots | Relative URLs, native TOC and search follow the path automatically. Keep existing default URLs at the root and expose alternate views under prefixes. Sharing identical assets can remain a packaging optimization. |
+| Historical consolidation | Three extractions and one render plus a 240-line C# consolidator | Uses less output space, but holds a primary declaration and explicit relationship deltas. Unexpected same-UID signatures fail the consolidation. |
+
+## Shared integration
+
+- **docfx-oci-build** can own one versioned host-side PowerShell entry point for local and CI use. Resolve selected project mappings with DocFX's glob semantics, evaluate TFMs, stage fresh per-view metadata and overwrites, and pass the separate view directories to the shared builder. Validate inventories and shared-asset equality before publishing. Keep the non-opt-in path as the current pipeline.
+- **codebeltnet/docfx** can consume the manifest in an optional left-nav selector and add view-aware URLs at the points where the template constructs TOC, breadcrumb and search links. Prefer a configurable search index/worker URL ahead of adopting the PoC search alias and observer in production.
+- **Cuemon** can opt in by naming its group and default TFM while keeping docfx.json and authored docs authoritative. Confirm cross-group xrefs and mixed and independently versioned dependency graphs before broadening beyond the two-project fixture. Require query-aware hosting and a framework-isolated search regression before shipping query views. TFM-prefixed URLs are the simpler native option for static-only hosts or when the shared template cannot expose the needed search and navigation hooks.
+
+---
+
+# Historical PoC 1 — 561-UID consolidation
 
 Run from the repository root with PowerShell 7, the .NET 11 SDK, and DocFX 2.81.0.
 

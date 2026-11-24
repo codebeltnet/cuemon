@@ -15,6 +15,7 @@ $site = "$workspace/site"
 $legacy = 'System.Runtime.CompilerServices.CallerArgumentExpressionAttribute'
 $buffer = 'Cuemon.IO.BufferWriterOptions'
 $factory = 'Cuemon.IO.StreamFactory'
+$baselineUids = @{ 'net11.0' = 557; 'net10.0' = 557; 'netstandard2.1' = 76; 'netstandard2.0' = 548 }
 
 function Assert-True([bool] $Condition, [string] $Message) {
     if (!$Condition) { throw $Message }
@@ -40,6 +41,10 @@ function Get-Fingerprint([string] $Root) {
             }) -join [char]10
         } elseif ($file.Extension -cin '.html', '.yml', '.json', '.js', '.css', '.ps1', '.svg', '.map' -or $file.Name -ceq '.manifest') {
             $content = [IO.File]::ReadAllText($file.FullName).Replace([string]([char]13) + [char]10, [string][char]10)
+            if ($content.StartsWith('### YamlMime:ManagedReference')) {
+                # Match the repository-relative source path DocFX uses to render the source link.
+                $content = $content -creplace '(?m)(^  source:\n    remote:\n      path: (\S+)\n      branch: [^\n]+\n      repo: [^\n]+\n    id: [^\n]+\n    path: )(?:[^\n]*/)?\2$', '$1$2'
+            }
         } else {
             $entries.Add($name, (Get-FileHash -LiteralPath $file.FullName).Hash)
             continue
@@ -143,6 +148,7 @@ try {
         $entry = $manifest.views[$view]
         $stage = "$workspace/$($entry.directory)"
         $inventory = Read-Json "$stage$($api).manifest"
+        Assert-True ($inventory.Count -eq $baselineUids[$entry.tfm]) "Unexpected baseline UID count for $view."
         $xref = Get-Xrefs (Get-Page $entry.xref) $api
         $renderedUids = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
         $renderedUids.UnionWith([string[]]@($xref.Keys | Where-Object { !$_.EndsWith('*') }))
@@ -156,6 +162,13 @@ try {
                 Assert-True ($pages[$path].Contains("id=""$id""")) "Missing anchor for $uid in $view."
             }
         }
+        $example = $pages.GetEnumerator() | Where-Object Value -Match 'href="[^"]*run-actions/[^"]+\.ps1"' | Select-Object -First 1
+        Assert-True ($null -ne $example) "No run-action link in $view."
+        $href = [regex]::Match($example.Value, 'href="([^"]*run-actions/[^"]+\.ps1)"').Groups[1].Value
+        $publicPage = [uri]::new($baseUri, "/$($example.Key)?view=$view")
+        $runAction = [uri]::new($publicPage, $href)
+        Assert-True ($runAction.AbsolutePath.StartsWith('/run-actions/')) "Run-action escaped the shared public path in $view."
+        Get-Page $runAction.AbsolutePath | Out-Null
 
         $isLegacy = $entry.tfm -ceq 'netstandard2.0'
         $toc = Get-Page "$($api)toc.json?view=$view" 200 'application/json'
@@ -196,6 +209,7 @@ try {
             Assert-True ($pages[$path] -match 'github\.com/codebeltnet/cuemon/blob/[^"]+\.cs/#L\d+') "Missing source link for $type in $view."
         }
         foreach ($file in Get-ChildItem "$stage/api/types" -Filter '*.md') {
+            if (!$xref.ContainsKey($file.BaseName)) { continue }
             if ((Get-Content -LiteralPath $file.FullName -Raw) -notmatch '(?m)^example:') { continue }
             $html = $pages[$xref[$file.BaseName]]
             Assert-True ($html -match '(?s)<h2 id="[^"]+_examples">Examples</h2>.*?<pre><code[^>]*>\s*\S') "Missing authored example for $($file.BaseName) in $view."

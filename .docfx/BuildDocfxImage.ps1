@@ -63,6 +63,7 @@ try {
     & (Join-Path $PSScriptRoot 'TestRunActions.ps1')
     $docfxRoot = $PSScriptRoot
     $repoRoot = Split-Path -Parent $docfxRoot
+    $skipSignAssembly = !(Test-Path -LiteralPath (Join-Path $repoRoot 'cuemon.snk') -PathType Leaf)
     $sourceRoot = Join-Path $repoRoot 'src'
     $docfxConfig = Get-Content -LiteralPath (Join-Path $docfxRoot 'docfx.json') -Raw | ConvertFrom-Json
     $version = minver -i -t v -v w
@@ -112,7 +113,7 @@ try {
         }
     )
     $inputValues = @(
-        $version; $docfxVersion; $sdkVersion; $revision; $branch
+        $version; $docfxVersion; $sdkVersion; $revision; $branch; "SkipSignAssembly=$skipSignAssembly"
         $docfxConfig.metadata | ConvertTo-Json -Depth 100 -Compress
         foreach ($name in @('CI', 'EMAIL', 'Configuration', 'MSBuildSDKsPath', 'DOTNET_ROOT', 'NUGET_PACKAGES', 'GITHUB_RUN_NUMBER')) {
             "$name=$([Environment]::GetEnvironmentVariable($name))"
@@ -139,12 +140,18 @@ try {
         $metadataTimer = [Diagnostics.Stopwatch]::StartNew()
         # One restore graph replaces DocFX's separate restore for each project.
         $restoreSolution = Join-Path ([IO.Path]::GetTempPath()) ("cuemon-docfx-{0}.slnx" -f [Guid]::NewGuid())
+        $restoreProperties = @()
+        $metadataProperties = @()
+        if ($skipSignAssembly) {
+            $restoreProperties = @('-p:SkipSignAssembly=true')
+            $metadataProperties = @('--property', 'SkipSignAssembly=true')
+        }
         try {
             $projectsXml = foreach ($project in $sourceProjects) {
                 '  <Project Path="{0}" />' -f [Security.SecurityElement]::Escape($project)
             }
             @('<Solution>') + $projectsXml + @('</Solution>') | Set-Content -LiteralPath $restoreSolution -Encoding utf8
-            dotnet restore $restoreSolution --verbosity quiet
+            dotnet restore $restoreSolution --verbosity quiet @restoreProperties
             Assert-CommandSucceeded 'dotnet restore'
         } finally {
             if (Test-Path -LiteralPath $restoreSolution) { Remove-Item -LiteralPath $restoreSolution }
@@ -155,7 +162,7 @@ try {
         foreach ($file in $metadataFiles) { Remove-Item -LiteralPath $file }
         $generationFingerprint = Get-Fingerprint $inputPaths $inputValues
         # Keep all groups in one process; DocFX carries resolver state across groups.
-        docfx metadata docfx.json --noRestore
+        docfx metadata docfx.json --noRestore @metadataProperties
         Assert-CommandSucceeded 'docfx metadata'
         $metadataFiles = @(Get-MetadataFiles)
         if ($metadataFiles.Count -eq 0) { throw 'DocFX did not generate metadata.' }

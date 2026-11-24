@@ -623,10 +623,25 @@ if (-not [string]::IsNullOrWhiteSpace($SiteRoot)) {
             Add-Failure $errors "No HTML files found in published site: $siteFullRoot"
         }
 
+        $frameworkManifest = Join-Path $siteFullRoot 'framework-views.json'
+        $frameworkPrefixes = @()
+        if (Test-Path -LiteralPath $frameworkManifest -PathType Leaf) {
+            $framework = Get-Content -LiteralPath $frameworkManifest -Raw | ConvertFrom-Json -AsHashtable
+            $frameworkPrefixes = @(foreach ($entry in $framework.views.GetEnumerator()) {
+                if ($entry.Key -cne $framework.defaultView) { "_frameworks/$($entry.Value.directory)" }
+            })
+        }
         $htmlLinksChecked = 0
         foreach ($htmlFile in $htmlFiles) {
             $relHtml = $htmlFile.FullName.Substring($siteFullRoot.Length + 1).Replace('\', '/')
-            $baseRelDir = [IO.Path]::GetDirectoryName($relHtml)?.Replace('\', '/')
+            $publicHtml = $relHtml
+            foreach ($prefix in $frameworkPrefixes) {
+                if ($relHtml.StartsWith("$prefix$($framework.apiPath)", [StringComparison]::Ordinal)) {
+                    $publicHtml = $relHtml.Substring($prefix.Length + 1)
+                    break
+                }
+            }
+            $baseRelDir = [IO.Path]::GetDirectoryName($publicHtml)?.Replace('\', '/')
             $htmlText = [IO.File]::ReadAllText($htmlFile.FullName)
             foreach ($match in $divRegex.Matches($htmlText)) {
                 $attrs = $match.Groups['attrs'].Value

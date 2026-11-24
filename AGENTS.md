@@ -609,6 +609,8 @@ Agents must never automatically commit code changes or push to remote repositori
 
 ## DocFX Build Entry Points
 
+For the scripted local build, install PowerShell 7, Git, the .NET 11 SDK, and Docker with Buildx, Linux containers, and the containerd image store enabled. Install the host tools with `dotnet tool install --global docfx --version 2.81.0` and `dotnet tool install --global minver-cli --version 7.0.0`, then make sure `docfx` and `minver` are on `PATH`. The build restores NuGet packages, pulls published container images, and skips assembly signing for metadata generation when the local signing key is absent.
+
 DocFX run-action scripts under `.docfx/run-actions/` and generated API metadata under `.docfx/api/**/*.yml` are Git-ignored and must be generated before building the site image:
 
 - **Scripted local image build (recommended):** `pwsh .docfx/BuildDocfxImage.ps1` — generates `.docfx/run-actions/` via `.docfx/BuildRunActions.ps1`, validates manifest/Markdown/scripts via `.docfx/TestRunActions.ps1`, generates or reuses DocFX metadata, builds `Dockerfile.docfx`, and verifies the built container image.

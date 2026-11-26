@@ -8,10 +8,6 @@ on:
         type: boolean
         description: Run the macOS test matrix despite the additional cost and runtime.
         default: false
-      run_docfx_framework_views:
-        type: boolean
-        description: Run the experimental DocFX framework-view fixture.
-        default: false
 
 permissions:
   contents: read
@@ -64,40 +60,6 @@ jobs:
           RUN test ! -e BuildRunActions.ps1 && test ! -e BuildDocfxImage.ps1 && sh ./verify-docfx-site.sh --context .
           EOF
           docker build --no-cache -f "$tmp_dockerfile" .docfx
-
-  docfx_framework_views:
-    name: DocFX framework views (${{ matrix.os }})
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_docfx_framework_views }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-26.04, windows-2025]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
-    steps:
-      - name: Checkout
-        uses: codebeltnet/git-checkout@v1
-
-      - name: Install .NET
-        uses: codebeltnet/install-dotnet@v3
-
-      - name: Build and validate the framework fixture
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $PSNativeCommandUseErrorActionPreference = $true
-          $tools = Join-Path $env:RUNNER_TEMP 'framework-tools'
-          dotnet tool install --tool-path $tools docfx --version 2.81.0
-          $env:PATH = "$tools$([IO.Path]::PathSeparator)$env:PATH"
-          $output = Join-Path $env:RUNNER_TEMP 'framework-views'
-          & ./tooling/docfx-multi-tfm/Build-DocfxFrameworkViews.ps1 -OutputRoot $output -TestSharedImplementation
-          if ($IsLinux) {
-              $browserTools = Join-Path $env:RUNNER_TEMP 'framework-browser'
-              npm install --prefix $browserTools playwright@1.61.1
-              node "$browserTools/node_modules/playwright/cli.js" install --with-deps chromium
-              $env:NODE_PATH = "$browserTools/node_modules"
-              & ./tooling/docfx-multi-tfm/Test-DocfxFrameworkViews.ps1 -Workspace $output -Browser
-          }
 
   # Keep the existing aggregate required-check name for branch protection.
   pr_quality_gate:

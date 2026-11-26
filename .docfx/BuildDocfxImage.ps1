@@ -19,9 +19,7 @@ function Invoke-Checked {
 }
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$builder = 'codebeltnet/docfx:2.81.0-v1.1.0'
-$expectedCliVersion = '2.81.0'
-$expectedEngineVersion = '1.1.0'
+$builder = 'codebeltnet/docfx:2'
 $botRoot = Join-Path $repoRoot '.bot/docfx'
 $cacheRoot = Join-Path $botRoot 'cache'
 $outputRoot = Join-Path $botRoot 'output'
@@ -37,14 +35,8 @@ try {
     $revision = Invoke-Checked git rev-parse HEAD
     $description = Invoke-Checked git describe --tags --always --match 'v*'
 
-    if (!(Invoke-Checked docker image ls -q $builder)) {
-        Invoke-Checked docker pull $builder
-    }
-    $builderMeta = (Invoke-Checked docker image inspect --format '{{.Id}}|{{index .Config.Labels "net.codebelt.docfx.cli.version"}}|{{index .Config.Labels "net.codebelt.docfx.engine.version"}}' $builder).Trim()
-    $builderId, $cliVersion, $engineVersion = $builderMeta.Split('|', 3)
-    if ($cliVersion -cne $expectedCliVersion -or $engineVersion -cne $expectedEngineVersion) {
-        throw "Builder image '$builder' reported CLI '$cliVersion' and engine '$engineVersion'; expected CLI '$expectedCliVersion' and engine '$expectedEngineVersion'."
-    }
+    Invoke-Checked docker pull $builder
+    $builderId = (Invoke-Checked docker image inspect --format '{{.Id}}' $builder).Trim()
 
     New-Item -ItemType Directory -Path $cacheRoot, $verifyDir -Force | Out-Null
     Copy-Item -LiteralPath "$PSScriptRoot/verify-docfx-site.sh", "$PSScriptRoot/run-actions.manifest.json" -Destination $verifyDir

@@ -1,6 +1,5 @@
-# Supported entry points (run from .docfx/ or pass .docfx as build context):
-#   1. pwsh .docfx/BuildDocfxImage.ps1   (recommended: generates run-actions, metadata, and Docker image)
-#   2. Direct docker build:
+# For the local multi-framework image, run pwsh .docfx/BuildDocfxImage.ps1.
+# To build this Dockerfile directly from the repository root:
 #        pwsh .docfx/BuildRunActions.ps1
 #        pwsh .docfx/TestRunActions.ps1
 #        docfx metadata .docfx/docfx.json

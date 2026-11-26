@@ -184,7 +184,10 @@ find "$site_root" -type f -name '*.html' | sort > "$html_list"
 check_file=$(mktemp)
 trap 'rm -f "$html_list" "$check_file"' EXIT
 
-awk -v site_root="$site_root" '
+framework_views=0
+[ ! -s "$site_root/framework-views.json" ] || framework_views=1
+
+awk -v site_root="$site_root" -v framework_views="$framework_views" '
 function normalize_rel(base_dir, href,    full, n, i, seg, out_n, res, stack) {
     if (href ~ /^\//) {
         full = substr(href, 2)
@@ -214,6 +217,8 @@ function normalize_rel(base_dir, href,    full, n, i, seg, out_n, res, stack) {
     file = $0
     rel_file = substr(file, length(site_root) + 2)
     dir = rel_file
+    # NGINX serves alternate API pages at the public path, without the physical view prefix.
+    if (framework_views) sub(/^_frameworks\/[^\/]+\//, "", dir)
     if (index(dir, "/") > 0) {
         sub(/\/[^\/]+$/, "", dir)
     } else {

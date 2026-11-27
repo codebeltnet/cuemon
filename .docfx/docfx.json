@@ -23,7 +23,14 @@
       ],
       "dest": "api/dotnet",
       "memberLayout": "separatePages",
-      "filter": "filterConfig.yml"
+      "filter": "filterConfig.yml",
+      "properties": {
+        "ProduceReferenceAssembly": "true",
+        "RunAnalyzers": "false",
+        "RunAnalyzersDuringBuild": "false",
+        "EnableNETAnalyzers": "false",
+        "EnforceCodeStyleInBuild": "false"
+      }
     },
     {
       "src": [
@@ -52,7 +59,14 @@
       ],
       "dest": "api/extensions/dotnet",
       "memberLayout": "separatePages",
-      "filter": "filterConfig.yml"
+      "filter": "filterConfig.yml",
+      "properties": {
+        "ProduceReferenceAssembly": "true",
+        "RunAnalyzers": "false",
+        "RunAnalyzersDuringBuild": "false",
+        "EnableNETAnalyzers": "false",
+        "EnforceCodeStyleInBuild": "false"
+      }
     },
     {
       "src": [
@@ -68,7 +82,14 @@
       ],
       "dest": "api/aspnet",
       "memberLayout": "separatePages",
-      "filter": "filterConfig.yml"
+      "filter": "filterConfig.yml",
+      "properties": {
+        "ProduceReferenceAssembly": "true",
+        "RunAnalyzers": "false",
+        "RunAnalyzersDuringBuild": "false",
+        "EnableNETAnalyzers": "false",
+        "EnforceCodeStyleInBuild": "false"
+      }
     },
     {
       "src": [
@@ -88,12 +109,19 @@
       ],
       "dest": "api/extensions/aspnet",
       "memberLayout": "separatePages",
-      "filter": "filterConfig.yml"
+      "filter": "filterConfig.yml",
+      "properties": {
+        "ProduceReferenceAssembly": "true",
+        "RunAnalyzers": "false",
+        "RunAnalyzersDuringBuild": "false",
+        "EnableNETAnalyzers": "false",
+        "EnforceCodeStyleInBuild": "false"
+      }
     }
   ],
   "build": {
     "xref": [
-      "https://github.com/dotnet/docfx/raw/main/.xrefmap.json"
+      "https://learn.microsoft.com/en-us/dotnet/.xrefmap.json"
     ],
     "content": [
       {

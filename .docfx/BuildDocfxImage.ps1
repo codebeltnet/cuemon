@@ -32,13 +32,17 @@ Push-Location $repoRoot
 try {
     $version = Invoke-Checked minver -i -t v -v w
     $image = "cuemon-docfx:$version"
-    $revision = Invoke-Checked git rev-parse HEAD
-    $description = Invoke-Checked git describe --tags --always --match 'v*'
+    $revision = (Invoke-Checked git rev-parse HEAD).Trim()
+    $branch = (Invoke-Checked git rev-parse --abbrev-ref HEAD).Trim()
+    $remoteUrl = (git config --get remote.origin.url 2>$null | Out-String).Trim()
+    $sourceRevision = (& git log -1 --format=%H -- src Directory.Build.props Directory.Build.targets Directory.Packages.props global.json nuget.config).Trim()
+    if ($LASTEXITCODE -ne 0) { throw "git log failed with exit code $LASTEXITCODE." }
 
     Invoke-Checked docker pull $builder
     $builderId = (Invoke-Checked docker image inspect --format '{{.Id}}' $builder).Trim()
 
-    New-Item -ItemType Directory -Path $cacheRoot, $verifyDir -Force | Out-Null
+    $xrefCacheRoot = Join-Path $cacheRoot 'xref'
+    New-Item -ItemType Directory -Path $cacheRoot, $xrefCacheRoot, $verifyDir -Force | Out-Null
     Copy-Item -LiteralPath "$PSScriptRoot/verify-docfx-site.sh", "$PSScriptRoot/run-actions.manifest.json" -Destination $verifyDir
 
     & "$PSScriptRoot/BuildRunActions.ps1" -OutputRoot $runActionsDir
@@ -58,28 +62,59 @@ try {
 
     $configPath = Join-Path $PSScriptRoot 'docfx.json'
     $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json -AsHashtable
+    $configModified = $false
     $skipSignAssembly = !(Test-Path -LiteralPath cuemon.snk -PathType Leaf)
     if ($skipSignAssembly) {
         foreach ($group in $config.metadata) {
             $group.properties ??= @{}
             $group.properties.SkipSignAssembly = 'true'
         }
+        $configModified = $true
+    }
+
+    # Cache remote xref maps under .bot/docfx/cache/xref so every TFM build avoids multi-100MB downloads.
+    $xrefDownloads = [Collections.Generic.List[string]]::new()
+    if ($config.ContainsKey('build') -and $config.build -and $config.build.ContainsKey('xref') -and $config.build.xref) {
+        $rewrittenXref = @(foreach ($entry in @($config.build.xref)) {
+            $url = [string]$entry
+            if ($url -match '^https?://') {
+                $urlHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($url))).ToLowerInvariant()
+                $ext = [IO.Path]::GetExtension(([Uri]$url).AbsolutePath)
+                if ([string]::IsNullOrWhiteSpace($ext)) { $ext = '.json' }
+                $fileName = "$urlHash$ext"
+                $xrefDownloads.Add("$fileName`t$url")
+                "/cache/xref/$fileName"
+            } else {
+                $url
+            }
+        })
+        if ($xrefDownloads.Count -gt 0) {
+            $config.build.xref = $rewrittenXref
+            $configModified = $true
+        }
+    }
+    if ($configModified) {
         ConvertTo-Json -InputObject $config -Depth 100 | Set-Content -LiteralPath "$work/docfx.json"
+    }
+    if ($xrefDownloads.Count -gt 0) {
+        [IO.File]::WriteAllText("$work/xref-urls.tsv", ($xrefDownloads -join "`n") + "`n", [Text.UTF8Encoding]::new($false))
     }
 
     # The upstream engine hashes its own implementation, docfx.json, SDK versions, and discovered views.
-    # This fingerprint covers Cuemon's source files, revision, root build/restore/signing inputs, and metadata filters.
+    # This fingerprint covers Cuemon's source files, branch/remote, last source-affecting commit, root build/restore/signing inputs, and metadata filters.
+    # Doc-only or script-only commits keep the same metadata cache key and reuse cached metadata.
     $buildInputs = Get-ChildItem -Force -File | Where-Object {
         $_.Extension -in '.props', '.targets', '.snk' -or $_.Name -in 'global.json', 'nuget.config'
     } | Sort-Object Name
     $srcFiles = @($stagedFiles | Where-Object { $_.StartsWith('src/', [StringComparison]::Ordinal) })
     $filterFiles = @($config.metadata.filter | Where-Object { $_ } | Sort-Object -Unique)
+    $gitSourceRef = if ($branch -ceq 'HEAD') { $revision } else { $branch }
     $fingerprint = @(
         $builder
         $builderId
-        $revision
-        $description
-        $version
+        "Branch=$gitSourceRef"
+        "Remote=$remoteUrl"
+        "SourceRevision=$sourceRevision"
         "SkipSignAssembly=$skipSignAssembly"
         "CI=$($env:CI)"
         "EMAIL=$($env:EMAIL)"
@@ -88,6 +123,8 @@ try {
         foreach ($name in $filterFiles) { ".docfx/$name=$((Get-FileHash -LiteralPath (Join-Path $PSScriptRoot $name)).Hash)" }
     ) -join "`n"
     $cacheKey = (Get-FileHash -InputStream ([IO.MemoryStream]::new([Text.Encoding]::UTF8.GetBytes($fingerprint)))).Hash
+    $metadataMarker = Join-Path $cacheRoot "metadata/.cuemon-key-$cacheKey"
+    $needsPreRestore = $ForceMetadata.IsPresent -or -not (Test-Path -LiteralPath $metadataMarker -PathType Leaf)
 
     $dockerArgs = @(
         'run', '--rm'
@@ -98,6 +135,9 @@ try {
         '--mount', "type=bind,source=$cacheRoot,target=/cache"
         '--mount', 'type=volume,source=cuemon-docfx-nuget,target=/root/.nuget/packages'
         '-w', '/workspace'
+        '-e', "CUEMON_PRE_RESTORE=$(if ($needsPreRestore) { '1' } else { '0' })"
+        '-e', "CUEMON_SKIP_SIGN=$(if ($skipSignAssembly) { 'true' } else { 'false' })"
+        '-e', "CUEMON_CACHE_KEY=$cacheKey"
     )
     if ($env:CI) { $dockerArgs += @('-e', 'CI') }
     if ($env:EMAIL) { $dockerArgs += @('-e', 'EMAIL') }
@@ -109,6 +149,7 @@ try {
         '-MetadataCacheKey', $cacheKey
     )
     if ($ForceMetadata) { $generator += '-ForceMetadata' }
+    if ($needsPreRestore) { $generator += '-NoRestore' }
 
     # Generate on the container filesystem and transfer packaged artifacts back as archives.
     $buildSite = @'
@@ -121,14 +162,37 @@ tar -xf /work/run-actions.tar -C /workspace/.docfx
 if [ -f /work/docfx.json ]; then
     cp /work/docfx.json /workspace/.docfx/docfx.json
 fi
+if [ -f /work/xref-urls.tsv ]; then
+    mkdir -p /cache/xref
+    while IFS="$(printf '\t')" read -r fname url; do
+        [ -n "$fname" ] || continue
+        target="/cache/xref/$fname"
+        if [ ! -s "$target" ]; then
+            echo "Caching xref map $url -> $target"
+            tmp="$target.$$.tmp"
+            curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors --compressed "$url" -o "$tmp" || { rm -f "$tmp"; exit 1; }
+            mv -f "$tmp" "$target"
+        fi
+    done < /work/xref-urls.tsv
+fi
 sh .docfx/verify-docfx-site.sh --context .docfx
 cp /opt/docfx/framework-views/framework-views.Dockerfile /work/framework-views.Dockerfile
+if [ "${CUEMON_PRE_RESTORE:-0}" = "1" ]; then
+    printf '<Solution>\n' > /tmp/restore.slnx
+    find /workspace/src -name '*.csproj' | sort | while IFS= read -r proj; do
+        printf '  <Project Path="%s" />\n' "$proj" >> /tmp/restore.slnx
+    done
+    printf '</Solution>\n' >> /tmp/restore.slnx
+    dotnet restore /tmp/restore.slnx --verbosity quiet -p:Configuration=Release "-p:SkipSignAssembly=${CUEMON_SKIP_SIGN:-false}"
+fi
 mkdir /tmp/docfx-output
 status=0
 pwsh -NoProfile -File /opt/docfx/framework-views/Build-DocfxFrameworkViews.ps1 "$@" || status=$?
 cd /tmp/docfx-output
 find . -type f -name '*.log' | tar -cf /work/logs.tar -T -
 [ "$status" -eq 0 ] || exit "$status"
+mkdir -p /cache/metadata
+touch "/cache/metadata/.cuemon-key-${CUEMON_CACHE_KEY}"
 tar -cf /work/site.tar site nginx.conf
 '@
     Set-Content -LiteralPath "$work/build-site.sh" -Value ($buildSite.Replace("`r`n", "`n")) -NoNewline

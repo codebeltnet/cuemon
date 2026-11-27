@@ -436,6 +436,7 @@ $referencedScripts = [System.Collections.Generic.HashSet[string]]::new([StringCo
 foreach ($mdFile in $mdFiles) {
     $relMd = $mdFile.FullName.Substring($docfxFullRoot.Length).TrimStart('\', '/').Replace('\', '/')
     $content = [IO.File]::ReadAllText($mdFile.FullName)
+    if ($content.IndexOf('run-actions', [StringComparison]::OrdinalIgnoreCase) -lt 0) { continue }
     $cleaned = $divRegex.Replace($content, {
         param($match)
         $attrs = $match.Groups['attrs'].Value
@@ -643,6 +644,7 @@ if (-not [string]::IsNullOrWhiteSpace($SiteRoot)) {
             }
             $baseRelDir = [IO.Path]::GetDirectoryName($publicHtml)?.Replace('\', '/')
             $htmlText = [IO.File]::ReadAllText($htmlFile.FullName)
+            if ($htmlText.IndexOf('run-actions', [StringComparison]::OrdinalIgnoreCase) -lt 0) { continue }
             foreach ($match in $divRegex.Matches($htmlText)) {
                 $attrs = $match.Groups['attrs'].Value
                 $inner = $match.Groups['inner'].Value

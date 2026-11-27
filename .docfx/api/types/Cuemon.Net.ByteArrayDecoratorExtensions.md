@@ -7,45 +7,40 @@ example:
 `ByteArrayDecoratorExtensions` in the `Net` namespace provides URL-encoding extension methods on `Decorator.Enclose` for byte arrays with partial encoding and custom encoding support. This example creates UTF-8 bytes from `"hello world & more <stuff>"` and calls `UrlEncode` with default parameters producing `"hello+world+%26+more+%3cstuff%3e"`, then demonstrates partial encoding on the first 5 bytes of `"a & b & c"` producing `"a+%26+b"`. It also shows custom UTF-32 encoding and empty array handling where `Array.Empty<byte>()` returns an encoded array of length `0`. Console output displays each encoded result.
 
 ```csharp
+// Program.cs
 using System;
 using System.Text;
 using Cuemon;
 using Cuemon.Net;
 using Cuemon.Text;
 
-namespace MyApp.Net
+// Create bytes containing characters that need URL encoding
+byte[] data = Encoding.UTF8.GetBytes("hello world & more <stuff>");
+
+// URL-encode the bytes with default position (0) and length (all)
+byte[] encoded = Decorator.Enclose(data).UrlEncode(0, data.Length);
+string encodedString = Encoding.ASCII.GetString(encoded);
+Console.WriteLine(encodedString); // "hello+world+%26+more+%3cstuff%3e"
+
+// Encode only a portion of the byte array
+byte[] partial = Encoding.UTF8.GetBytes("a & b & c");
+byte[] encodedPartial = Decorator.Enclose(partial).UrlEncode(position: 0, bytesToRead: 5);
+string partialString = Encoding.ASCII.GetString(encodedPartial);
+Console.WriteLine(partialString); // "a+%26+b" (only first 5 bytes encoded)
+
+// Encode with custom encoding options
+byte[] utf32Data = Encoding.UTF32.GetBytes("hello");
+byte[] utf32Encoded = Decorator.Enclose(utf32Data).UrlEncode(0, utf32Data.Length, o =>
 {
-    public class ByteArrayDecoratorExtensionsExample
-    {
-        public void Demonstrate()
-        {
-            // Create bytes containing characters that need URL encoding
-            byte[] data = Encoding.UTF8.GetBytes("hello world & more <stuff>");
+    o.Encoding = Encoding.UTF32;
+});
 
-            // URL-encode the bytes with default position (0) and length (all)
-            byte[] encoded = Decorator.Enclose(data).UrlEncode();
-            string encodedString = Encoding.ASCII.GetString(encoded);
-            Console.WriteLine(encodedString); // "hello+world+%26+more+%3cstuff%3e"
-
-            // Encode only a portion of the byte array
-            byte[] partial = Encoding.UTF8.GetBytes("a & b & c");
-            byte[] encodedPartial = Decorator.Enclose(partial).UrlEncode(position: 0, bytesToRead: 5);
-            string partialString = Encoding.ASCII.GetString(encodedPartial);
-            Console.WriteLine(partialString); // "a+%26+b" (only first 5 bytes encoded)
-
-            // Encode with custom encoding options
-            byte[] utf32Data = Encoding.UTF32.GetBytes("hello");
-            byte[] utf32Encoded = Decorator.Enclose(utf32Data).UrlEncode(0, utf32Data.Length, o =>
-            {
-                o.Encoding = Encoding.UTF32;
-            });
-
-            // Handle empty byte arrays
-            byte[] empty = Array.Empty<byte>();
-            byte[] emptyEncoded = Decorator.Enclose(empty).UrlEncode();
-            Console.WriteLine(emptyEncoded.Length); // 0
-
-}}
-}
-
+// Handle empty byte arrays
+byte[] empty = Array.Empty<byte>();
+byte[] emptyEncoded = Decorator.Enclose(empty).UrlEncode(0, 0);
+Console.WriteLine(emptyEncoded.Length); // 0
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="003f8f9bd4acab0cacdd2623"><a href="~/run-actions/003f8f9bd4acab0cacdd2623/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/003f8f9bd4acab0cacdd2623/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

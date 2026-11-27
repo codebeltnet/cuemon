@@ -7,16 +7,11 @@ example:
 `DataTransferRow` provides access to data reader field values by index, column name, or `DataTransferColumn` object, including type-safe access via generic methods and automatic `DBNull` to `null` conversion. This example creates a `DataTable` with `Id`, `Name`, `Created`, and `Notes` columns containing two rows (one with a `DBNull` note), then retrieves a `DataTransferRowCollection` via `DataTransfer.GetRows`. It accesses values using all three lookup approaches — `first[0]` by index, `first["Name"]` by column name, and `first[idCol]` by column object — and uses `As<int>("Id")` for type-safe access. Console output confirms each value, shows `null` for the `DBNull` case, and displays the string representation of the row.
 
 ```csharp
+// Program.cs
 using System;
 using System.Data;
 using Cuemon.Data;
 
-namespace MyApp.Data
-{
-    public static class DataTransferRowExamples
-    {
-        public static void Demonstrate()
-        {
             // Build a DataTable to simulate a database result set.
             var table = new DataTable();
             table.Columns.Add("Id", typeof(int));
@@ -62,7 +57,9 @@ namespace MyApp.Data
                 // String representation of the row.
                 Console.WriteLine("Row string: {0}", first);
 
-}}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="d613c939b0c631c5c3595301"><a href="~/run-actions/d613c939b0c631c5c3595301/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/d613c939b0c631c5c3595301/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

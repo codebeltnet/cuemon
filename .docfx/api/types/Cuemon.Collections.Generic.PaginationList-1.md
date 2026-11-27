@@ -7,16 +7,11 @@ example:
 The following example demonstrates eager pagination of a customer list using `PaginationList`. It shows indexer-based access and page metadata such as total items, page count, and first/last page flags.
 
 ```csharp
+// Program.cs
 using System;
 using System.Collections.Generic;
 using Cuemon.Collections.Generic;
 
-namespace MyApp.Examples
-{
-    public class PaginationListExample
-    {
-        public static void Demonstrate()
-        {
             var customers = new List<string>
             {
                 "Alice", "Bob", "Carol", "Dave", "Eve",
@@ -35,12 +30,13 @@ namespace MyApp.Examples
             for (int i = 0; i < page.Count; i++)
             {
                 Console.WriteLine($"  [{i}] {page[i]}");
+            }
             Console.WriteLine($"Total items: {page.TotalElementCount}");
             Console.WriteLine($"Total pages: {page.PageCount}");
             Console.WriteLine($"First page: {page.FirstPage}");
             Console.WriteLine($"Last page: {page.LastPage}");
-
-}}}
-}
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="67851cde4641d6d2aa9166e2"><a href="~/run-actions/67851cde4641d6d2aa9166e2/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/67851cde4641d6d2aa9166e2/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

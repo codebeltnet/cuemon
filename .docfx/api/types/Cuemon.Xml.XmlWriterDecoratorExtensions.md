@@ -4,62 +4,49 @@ example:
 - *content
 ---
 
-`XmlWriterDecoratorExtensions` provides extension methods on `Decorator.Enclose` for serializing objects directly to `XmlWriter` with root element handling, conditional encapsulation, and custom root naming. This example creates an `XmlWriter` targeting a `StringWriter` with indented settings, then uses `WriteXmlRootElement` with a custom delegate that writes a root element, serializes an anonymous `Person` object, and conditionally wraps notes in an encapsulating `<Notes>` element via `WriteEncapsulatingElementIfNotNull`. A second example shows `WriteObject` to serialize a `Version` with a custom `RootName = new XmlQualifiedEntity("Version")`. Console output displays both XML results with the correct element structure.
+`XmlWriterDecoratorExtensions` provides extension methods on `Decorator.Enclose` for serializing objects directly to `XmlWriter` with root element handling, conditional encapsulation, and custom root naming. This example creates an `XmlWriter` targeting a `StringWriter` with indented settings, then uses `WriteXmlRootElement` with a custom delegate that writes a root element, serializes an anonymous `Person` object, and also demonstrates `WriteStartElement` plus `WriteEncapsulatingElementIfNotNull` for a `<LastName>` element. A second example shows `WriteObject` to serialize a `Version` with a custom `RootName = new XmlQualifiedEntity("Version")`. Console output displays both XML results with the correct element structure.
 
 ```csharp
+// Program.cs
 using System;
 using System.IO;
-using System.Text;
 using System.Xml;
 using Cuemon;
 using Cuemon.Xml;
 using Cuemon.Xml.Serialization;
 
-namespace MyApp.Examples;
+var writer = new StringWriter();
+using var xmlWriter = XmlWriter.Create(writer, new XmlWriterSettings { Indent = true });
+var decorator = Decorator.Enclose(xmlWriter);
 
-public class Example
+var person = new { FirstName = "John", LastName = "Doe", Age = 30 };
+decorator.WriteXmlRootElement(person, (w, value, rootEntity) =>
 {
-    public void Run()
-    {
+    w.WriteElementString("FirstName", value.FirstName);
+    w.WriteElementString("LastName", value.LastName);
+    w.WriteElementString("Age", value.Age.ToString());
+}, new XmlQualifiedEntity("Person"));
 
-        var writer = new StringWriter();
-        var xmlWriter = XmlWriter.Create(writer, new XmlWriterSettings { Indent = true, Encoding = Encoding.UTF8, OmitXmlDeclaration = false });
+xmlWriter.Flush();
+Console.WriteLine(writer.ToString());
 
-        var decorator = Decorator.Enclose(xmlWriter);
+var manualWriter = new StringWriter();
+using var manualXmlWriter = XmlWriter.Create(manualWriter, new XmlWriterSettings { Indent = true });
+var manualDecorator = Decorator.Enclose(manualXmlWriter);
+manualDecorator.WriteStartElement(new XmlQualifiedEntity("Person"));
+manualDecorator.WriteEncapsulatingElementIfNotNull("Doe", new XmlQualifiedEntity("LastName"), (w, value) => w.WriteString(value));
+manualXmlWriter.WriteEndElement();
+manualXmlWriter.Flush();
+Console.WriteLine(manualWriter.ToString());
 
-        // Write a root element and serialize an object
-        var person = new { FirstName = "John", LastName = "Doe", Age = 30 };
-        decorator.WriteXmlRootElement(person, (w, value, rootEntity) =>
-        {
-            decorator.WriteStartElement(rootEntity);                          // <Root>
-            decorator.WriteObject(value, typeof(object));                      // serialized person content
-            decorator.WriteEncapsulatingElementIfNotNull("notes", new XmlQualifiedEntity("Notes"), (w2, notes) =>
-            {
-                w2.WriteString(notes);                                        // <Notes>notes</Notes>
-            });
-        });
-
-        xmlWriter.Flush();
-        string xml = writer.ToString();
-        Console.WriteLine(xml);
-
-        // Write an object directly without root element handling
-        var version = new Version(1, 0, 0, 0);
-        var xmlWriter2 = XmlWriter.Create(new StringWriter(), new XmlWriterSettings { Indent = true });
-        var decorator2 = Decorator.Enclose(xmlWriter2);
-        decorator2.WriteObject(version, o =>
-        {
-            o.Settings.RootName = new XmlQualifiedEntity("Version");
-        });
-        xmlWriter2.Flush();
-        // <Version>
-        //   <Major>1</Major>
-        //   <Minor>0</Minor>
-        //   <Build>0</Build>
-        //   <Revision>0</Revision>
-        // </Version>
-
-}
-}
-
+var versionWriter = new StringWriter();
+using var versionXmlWriter = XmlWriter.Create(versionWriter, new XmlWriterSettings { Indent = true });
+var versionDecorator = Decorator.Enclose(versionXmlWriter);
+versionDecorator.WriteObject(new Version(1, 0, 0, 0), o => o.Settings.RootName = new XmlQualifiedEntity("Version"));
+versionXmlWriter.Flush();
+Console.WriteLine(versionWriter.ToString());
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="7ee751fbf1a097b26a323aa2"><a href="~/run-actions/7ee751fbf1a097b26a323aa2/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/7ee751fbf1a097b26a323aa2/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

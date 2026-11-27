@@ -40,3 +40,7 @@ public class DictionaryDecoratorExtensionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="81ffca40f4929d80ab9e544a"><a href="~/run-actions/81ffca40f4929d80ab9e544a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/81ffca40f4929d80ab9e544a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

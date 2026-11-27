@@ -7,8 +7,14 @@ example:
 The following example demonstrates how to configure AesKeyOptions to specify the key size and custom random string provider when generating AES keys.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Security.Cryptography;
+using MyApp.Security.Cryptography;
+
+AesKeyOptionsExamples.ConfigureKeySize();
+AesKeyOptionsExamples.CustomRandomStringProvider();
+AesKeyOptionsExamples.InspectDefaultProperties();
 
 namespace MyApp.Security.Cryptography
 {
@@ -63,5 +69,8 @@ namespace MyApp.Security.Cryptography
         }
     }
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="ad08a57f6c88597aabfdec8e"><a href="~/run-actions/ad08a57f6c88597aabfdec8e/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/ad08a57f6c88597aabfdec8e/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

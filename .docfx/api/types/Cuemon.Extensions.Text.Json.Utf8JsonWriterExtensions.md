@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Cuemon.Extensions.Text.Json;
 
 namespace MyApp.Examples;
@@ -35,7 +36,8 @@ public class Utf8JsonWriterExtensionsExample
         var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
+            WriteIndented = true,
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         };
 
         using var stream = new MemoryStream();
@@ -58,3 +60,7 @@ public class Utf8JsonWriterExtensionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="106cceb80923ff6e464bbf26"><a href="~/run-actions/106cceb80923ff6e464bbf26/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/106cceb80923ff6e464bbf26/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

@@ -7,9 +7,15 @@ example:
 `TransientFaultEvidence` captures retry attempt details, recovery wait times, latency, and method signature information for transient fault handling scenarios. This example creates evidence with `attempts = 3`, `RecoveryWaitTime = 2s`, `TotalRecoveryWaitTime = 5s`, `Latency = 1500ms`, and a `MethodSignature` for `PaymentService.ProcessPayment`. It also demonstrates equality comparison between two identical evidence instances, and a minimal-info creation with `attempts = 1` and `Latency = 200ms` for simple scenarios. Console output displays the evidence's `ToString` representation, individual property values, equality results, and hash code consistency.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Reflection;
 using Cuemon.Resilience;
+using MyApp.Resilience;
+
+TransientFaultEvidenceExamples.CreateWithMethodSignature();
+TransientFaultEvidenceExamples.EqualityComparison();
+TransientFaultEvidenceExamples.CreateWithMinimalInfo();
 
 namespace MyApp.Resilience
 {
@@ -68,3 +74,7 @@ namespace MyApp.Resilience
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="13e9f47740477aa381f0e5eb"><a href="~/run-actions/13e9f47740477aa381f0e5eb/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/13e9f47740477aa381f0e5eb/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

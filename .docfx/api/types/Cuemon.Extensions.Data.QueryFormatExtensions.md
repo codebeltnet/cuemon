@@ -21,23 +21,27 @@ public class QueryFormatExtensionsExample
         // Embed string values in a delimited format: value, value, value
         var productIds = new[] { "ALFKI", "BONAP", "FRANS" };
         string delimited = QueryFormat.Delimited.Embed(productIds);
-        Console.WriteLine(delimited); // Output: "ALFKI", "BONAP", "FRANS"
+        Console.WriteLine(delimited); // Output: ALFKI,BONAP,FRANS
 
         // Embed string values with single quotes: 'value', 'value', 'value'
         string delimitedString = QueryFormat.DelimitedString.Embed(productIds);
-        Console.WriteLine(delimitedString); // Output: 'ALFKI', 'BONAP', 'FRANS'
+        Console.WriteLine(delimitedString); // Output: 'ALFKI','BONAP','FRANS'
 
         // Embed integer values
         var ids = new[] { 1, 2, 3, 4, 5 };
         string intEmbedded = QueryFormat.Delimited.Embed(ids);
-        Console.WriteLine(intEmbedded); // Output: 1, 2, 3, 4, 5
+        Console.WriteLine(intEmbedded); // Output: 1,2,3,4,5
 
         // Embed with distinct filtering to remove duplicates
         var withDuplicates = new[] { "apple", "banana", "apple", "cherry" };
         string distinctFragment = QueryFormat.DelimitedString.Embed(withDuplicates, distinct: true);
-        Console.WriteLine(distinctFragment); // Output: 'apple', 'banana', 'cherry'
+        Console.WriteLine(distinctFragment); // Output: 'apple','banana','cherry'
 
 }
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="f9702ad8e72ee921cb71d346"><a href="~/run-actions/f9702ad8e72ee921cb71d346/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f9702ad8e72ee921cb71d346/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

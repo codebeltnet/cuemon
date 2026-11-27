@@ -7,56 +7,51 @@ example:
 `XmlQualifiedEntity` represents an XML element or attribute name with optional namespace and prefix, and can be created from XML serialization attributes. This example creates entities from a local name only (`"Order"`), with a namespace (`"http://example.com/orders"`), and with a prefix/namespace combination (`"o"`, `"Order"`, `"http://example.com/orders"`). It then creates entities from `XmlRootAttribute("PurchaseOrder")`, `XmlElementAttribute("LineItem")`, and `XmlAttributeAttribute("Quantity")`, and demonstrates using `XmlQualifiedEntity` with `XmlSerializerOptions` to set a custom root name. Console output displays each entity's `LocalName`, `Namespace`, `Prefix`, and decoration flags.
 
 ```csharp
+// Program.cs
 using System;
 using System.Xml.Serialization;
 using Cuemon.Xml.Serialization;
 
-namespace MyApp.Xml
+// Create an entity from local name only
+var entity1 = new XmlQualifiedEntity("Order");
+Console.WriteLine($"LocalName: {entity1.LocalName}"); // Order
+Console.WriteLine($"Namespace: {entity1.Namespace}"); // (empty string)
+Console.WriteLine($"Prefix: {entity1.Prefix}"); // (empty string)
+
+// Create an entity with local name and namespace
+var entity2 = new XmlQualifiedEntity("Order", "http://example.com/orders");
+Console.WriteLine($"LocalName: {entity2.LocalName}, Namespace: {entity2.Namespace}");
+
+// Create an entity with prefix, local name, and namespace
+var entity3 = new XmlQualifiedEntity("o", "Order", "http://example.com/orders");
+Console.WriteLine($"Prefix: {entity3.Prefix}, LocalName: {entity3.LocalName}, Namespace: {entity3.Namespace}");
+
+// Create from XmlRootAttribute
+var rootAttr = new XmlRootAttribute("PurchaseOrder");
+var fromRoot = new XmlQualifiedEntity(rootAttr);
+Console.WriteLine($"From XmlRoot: {fromRoot.LocalName} (Namespace: {fromRoot.Namespace})");
+Console.WriteLine($"HasXmlRootDecoration: {fromRoot.HasXmlRootDecoration}"); // True
+
+// Create from XmlElementAttribute
+var elemAttr = new XmlElementAttribute("LineItem");
+var fromElement = new XmlQualifiedEntity(elemAttr);
+Console.WriteLine($"From XmlElement: {fromElement.LocalName}");
+Console.WriteLine($"HasXmlElementDecoration: {fromElement.HasXmlElementDecoration}"); // True
+
+// Create from XmlAttributeAttribute
+var attr = new XmlAttributeAttribute("Quantity");
+var fromAttribute = new XmlQualifiedEntity(attr);
+Console.WriteLine($"From XmlAttribute: {fromAttribute.LocalName}");
+Console.WriteLine($"HasXmlAttributeDecoration: {fromAttribute.HasXmlAttributeDecoration}"); // True
+
+// Use with XmlSerializerOptions to set a custom root name
+var options = new XmlSerializerOptions
 {
-    public class XmlQualifiedEntityExample
-    {
-        public void Demonstrate()
-        {
-            // Create an entity from local name only
-            var entity1 = new XmlQualifiedEntity("Order");
-            Console.WriteLine($"LocalName: {entity1.LocalName}"); // Order
-            Console.WriteLine($"Namespace: {entity1.Namespace}"); // (null)
-            Console.WriteLine($"Prefix: {entity1.Prefix}"); // (null)
-
-            // Create an entity with local name and namespace
-            var entity2 = new XmlQualifiedEntity("Order", "http://example.com/orders");
-            Console.WriteLine($"LocalName: {entity2.LocalName}, Namespace: {entity2.Namespace}");
-
-            // Create an entity with prefix, local name, and namespace
-            var entity3 = new XmlQualifiedEntity("o", "Order", "http://example.com/orders");
-            Console.WriteLine($"Prefix: {entity3.Prefix}, LocalName: {entity3.LocalName}, Namespace: {entity3.Namespace}");
-
-            // Create from XmlRootAttribute
-            var rootAttr = new XmlRootAttribute("PurchaseOrder");
-            var fromRoot = new XmlQualifiedEntity(rootAttr);
-            Console.WriteLine($"From XmlRoot: {fromRoot.LocalName} (Namespace: {fromRoot.Namespace})");
-            Console.WriteLine($"HasXmlRootDecoration: {fromRoot.HasXmlRootDecoration}"); // True
-
-            // Create from XmlElementAttribute
-            var elemAttr = new XmlElementAttribute("LineItem");
-            var fromElement = new XmlQualifiedEntity(elemAttr);
-            Console.WriteLine($"From XmlElement: {fromElement.LocalName}");
-            Console.WriteLine($"HasXmlElementDecoration: {fromElement.HasXmlElementDecoration}"); // True
-
-            // Create from XmlAttributeAttribute
-            var attr = new XmlAttributeAttribute("Quantity");
-            var fromAttribute = new XmlQualifiedEntity(attr);
-            Console.WriteLine($"From XmlAttribute: {fromAttribute.LocalName}");
-            Console.WriteLine($"HasXmlAttributeDecoration: {fromAttribute.HasXmlAttributeDecoration}"); // True
-
-            // Use with XmlSerializerOptions to set a custom root name
-            var options = new XmlSerializerOptions
-            {
-                RootName = new XmlQualifiedEntity("CustomRoot", "http://example.com/schema")
-            };
-            Console.WriteLine($"Options root name: {options.RootName.LocalName}");
-
-}}
-}
-
+    RootName = new XmlQualifiedEntity("CustomRoot", "http://example.com/schema")
+};
+Console.WriteLine($"Options root name: {options.RootName.LocalName}");
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="1f4e8bd4e97480ceabc792c7"><a href="~/run-actions/1f4e8bd4e97480ceabc792c7/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/1f4e8bd4e97480ceabc792c7/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

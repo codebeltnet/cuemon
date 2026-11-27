@@ -361,6 +361,12 @@ jobs:
       - name: Install .NET
         uses: codebeltnet/install-dotnet@v3
 
+      - name: Generate and validate DocFX run-action scripts
+        shell: pwsh
+        run: |
+          & ./.docfx/BuildRunActions.ps1
+          & ./.docfx/TestRunActions.ps1
+
       - name: Build and verify the multi-platform DocFX OCI artifact
         uses: codebeltnet/docfx-oci-build@v1
         with:
@@ -369,6 +375,13 @@ jobs:
           output-path: ${{ runner.temp }}/cuemon-docfx-${{ needs.release_preflight.outputs.version }}.oci.tar
           docfx-version: 2.78.5
           platforms: linux/amd64,linux/arm64
+
+      - name: Verify DocFX run-action assets in OCI archive
+        shell: pwsh
+        env:
+          OCI_ARCHIVE_PATH: ${{ runner.temp }}/cuemon-docfx-${{ needs.release_preflight.outputs.version }}.oci.tar
+        run: |
+          & ./.docfx/TestRunActions.ps1 -OciArchivePath $env:OCI_ARCHIVE_PATH
 
       - name: Persist OCI image between release jobs
         uses: actions/upload-artifact@v7

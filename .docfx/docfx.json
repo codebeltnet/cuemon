@@ -25,7 +25,11 @@
       "memberLayout": "separatePages",
       "filter": "filterConfig.yml",
       "properties": {
-        "TargetFramework": "net10.0"
+        "ProduceReferenceAssembly": "true",
+        "RunAnalyzers": "false",
+        "RunAnalyzersDuringBuild": "false",
+        "EnableNETAnalyzers": "false",
+        "EnforceCodeStyleInBuild": "false"
       }
     },
     {
@@ -57,7 +61,11 @@
       "memberLayout": "separatePages",
       "filter": "filterConfig.yml",
       "properties": {
-        "TargetFramework": "net10.0"
+        "ProduceReferenceAssembly": "true",
+        "RunAnalyzers": "false",
+        "RunAnalyzersDuringBuild": "false",
+        "EnableNETAnalyzers": "false",
+        "EnforceCodeStyleInBuild": "false"
       }
     },
     {
@@ -76,7 +84,11 @@
       "memberLayout": "separatePages",
       "filter": "filterConfig.yml",
       "properties": {
-        "TargetFramework": "net10.0"
+        "ProduceReferenceAssembly": "true",
+        "RunAnalyzers": "false",
+        "RunAnalyzersDuringBuild": "false",
+        "EnableNETAnalyzers": "false",
+        "EnforceCodeStyleInBuild": "false"
       }
     },
     {
@@ -99,14 +111,17 @@
       "memberLayout": "separatePages",
       "filter": "filterConfig.yml",
       "properties": {
-        "TargetFramework": "net10.0"
+        "ProduceReferenceAssembly": "true",
+        "RunAnalyzers": "false",
+        "RunAnalyzersDuringBuild": "false",
+        "EnableNETAnalyzers": "false",
+        "EnforceCodeStyleInBuild": "false"
       }
     }
   ],
   "build": {
     "xref": [
-      "https://docs.cuemon.net/xrefmap.yml",
-      "https://github.com/dotnet/docfx/raw/main/.xrefmap.json"
+      "https://learn.microsoft.com/en-us/dotnet/.xrefmap.json"
     ],
     "content": [
       {
@@ -130,6 +145,11 @@
       {
         "files": [
           "images/**"
+        ]
+      },
+      {
+        "files": [
+          "run-actions/**"
         ]
       }
     ],

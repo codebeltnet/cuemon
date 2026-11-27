@@ -7,17 +7,12 @@ example:
 The following example demonstrates lazy pagination of a string array using `PaginationEnumerable`. It shows how to access page 2 with 3 items per page and prints page metadata such as page count and navigation flags.
 
 ```csharp
+// Program.cs
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cuemon.Collections.Generic;
 
-namespace MyApp.Examples
-{
-    public class PaginationEnumerableExample
-    {
-        public static void Demonstrate()
-        {
             var fruits = new[] { "Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew" };
 
             // Show page 2 with 3 items per page
@@ -35,7 +30,9 @@ namespace MyApp.Examples
             {
                 Console.WriteLine($"  {item}");
 
-}}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="cd62a9db1f3ff4c649b5a55a"><a href="~/run-actions/cd62a9db1f3ff4c649b5a55a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/cd62a9db1f3ff4c649b5a55a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

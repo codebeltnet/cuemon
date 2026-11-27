@@ -7,10 +7,14 @@ example:
 The following example demonstrates how to use <see cref="FileIntegrityOptions"/> to configure file integrity checksum computation.
 
 ```csharp
+// Program.cs
 using System;
 using System.IO;
 using Cuemon.Data.Integrity;
 using Cuemon.Security;
+using MyApp.Examples;
+
+new FileIntegrityOptionsExample().Demonstrate();
 
 namespace MyApp.Examples
 {
@@ -55,3 +59,7 @@ namespace MyApp.Examples
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="df2e30c119abdf2a5e231072"><a href="~/run-actions/df2e30c119abdf2a5e231072/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/df2e30c119abdf2a5e231072/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

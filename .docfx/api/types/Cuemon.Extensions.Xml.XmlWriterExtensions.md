@@ -7,65 +7,74 @@ example:
 `XmlWriterExtensions` provides extension methods for `XmlWriter` including object serialization, qualified element names, conditional wrapping, and root element generation. This example creates an `XmlWriter` targeting a `StringWriter` with indented, declaration-free settings, then calls `WriteObject` to serialize an `InvalidOperationException`, `WriteStartElement` with an `XmlQualifiedEntity("Cuemon")` for a standalone element, `WriteEncapsulatingElementWhenNotNull` to conditionally wrap an exception in a `"MyWrappedElement"`, and `WriteXmlRootElement` to produce a `Root` element with a `"cuemon"` namespace URI. Console output displays four separate XML results showing the serialized exception, the standalone element, the wrapped exception, and the namespace-qualified root element.
 
 ```csharp
+// Program.cs
 using System;
 using System.IO;
 using System.Xml;
 using Cuemon.Extensions.Xml;
 using Cuemon.Xml.Serialization;
+using DocExamples;
 
-namespace DocExamples;
+XmlWriterExtensionsExample.Demonstrate();
 
-public static class XmlWriterExtensionsExample
+namespace DocExamples
 {
-    public static void Demonstrate()
+    public static class XmlWriterExtensionsExample
     {
-        Console.WriteLine(WriteException());
-        Console.WriteLine(WriteStandaloneElement());
-        Console.WriteLine(WriteWrappedException());
-        Console.WriteLine(WriteRootElement());
-    }
-
-    private static string WriteException()
-    {
-        var output = new StringWriter();
-        using var writer = XmlWriter.Create(output, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true });
-        writer.WriteObject(new InvalidOperationException());
-        writer.Flush();
-        return output.ToString();
-    }
-
-    private static string WriteStandaloneElement()
-    {
-        var output = new StringWriter();
-        using var writer = XmlWriter.Create(output, new XmlWriterSettings { OmitXmlDeclaration = true });
-        writer.WriteStartElement(new XmlQualifiedEntity("Cuemon"));
-        writer.WriteEndElement();
-        writer.Flush();
-        return output.ToString();
-    }
-
-    private static string WriteWrappedException()
-    {
-        var output = new StringWriter();
-        using var writer = XmlWriter.Create(output, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true });
-        writer.WriteEncapsulatingElementWhenNotNull(new InvalidOperationException(), new XmlQualifiedEntity("MyWrappedElement"), (nestedWriter, exception) =>
+        public static void Demonstrate()
         {
-            nestedWriter.WriteObject(exception);
-        });
-        writer.Flush();
-        return output.ToString();
-    }
+            Console.WriteLine(WriteException());
+            Console.WriteLine(WriteStandaloneElement());
+            Console.WriteLine(WriteWrappedException());
+            Console.WriteLine(WriteRootElement());
+        }
 
-    private static string WriteRootElement()
-    {
-        var output = new StringWriter();
-        using var writer = XmlWriter.Create(output, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true });
-        writer.WriteXmlRootElement(new InvalidOperationException(), (nestedWriter, exception, rootEntity) =>
+        private static string WriteException()
         {
-            nestedWriter.WriteObject(exception);
-        }, new XmlQualifiedEntity("Root", "cuemon"));
-        writer.Flush();
-        return output.ToString();
+            var output = new StringWriter();
+            using var writer = XmlWriter.Create(output, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true });
+            writer.WriteObject(new InvalidOperationException());
+            writer.Flush();
+            return output.ToString();
+        }
+
+        private static string WriteStandaloneElement()
+        {
+            var output = new StringWriter();
+            using var writer = XmlWriter.Create(output, new XmlWriterSettings { OmitXmlDeclaration = true });
+            writer.WriteStartElement(new XmlQualifiedEntity("Cuemon"));
+            writer.WriteEndElement();
+            writer.Flush();
+            return output.ToString();
+        }
+
+        private static string WriteWrappedException()
+        {
+            var output = new StringWriter();
+            using var writer = XmlWriter.Create(output, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true });
+            writer.WriteEncapsulatingElementWhenNotNull(new InvalidOperationException(), new XmlQualifiedEntity("MyWrappedElement"), (nestedWriter, exception) =>
+            {
+                nestedWriter.WriteObject(exception);
+            });
+            writer.Flush();
+            return output.ToString();
+        }
+
+        private static string WriteRootElement()
+        {
+            var output = new StringWriter();
+            using var writer = XmlWriter.Create(output, new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true });
+            writer.WriteXmlRootElement(new InvalidOperationException(), (nestedWriter, exception, rootEntity) =>
+            {
+                nestedWriter.WriteObject(exception);
+            }, new XmlQualifiedEntity("Root", "cuemon"));
+            writer.Flush();
+            return output.ToString();
+        }
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="4ada39afb45c843c74ab5544"><a href="~/run-actions/4ada39afb45c843c74ab5544/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/4ada39afb45c843c74ab5544/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

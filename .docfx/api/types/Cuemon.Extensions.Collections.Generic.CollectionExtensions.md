@@ -7,24 +7,21 @@ example:
 `CollectionExtensions` provides extension methods for `ICollection<T>` including `AddRange` for bulk insertion and `ToPartitioner` for batched iteration. This example creates an empty `List<int>`, calls `AddRange(1, 2, 3, 4)` to insert four integers at once, then creates a partitioner with `ToPartitioner(2)` to split elements into batches of two. Console output confirms the element count (`4`) and the partition count (`2`), demonstrating batch processing of collection contents.
 
 ```csharp
+// Program.cs
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cuemon.Extensions.Collections.Generic;
 
-namespace MyApp.Examples;
+ICollection<int> values = new List<int>();
+values.AddRange(1, 2, 3, 4);
 
-public static class CollectionExtensionsExample
-{
-    public static void Demonstrate()
-    {
-        ICollection<int> values = new List<int>();
-        values.AddRange(1, 2, 3, 4);
+var partitioner = values.ToPartitioner(2);
 
-        var partitioner = values.ToPartitioner(2);
-
-        Console.WriteLine(values.Count);
-        Console.WriteLine(partitioner.Count());
-    }
-}
+Console.WriteLine(values.Count);
+Console.WriteLine(partitioner.Count());
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="62fb3bdecb7b61910d959626"><a href="~/run-actions/62fb3bdecb7b61910d959626/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/62fb3bdecb7b61910d959626/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

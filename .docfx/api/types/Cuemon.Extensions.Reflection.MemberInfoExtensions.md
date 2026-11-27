@@ -38,3 +38,7 @@ public class MemberInfoExtensionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="6547eedabe61adc152ed0363"><a href="~/run-actions/6547eedabe61adc152ed0363/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/6547eedabe61adc152ed0363/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

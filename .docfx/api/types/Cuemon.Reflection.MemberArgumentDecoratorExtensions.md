@@ -7,39 +7,47 @@ example:
 The following example demonstrates how to reconstruct an exception from a recorded member argument stack using the <xref:Cuemon.Reflection.MemberArgumentDecoratorExtensions> class accessed through the <xref:Cuemon.Decorator> class.
 
 ```csharp
+// Program.cs
 using System;
 using System.Collections.Generic;
 using Cuemon;
 using Cuemon.Reflection;
+using MyApp.Examples;
 
-namespace MyApp.Examples;
+Console.WriteLine(new MemberArgumentDecoratorExtensionsExample().ReconstructException());
 
-public class MemberArgumentDecoratorExtensionsExample
+namespace MyApp.Examples
 {
-    public Exception ReconstructException()
+    public class MemberArgumentDecoratorExtensionsExample
     {
-        // Simulate a recorded stack of member arguments representing an exception chain
-        var stack = new Stack<IList<MemberArgument>>();
-
-        var innerArgs = new List<MemberArgument>
+        public Exception ReconstructException()
         {
-            new MemberArgument("type", typeof(InvalidOperationException)),
-            new MemberArgument("message", "Inner operation failed.")
-        };
-        stack.Push(innerArgs);
+            // Simulate a recorded stack of member arguments representing an exception chain
+            var stack = new Stack<IList<MemberArgument>>();
 
-        var outerArgs = new List<MemberArgument>
-        {
-            new MemberArgument("type", typeof(ArgumentException)),
-            new MemberArgument("message", "Outer argument error."),
-            new MemberArgument("paramName", "myParam"),
-        };
-        stack.Push(outerArgs);
+            var outerArgs = new List<MemberArgument>
+            {
+                new MemberArgument("type", typeof(ArgumentException)),
+                new MemberArgument("message", "Outer argument error."),
+                new MemberArgument("paramName", "myParam"),
+                new MemberArgument("innerException", null)
+            };
+            stack.Push(outerArgs);
 
-        // Reconstruct the exception chain from the recorded arguments
-        return Decorator.Enclose(stack).CreateException();
+            var innerArgs = new List<MemberArgument>
+            {
+                new MemberArgument("type", typeof(InvalidOperationException)),
+                new MemberArgument("message", "Inner operation failed.")
+            };
+            stack.Push(innerArgs);
 
+            // Reconstruct the exception chain from the recorded arguments
+            return Decorator.Enclose(stack).CreateException();
+        }
+    }
 }
-}
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="b0f5717aedfc25fb3562c613"><a href="~/run-actions/b0f5717aedfc25fb3562c613/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b0f5717aedfc25fb3562c613/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

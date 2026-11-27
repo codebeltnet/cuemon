@@ -7,9 +7,13 @@ example:
 The following example uses `ServiceOptions` to choose the lifetime that is applied when the Cuemon registration helpers add a service to `IServiceCollection`.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Cuemon.Docs.Samples.DependencyInjection;
+
+ServiceOptionsExample.Demonstrate();
 
 namespace Cuemon.Docs.Samples.DependencyInjection
 {
@@ -51,3 +55,7 @@ namespace Cuemon.Docs.Samples.DependencyInjection
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="f2c381e78849e37218bac586"><a href="~/run-actions/f2c381e78849e37218bac586/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f2c381e78849e37218bac586/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

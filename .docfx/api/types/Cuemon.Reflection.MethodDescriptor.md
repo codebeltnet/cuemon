@@ -7,17 +7,12 @@ example:
 `MethodDescriptor` provides a structured representation of a method's metadata including its caller type, method name, parameters, and optional runtime arguments. This example creates a `MethodDescriptor` from `string.IndexOf`'s `MethodInfo`, inspects its `Caller` (`System.String`), `MethodName` (`IndexOf`), and `Parameters` (value and comparisonType), then appends runtime arguments via `AppendRuntimeArguments("Hello", StringComparison.OrdinalIgnoreCase)`. It also demonstrates the static `Create` factory and `MergeParameters` to combine parameter signatures with runtime values. Console output displays the caller full name, method name, signature, parameter list, runtime argument key-value pairs, and merged parameter values.
 
 ```csharp
+// Program.cs
 using System;
 using System.Linq;
 using System.Reflection;
 using Cuemon.Reflection;
 
-namespace MyApp.Reflection
-{
-    public static class MethodDescriptorExamples
-    {
-        public static void Demonstrate()
-        {
             // Create a MethodDescriptor from a MethodInfo.
             MethodInfo methodInfo = typeof(string).GetMethod("IndexOf",
                 new[] { typeof(string), typeof(StringComparison) });
@@ -33,6 +28,7 @@ namespace MyApp.Reflection
             foreach (var param in descriptor.Parameters)
             {
                 Console.WriteLine("  {0} {1}", param.ParameterType.Name, param.ParameterName);
+            }
 
             // Append runtime arguments for debugging or logging.
             descriptor.AppendRuntimeArguments("Hello", StringComparison.OrdinalIgnoreCase);
@@ -40,6 +36,7 @@ namespace MyApp.Reflection
             foreach (var kvp in descriptor.RuntimeArguments)
             {
                 Console.WriteLine("  {0} = {1}", kvp.Key, kvp.Value);
+            }
 
             // Static factory method.
             var fromFactory = MethodDescriptor.Create(
@@ -54,8 +51,8 @@ namespace MyApp.Reflection
                 },
                 "test", 3);
             Console.WriteLine("Merged: input={0}, count={1}", merged["input"], merged["count"]);
-
-}}}}
-}
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="cef0fc8cef85037f50280653"><a href="~/run-actions/cef0fc8cef85037f50280653/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/cef0fc8cef85037f50280653/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

@@ -36,3 +36,7 @@ public class FowlerNollVoAlgorithmExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="81b0607d5a43c84eea6fc977"><a href="~/run-actions/81b0607d5a43c84eea6fc977/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/81b0607d5a43c84eea6fc977/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

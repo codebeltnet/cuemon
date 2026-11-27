@@ -36,10 +36,14 @@ public class HashResultExample
         // HasValue: True
         // Hex: dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f
         // Base64: 3/1gIbsr1bCvZ2KQgJ7DpTGR3YHH9wpLKGiKNiGCmG8=
-        // Url-safe Base64: 3_1gIbsr1bCvZ2KQgJ7DpTGR3YHH9wpLKGiKNiGCmG8=
+        // Url-safe Base64: 3_1gIbsr1bCvZ2KQgJ7DpTGR3YHH9wpLKGiKNiGCmG8
         // ToString: dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f
 
 }
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="bafa13dc7f0bff3268cab954"><a href="~/run-actions/bafa13dc7f0bff3268cab954/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/bafa13dc7f0bff3268cab954/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

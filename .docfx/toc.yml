@@ -5,16 +5,16 @@
   expanded: true
   items:
   - name: .NET API
-    href: api/dotnet/Cuemon.html
+    href: /api/dotnet/Cuemon.html
   - name: .NET API Extensions
-    href: api/extensions/dotnet/Cuemon.Extensions.html
+    href: /api/extensions/dotnet/Cuemon.Extensions.html
 - name: Microsoft ASP.NET Core
   href: aspnetcore.md
   expanded: true
   items:
   - name: ASP.NET Core API
-    href: api/aspnet/Cuemon.AspNetCore.html
+    href: /api/aspnet/Cuemon.AspNetCore.html
   - name: ASP.NET Core API Extensions
-    href: api/extensions/aspnet/Cuemon.Extensions.AspNetCore.Configuration.html
+    href: /api/extensions/aspnet/Cuemon.Extensions.AspNetCore.Configuration.html
 - name: NuGet
-  href: packages
+  href: /packages

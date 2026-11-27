@@ -7,33 +7,41 @@ example:
 The following example creates a `DynamicXmlConverter<int>` with custom read and write delegates. Writing the value 42 produces an XML fragment containing a `<Value>` element; the converter can also read it back from XML.
 
 ```csharp
+// Program.cs
 using System;
 using System.IO;
 using System.Xml;
 using Cuemon.Xml.Serialization;
 
-namespace Cuemon.Xml.Serialization;
+new DynamicXmlConverterExample().Demonstrate();
 
-public class DynamicXmlConverterExample
+namespace Cuemon.Xml.Serialization
 {
-    public void Demonstrate()
+    public class DynamicXmlConverterExample
     {
-        var converter = DynamicXmlConverter.Create<int>(
-            writer: (w, value, entity) =>
-            {
-                w.WriteElementString("Value", value.ToString());
-            },
-            reader: (r, type) =>
-            {
-                r.ReadToDescendant("Value");
-                return int.Parse(r.ReadElementContentAsString());
-            });
+        public void Demonstrate()
+        {
+            var converter = DynamicXmlConverter.Create<int>(
+                writer: (w, value, entity) =>
+                {
+                    w.WriteElementString("Value", value.ToString());
+                },
+                reader: (r, type) =>
+                {
+                    r.ReadToDescendant("Value");
+                    return int.Parse(r.ReadElementContentAsString());
+                });
 
-        using var sw = new StringWriter();
-        using var writer = XmlWriter.Create(sw);
-        converter.WriteXml(writer, 42);
-        writer.Flush();
-        Console.WriteLine(sw.ToString());
+            using var sw = new StringWriter();
+            using var writer = XmlWriter.Create(sw);
+            converter.WriteXml(writer, 42);
+            writer.Flush();
+            Console.WriteLine(sw.ToString());
+        }
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="483e201dc25f9f254c080d9a"><a href="~/run-actions/483e201dc25f9f254c080d9a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/483e201dc25f9f254c080d9a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

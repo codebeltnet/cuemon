@@ -7,31 +7,39 @@ example:
 `AsyncFuncFactory` provides factory methods for creating deferred asynchronous functions with zero or more typed arguments and a return value, executed via `ExecuteMethodAsync`. This example creates a function that returns `42` and another that sums two integers (`3` and `4`) after a 10ms delay, then invokes each with `CancellationToken.None`. Key setup includes using `AsyncFuncFactory.Create` with a lambda and passing arguments separately so the factory manages lifetime and error propagation. Console output displays `"Result: 42"` and `"Sum: 7"`, confirming both the parameterless and parameterized async function patterns.
 
 ```csharp
+// Program.cs
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Cuemon.Threading;
 
-namespace Cuemon.Threading;
+await new AsyncFuncFactoryExample().DemonstrateAsync();
 
-public class AsyncFuncFactoryExample
+namespace Cuemon.Threading
 {
-    public async Task DemonstrateAsync()
+    public class AsyncFuncFactoryExample
     {
-        var factory = AsyncFuncFactory.Create(ct =>
+        public async Task DemonstrateAsync()
         {
-            return Task.FromResult(42);
-        });
-        var result = await factory.ExecuteMethodAsync(CancellationToken.None);
-        Console.WriteLine($"Result: {result}");
+            var factory = AsyncFuncFactory.Create(ct =>
+            {
+                return Task.FromResult(42);
+            });
+            var result = await factory.ExecuteMethodAsync(CancellationToken.None);
+            Console.WriteLine($"Result: {result}");
 
-        var factoryWithArg = AsyncFuncFactory.Create(async (int a, int b, CancellationToken ct) =>
-        {
-            await Task.Delay(10, ct);
-            return a + b;
-        }, 3, 4);
-        var sum = await factoryWithArg.ExecuteMethodAsync(CancellationToken.None);
-        Console.WriteLine($"Sum: {sum}");
+            var factoryWithArg = AsyncFuncFactory.Create(async (int a, int b, CancellationToken ct) =>
+            {
+                await Task.Delay(10, ct);
+                return a + b;
+            }, 3, 4);
+            var sum = await factoryWithArg.ExecuteMethodAsync(CancellationToken.None);
+            Console.WriteLine($"Sum: {sum}");
+        }
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="5b8b29f35dafdc718e28b156"><a href="~/run-actions/5b8b29f35dafdc718e28b156/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/5b8b29f35dafdc718e28b156/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

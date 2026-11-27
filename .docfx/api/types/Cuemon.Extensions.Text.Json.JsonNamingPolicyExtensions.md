@@ -39,3 +39,7 @@ public class JsonNamingPolicyExtensionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="05fda780457d8373cedc0c00"><a href="~/run-actions/05fda780457d8373cedc0c00/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/05fda780457d8373cedc0c00/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

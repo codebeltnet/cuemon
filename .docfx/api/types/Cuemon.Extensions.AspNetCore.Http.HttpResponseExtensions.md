@@ -4,51 +4,62 @@ example:
 - *content
 ---
 
-`HttpResponseExtensions` provides extension methods for `HttpResponse` to manage ETag and Last-Modified headers, write response bodies asynchronously, and transform `HttpResponseMessage` content into the ASP.NET Core response pipeline. This example calls `AddOrUpdateEntityTagHeader` with a `ChecksumBuilder` for ETag generation, `AddOrUpdateLastModifiedHeader` with a `2024-06-15T10:00:00Z` UTC date, `WriteBodyAsync` with a byte array delegate, and `OnStartingInvokeTransformer` to transfer an `HttpResponseMessage` with status `200 OK` and JSON content type. Each operation is demonstrated independently, with Console output confirming the header values and response modifications.
+`HttpResponseExtensions` provides extension methods for `HttpResponse` to manage ETag and Last-Modified headers, write response bodies asynchronously, and transform `HttpResponseMessage` content into the ASP.NET Core response pipeline. This example hosts a minimal `WebApplication` endpoint that calls `AddOrUpdateEntityTagHeader` with a `ChecksumBuilder`, `AddOrUpdateLastModifiedHeader` with a `2024-06-15T10:00:00Z` UTC date, `OnStartingInvokeTransformer` to copy a trace header from an `HttpResponseMessage` when the response starts, and `WriteBodyAsync` to write `"Hello"`. An `HttpClient` request confirms the `ETag`, `Last-Modified`, and `X-Transferred` headers along with the response body.
 
 ```csharp
+// Program.cs
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
+using System.Text;
 using Cuemon.Data.Integrity;
 using Cuemon.Extensions.AspNetCore.Http;
 using Cuemon.Security;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
 
-namespace MyApp.AspNetCore.Http
+var builder = WebApplication.CreateBuilder();
+await using var app = builder.Build();
+app.Urls.Add("http://127.0.0.1:0");
+
+app.Run(async context =>
 {
-    public class HttpResponseExtensionsExample
+    var request = context.Request;
+    var response = context.Response;
+
+    var checksum = new ChecksumBuilder(() => HashFactory.CreateFnv128());
+    checksum.CombineWith(Encoding.UTF8.GetBytes("Hello"));
+    response.AddOrUpdateEntityTagHeader(request, checksum, isWeak: false);
+
+    var lastModified = new DateTime(2024, 6, 15, 10, 0, 0, DateTimeKind.Utc);
+    response.AddOrUpdateLastModifiedHeader(request, lastModified);
+
+    using var message = new HttpResponseMessage(HttpStatusCode.OK);
+    message.Headers.Add("X-Trace", "demo");
+    response.OnStartingInvokeTransformer(message, (source, target) =>
     {
-        public async Task DemonstrateAsync(HttpResponse response, HttpRequest request)
-        {
-            // Add or update an ETag header using a checksum builder
-            var builder = new ChecksumBuilder(() => HashFactory.CreateFnv128());
-            response.AddOrUpdateEntityTagHeader(request, builder, isWeak: false);
-            // Response now has ETag: "..." header
+        target.Headers["X-Transferred"] = string.Join(string.Empty, source.Headers.GetValues("X-Trace"));
+    });
 
-            // Add or update a Last-Modified header with a specific date
-            var lastModified = new DateTime(2024, 6, 15, 10, 0, 0, DateTimeKind.Utc);
-            response.AddOrUpdateLastModifiedHeader(request, lastModified);
-            // Response now has Last-Modified: "Sat, 15 Jun 2024 10:00:00 GMT" header
+    await response.WriteBodyAsync(() => new byte[] { 0x48, 0x65, 0x6C, 0x6C, 0x6F });
+});
 
-            // Write bytes to the response body from a delegate
-            await response.WriteBodyAsync(() => new byte[] { 0x48, 0x65, 0x6C, 0x6C, 0x6F });
-            // Response body now contains "Hello"
-
-            // Transfer a HttpResponseMessage to the response pipeline
-            var message = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("{\"status\":\"ok\"}")
-            };
-            response.OnStartingInvokeTransformer(message, (msg, resp) =>
-            {
-                resp.StatusCode = (int)msg.StatusCode;
-                resp.Headers["Content-Type"] = "application/json";
-            });
-            // The response will send the transformed content when the pipeline starts
-
-}}
+await app.StartAsync();
+try
+{
+    using var client = new HttpClient { BaseAddress = new Uri(app.Urls.First()) };
+    using var httpResponse = await client.GetAsync("/");
+    Console.WriteLine(httpResponse.Headers.ETag?.ToString());
+    Console.WriteLine(httpResponse.Content.Headers.LastModified?.ToString("R"));
+    Console.WriteLine(string.Join(", ", httpResponse.Headers.GetValues("X-Transferred")));
+    Console.WriteLine(await httpResponse.Content.ReadAsStringAsync());
 }
-
+finally
+{
+    await app.StopAsync();
+}
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="5d949fddddc841f26493e5b5"><a href="~/run-actions/5d949fddddc841f26493e5b5/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/5d949fddddc841f26493e5b5/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

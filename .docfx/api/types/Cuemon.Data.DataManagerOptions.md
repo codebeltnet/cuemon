@@ -7,31 +7,27 @@ example:
 `DataManagerOptions` configures connection strings, reader behavior, and connection lifecycle settings for use with `DataManager`. This example creates an options instance with `ConnectionString = "Data Source=app.db"`, `PreferredReaderBehavior` set to `SequentialAccess | CloseConnection`, and both `LeaveConnectionOpen` and `LeaveCommandOpen` set to `false`. After configuration, `ValidateOptions()` is called to confirm the settings are valid. Console output prints the connection string, reader behavior flag, and lifecycle settings.
 
 ```csharp
+// Program.cs
 using System;
 using System.Data;
 using Cuemon.Data;
 
-namespace MyApp.Data
+var options = new DataManagerOptions
 {
-    public sealed class DataManagerOptionsExample
-    {
-        public void Demonstrate()
-        {
-            var options = new DataManagerOptions
-            {
-                ConnectionString = "Data Source=app.db",
-                PreferredReaderBehavior = CommandBehavior.SequentialAccess | CommandBehavior.CloseConnection,
-                LeaveConnectionOpen = false,
-                LeaveCommandOpen = false
-            };
+    ConnectionString = "Data Source=app.db",
+    PreferredReaderBehavior = CommandBehavior.SequentialAccess | CommandBehavior.CloseConnection,
+    LeaveConnectionOpen = false,
+    LeaveCommandOpen = false
+};
 
-            options.ValidateOptions();
+options.ValidateOptions();
 
-            Console.WriteLine($"Connection: {options.ConnectionString}");
-            Console.WriteLine($"Reader behavior: {options.PreferredReaderBehavior}");
-            Console.WriteLine($"Leave connection open: {options.LeaveConnectionOpen}");
-            Console.WriteLine($"Leave command open: {options.LeaveCommandOpen}");
-        }
-    }
-}
+Console.WriteLine($"Connection: {options.ConnectionString}");
+Console.WriteLine($"Reader behavior: {options.PreferredReaderBehavior}");
+Console.WriteLine($"Leave connection open: {options.LeaveConnectionOpen}");
+Console.WriteLine($"Leave command open: {options.LeaveCommandOpen}");
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="9350ef439be81fd7d95f9884"><a href="~/run-actions/9350ef439be81fd7d95f9884/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/9350ef439be81fd7d95f9884/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

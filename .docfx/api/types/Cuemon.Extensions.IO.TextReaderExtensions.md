@@ -7,34 +7,30 @@ example:
 `TextReaderExtensions` provides extension methods for `TextReader` including `ReadAllLines`, `ReadAllLinesAsync`, and `CopyToAsync` for reading and copying text content. This example creates a multi-line string `"line one\nline two\nline three"`, converts it to a `TextReader` via `ToTextReader`, then calls `ReadAllLines` synchronously and `ReadAllLinesAsync` asynchronously to collect each line. It also uses `CopyToAsync` to write the reader content into a `StringWriter`. Console output confirms all three approaches produce the correct line count of `3` and that the copied content contains `"line two"`.
 
 ```csharp
+// Program.cs
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Cuemon.Extensions.IO;
 
-namespace MyApp.Examples
-{
-    public static class TextReaderExtensionsExample
-    {
-        public static async Task DemonstrateAsync()
-        {
-            const string input = "line one\nline two\nline three";
+const string input = "line one\nline two\nline three";
 
-            using var linesReader = input.ToTextReader();
-            var lines = linesReader.ReadAllLines().ToList();
+using var linesReader = input.ToTextReader();
+var lines = linesReader.ReadAllLines().ToList();
 
-            using var asyncLinesReader = input.ToTextReader();
-            using var writer = new StringWriter();
-            var asyncLines = await asyncLinesReader.ReadAllLinesAsync();
+using var asyncLinesReader = input.ToTextReader();
+using var writer = new StringWriter();
+var asyncLines = await asyncLinesReader.ReadAllLinesAsync();
 
-            using var copyReader = input.ToTextReader();
-            await copyReader.CopyToAsync(writer);
+using var copyReader = input.ToTextReader();
+await copyReader.CopyToAsync(writer);
 
-            Console.WriteLine(lines.Count);
-            Console.WriteLine(asyncLines.Count);
-            Console.WriteLine(writer.ToString().Contains("line two"));
-        }
-    }
-}
+Console.WriteLine(lines.Count);
+Console.WriteLine(asyncLines.Count);
+Console.WriteLine(writer.ToString().Contains("line two"));
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="4a36d0deb95a5d971eee1fa5"><a href="~/run-actions/4a36d0deb95a5d971eee1fa5/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/4a36d0deb95a5d971eee1fa5/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

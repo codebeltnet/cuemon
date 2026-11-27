@@ -43,3 +43,7 @@ public class AsyncStreamEncodingOptionsExample
 }
 
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="8f8c17ccc69dd8579b97ea03"><a href="~/run-actions/8f8c17ccc69dd8579b97ea03/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/8f8c17ccc69dd8579b97ea03/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

@@ -19,7 +19,8 @@ This major release adds .NET 11 targets, removes .NET 9-specific targets, and ch
 - `SonarAnalyzer.CSharp` 10.35.0.4138 is configured for source projects,
 - Central transitive pins for `System.Security.Cryptography.Pkcs` use 10.0.15 for .NET 10 and 11.0.0 for .NET 11,
 - A .NET 11 test workflow accepts preview SDKs and uses absolute project paths as a workaround for an SDK test-runner issue,
-- `Resolve-PackageReleaseNotesConflicts.ps1` resolves package release-note conflict markers and stages the resolved files when run.
+- `Resolve-PackageReleaseNotesConflicts.ps1` resolves package release-note conflict markers and stages the resolved files when run,
+- DocFX run-actions build, validation, and site-verification scripts (`BuildRunActions.ps1`, `TestRunActions.ps1`, `verify-docfx-site.sh`), manifest, settings, and client-side template integration for generating and verifying native, host-sample, and Docker run scripts across API example pages.
 
 ### Changed
 
@@ -32,7 +33,10 @@ This major release adds .NET 11 targets, removes .NET 9-specific targets, and ch
 - Test tooling updates `Codebelt.Coverlet.MTP` from 10.1.1 to 11.0.0, `Microsoft.Testing.Extensions.HangDump` from 2.5.1 to 2.5.2, and `xunit.v3`, `xunit.v3.extensibility.core`, and `xunit.v3.runner.console` from 4.0.2 to 4.0.3,
 - The DocFX image uses `dhi.io/nginx`; fingerprinted assets cache successful and revalidation responses but use `no-store` for other responses, and range requests are disabled for those assets,
 - Test environments retain separate .NET 10 and .NET 11 Docker runners and remove the .NET 9 runner,
-- Verification temporarily skips CodeQL and excludes it from post-release service identity checks while the branch targets .NET 11; the workflow does not claim CodeQL assurance.
+- Verification temporarily skips CodeQL and excludes it from post-release service identity checks while the branch targets .NET 11; the workflow does not claim CodeQL assurance,
+- DocFX local image build (`BuildDocfxImage.ps1`), configuration (`docfx.json`), table of contents (`toc.yml`), and Docker packaging now use the shared `codebeltnet/docfx:2` builder image with cached remote xref maps and source-keyed metadata, disable analyzers during metadata extraction with reference assemblies enabled, use Microsoft Learn's .NET xref map, and run site and run-action verification,
+- PR and release workflows (`pr.yml`, `release.yml`) now validate DocFX run-action script generation, determinism, Docker build context, and OCI archive assets,
+- Updated DocFX API namespace and type overwrite files (including examples, availability includes, and run-action links), documented DocFX build entry points and maintenance rules in `AGENTS.md`, added `Cuemon.Kernel` to the package table in `README.md`, and ignored generated `.docfx/run-actions/` output in `.gitignore`.
 
 ### Removed
 
@@ -1978,11 +1982,11 @@ This release was primarily focused on adapting a more modern way of performing C
 - XmlWriterUtility class from Cuemon.Xml namespace
 - XmlWriterUtilityExtensions class from the Cuemon.Xml namespace
 
+[11.0.0]: https://github.com/codebeltnet/cuemon/compare/v10.8.2...v11.0.0
 [10.8.2]: https://github.com/codebeltnet/cuemon/compare/v10.8.1...v10.8.2
 [10.8.1]: https://github.com/codebeltnet/cuemon/compare/v10.8.0...v10.8.1
 [10.8.0]: https://github.com/codebeltnet/cuemon/compare/v10.7.1...v10.8.0
 [10.7.1]: https://github.com/codebeltnet/cuemon/compare/v10.7.0...v10.7.1
-[11.0.0]: https://github.com/codebeltnet/cuemon/compare/v10.8.2...v11.0.0
 [10.7.0]: https://github.com/codebeltnet/cuemon/compare/v10.6.0...v10.7.0
 [10.6.0]: https://github.com/codebeltnet/cuemon/compare/v10.5.5...v10.6.0
 [10.5.5]: https://github.com/codebeltnet/cuemon/compare/v10.5.4...v10.5.5

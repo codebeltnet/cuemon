@@ -7,16 +7,11 @@ example:
 The following example demonstrates how to use `DayPart` to determine the current part of the day and enumerate all built-in day parts.
 
 ```csharp
+// Program.cs
 using System;
 using System.Linq;
 using Cuemon;
 
-namespace MyApp.Examples;
-
-public class DayPartExample
-{
-    public void Demonstrate()
-    {
         var now = DateTime.Now.TimeOfDay;
 
         var current = DayPart.All.FirstOrDefault(dp =>
@@ -30,7 +25,9 @@ public class DayPartExample
         {
             Console.WriteLine($"  {part}");
 
-}}
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="0f19ce721851c5e0891be345"><a href="~/run-actions/0f19ce721851c5e0891be345/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0f19ce721851c5e0891be345/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

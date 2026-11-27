@@ -7,26 +7,21 @@ example:
 `QueryStringCollection` provides creation, parsing, and manipulation of URI query string parameters, extending `NameValueCollection` with URL decoding support. This example creates an empty collection and adds `"search"`, `"page"`, and `"sort"` parameters, parses an existing query string (`"?category=books&author=tolkien"`) with and without URL decoding, and iterates key-value pairs. It also demonstrates cloning the collection and modifying the clone independently to verify they are separate instances. Console output shows the query string representation, decoded values, keys, clone independence, and entry counts.
 
 ```csharp
+// Program.cs
 using System;
 using System.Linq;
 using Cuemon.Net;
 
-namespace MyApp.Net
-{
-    public static class QueryStringCollectionExamples
-    {
-        public static void Demonstrate()
-        {
             // Create an empty query string collection and add parameters.
             var qsc = new QueryStringCollection();
             qsc.Add("search", "dotnet");
             qsc.Add("page", "2");
             qsc.Add("sort", "name");
-            Console.WriteLine("Query string: {0}", qsc); // search=dotnet&page=2&sort=name
+            Console.WriteLine("Query string: {0}", qsc); // ?search=dotnet&page=2&sort=name
 
             // Create from an existing URI query string.
             var fromUrl = new QueryStringCollection("?category=books&author=tolkien");
-            Console.WriteLine("Parsed query: {0}", fromUrl); // category=books&author=tolkien
+            Console.WriteLine("Parsed query: {0}", fromUrl); // ?category=books&author=tolkien
 
             // Create with URL decoding enabled.
             var encoded = new QueryStringCollection("q=hello%20world&lang=en", urlDecode: true);
@@ -37,6 +32,7 @@ namespace MyApp.Net
             foreach (var pair in fromUrl)
             {
                 Console.WriteLine("  {0} = {1}", pair.Key, pair.Value);
+            }
 
             // Use AllKeys from the base NameValueCollection.
             Console.WriteLine("Keys: {0}", string.Join(", ", qsc.AllKeys));
@@ -49,8 +45,8 @@ namespace MyApp.Net
 
             // Count entries.
             Console.WriteLine("Count: {0}", qsc.Count);
-
-}}}
-}
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="0a3af96a351dd4358fa542cb"><a href="~/run-actions/0a3af96a351dd4358fa542cb/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0a3af96a351dd4358fa542cb/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

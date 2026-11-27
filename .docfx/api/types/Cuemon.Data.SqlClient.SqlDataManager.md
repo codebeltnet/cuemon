@@ -4,49 +4,25 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use `SqlDataManager` to execute commands against Microsoft SQL Server.
+The following example demonstrates how to configure `SqlDataManager` with a Microsoft SQL Server connection string, inspect its transient fault handling callback, and clone the manager instance.
 
 ```csharp
+// Program.cs
 using System;
-using Cuemon.Collections.Generic;
-using Cuemon.Data;
 using Cuemon.Data.SqlClient;
-using Microsoft.Data.SqlClient;
 
-namespace MyApp.Examples;
-
-public class Example
+var manager = new SqlDataManager(o =>
 {
-    public void Run()
-    {
+    o.ConnectionString = "Server=.;Database=AdventureWorks;Trusted_Connection=True;TrustServerCertificate=True;";
+});
 
-        // Configure the SQL data manager with a connection string
-        var manager = new SqlDataManager(o =>
-        {
-            o.ConnectionString = "Server=.;Database=AdventureWorks;Trusted_Connection=True;TrustServerCertificate=True;";
-        });
+var cloned = (SqlDataManager)manager.Clone();
 
-        // Execute a scalar query (implicit string to DataStatement conversion)
-        var productCount = manager.ExecuteScalar("SELECT COUNT(*) FROM Production.Product");
-        Console.WriteLine($"Product count: {productCount}");
-
-        // Execute a reader command with parameters
-using var reader = manager.ExecuteReader(new DataStatement(
-            "SELECT ProductID, Name, ListPrice FROM Production.Product WHERE ListPrice > @minPrice",
-            o => o.Parameters = Arguments.ToArrayOf(new SqlParameter("@minPrice", 1000m))));
-
-        while (reader.Read())
-        {
-            Console.WriteLine($"  #{reader.GetInt32(0)}: {reader.GetString(1)} - ${reader.GetDecimal(2):F2}");
-
-        // Execute a non-query (INSERT)
-        var affected = manager.Execute(new DataStatement(
-            "UPDATE Production.Product SET ListPrice = ListPrice * 1.05 WHERE ProductID = @id",
-            o => o.Parameters = Arguments.ToArrayOf(new SqlParameter("@id", 999))));
-
-        Console.WriteLine($"Rows affected: {affected}");
-
-}}
-}
-
+Console.WriteLine($"Connection string: {manager.Options.ConnectionString}");
+Console.WriteLine($"Transient fault callback configured: {manager.TransientFaultHandlingOptionsCallback is not null}");
+Console.WriteLine($"Cloned connection string matches: {cloned.Options.ConnectionString == manager.Options.ConnectionString}");
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="a25d8ef50be5b6e478d9908f"><a href="~/run-actions/a25d8ef50be5b6e478d9908f/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/a25d8ef50be5b6e478d9908f/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

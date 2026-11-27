@@ -7,10 +7,14 @@ example:
 `ServiceCollectionExtensions` provides registration methods for `IServiceCollection` that support multi-contract resolution, typed options, and bulk post-configuration. This example defines an `OrdersMessageHandler` implementing both `IMessageHandler<OrdersChannel>` and `IDependencyInjectionMarker<OrdersChannel>`, then registers it with various lifecycle options using `Add`, `TryAdd`, and `TryConfigure` overloads including scoped and singleton lifetimes. It also demonstrates `PostConfigureAllOf<HandlerOptions>` for bulk configuration of options instances. After building the service provider and creating a scope, the concrete handler, typed contract, and marker are resolved and compared by reference. Console output confirms that all three resolve to the same instance and that `HandlerOptions.Label` is correctly set to `"post-configured"`.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Cuemon.Docs.Samples.DependencyInjection;
+
+ServiceCollectionExtensionsExample.Demonstrate();
 
 namespace Cuemon.Docs.Samples.DependencyInjection
 {
@@ -95,6 +99,10 @@ namespace Cuemon.Docs.Samples.DependencyInjection
 }
 ```
 
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="75a0528e37206a742b4f3ff2"><a href="~/run-actions/75a0528e37206a742b4f3ff2/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/75a0528e37206a742b4f3ff2/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->
+
 Configure delivery retries with `AddConfiguredOptions<DeliveryOptions>` to let Microsoft Options construct the Parameter Object, calculate its retry budget during post-configuration, and validate the final settings. This example adds an ordinary Microsoft configurator that raises the attempt limit to four, then resolves the cached default options directly and through `IOptions<DeliveryOptions>`. The output shows a 15-second retry budget and a shared default instance. The injectable `Action<DeliveryOptions>` is the exact primary delegate and sets three attempts on a fresh object; invoking it directly does not calculate the budget or validate the object. Further `AddConfiguredOptions<DeliveryOptions>` calls would be ignored, while ordinary `Configure` calls still compose. Cuemon's conventions participate for all options names in registration order, and recoverable validation failures surface as `OptionsValidationException` when Microsoft materializes options.
 
 ```csharp
@@ -156,3 +164,7 @@ public sealed class DeliveryOptions : IPostConfigurableParameterObject, IValidat
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="42a26341576df948b9bb2430"><a href="~/run-actions/42a26341576df948b9bb2430/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/42a26341576df948b9bb2430/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

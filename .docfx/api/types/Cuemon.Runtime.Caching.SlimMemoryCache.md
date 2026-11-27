@@ -7,15 +7,9 @@ example:
 `SlimMemoryCache` provides in-memory caching with absolute and sliding expiration, namespace grouping, and automatic cleanup. This example creates a cache with cleanup enabled (`FirstSweep = 30s`, `SucceedingSweep = 10s`), adds a config entry with absolute expiration, a session entry with sliding expiration under the `"sessions"` namespace, and updates the config entry via the indexer. It demonstrates safe retrieval with `TryGet`, key-based removal with `Remove`, namespace-based counting with `Count("data")`, and bulk namespace removal with `RemoveAll("data")`. Console output confirms the cached values, update status, removal success, and namespace counts before and after removal.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Runtime.Caching;
-
-namespace MyApp.Examples;
-
-public class Example
-{
-    public void Run()
-    {
 
         // Create a cache with automatic cleanup
         var cache = new SlimMemoryCache(o =>
@@ -37,6 +31,7 @@ public class Example
         if (cache.TryGet("session", "sessions", out var session))
         {
             Console.WriteLine($"Session: {session}");
+        }
 
         // Update an existing entry using the indexer
         cache["config"] = new { Theme = "Light", Locale = "en-US" };
@@ -47,6 +42,7 @@ public class Example
         {
             cache.Remove("config");
             Console.WriteLine("Config removed.");
+        }
 
         // Count entries within a namespace
         cache.Add("item1", 100, DateTime.MaxValue, "data");
@@ -58,8 +54,8 @@ public class Example
         Console.WriteLine($"After removal: {cache.Count("data")}");
 
         cache.Dispose();
-
-}}}
-}
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="a1af386558a6a097c106aa3e"><a href="~/run-actions/a1af386558a6a097c106aa3e/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/a1af386558a6a097c106aa3e/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

@@ -7,6 +7,7 @@ example:
 `UriExtensions` provides HTTP extension methods directly on `Uri` covering GET, POST, PUT, DELETE, HEAD, OPTIONS, PATCH, and TRACE with support for custom headers, content types, and cancellation. This example assigns a stub `IHttpClientFactory` that returns a fixed `200 OK` response, then calls each HTTP method variant including `HttpGetAsync`, `HttpDeleteAsync`, `HttpPostAsync` with JSON content, `HttpPutAsync` with a stream body, `HttpPatchAsync`, `HttpTraceAsync`, and the generic `HttpAsync` overload for full `HttpRequestOptions` control with custom headers. It also demonstrates passing a `CancellationToken` with a timeout that triggers a `TaskCanceledException`. Console output confirms that each request returns `200 OK` and that cancellation is handled gracefully.
 
 ```csharp
+// Program.cs
 using System.Text;
 using System;
 using System.IO;
@@ -16,6 +17,9 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Cuemon.Extensions.Net.Http;
+using MyApp.Http;
+
+await new UriExtensionsExample().DemonstrateAsync();
 
 namespace MyApp.Http
 {
@@ -114,12 +118,13 @@ namespace MyApp.Http
                 Console.WriteLine($"Custom GET: {response.StatusCode}"); // 200
             }
 
-            // Use cancellation token
+            // Use cancellation token with a timeout against a delayed endpoint
+            var slowLocation = new Uri("https://example.com/api/slow");
             using var cts = new CancellationTokenSource();
-            cts.CancelAfter(TimeSpan.FromSeconds(5));
+            cts.CancelAfter(TimeSpan.FromMilliseconds(50));
             try
             {
-                using var response = await location.HttpGetAsync(cts.Token);
+                using var response = await slowLocation.HttpGetAsync(cts.Token);
                 Console.WriteLine($"Cancellable GET: {response.StatusCode}");
             }
             catch (TaskCanceledException)
@@ -163,17 +168,25 @@ namespace MyApp.Http
             _statusCode = statusCode;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(
+        protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken ct)
         {
+            if (request.RequestUri?.AbsolutePath.EndsWith("/slow", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5), ct);
+            }
+
             var response = new HttpResponseMessage(_statusCode)
             {
                 Content = new StringContent("OK"),
                 RequestMessage = request
             };
-            return Task.FromResult(response);
+            return response;
         }
     }
 }
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="a96a01fbdfb87cfa130ed27a"><a href="~/run-actions/a96a01fbdfb87cfa130ed27a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/a96a01fbdfb87cfa130ed27a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

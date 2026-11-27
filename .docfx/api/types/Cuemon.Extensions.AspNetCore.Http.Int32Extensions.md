@@ -7,44 +7,38 @@ example:
 The following example demonstrates how to use the <xref:Cuemon.Extensions.AspNetCore.Http.Int32Extensions> extension methods to classify HTTP status codes by range.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Extensions.AspNetCore.Http;
 
-namespace MyApp.Examples;
+int statusCode = 404;
 
-public class Example
-{
-    public void Run()
-    {
+// Check the status code range
+bool isInfo = statusCode.IsInformationStatusCode();
+bool isSuccess = statusCode.IsSuccessStatusCode();
+bool isRedirect = statusCode.IsRedirectionStatusCode();
+bool isClientError = statusCode.IsClientErrorStatusCode();
+bool isServerError = statusCode.IsServerErrorStatusCode();
+bool isNotModified = statusCode.IsNotModifiedStatusCode();
 
-        int statusCode = 404;
+Console.WriteLine($"HTTP {statusCode}:");
+Console.WriteLine($"  Informational: {isInfo}");
+Console.WriteLine($"  Success: {isSuccess}");
+Console.WriteLine($"  Redirection: {isRedirect}");
+Console.WriteLine($"  Client Error: {isClientError}");
+Console.WriteLine($"  Server Error: {isServerError}");
+Console.WriteLine($"  Not Modified: {isNotModified}");
 
-        // Check the status code range
-        bool isInfo = statusCode.IsInformationStatusCode();
-        bool isSuccess = statusCode.IsSuccessStatusCode();
-        bool isRedirect = statusCode.IsRedirectionStatusCode();
-        bool isClientError = statusCode.IsClientErrorStatusCode();
-        bool isServerError = statusCode.IsServerErrorStatusCode();
-        bool isNotModified = statusCode.IsNotModifiedStatusCode();
+// Use with common HTTP status codes
+int ok = 200;
+int notFound = 404;
+int serverError = 500;
 
-        Console.WriteLine($"HTTP {statusCode}:");
-        Console.WriteLine($"  Informational: {isInfo}");
-        Console.WriteLine($"  Success: {isSuccess}");
-        Console.WriteLine($"  Redirection: {isRedirect}");
-        Console.WriteLine($"  Client Error: {isClientError}");
-        Console.WriteLine($"  Server Error: {isServerError}");
-        Console.WriteLine($"  Not Modified: {isNotModified}");
-
-        // Use with common HTTP status codes
-        int ok = 200;
-        int notFound = 404;
-        int serverError = 500;
-
-        Console.WriteLine($"\n{ok} is success: {ok.IsSuccessStatusCode()}");
-        Console.WriteLine($"{notFound} is client error: {notFound.IsClientErrorStatusCode()}");
-        Console.WriteLine($"{serverError} is server error: {serverError.IsServerErrorStatusCode()}");
-
-}
-}
-
+Console.WriteLine($"\n{ok} is success: {ok.IsSuccessStatusCode()}");
+Console.WriteLine($"{notFound} is client error: {notFound.IsClientErrorStatusCode()}");
+Console.WriteLine($"{serverError} is server error: {serverError.IsServerErrorStatusCode()}");
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="f111ba3a93cd78316117d884"><a href="~/run-actions/f111ba3a93cd78316117d884/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f111ba3a93cd78316117d884/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

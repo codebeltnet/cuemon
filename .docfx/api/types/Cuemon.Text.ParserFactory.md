@@ -7,26 +7,23 @@ example:
 The following example demonstrates parsing a GUID string, a Base64-encoded value, and a URI string using the factory methods provided by `ParserFactory`. Each parser is created via a dedicated factory method and then invoked to produce a strongly typed result.
 
 ```csharp
+// Program.cs
 using System;
 using Cuemon.Text;
 
-namespace Cuemon.Text;
+var guidParser = ParserFactory.FromGuid();
+var result = guidParser.Parse("6B29FC40-CA47-1067-B31D-00DD010662DA");
+Console.WriteLine($"Parsed GUID: {result}");
 
-public class ParserFactoryExample
-{
-    public void Demonstrate()
-    {
-        var guidParser = ParserFactory.FromGuid();
-        var result = guidParser.Parse("6B29FC40-CA47-1067-B31D-00DD010662DA");
-        Console.WriteLine($"Parsed GUID: {result}");
+var base64Parser = ParserFactory.FromBase64();
+var bytes = base64Parser.Parse("SGVsbG8gV29ybGQ=");
+Console.WriteLine($"Base64 decoded bytes: {bytes.Length}");
 
-        var base64Parser = ParserFactory.FromBase64();
-        var bytes = base64Parser.Parse("SGVsbG8gV29ybGQ=");
-        Console.WriteLine($"Base64 decoded bytes: {bytes.Length}");
-
-        var uriParser = ParserFactory.FromUri();
-        var uri = uriParser.Parse("https://example.com/resource");
-        Console.WriteLine($"Parsed URI: {uri}");
-    }
-}
+var uriParser = ParserFactory.FromUri();
+var uri = uriParser.Parse("https://example.com/resource");
+Console.WriteLine($"Parsed URI: {uri}");
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="b5d458a8c345ebe80fd9277b"><a href="~/run-actions/b5d458a8c345ebe80fd9277b/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b5d458a8c345ebe80fd9277b/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

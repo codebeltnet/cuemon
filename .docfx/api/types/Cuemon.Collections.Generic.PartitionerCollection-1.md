@@ -7,16 +7,11 @@ example:
 The following example shows how to partition a list of numbers into fixed-size groups using `PartitionerCollection`. It iterates through each partition and prints partition-level and collection-level metadata.
 
 ```csharp
+// Program.cs
 using System;
 using System.Collections.Generic;
 using Cuemon.Collections.Generic;
 
-namespace MyApp.Examples
-{
-    public class PartitionerCollectionExample
-    {
-        public static void Demonstrate()
-        {
             var numbers = new List<int>();
             for (int i = 1; i <= 50; i++) numbers.Add(i);
 
@@ -37,13 +32,15 @@ namespace MyApp.Examples
                 foreach (var item in partitioner)
                 {
                     Console.Write($"{item} ");
+                }
                 Console.WriteLine();
 
-            Console.WriteLine();
-            Console.WriteLine($"Iterated count: {partitioner.IteratedCount}");
-            Console.WriteLine($"Has remaining partitions: {partitioner.HasPartitions}");
-
-}}}}
-}
-
+                Console.WriteLine();
+                Console.WriteLine($"Iterated count: {partitioner.IteratedCount}");
+                Console.WriteLine($"Has remaining partitions: {partitioner.HasPartitions}");
+            }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="096a45ec49b673b20921646d"><a href="~/run-actions/096a45ec49b673b20921646d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/096a45ec49b673b20921646d/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

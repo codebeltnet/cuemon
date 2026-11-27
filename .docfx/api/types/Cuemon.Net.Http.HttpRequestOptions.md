@@ -4,34 +4,24 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure and send an HTTP request using `HttpRequestOptions` with the `HttpManager`.
+The following example demonstrates how to configure an HTTP request using `HttpRequestOptions`.
 
 ```csharp
+// Program.cs
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Cuemon.Net.Http;
 using HttpRequestOptions = Cuemon.Net.Http.HttpRequestOptions;
 
-namespace Examples;
+// Direct instantiation of HttpRequestOptions
+var requestOptions = new HttpRequestOptions();
+requestOptions.Request.Method = HttpMethod.Get;
 
-public class HttpRequestExample
-{
-    public async Task SendRequestAsync()
-    {
-        // Direct instantiation of HttpRequestOptions
-        var requestOptions = new HttpRequestOptions();
-        requestOptions.Request.Method = HttpMethod.Get;
-
-        using var manager = new HttpManager();
-        using var response = await manager.HttpAsync(
-            new Uri("https://api.example.com/data"),
-            o =>
-            {
-                o.Request.Method = HttpMethod.Get;
-                o.Request.Headers.Add("Accept", "application/json");
-            });
-    }
-}
-
+requestOptions.Request.Headers.Add("Accept", "application/json");
+Console.WriteLine($"{requestOptions.Request.Method} {string.Join(", ", requestOptions.Request.Headers.Accept)}");
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="ce261fa5e4c42172dba24385"><a href="~/run-actions/ce261fa5e4c42172dba24385/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/ce261fa5e4c42172dba24385/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

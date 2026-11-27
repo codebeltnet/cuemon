@@ -24,14 +24,14 @@ Related: [Cuemon.Extensions namespace](/api/extensions/dotnet/Cuemon.Extensions.
 
 |Type|Ext|Methods|
 |--:|:-:|---|
-|IDecorator<Byte[]>|⬇️|`ToEncodedString`, `ToHexadecimalString`, `ToBinaryString`, `ToUrlEncodedBase64String`, `ToBase64String`, `TryDetectUnicodeEncoding`, `ToStream`|
+|IDecorator<Byte[]>|⬇️|`ToEncodedString`, `ToStream`|
 |IDecorator<IEnumerable<Char>>|⬇️|`ToEnumerable`, `ToStringEquivalent`|
 |IDecorator<DateTime>|⬇️|`GetUnixEpoch`, `ToUnixEpochTime`, `ToUtcKind`, `ToLocalKind`, `ToDefaultKind`|
 |IDecorator<Delegate>|⬇️|`ResolveDelegateInfo`|
 |IDecorator<Double>|⬇️|`ToTimeSpan`|
 |IDecorator<Exception>|⬇️|`Flatten`|
-|IDecorator<Int32>|⬇️|`Max`, `Min`, `IsPrime`, `IsCountableSequence`, `IsEven`, `IsOdd`|
+|IDecorator<Int32>|⬇️|`Max`|
 |IDecorator<Object>|⬇️|`ChangeType`, `ChangeType<T>`, `ChangeTypeOrDefault<T>`, `DefaultPropertyValueResolver`|
-|IDecorator<String>|⬇️|`Difference`, `ToByteArray`, `FromUrlEncodedBase64`, `ToCasing`, `ToAsciiEncodedString`, `ToStream`, `ToUri`, `StartsWith`, `ContainsAny`|
+|IDecorator<String>|⬇️|`Difference`, `ToByteArray`, `ToCasing`, `ToAsciiEncodedString`, `ToStream`, `ToUri`, `StartsWith`, `ContainsAny`|
 |IDecorator<TSource>|⬇️|`TraverseWhileNotEmpty<TSource>`|
-|IDecorator<Type>|⬇️|`ToFriendlyName`, `IsNullable`, `IsComplex`, `IsSimple`, `HasAnonymousCharacteristics`, `HasDefaultConstructor`, `HasEqualityComparerImplementation`, `HasComparableImplementation`, `HasComparerImplementation`, `HasEnumerableImplementation`, `HasDictionaryImplementation`, `HasKeyValuePairImplementation`, `HasTypes`, `HasInterfaces`, `HasAttribute`, `HasCircularReference`, `MatchMember`, `GetDefaultValue`, `GetAllProperties`, `GetAllFields`, `GetAllEvents`, `GetAllMethods`, `GetRuntimePropertiesExceptOf<T>`, `GetInheritedTypes`, `GetDerivedTypes`, `GetHierarchyTypes`|
+|IDecorator<Type>|⬇️|`ToFriendlyName`, `IsNullable`, `IsComplex`, `HasAnonymousCharacteristics`, `HasDefaultConstructor`, `HasEqualityComparerImplementation`, `HasComparableImplementation`, `HasComparerImplementation`, `HasEnumerableImplementation`, `HasDictionaryImplementation`, `HasKeyValuePairImplementation`, `HasTypes`, `HasInterfaces`, `HasAttribute`, `HasCircularReference`, `MatchMember`, `GetDefaultValue`, `GetAllProperties`, `GetAllFields`, `GetAllEvents`, `GetAllMethods`, `GetRuntimePropertiesExceptOf<T>`, `GetInheritedTypes`, `GetDerivedTypes`, `GetHierarchyTypes`|

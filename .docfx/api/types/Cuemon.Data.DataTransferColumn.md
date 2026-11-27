@@ -7,16 +7,11 @@ example:
 `DataTransferColumn` provides column metadata such as ordinal position, name, and data type for fields retrieved from an `IDataReader`. This example builds a `DataTable` with `EmployeeId`, `FirstName`, `LastName`, and `HireDate` columns containing two sample rows, creates a data reader, and retrieves a `DataTransferColumnCollection` via `DataTransfer.GetColumns`. It iterates each column to display ordinal, name, and `DataType.Name`, accesses the `"FirstName"` column by name to get its ordinal, and calls `ToString()` on a column instance. Console output shows column metadata such as `[0] EmployeeId (Int32)` and confirms the column name string representation.
 
 ```csharp
+// Program.cs
 using System;
 using System.Data;
 using Cuemon.Data;
 
-namespace MyApp.Data
-{
-    public class DataTransferColumnExample
-    {
-        public void Demonstrate()
-        {
             // Create a DataTable as a sample data source
             var table = new DataTable("Employees");
             table.Columns.Add("EmployeeId", typeof(int));
@@ -35,6 +30,7 @@ namespace MyApp.Data
             foreach (DataTransferColumn column in columns)
             {
                 Console.WriteLine($"  [{column.Ordinal}] {column.Name} ({column.DataType.Name})");
+            }
 
             // Output:
             //   [0] EmployeeId (Int32)
@@ -48,8 +44,8 @@ namespace MyApp.Data
 
             // ToString() returns the column name
             Console.WriteLine($"Column ToString: {firstNameCol}"); // FirstName
-
-}}}
-}
-
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="ca72eb3df9c3e56d771886f0"><a href="~/run-actions/ca72eb3df9c3e56d771886f0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/ca72eb3df9c3e56d771886f0/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

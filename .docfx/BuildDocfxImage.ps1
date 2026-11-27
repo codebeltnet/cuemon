@@ -1,171 +1,230 @@
+#requires -Version 7.0
+<#
+.SYNOPSIS
+Builds and verifies the local Cuemon documentation image using the shared Codebelt DocFX builder.
+#>
 [CmdletBinding()]
 param(
-    # Regenerate metadata even when the inputs and generated files are unchanged.
+    # Regenerate metadata even when the shared builder can reuse its cache.
     [switch] $ForceMetadata
 )
 
 $ErrorActionPreference = 'Stop'
+$PSNativeCommandUseErrorActionPreference = $false
 
-function Assert-CommandSucceeded([string] $Command) {
-    if ($LASTEXITCODE -ne 0) { throw "$Command failed with exit code $LASTEXITCODE." }
+function Invoke-Checked {
+    $command, $arguments = $args
+    & $command @arguments
+    if ($LASTEXITCODE -ne 0) { throw "$command $($arguments[0]) failed with exit code $LASTEXITCODE." }
 }
 
-function Get-SourceFiles([string] $Directory) {
-    foreach ($item in Get-ChildItem -LiteralPath $Directory -Force) {
-        if ($item.PSIsContainer) {
-            if ($item.Name -notin @('bin', 'obj', '.git')) { Get-SourceFiles $item.FullName }
-        } else {
-            $item.FullName
-        }
-    }
-}
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$builder = 'codebeltnet/docfx:2'
+$botRoot = Join-Path $repoRoot '.bot/docfx'
+$cacheRoot = Join-Path $botRoot 'cache'
+$outputRoot = Join-Path $botRoot 'output'
+$work = Join-Path ([IO.Path]::GetTempPath()) "cuemon-docfx-$([Guid]::NewGuid().ToString('N'))"
+$verifyDir = Join-Path $work 'verify'
+$runActionsDir = Join-Path $verifyDir 'run-actions'
+$timer = [Diagnostics.Stopwatch]::StartNew()
 
-function Get-Fingerprint([string[]] $Paths, [string[]] $Values = @()) {
-    $entries = @(
-        $Values
-        foreach ($path in $Paths | Sort-Object -Unique) {
-            if (Test-Path -LiteralPath $path -PathType Leaf) {
-                "$path=$((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash)"
-            } else {
-                "$path=<missing>"
-            }
-        }
-    )
-    $sha = [System.Security.Cryptography.SHA256]::Create()
-    try {
-        [BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes(($entries -join [Environment]::NewLine))))
-    } finally {
-        $sha.Dispose()
-    }
-}
-
-function Get-MetadataFiles {
-    foreach ($directory in $metadataDirectories) {
-        if (Test-Path -LiteralPath $directory) {
-            Get-ChildItem -LiteralPath $directory -Recurse -Force -File |
-                Where-Object { $_.Extension -eq '.yml' -or $_.Name -eq '.manifest' } |
-                Select-Object -ExpandProperty FullName
-        }
-    }
-}
-
-$totalTimer = [Diagnostics.Stopwatch]::StartNew()
-Push-Location $PSScriptRoot
+Push-Location $repoRoot
 try {
-    $docfxRoot = $PSScriptRoot
-    $repoRoot = Split-Path -Parent $docfxRoot
-    $sourceRoot = Join-Path $repoRoot 'src'
-    $docfxConfig = Get-Content -LiteralPath (Join-Path $docfxRoot 'docfx.json') -Raw | ConvertFrom-Json
-    $version = minver -i -t v -v w
-    Assert-CommandSucceeded 'minver'
-    $docfxVersion = docfx --version
-    Assert-CommandSucceeded 'docfx --version'
-    $sdkVersion = dotnet --version
-    Assert-CommandSucceeded 'dotnet --version'
-    $revision = git rev-parse HEAD
-    Assert-CommandSucceeded 'git rev-parse HEAD'
-    $branch = git rev-parse --abbrev-ref HEAD
-    Assert-CommandSucceeded 'git rev-parse --abbrev-ref HEAD'
+    $version = Invoke-Checked minver -i -t v -v w
+    $image = "cuemon-docfx:$version"
+    $revision = (Invoke-Checked git rev-parse HEAD).Trim()
+    $branch = (Invoke-Checked git rev-parse --abbrev-ref HEAD).Trim()
+    $remoteUrl = (git config --get remote.origin.url 2>$null | Out-String).Trim()
+    $sourceRevision = (& git log -1 --format=%H -- src Directory.Build.props Directory.Build.targets Directory.Packages.props global.json nuget.config).Trim()
+    if ($LASTEXITCODE -ne 0) { throw "git log failed with exit code $LASTEXITCODE." }
 
-    # Only these generated destinations may be cleaned; preserve authored Markdown.
-    $apiRoot = [IO.Path]::GetFullPath((Join-Path $docfxRoot 'api')) + [IO.Path]::DirectorySeparatorChar
-    $metadataDirectories = @(
-        foreach ($metadata in $docfxConfig.metadata) {
-            $destination = [IO.Path]::GetFullPath((Join-Path $docfxRoot $metadata.dest))
-            if (-not $destination.StartsWith($apiRoot, [StringComparison]::OrdinalIgnoreCase)) {
-                throw "Metadata destination must be beneath $apiRoot : $destination"
-            }
-            $destination
-        }
-    )
-    $sourceFiles = @(Get-SourceFiles $sourceRoot)
-    $sourceProjects = @($sourceFiles | Where-Object { [IO.Path]::GetExtension($_) -eq '.csproj' })
-    $inputPaths = @(
-        $PSCommandPath
-        $sourceFiles
-        Get-ChildItem -LiteralPath $repoRoot -Force -File | Select-Object -ExpandProperty FullName
-        foreach ($metadata in $docfxConfig.metadata) {
-            if ($metadata.filter) { Join-Path $docfxRoot $metadata.filter }
-        }
-        $inputDirectory = $repoRoot
-        while ($inputDirectory) {
-            foreach ($name in @('Directory.Build.props', 'Directory.Build.targets', 'Directory.Packages.props', 'NuGet.Config', 'global.json')) {
-                Join-Path $inputDirectory $name
-            }
-            $inputDirectory = Split-Path -Parent $inputDirectory
-        }
-        if ($env:APPDATA) { Join-Path $env:APPDATA 'NuGet/NuGet.Config' }
-        foreach ($project in $sourceProjects) {
-            $objDirectory = Join-Path (Split-Path -Parent $project) 'obj'
-            Join-Path $objDirectory 'project.assets.json'
-            Join-Path $objDirectory ((Split-Path -Leaf $project) + '.nuget.g.props')
-            Join-Path $objDirectory ((Split-Path -Leaf $project) + '.nuget.g.targets')
-        }
-    )
-    $inputValues = @(
-        $version; $docfxVersion; $sdkVersion; $revision; $branch
-        $docfxConfig.metadata | ConvertTo-Json -Depth 100 -Compress
-        foreach ($name in @('CI', 'EMAIL', 'Configuration', 'MSBuildSDKsPath', 'DOTNET_ROOT', 'NUGET_PACKAGES', 'GITHUB_RUN_NUMBER')) {
-            "$name=$([Environment]::GetEnvironmentVariable($name))"
-        }
-    )
-    $cachePath = Join-Path $docfxRoot 'obj/metadata-cache.json'
-    $inputFingerprint = Get-Fingerprint $inputPaths $inputValues
-    $metadataFiles = @(Get-MetadataFiles)
-    $cache = $null
-    if (Test-Path -LiteralPath $cachePath) {
-        try {
-            $cache = Get-Content -LiteralPath $cachePath -Raw | ConvertFrom-Json
-        } catch {
-            Write-Warning 'Metadata cache could not be read; regenerating it.'
-        }
+    Invoke-Checked docker pull $builder
+    $builderId = (Invoke-Checked docker image inspect --format '{{.Id}}' $builder).Trim()
+
+    $xrefCacheRoot = Join-Path $cacheRoot 'xref'
+    New-Item -ItemType Directory -Path $cacheRoot, $xrefCacheRoot, $verifyDir -Force | Out-Null
+    Copy-Item -LiteralPath "$PSScriptRoot/verify-docfx-site.sh", "$PSScriptRoot/run-actions.manifest.json" -Destination $verifyDir
+
+    & "$PSScriptRoot/BuildRunActions.ps1" -OutputRoot $runActionsDir
+    & "$PSScriptRoot/TestRunActions.ps1" -ScriptsRoot $runActionsDir
+
+    # Pack clean authored inputs without host bin/obj or generated DocFX YAML.
+    $inputs = @(Invoke-Checked git -c core.quotePath=false ls-files --cached --others --exclude-standard -- .docfx src)
+    if (Test-Path -LiteralPath .docfx/packages -PathType Container) {
+        $inputs += @(Get-ChildItem -LiteralPath .docfx/packages -Recurse -File | ForEach-Object {
+            [IO.Path]::GetRelativePath($repoRoot, $_.FullName).Replace('\', '/')
+        })
     }
-    $reuseMetadata = -not $ForceMetadata -and $cache -and
-        $cache.inputs -eq $inputFingerprint -and $metadataFiles.Count -gt 0 -and
-        $cache.outputs -eq (Get-Fingerprint $metadataFiles)
+    $stagedFiles = @($inputs | Sort-Object -Unique | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf })
+    [IO.File]::WriteAllLines("$work/inputs.txt", $stagedFiles)
+    Invoke-Checked tar -cf "$work/inputs.tar" -T "$work/inputs.txt"
+    Invoke-Checked tar -cf "$work/run-actions.tar" -C $verifyDir run-actions
 
-    if ($reuseMetadata) {
-        Write-Host 'Metadata unchanged; reusing verified generated files.'
-    } else {
-        $metadataTimer = [Diagnostics.Stopwatch]::StartNew()
-        # One restore graph replaces DocFX's separate restore for each project.
-        $restoreSolution = Join-Path ([IO.Path]::GetTempPath()) ("cuemon-docfx-{0}.slnx" -f [Guid]::NewGuid())
-        try {
-            $projectsXml = foreach ($project in $sourceProjects) {
-                '  <Project Path="{0}" />' -f [Security.SecurityElement]::Escape($project)
-            }
-            @('<Solution>') + $projectsXml + @('</Solution>') | Set-Content -LiteralPath $restoreSolution -Encoding utf8
-            dotnet restore $restoreSolution --verbosity quiet
-            Assert-CommandSucceeded 'dotnet restore'
-        } finally {
-            if (Test-Path -LiteralPath $restoreSolution) { Remove-Item -LiteralPath $restoreSolution }
+    $configPath = Join-Path $PSScriptRoot 'docfx.json'
+    $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json -AsHashtable
+    $configModified = $false
+    $skipSignAssembly = !(Test-Path -LiteralPath cuemon.snk -PathType Leaf)
+    if ($skipSignAssembly) {
+        foreach ($group in $config.metadata) {
+            $group.properties ??= @{}
+            $group.properties.SkipSignAssembly = 'true'
         }
-
-        # Invalidate before generation so an interrupted or failed run cannot be reused.
-        if (Test-Path -LiteralPath $cachePath) { Remove-Item -LiteralPath $cachePath }
-        foreach ($file in $metadataFiles) { Remove-Item -LiteralPath $file }
-        $generationFingerprint = Get-Fingerprint $inputPaths $inputValues
-        # Keep all groups in one process; DocFX carries resolver state across groups.
-        docfx metadata docfx.json --noRestore
-        Assert-CommandSucceeded 'docfx metadata'
-        $metadataFiles = @(Get-MetadataFiles)
-        if ($metadataFiles.Count -eq 0) { throw 'DocFX did not generate metadata.' }
-        if ((Get-Fingerprint $inputPaths $inputValues) -ne $generationFingerprint) {
-            throw 'Metadata inputs changed during generation; rerun the build.'
-        }
-        $cache = @{
-            inputs = $generationFingerprint
-            outputs = Get-Fingerprint $metadataFiles
-        }
-        New-Item -ItemType Directory -Path (Split-Path -Parent $cachePath) -Force | Out-Null
-        $cache | ConvertTo-Json | Set-Content -LiteralPath $cachePath -Encoding utf8
-        Write-Host ('Metadata and restore: {0:N2}s' -f $metadataTimer.Elapsed.TotalSeconds)
+        $configModified = $true
     }
 
-    $imageTimer = [Diagnostics.Stopwatch]::StartNew()
-    docker buildx build -t cuemon-docfx:$version --platform linux/arm64,linux/amd64 --load -f Dockerfile.docfx .
-    Assert-CommandSucceeded 'docker buildx build'
-    Write-Host ('Docker image: {0:N2}s; total: {1:N2}s' -f $imageTimer.Elapsed.TotalSeconds, $totalTimer.Elapsed.TotalSeconds)
+    # Cache remote xref maps under .bot/docfx/cache/xref so every TFM build avoids multi-100MB downloads.
+    $xrefDownloads = [Collections.Generic.List[string]]::new()
+    if ($config.ContainsKey('build') -and $config.build -and $config.build.ContainsKey('xref') -and $config.build.xref) {
+        $rewrittenXref = @(foreach ($entry in @($config.build.xref)) {
+            $url = [string]$entry
+            if ($url -match '^https?://') {
+                $urlHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($url))).ToLowerInvariant()
+                $ext = [IO.Path]::GetExtension(([Uri]$url).AbsolutePath)
+                if ([string]::IsNullOrWhiteSpace($ext)) { $ext = '.json' }
+                $fileName = "$urlHash$ext"
+                $xrefDownloads.Add("$fileName`t$url")
+                "/cache/xref/$fileName"
+            } else {
+                $url
+            }
+        })
+        if ($xrefDownloads.Count -gt 0) {
+            $config.build.xref = $rewrittenXref
+            $configModified = $true
+        }
+    }
+    if ($configModified) {
+        ConvertTo-Json -InputObject $config -Depth 100 | Set-Content -LiteralPath "$work/docfx.json"
+    }
+    if ($xrefDownloads.Count -gt 0) {
+        [IO.File]::WriteAllText("$work/xref-urls.tsv", ($xrefDownloads -join "`n") + "`n", [Text.UTF8Encoding]::new($false))
+    }
+
+    # The upstream engine hashes its own implementation, docfx.json, SDK versions, and discovered views.
+    # This fingerprint covers Cuemon's source files, branch/remote, last source-affecting commit, root build/restore/signing inputs, and metadata filters.
+    # Doc-only or script-only commits keep the same metadata cache key and reuse cached metadata.
+    $buildInputs = Get-ChildItem -Force -File | Where-Object {
+        $_.Extension -in '.props', '.targets', '.snk' -or $_.Name -in 'global.json', 'nuget.config'
+    } | Sort-Object Name
+    $srcFiles = @($stagedFiles | Where-Object { $_.StartsWith('src/', [StringComparison]::Ordinal) })
+    $filterFiles = @($config.metadata.filter | Where-Object { $_ } | Sort-Object -Unique)
+    $gitSourceRef = if ($branch -ceq 'HEAD') { $revision } else { $branch }
+    $fingerprint = @(
+        $builder
+        $builderId
+        "Branch=$gitSourceRef"
+        "Remote=$remoteUrl"
+        "SourceRevision=$sourceRevision"
+        "SkipSignAssembly=$skipSignAssembly"
+        "CI=$($env:CI)"
+        "EMAIL=$($env:EMAIL)"
+        foreach ($file in $buildInputs) { "$($file.Name)=$((Get-FileHash -LiteralPath $file.FullName).Hash)" }
+        foreach ($path in $srcFiles) { "$path=$((Get-FileHash -LiteralPath $path).Hash)" }
+        foreach ($name in $filterFiles) { ".docfx/$name=$((Get-FileHash -LiteralPath (Join-Path $PSScriptRoot $name)).Hash)" }
+    ) -join "`n"
+    $cacheKey = (Get-FileHash -InputStream ([IO.MemoryStream]::new([Text.Encoding]::UTF8.GetBytes($fingerprint)))).Hash
+    $metadataMarker = Join-Path $cacheRoot "metadata/.cuemon-key-$cacheKey"
+    $needsPreRestore = $ForceMetadata.IsPresent -or -not (Test-Path -LiteralPath $metadataMarker -PathType Leaf)
+
+    $dockerArgs = @(
+        'run', '--rm'
+        '--mount', "type=bind,source=$repoRoot,target=/workspace,readonly"
+        '--mount', 'type=volume,target=/workspace/src,volume-nocopy'
+        '--mount', 'type=volume,target=/workspace/.docfx,volume-nocopy'
+        '--mount', "type=bind,source=$work,target=/work"
+        '--mount', "type=bind,source=$cacheRoot,target=/cache"
+        '--mount', 'type=volume,source=cuemon-docfx-nuget,target=/root/.nuget/packages'
+        '-w', '/workspace'
+        '-e', "CUEMON_PRE_RESTORE=$(if ($needsPreRestore) { '1' } else { '0' })"
+        '-e', "CUEMON_SKIP_SIGN=$(if ($skipSignAssembly) { 'true' } else { 'false' })"
+        '-e', "CUEMON_CACHE_KEY=$cacheKey"
+    )
+    if ($env:CI) { $dockerArgs += @('-e', 'CI') }
+    if ($env:EMAIL) { $dockerArgs += @('-e', 'EMAIL') }
+
+    $generator = @(
+        '-DocfxConfig', '.docfx/docfx.json'
+        '-OutputRoot', '/tmp/docfx-output'
+        '-MetadataCache', '/cache/metadata'
+        '-MetadataCacheKey', $cacheKey
+    )
+    if ($ForceMetadata) { $generator += '-ForceMetadata' }
+    if ($needsPreRestore) { $generator += '-NoRestore' }
+
+    # Generate on the container filesystem and transfer packaged artifacts back as archives.
+    $buildSite = @'
+set -eu
+test -f /opt/docfx/framework-views/Build-DocfxFrameworkViews.ps1
+test -f /opt/docfx/framework-views/framework-views.Dockerfile
+git config --global --add safe.directory /workspace
+tar -xf /work/inputs.tar -C /workspace
+tar -xf /work/run-actions.tar -C /workspace/.docfx
+if [ -f /work/docfx.json ]; then
+    cp /work/docfx.json /workspace/.docfx/docfx.json
+fi
+if [ -f /work/xref-urls.tsv ]; then
+    mkdir -p /cache/xref
+    while IFS="$(printf '\t')" read -r fname url; do
+        [ -n "$fname" ] || continue
+        target="/cache/xref/$fname"
+        if [ ! -s "$target" ]; then
+            echo "Caching xref map $url -> $target"
+            tmp="$target.$$.tmp"
+            curl -fsSL --retry 3 --retry-delay 2 --retry-all-errors --compressed "$url" -o "$tmp" || { rm -f "$tmp"; exit 1; }
+            mv -f "$tmp" "$target"
+        fi
+    done < /work/xref-urls.tsv
+fi
+sh .docfx/verify-docfx-site.sh --context .docfx
+cp /opt/docfx/framework-views/framework-views.Dockerfile /work/framework-views.Dockerfile
+if [ "${CUEMON_PRE_RESTORE:-0}" = "1" ]; then
+    printf '<Solution>\n' > /tmp/restore.slnx
+    find /workspace/src -name '*.csproj' | sort | while IFS= read -r proj; do
+        printf '  <Project Path="%s" />\n' "$proj" >> /tmp/restore.slnx
+    done
+    printf '</Solution>\n' >> /tmp/restore.slnx
+    dotnet restore /tmp/restore.slnx --verbosity quiet -p:Configuration=Release "-p:SkipSignAssembly=${CUEMON_SKIP_SIGN:-false}"
+fi
+mkdir /tmp/docfx-output
+status=0
+pwsh -NoProfile -File /opt/docfx/framework-views/Build-DocfxFrameworkViews.ps1 "$@" || status=$?
+cd /tmp/docfx-output
+find . -type f -name '*.log' | tar -cf /work/logs.tar -T -
+[ "$status" -eq 0 ] || exit "$status"
+mkdir -p /cache/metadata
+touch "/cache/metadata/.cuemon-key-${CUEMON_CACHE_KEY}"
+tar -cf /work/site.tar site nginx.conf
+'@
+    Set-Content -LiteralPath "$work/build-site.sh" -Value ($buildSite.Replace("`r`n", "`n")) -NoNewline
+
+    # Clean only generated output; keep persistent cache under .bot/docfx/cache untouched.
+    if (Test-Path -LiteralPath $outputRoot) { Remove-Item -LiteralPath $outputRoot -Recurse -Force }
+    New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
+
+    Write-Host "DocFX build output and logs will be saved to $outputRoot"
+    try {
+        Invoke-Checked docker @dockerArgs $builderId sh /work/build-site.sh @generator
+    } finally {
+        if (Test-Path -LiteralPath "$work/logs.tar") {
+            Invoke-Checked tar -xf "$work/logs.tar" -C $outputRoot
+        }
+    }
+    Invoke-Checked tar -xf "$work/site.tar" -C $outputRoot
+    Copy-Item -LiteralPath "$work/framework-views.Dockerfile" -Destination "$outputRoot/framework-views.Dockerfile"
+
+    & "$PSScriptRoot/TestRunActions.ps1" -ScriptsRoot $runActionsDir -SiteRoot "$outputRoot/site"
+
+    @('*', '!site/', '!site/**', '!nginx.conf') | Set-Content -LiteralPath "$outputRoot/.dockerignore"
+    Invoke-Checked docker buildx build --platform 'linux/amd64,linux/arm64' --load -t $image -t cuemon-docfx:latest `
+        -f "$outputRoot/framework-views.Dockerfile" $outputRoot
+
+    Invoke-Checked docker run --rm --entrypoint sh --mount "type=bind,source=$verifyDir,target=/verify,readonly" $image `
+        /verify/verify-docfx-site.sh --site /usr/share/nginx/html --source /verify --manifest /verify/run-actions.manifest.json
+
+    Write-Host ("Built and verified {0} in {1:N2}s." -f $image, $timer.Elapsed.TotalSeconds)
+    Write-Host 'docker run --rm -p 127.0.0.1:8080:8080 cuemon-docfx'
+    Write-Host 'Browse to http://localhost:8080/'
 } finally {
+    if (Test-Path -LiteralPath $work) { Remove-Item -LiteralPath $work -Recurse -Force }
     Pop-Location
 }

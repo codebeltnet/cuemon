@@ -7,12 +7,17 @@ example:
 `HmacMessageDigest5` computes and verifies HMAC-MD5 message authentication codes with support for custom byte order and direct string input. This example creates a 64-byte secret key, computes the HMAC of `"Important: Transfer $100 to account 12345"`, then verifies it by recomputing with the same secret. A tampered message with a different account number produces a different HMAC, confirming tamper detection. It also demonstrates options-based construction with `Endianness.LittleEndian` and direct `ComputeHash(string)` overload. Console output shows the hex and base64 HMAC values, verification status (`True`), tamper detection (`False`), and options-based result.
 
 ```csharp
+// Program.cs
 using System;
 using System.Text;
 using Cuemon.Security;
 using Cuemon.Security.Cryptography;
-
 using Cuemon;
+using MyApp.Security;
+
+HmacMessageDigest5Examples.Demonstrate();
+HmacMessageDigest5Examples.DemonstrateWithOptions();
+
 namespace MyApp.Security
 {
     public static class HmacMessageDigest5Examples
@@ -36,13 +41,13 @@ namespace MyApp.Security
             // Verify the HMAC by recomputing with the same secret.
             var verifier = new HmacMessageDigest5(secret, null);
             HashResult expected = verifier.ComputeHash(message);
-            bool isValid = hash.Equals(expected);
-            Console.WriteLine("HMAC valid: {0}", isValid); // true
+            bool isValid = hash.ToHexadecimalString() == expected.ToHexadecimalString();
+            Console.WriteLine("HMAC valid: {0}", isValid); // True
 
             // Tampered message produces a different HMAC.
             byte[] tampered = Encoding.UTF8.GetBytes("Important: Transfer $100 to account 99999");
             HashResult tamperedHash = hmacMd5.ComputeHash(tampered);
-            Console.WriteLine("Tampered HMAC matches: {0}", hash.Equals(tamperedHash)); // false
+            Console.WriteLine("Tampered HMAC matches: {0}", hash.ToHexadecimalString() == tamperedHash.ToHexadecimalString()); // False
 
             // Compute HMAC from string directly (UTF-8 encoding by default).
             HashResult fromString = hmacMd5.ComputeHash("Hello, HMAC!");
@@ -62,3 +67,7 @@ namespace MyApp.Security
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="1860051219f434162896a728"><a href="~/run-actions/1860051219f434162896a728/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/1860051219f434162896a728/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

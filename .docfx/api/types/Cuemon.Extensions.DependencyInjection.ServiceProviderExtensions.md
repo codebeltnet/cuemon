@@ -7,10 +7,14 @@ example:
 The following example wraps the built service provider and then uses `GetServiceDescriptors()` to inspect the registrations that were added to the container. It registers singleton and scoped services in a `ServiceCollection`, builds the provider, and wraps it in a `DelegatingServiceProvider`. The wrapped provider's descriptors are queried for the registered types, and the results are written to the console, showing how to introspect service registrations at runtime.
 
 ```csharp
+// Program.cs
 using System;
 using System.Linq;
 using Cuemon.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Cuemon.Docs.Samples.DependencyInjection;
+
+ServiceProviderExtensionsExample.Demonstrate();
 
 namespace Cuemon.Docs.Samples.DependencyInjection
 {
@@ -64,3 +68,7 @@ namespace Cuemon.Docs.Samples.DependencyInjection
     }
 }
 ```
+
+<!-- docfx-run-actions:start -->
+<div class="docfx-run-actions" data-example-id="4bd44e098b76a82d7e9a84f6"><a href="~/run-actions/4bd44e098b76a82d7e9a84f6/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/4bd44e098b76a82d7e9a84f6/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<!-- docfx-run-actions:end -->

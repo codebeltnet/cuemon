@@ -28,7 +28,7 @@ Console.WriteLine(firstBatch.Count);  // 100
 Console.WriteLine(firstBatch[0]);     // 1
 Console.WriteLine(firstBatch[99]);    // 100
 
-Console.WriteLine(partitioner.IteratedCount); // 1
+Console.WriteLine(partitioner.IteratedCount); // 100
 Console.WriteLine(partitioner.HasPartitions); // True
 
 // Process the remaining partitions
@@ -36,9 +36,10 @@ while (partitioner.HasPartitions)
 {
     var batch = partitioner.ToList();
     Console.WriteLine($"Batch {partitioner.IteratedCount}: {batch.Count} items");
+}
 // After exhausting the sequence:
 Console.WriteLine(partitioner.HasPartitions); // False
-Console.WriteLine(partitioner.IteratedCount); // 10 (1000/100)
+Console.WriteLine(partitioner.IteratedCount); // 1000
 
 // A partitioner can be iterated multiple times (each iteration
 // advances through the source sequence)
@@ -50,14 +51,13 @@ while (words.HasPartitions)
 {
     var chunk = words.ToList();
     Console.WriteLine(string.Join(",", chunk));
+}
 // Output:
 //   a,b,c
 //   d,e,f
 //   g,h
-
-}}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="8882e8daf65f19468eab3d82"><a href="~/run-actions/8882e8daf65f19468eab3d82/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/8882e8daf65f19468eab3d82/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="0a1aab292a0a94ec81d63baa"><a href="~/run-actions/0a1aab292a0a94ec81d63baa/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0a1aab292a0a94ec81d63baa/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

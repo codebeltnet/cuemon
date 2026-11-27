@@ -9,6 +9,7 @@ The following example demonstrates how to calculate the time span between two da
 ```csharp
 // Program.cs
 using System;
+using System.Globalization;
 using Cuemon;
 
 // Create a DateSpan between two dates
@@ -18,8 +19,8 @@ var span = new DateSpan(start, end);
 
 Console.WriteLine($"Years: {span.Years}");         // 5
 Console.WriteLine($"Months: {span.Months}");       // 65
-Console.WriteLine($"Days: {span.Days}");           // 1991
-Console.WriteLine($"Total days: {span.TotalDays:F1}"); // 1991.0
+Console.WriteLine($"Days: {span.Days}");           // 1992
+Console.WriteLine($"Total days: {span.TotalDays.ToString("F1", CultureInfo.InvariantCulture)}"); // 1992.0
 
 // Parse from ISO 8601 strings
 var parsed = DateSpan.Parse("2020-01-01", "2025-06-15");
@@ -31,5 +32,5 @@ Console.WriteLine($"Days since 2023-01-01: {fromPast.TotalDays:F0}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="0f8aabdb39b412c4d9167252"><a href="~/run-actions/0f8aabdb39b412c4d9167252/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0f8aabdb39b412c4d9167252/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="9efb6e500fb03d9f722da10d"><a href="~/run-actions/9efb6e500fb03d9f722da10d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/9efb6e500fb03d9f722da10d/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

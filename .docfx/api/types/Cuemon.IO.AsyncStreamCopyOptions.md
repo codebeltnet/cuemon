@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`AsyncStreamCopyOptions` configures buffer size and stream lifetime for asynchronous stream copy operations. This example creates options with `BufferSize = 4096` and `LeaveOpen = true`, then copies UTF-8 string content from one `MemoryStream` to another using `Decorator.Enclose(source).CopyStreamAsync(destination, options.BufferSize, ...)`. The copied data is read back as a string and printed to confirm `"Copy me asynchronously."` was transferred intact, while the source stream remains open due to `LeaveOpen = true`.
+`AsyncStreamCopyOptions` configures buffer size and stream lifetime for asynchronous stream copy operations. This example creates options with `BufferSize = 4096` and `LeaveOpen = true`, then copies UTF-8 string content from one `MemoryStream` to another using `Decorator.Enclose(source).CopyStreamAsync(destination, options.BufferSize, ...)`. The copied data is read back via `ToByteArrayAsync` with `setup.LeaveOpen = options.LeaveOpen`, confirming `"Copy me asynchronously."` was transferred intact while `destination` remains open (`CanRead = True`).
 
 ```csharp
 // Program.cs
@@ -34,8 +34,9 @@ byte[] copied = await Decorator.Enclose(destination).ToByteArrayAsync(setup =>
 });
 
 Console.WriteLine(Encoding.UTF8.GetString(copied));
+Console.WriteLine($"Destination stream is still open: {destination.CanRead}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="74eb5de683d654a7ac988607"><a href="~/run-actions/74eb5de683d654a7ac988607/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/74eb5de683d654a7ac988607/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="e07c5fa5a31b36f38cecbd65"><a href="~/run-actions/e07c5fa5a31b36f38cecbd65/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/e07c5fa5a31b36f38cecbd65/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

@@ -22,6 +22,7 @@ Console.WriteLine(days.Count); // 7
 foreach (var kvp in days.OrderBy(kvp => kvp.Key.ToInt32(null)))
 {
     Console.WriteLine($"{kvp.Key.ToInt32(null)} -> {kvp.Value}");
+}
 // Output:
 //   0 -> Sunday
 //   1 -> Monday
@@ -35,15 +36,15 @@ foreach (var kvp in days.OrderBy(kvp => kvp.Key.ToInt32(null)))
 foreach (var name in days.Values)
 {
     Console.WriteLine(name); // Sunday, Monday, ..., Saturday
+}
 
 // Access the keys collection
 foreach (var key in days.Keys)
 {
     Console.WriteLine(key.ToInt32(null)); // 0, 1, 2, ..., 6
-
-}}}
+}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="f15599ea0257bb435d4beae7"><a href="~/run-actions/f15599ea0257bb435d4beae7/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f15599ea0257bb435d4beae7/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="f2304c9265ec645b9972d05e"><a href="~/run-actions/f2304c9265ec645b9972d05e/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f2304c9265ec645b9972d05e/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

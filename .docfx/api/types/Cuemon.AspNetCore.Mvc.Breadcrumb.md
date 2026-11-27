@@ -25,6 +25,7 @@ var breadcrumbs = new List<Breadcrumb>
 foreach (var crumb in breadcrumbs)
 {
     Console.WriteLine($"<a href='/{crumb.ControllerName}/{crumb.ActionName}'>{crumb.Label}</a>");
+}
 // Output:
 //   <a href='/Home/Index'>Home</a>
 //   <a href='/Product/Index'>Products</a>
@@ -35,10 +36,8 @@ foreach (var crumb in breadcrumbs)
 var current = breadcrumbs[^1];
 Console.WriteLine($"<span>{current.Label}</span>");
 // Output: <span>Smartphone X</span>
-
-}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="d7ecb2daefff94e8f8024695"><a href="~/run-actions/d7ecb2daefff94e8f8024695/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/d7ecb2daefff94e8f8024695/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="dcba769735f6d2e984c05363"><a href="~/run-actions/dcba769735f6d2e984c05363/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/dcba769735f6d2e984c05363/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

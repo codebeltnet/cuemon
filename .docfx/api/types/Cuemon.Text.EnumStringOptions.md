@@ -12,22 +12,21 @@ using System;
 using Cuemon;
 using Cuemon.Text;
 
-// Direct instantiation of EnumStringOptions
+var parser = ParserFactory.FromEnum();
+
 var options = new EnumStringOptions
 {
     IgnoreCase = true
 };
 
-var parser = ParserFactory.FromEnum();
-
-var result = (UriKind)parser.Parse("Relative", typeof(UriKind), o =>
+var result = (UriKind)parser.Parse("relative", typeof(UriKind), o =>
 {
-    o.IgnoreCase = true;
+    o.IgnoreCase = options.IgnoreCase;
 });
 
 Console.WriteLine(result); // outputs: Relative
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="216072929a2ccbe653e42ecc"><a href="~/run-actions/216072929a2ccbe653e42ecc/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/216072929a2ccbe653e42ecc/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="58cdffbec5c2fa4e5b59be8b"><a href="~/run-actions/58cdffbec5c2fa4e5b59be8b/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/58cdffbec5c2fa4e5b59be8b/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

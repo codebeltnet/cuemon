@@ -14,7 +14,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Mvc;
 
-Console.WriteLine(new ForbiddenObjectResultExample().Demonstrate());
+var example = new ForbiddenObjectResultExample();
+Console.WriteLine(example.Demonstrate());
+Console.WriteLine(example.DemonstrateWithCustomStatusCode());
 
 namespace MyApp.Mvc
 {
@@ -48,5 +50,5 @@ namespace MyApp.Mvc
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="ecccd973a87c327f3678a3d5"><a href="~/run-actions/ecccd973a87c327f3678a3d5/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/ecccd973a87c327f3678a3d5/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="86a0f98684f9cc2f4050535c"><a href="~/run-actions/86a0f98684f9cc2f4050535c/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/86a0f98684f9cc2f4050535c/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

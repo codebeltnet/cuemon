@@ -11,32 +11,32 @@ The following example demonstrates how to use the `SystemSnapshots` flags enum t
 using System;
 using Cuemon;
 
-            // SystemSnapshots is a flags enum controlling which system
-            // information categories to capture.
+// SystemSnapshots is a flags enum controlling which system
+// information categories to capture.
 
-            // Capture everything available.
-            var all = SystemSnapshots.CaptureAll;
-            Console.WriteLine($"CaptureAll = {all}");   // CaptureThreadInfo | CaptureProcessInfo | CaptureEnvironmentInfo
+// Capture everything available.
+var all = SystemSnapshots.CaptureAll;
+Console.WriteLine($"CaptureAll = {all}");   // CaptureAll
 
-            // Capture only specific categories.
-            var minimal = SystemSnapshots.CaptureThreadInfo | SystemSnapshots.CaptureProcessInfo;
+// Capture only specific categories.
+var minimal = SystemSnapshots.CaptureThreadInfo | SystemSnapshots.CaptureProcessInfo;
+Console.WriteLine($"Minimal = {minimal}");  // CaptureThreadInfo, CaptureProcessInfo
 
-            // Test if a flag is set.
-            if (all.HasFlag(SystemSnapshots.CaptureEnvironmentInfo))
-            {
-                Console.WriteLine("Environment info will be captured.");
-
-            // Start with none and add incrementally.
-            var flags = SystemSnapshots.None;
-            flags |= SystemSnapshots.CaptureThreadInfo;
-            flags |= SystemSnapshots.CaptureProcessInfo;
-
-            Console.WriteLine($"Flags: {flags}");                           // CaptureThreadInfo | CaptureProcessInfo
-            Console.WriteLine($"Has thread info: {flags.HasFlag(SystemSnapshots.CaptureThreadInfo)}");   // True
-
+// Test if a flag is set.
+if (all.HasFlag(SystemSnapshots.CaptureEnvironmentInfo))
+{
+    Console.WriteLine("Environment info will be captured.");
 }
+
+// Start with none and add incrementally.
+var flags = SystemSnapshots.None;
+flags |= SystemSnapshots.CaptureThreadInfo;
+flags |= SystemSnapshots.CaptureProcessInfo;
+
+Console.WriteLine($"Flags: {flags}");                           // CaptureThreadInfo, CaptureProcessInfo
+Console.WriteLine($"Has thread info: {flags.HasFlag(SystemSnapshots.CaptureThreadInfo)}");   // True
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="0a3f204ebac75cfb9b9d91e1"><a href="~/run-actions/0a3f204ebac75cfb9b9d91e1/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0a3f204ebac75cfb9b9d91e1/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="0b070c5991720632e4d13172"><a href="~/run-actions/0b070c5991720632e4d13172/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0b070c5991720632e4d13172/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

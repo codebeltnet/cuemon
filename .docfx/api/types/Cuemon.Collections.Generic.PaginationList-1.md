@@ -30,14 +30,13 @@ using Cuemon.Collections.Generic;
             for (int i = 0; i < page.Count; i++)
             {
                 Console.WriteLine($"  [{i}] {page[i]}");
+            }
             Console.WriteLine($"Total items: {page.TotalElementCount}");
             Console.WriteLine($"Total pages: {page.PageCount}");
             Console.WriteLine($"First page: {page.FirstPage}");
             Console.WriteLine($"Last page: {page.LastPage}");
-
-}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="9593526bd234571d19685cf8"><a href="~/run-actions/9593526bd234571d19685cf8/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/9593526bd234571d19685cf8/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="67851cde4641d6d2aa9166e2"><a href="~/run-actions/67851cde4641d6d2aa9166e2/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/67851cde4641d6d2aa9166e2/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

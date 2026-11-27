@@ -9,12 +9,14 @@ example:
 ```csharp
 // Program.cs
 using System;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 using Cuemon.Xml.Serialization;
 using MyApp.Xml;
 
 DynamicXmlConverterCoreExamples.Demonstrate();
+DynamicXmlConverterCoreExamples.DemonstrateWriteOnly();
 
 namespace MyApp.Xml
 {
@@ -30,7 +32,7 @@ namespace MyApp.Xml
                     xmlWriter.WriteStartElement(element?.LocalName ?? "Person");
                     xmlWriter.WriteElementString("FirstName", person.FirstName);
                     xmlWriter.WriteElementString("LastName", person.LastName);
-                    xmlWriter.WriteElementString("Age", person.Age.ToString());
+                    xmlWriter.WriteElementString("Age", person.Age.ToString(CultureInfo.InvariantCulture));
                     xmlWriter.WriteEndElement();
                 },
                 reader: (xmlReader, type) =>
@@ -104,5 +106,5 @@ namespace MyApp.Xml
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="309a745320819cef16751645"><a href="~/run-actions/309a745320819cef16751645/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/309a745320819cef16751645/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="fb1fe080e00fe5715a4b5f18"><a href="~/run-actions/fb1fe080e00fe5715a4b5f18/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/fb1fe080e00fe5715a4b5f18/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

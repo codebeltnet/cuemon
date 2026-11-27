@@ -15,7 +15,12 @@ using Cuemon.Data.Integrity;
 using Cuemon.Extensions.AspNetCore.Mvc;
 using Cuemon.Extensions.AspNetCore.Mvc.DocExamples;
 
-Console.WriteLine(new CacheableObjectResultExample().CreateLastModifiedResult());
+var example = new CacheableObjectResultExample();
+var lastModified = (IEntityDataTimestamp)example.CreateLastModifiedResult();
+var entityTag = (IEntityDataIntegrity)example.CreateEntityTagResult();
+Console.WriteLine($"LastModified: {lastModified.Modified:O}");
+Console.WriteLine($"EntityTag: {entityTag.Validation}");
+example.Describe();
 
 namespace Cuemon.Extensions.AspNetCore.Mvc.DocExamples
 {
@@ -79,5 +84,5 @@ namespace Cuemon.Extensions.AspNetCore.Mvc.DocExamples
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="8597fc3e867998717795db56"><a href="~/run-actions/8597fc3e867998717795db56/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/8597fc3e867998717795db56/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="fc28f96d3b8ebc4ed7bc10cc"><a href="~/run-actions/fc28f96d3b8ebc4ed7bc10cc/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/fc28f96d3b8ebc4ed7bc10cc/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

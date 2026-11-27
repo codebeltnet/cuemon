@@ -67,7 +67,7 @@ var updateBuilder = new SqlQueryBuilder(
 
 string updateQuery = updateBuilder.GetQuery(QueryType.Update);
 Console.WriteLine(updateQuery);
-// UPDATE [Employees] SET [FirstName]=@FirstName,[LastName]=@LastName WHERE [EmployeeId]=@EmployeeId
+// UPDATE [Employees] SET[FirstName]=@FirstName,[LastName]=@LastName WHERE [EmployeeId]=@EmployeeId
 
 // Build a DELETE query
 var deleteBuilder = new SqlQueryBuilder(
@@ -83,10 +83,19 @@ Console.WriteLine(deleteQuery);
 // DELETE FROM [Employees] WHERE [EmployeeId]=@EmployeeId
 
 // Build an EXISTS query
-string existsQuery = deleteBuilder.GetQuery(QueryType.Exists);
+var existsBuilder = new SqlQueryBuilder(
+    "Employees",
+    new Dictionary<string, string> { { "EmployeeId", "@EmployeeId" } },
+    new Dictionary<string, string>())
+{
+    EnableTableAndColumnEncapsulation = true
+};
+
+string existsQuery = existsBuilder.GetQuery(QueryType.Exists);
 Console.WriteLine(existsQuery);
+// SELECT 1 FROM [Employees] WHERE [EmployeeId]=@EmployeeId
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="64b6f8c3b5489af0abce2e5d"><a href="~/run-actions/64b6f8c3b5489af0abce2e5d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/64b6f8c3b5489af0abce2e5d/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="b9b80710d56029b234dedbdc"><a href="~/run-actions/b9b80710d56029b234dedbdc/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b9b80710d56029b234dedbdc/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

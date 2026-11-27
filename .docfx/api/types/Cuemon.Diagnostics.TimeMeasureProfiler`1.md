@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`TimeMeasureProfiler<TResult>` extends `TimeMeasureProfiler` by providing typed access to the result of a timed function via `TimeMeasure.WithFunc`. This example wraps a `Thread.Sleep(100)` followed by returning `42`, then inspects the profiler's `Result` (`42`), `Elapsed` (~100ms), `IsRunning` (`False`), and `Member` properties. Key setup includes capturing the profiler and checking each property after execution. Console output shows the result value, the elapsed duration, the running state, the member name, and the `ToString()` output like `<anonymous method> took 00:00:00.100 to execute.`.
+`TimeMeasureProfiler<TResult>` extends `TimeMeasureProfiler` by providing typed access to the result of a timed function via `TimeMeasure.WithFunc`. This example wraps a `Thread.Sleep(100)` followed by returning `42`, then inspects the profiler's `Result` (`42`), `Elapsed` (~100ms), `IsRunning` (`False`), and `Member` properties. Key setup includes capturing the profiler and checking each property after execution. Console output shows the result value, the elapsed duration, the running state, the compiler-generated lambda member name, and the `ToString()` output showing the member name and elapsed time.
 
 ```csharp
 // Program.cs
@@ -31,9 +31,9 @@ namespace MyApp.Examples
             Console.WriteLine($"Result: {profiler.Result}");       // 42
             Console.WriteLine($"Elapsed: {profiler.Elapsed}");     // ~00:00:00.100
             Console.WriteLine($"IsRunning: {profiler.IsRunning}");  // False
-            Console.WriteLine($"Member: {profiler.Member}");        // <anonymous method>
+            Console.WriteLine($"Member: {profiler.Member}");        // MyApp.Examples.TimeMeasureProfilerOfTExample+<>c.<Demonstrate>b__0_0()
             Console.WriteLine(profiler.ToString());
-            // Output: <anonymous method> took 00:00:00.100 to execute.
+            // Output: MyApp.Examples.TimeMeasureProfilerOfTExample+<>c.<Demonstrate>b__0_0() took ~00:00:00.100 to execute.
 
     }
     }
@@ -41,5 +41,5 @@ namespace MyApp.Examples
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="3f32907bd26e45c902b55415"><a href="~/run-actions/3f32907bd26e45c902b55415/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/3f32907bd26e45c902b55415/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="0b479dc66a94c70f03627c54"><a href="~/run-actions/0b479dc66a94c70f03627c54/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0b479dc66a94c70f03627c54/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

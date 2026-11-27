@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`StringExtensions` in the `Text` namespace provides encoding conversion between character encodings with custom fallback handling and ASCII sanitization. This example takes `"Café au lait: 2,50 €"` and converts it to UTF-8 (preserves all characters), ASCII with `EncoderReplacementFallback("?")` (replaces `é` and `€` with `?`), and Windows-1252 (preserves Western European characters). It also demonstrates `ToAsciiEncodedString` for quick ASCII sanitization that removes unsupported characters by default. Console output shows each encoded result, such as `"Caf? au lait: 2,50 ?"` for the ASCII replacement case and `"Cafe au lait: 2,50 "` for the quick ASCII sanitization.
+`StringExtensions` in the `Text` namespace provides encoding conversion between character encodings with custom fallback handling and ASCII sanitization. This example takes `"Café au lait: 2,50 €"` and converts it to UTF-8 (preserves all characters), ASCII with `EncoderReplacementFallback("?")` (replaces `é` and `€` with `?`), and UTF-16 (`Encoding.Unicode`). It also demonstrates `ToAsciiEncodedString` for quick ASCII sanitization that removes unsupported characters by default. Console output shows each encoded result, such as `"Caf? au lait: 2,50 ?"` for the ASCII replacement case and `"Caf au lait: 2,50 "` for the quick ASCII sanitization.
 
 ```csharp
 // Program.cs
@@ -41,7 +41,7 @@ Console.WriteLine(unicode);
 
 // ToAsciiEncodedString - quick ASCII conversion
 var asciiQuick = withSpecialChars.ToAsciiEncodedString();
-Console.WriteLine(asciiQuick); // "Cafe au lait: 2,50 "
+Console.WriteLine(asciiQuick); // "Caf au lait: 2,50 "
 // Uses EncoderReplacementFallback("") by default, so unsupported chars are removed silently
 
 // ToAsciiEncodedString with custom encoding options
@@ -59,5 +59,5 @@ Console.WriteLine(sanitized); // "Hello  World  2025 " (em dash and copyright re
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="2c4918dbab6057df574256d0"><a href="~/run-actions/2c4918dbab6057df574256d0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/2c4918dbab6057df574256d0/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="dfe56fad8969075b991d4616"><a href="~/run-actions/dfe56fad8969075b991d4616/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/dfe56fad8969075b991d4616/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

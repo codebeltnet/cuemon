@@ -12,24 +12,23 @@ using System;
 using System.Globalization;
 using Cuemon;
 
-// Direct instantiation of ObjectFormattingOptions
+var value = "1234,56";
+
 var options = new ObjectFormattingOptions
 {
     FormatProvider = new CultureInfo("da-DK")
 };
 
-var value = "1234.56";
-
-// Convert the string to a double using Danish formatting
+// Convert the string to a double using Danish formatting (comma as decimal separator)
 var result = Decorator.Enclose((object)value)
     .ChangeType<double>(o =>
     {
-        o.FormatProvider = new CultureInfo("da-DK");
+        o.FormatProvider = options.FormatProvider;
     });
 
-Console.WriteLine(result); // Output: 1234.56
+Console.WriteLine(result.ToString(CultureInfo.InvariantCulture)); // Output: 1234.56
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="71b4339e023d93125f75d02a"><a href="~/run-actions/71b4339e023d93125f75d02a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/71b4339e023d93125f75d02a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="f0022cc9c50658cad107c485"><a href="~/run-actions/f0022cc9c50658cad107c485/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f0022cc9c50658cad107c485/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

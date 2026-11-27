@@ -27,11 +27,11 @@ Console.WriteLine(details); // Failure
 
 // Include both Failure and StackTrace
 details = FaultSensitivityDetails.FailureWithStackTrace;
-Console.WriteLine(details); // Failure, StackTrace
+Console.WriteLine(details); // FailureWithStackTrace
 
 // Include everything (development environments only)
 details = FaultSensitivityDetails.All;
-Console.WriteLine(details); // Failure, StackTrace, Data, Evidence
+Console.WriteLine(details); // All
 
 // Combine flags manually
 details = FaultSensitivityDetails.Failure | FaultSensitivityDetails.Data;
@@ -46,5 +46,5 @@ Console.WriteLine(hasFailure); // True
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="2188df40437c953f3b2421e4"><a href="~/run-actions/2188df40437c953f3b2421e4/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/2188df40437c953f3b2421e4/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="727d6497cd0b57293c802d3e"><a href="~/run-actions/727d6497cd0b57293c802d3e/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/727d6497cd0b57293c802d3e/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

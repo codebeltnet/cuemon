@@ -25,6 +25,15 @@ namespace MyApp.Examples
             // Simulate a recorded stack of member arguments representing an exception chain
             var stack = new Stack<IList<MemberArgument>>();
 
+            var outerArgs = new List<MemberArgument>
+            {
+                new MemberArgument("type", typeof(ArgumentException)),
+                new MemberArgument("message", "Outer argument error."),
+                new MemberArgument("paramName", "myParam"),
+                new MemberArgument("innerException", null)
+            };
+            stack.Push(outerArgs);
+
             var innerArgs = new List<MemberArgument>
             {
                 new MemberArgument("type", typeof(InvalidOperationException)),
@@ -32,22 +41,13 @@ namespace MyApp.Examples
             };
             stack.Push(innerArgs);
 
-            var outerArgs = new List<MemberArgument>
-            {
-                new MemberArgument("type", typeof(ArgumentException)),
-                new MemberArgument("message", "Outer argument error."),
-                new MemberArgument("paramName", "myParam"),
-            };
-            stack.Push(outerArgs);
-
             // Reconstruct the exception chain from the recorded arguments
             return Decorator.Enclose(stack).CreateException();
-
-    }
+        }
     }
 }
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="cdca439be791342610a197b0"><a href="~/run-actions/cdca439be791342610a197b0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/cdca439be791342610a197b0/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="b0f5717aedfc25fb3562c613"><a href="~/run-actions/b0f5717aedfc25fb3562c613/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b0f5717aedfc25fb3562c613/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

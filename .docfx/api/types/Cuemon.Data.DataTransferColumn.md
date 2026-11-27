@@ -30,6 +30,7 @@ using Cuemon.Data;
             foreach (DataTransferColumn column in columns)
             {
                 Console.WriteLine($"  [{column.Ordinal}] {column.Name} ({column.DataType.Name})");
+            }
 
             // Output:
             //   [0] EmployeeId (Int32)
@@ -43,10 +44,8 @@ using Cuemon.Data;
 
             // ToString() returns the column name
             Console.WriteLine($"Column ToString: {firstNameCol}"); // FirstName
-
-}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="c56bd9e998427f9a635e9df0"><a href="~/run-actions/c56bd9e998427f9a635e9df0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/c56bd9e998427f9a635e9df0/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="ca72eb3df9c3e56d771886f0"><a href="~/run-actions/ca72eb3df9c3e56d771886f0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/ca72eb3df9c3e56d771886f0/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

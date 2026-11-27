@@ -32,23 +32,22 @@ using Cuemon.IO;
             using var source = new MemoryStream(original);
             using var compressed = new MemoryStream();
 
-            using (var deflateStream = new DeflateStream(compressed, fastOptions.Level, leaveOpen: true))
-            {
-                await source.CopyToAsync(deflateStream, fastOptions.BufferSize);
-
-            Console.WriteLine($"Original size: {original.Length} bytes");
-            Console.WriteLine($"Compressed size: {compressed.Length} bytes");
-
-            // No compression level for testing or passthrough scenarios
-            var noCompressionOptions = new AsyncStreamCompressionOptions
-            {
-                Level = CompressionLevel.NoCompression
-            };
-            Console.WriteLine($"No compression level: {noCompressionOptions.Level}");
-
+using (var deflateStream = new DeflateStream(compressed, fastOptions.Level, leaveOpen: true))
+{
+    await source.CopyToAsync(deflateStream, fastOptions.BufferSize);
 }
+
+Console.WriteLine($"Original size: {original.Length} bytes");
+Console.WriteLine($"Compressed size: {compressed.Length} bytes");
+
+// No compression level for testing or passthrough scenarios
+var noCompressionOptions = new AsyncStreamCompressionOptions
+{
+    Level = CompressionLevel.NoCompression
+};
+Console.WriteLine($"No compression level: {noCompressionOptions.Level}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="fc5bc2b379d6ad6e5386b6b5"><a href="~/run-actions/fc5bc2b379d6ad6e5386b6b5/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/fc5bc2b379d6ad6e5386b6b5/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="bee2142aaa0b2d566b476e6a"><a href="~/run-actions/bee2142aaa0b2d566b476e6a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/bee2142aaa0b2d566b476e6a/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`FaultResolver` registers exception-to-descriptor mappings for structured error reporting, using a validator predicate and a descriptor factory. This example registers a resolver that matches `ArgumentNullException` and produces an `ExceptionDescriptor` with code `"ERR_NULL_ARG"` and a message including the parameter name. It then tests resolution against both a matching `ArgumentNullException("value")` and a non-matching `InvalidOperationException`. Console output shows `True`, `ERR_NULL_ARG`, the descriptive message, the failure details (`"value"`), and `False` for the unmatched case where the result is `null`.
+`FaultResolver` registers exception-to-descriptor mappings for structured error reporting, using a validator predicate and a descriptor factory. This example registers a resolver that matches `ArgumentNullException` and produces an `ExceptionDescriptor` with code `"ERR_NULL_ARG"` and a message including the parameter name. It then tests resolution against both a matching `ArgumentNullException("value")` and a non-matching `InvalidOperationException`. Console output shows `True`, `ERR_NULL_ARG`, the descriptive message, the failure message (`"Value cannot be null. (Parameter 'value')"`), and `False` for the unmatched case where the result is `null`.
 
 ```csharp
 // Program.cs
@@ -39,7 +39,7 @@ namespace MyApp.Examples
             Console.WriteLine(resolved);               // True
             Console.WriteLine(result.Code);            // ERR_NULL_ARG
             Console.WriteLine(result.Message);         // The parameter 'value' cannot be null.
-            Console.WriteLine(result.Failure.Message); // value
+            Console.WriteLine(result.Failure.Message); // Value cannot be null. (Parameter 'value')
 
             // Try to resolve an unrelated exception
             var otherEx = new InvalidOperationException("not handled");
@@ -53,5 +53,5 @@ namespace MyApp.Examples
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="2076d7705c147ef0b68ce943"><a href="~/run-actions/2076d7705c147ef0b68ce943/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/2076d7705c147ef0b68ce943/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="c6ac16fc8addb4290802f076"><a href="~/run-actions/c6ac16fc8addb4290802f076/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/c6ac16fc8addb4290802f076/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

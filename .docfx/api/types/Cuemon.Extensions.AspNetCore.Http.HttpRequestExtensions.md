@@ -15,11 +15,12 @@ using Cuemon.Data.Integrity;
 using Cuemon.Extensions.AspNetCore.Http;
 using Cuemon.Security;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 
 var context = new DefaultHttpContext();
 var request = context.Request;
 
-request.Headers["Accept"] = "text/html;q=0.8, application/json;q=0.9, */*;q=0.1";
+request.Headers.Accept = new StringValues(new[] { "text/html;q=0.8", "application/json;q=0.9", "*/*;q=0.1" });
 IEnumerable<string> preferredTypes = request.AcceptMimeTypesOrderedByQuality();
 Console.WriteLine(string.Join(", ", preferredTypes));
 
@@ -41,5 +42,5 @@ Console.WriteLine(request.IsClientSideResourceCached(lastModified));
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="de1f2e1db2c942a856cf8498"><a href="~/run-actions/de1f2e1db2c942a856cf8498/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/de1f2e1db2c942a856cf8498/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="d5eba7c050506e62130e25e3"><a href="~/run-actions/d5eba7c050506e62130e25e3/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/d5eba7c050506e62130e25e3/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

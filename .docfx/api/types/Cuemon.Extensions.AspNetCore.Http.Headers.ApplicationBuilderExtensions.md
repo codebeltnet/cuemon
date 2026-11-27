@@ -4,23 +4,23 @@ example:
 - *content
 ---
 
-The following example demonstrates how to add correlation, request, validation, and cache headers to an ASP.NET Core request pipeline.
+The following example demonstrates how to add correlation, request, validation, and cache headers to an ASP.NET Core request pipeline and invoke it to observe the resulting HTTP status and response headers.
 
 ```csharp
 // Program.cs
 using System;
+using System.Linq;
+using System.Net.Http;
 using Cuemon.AspNetCore.Http.Headers;
 using Cuemon.Extensions.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 
-var services = new ServiceCollection();
-services.AddLogging();
-services.AddOptions();
-using var provider = services.BuildServiceProvider();
+var builder = WebApplication.CreateBuilder();
+await using var app = builder.Build();
+app.Urls.Add("http://127.0.0.1:0");
 
-var app = new ApplicationBuilder(provider);
 app.UseCorrelationIdentifier(options => options.HeaderName = "X-Correlation-ID");
 app.UseRequestIdentifier(options => options.HeaderName = "X-Request-ID");
 app.UseUserAgentSentinel(options =>
@@ -41,10 +41,29 @@ app.UseCacheControl(options =>
     options.Expires = new ExpiresHeaderValue(TimeSpan.FromHours(1));
 });
 app.UseVaryAccept();
+app.Run(context => context.Response.WriteAsync("ok"));
 
-Console.WriteLine("Correlation, request, agent, API key, cache-control and Vary middleware configured.");
+await app.StartAsync();
+try
+{
+    using var client = new HttpClient { BaseAddress = new Uri(app.Urls.First()) };
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("Cuemon-Agent");
+    client.DefaultRequestHeaders.Add("X-Test-Key", "known-key");
+
+    using var response = await client.GetAsync("/");
+    Console.WriteLine($"Status: {(int)response.StatusCode}");
+    Console.WriteLine($"Has X-Correlation-ID: {response.Headers.Contains("X-Correlation-ID")}");
+    Console.WriteLine($"Has X-Request-ID: {response.Headers.Contains("X-Request-ID")}");
+    Console.WriteLine($"Cache-Control: {response.Headers.CacheControl}");
+    Console.WriteLine($"Has Expires: {response.Content.Headers.Expires.HasValue}");
+    Console.WriteLine($"Vary: {string.Join(", ", response.Headers.Vary)}");
+}
+finally
+{
+    await app.StopAsync();
+}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="d94ab6c85c5cec15eb7839bc"><a href="~/run-actions/d94ab6c85c5cec15eb7839bc/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/d94ab6c85c5cec15eb7839bc/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="f4f3396aa15690f231f724a8"><a href="~/run-actions/f4f3396aa15690f231f724a8/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f4f3396aa15690f231f724a8/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

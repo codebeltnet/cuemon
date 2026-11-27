@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`XmlReaderExtensions` provides extension methods for `XmlReader` including navigation, hierarchy building, chunked reading, and stream conversion. This example starts with an XML string containing `<root>` and two `<item>` elements, then demonstrates `MoveToFirstElement` to position at the first element, `ToHierarchy` to build a tree of element nodes with child names, `Chunk(1)` to stream only the first element as a new indented `XmlReader`, and `ToStream` to convert the entire reader content into a readable stream. Console output shows the root element name (`"root"`), a hierarchy description with child names, the outer XML of the first chunk (`<item>First</item>`), and the full XML content.
+`XmlReaderExtensions` provides extension methods for `XmlReader` including navigation, hierarchy building, chunked reading, and stream conversion. This example starts with an XML string containing `<root>` and two `<item>` elements, then demonstrates `MoveToFirstElement` to position at the first element, `ToHierarchy` to build a tree of element nodes with child names, `Chunk(1)` to stream only the first element as a new indented `XmlReader`, and `ToStream` to convert the entire reader content into a readable stream. Console output shows the root element name (`"root"`), a hierarchy description with child names, the outer XML of the first chunk (`<root><item>First</item></root>` formatted with indentation), and the full XML content.
 
 ```csharp
 // Program.cs

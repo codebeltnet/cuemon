@@ -14,6 +14,8 @@ using Cuemon.Resilience;
 using MyApp.Resilience;
 
 TransientFaultEvidenceExamples.CreateWithMethodSignature();
+TransientFaultEvidenceExamples.EqualityComparison();
+TransientFaultEvidenceExamples.CreateWithMinimalInfo();
 
 namespace MyApp.Resilience
 {
@@ -74,5 +76,5 @@ namespace MyApp.Resilience
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="83acaca5a015390942bdfbe0"><a href="~/run-actions/83acaca5a015390942bdfbe0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/83acaca5a015390942bdfbe0/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="13e9f47740477aa381f0e5eb"><a href="~/run-actions/13e9f47740477aa381f0e5eb/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/13e9f47740477aa381f0e5eb/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

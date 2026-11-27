@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`StreamExtensions` in the `Xml` namespace provides stream-based XML operations including `XmlReader` creation, indented copying, encoding detection, and namespace removal. This example loads an XML string into a `MemoryStream` and demonstrates four operations: `ToXmlReader` to parse element names, `CopyXmlStream` with `Indent = true` for pretty-printed XML output, `TryDetectXmlEncoding` to identify `UTF-8` encoding, and `RemoveXmlNamespaceDeclarations` to strip namespace prefixes from elements. Each operation repositions the stream to `Position = 0` before proceeding. Console output shows element names (`root`, `item`), the indented XML, the detected encoding name (`Unicode (UTF-8)`), and the namespace-cleaned content.
+`StreamExtensions` in the `Xml` namespace provides stream-based XML operations including `XmlReader` creation, indented copying, encoding detection, and namespace removal. This example loads a namespace-prefixed XML string into a `MemoryStream` for four operations: `ToXmlReader` to parse element names, `CopyXmlStream` with `Indent = true` for pretty-printed XML output, `TryDetectXmlEncoding` to identify `UTF-8` encoding, and `RemoveXmlNamespaceDeclarations` to strip namespace declarations and prefixes from elements. Console output shows element names (`ns:root`, `ns:item`), the indented XML, the detected encoding name (`Unicode (UTF-8)`), and the namespace-cleaned XML (`<root><item>Value</item></root>`).
 
 ```csharp
 // Program.cs
@@ -23,7 +23,7 @@ namespace MyApp.Xml
     {
         public void Demonstrate()
         {
-            const string xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><root><item>Value</item></root>";
+            const string xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ns:root xmlns:ns=\"https://example.com/ns\"><ns:item>Value</ns:item></ns:root>";
 
             using (var reader = CreateStream(xml).ToXmlReader())
             {
@@ -66,5 +66,5 @@ namespace MyApp.Xml
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="b418c59f6a61ed2f5745e0ec"><a href="~/run-actions/b418c59f6a61ed2f5745e0ec/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b418c59f6a61ed2f5745e0ec/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="a27286f4a618d3e13702388a"><a href="~/run-actions/a27286f4a618d3e13702388a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/a27286f4a618d3e13702388a/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

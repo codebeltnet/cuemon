@@ -31,6 +31,7 @@ using Cuemon.Runtime.Caching;
         if (cache.TryGet("session", "sessions", out var session))
         {
             Console.WriteLine($"Session: {session}");
+        }
 
         // Update an existing entry using the indexer
         cache["config"] = new { Theme = "Light", Locale = "en-US" };
@@ -41,6 +42,7 @@ using Cuemon.Runtime.Caching;
         {
             cache.Remove("config");
             Console.WriteLine("Config removed.");
+        }
 
         // Count entries within a namespace
         cache.Add("item1", 100, DateTime.MaxValue, "data");
@@ -52,10 +54,8 @@ using Cuemon.Runtime.Caching;
         Console.WriteLine($"After removal: {cache.Count("data")}");
 
         cache.Dispose();
-
-}}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="f8bbfdc259cd20e8f7ffa98f"><a href="~/run-actions/f8bbfdc259cd20e8f7ffa98f/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f8bbfdc259cd20e8f7ffa98f/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="a1af386558a6a097c106aa3e"><a href="~/run-actions/a1af386558a6a097c106aa3e/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/a1af386558a6a097c106aa3e/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

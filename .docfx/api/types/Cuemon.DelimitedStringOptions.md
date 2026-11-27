@@ -39,9 +39,9 @@ fields = DelimitedString.Split(pipeLine, o =>
     o.Delimiter = "|";
     o.Qualifier = "'";
 });
-Console.WriteLine($"Fields: {string.Join(", ", fields)}"); // Bob, 25, London
+Console.WriteLine($"Fields: {string.Join(", ", fields)}"); // 'Bob', '25', 'London'
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="6699d0446f0322e7594501f1"><a href="~/run-actions/6699d0446f0322e7594501f1/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/6699d0446f0322e7594501f1/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="37871fdd924c8ac21af4050d"><a href="~/run-actions/37871fdd924c8ac21af4050d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/37871fdd924c8ac21af4050d/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

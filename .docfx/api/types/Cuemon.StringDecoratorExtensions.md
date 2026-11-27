@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`StringDecoratorExtensions` provides extension methods on `Decorator.Enclose` for string manipulation including casing conversion, encoding, URI conversion, set operations, and content inspection. This example wraps `" Hello World! "` and applies `ToCasing` with `LowerCase`, `UpperCase`, and `TitleCase` modes, converts the string to a byte array and stream with configurable encoding, and extracts the differing portion between `"Hello World!"` and `"Hello Universe!"` using `Difference`. Key steps also include `StartsWith` checks with multiple candidate strings and `ContainsAny` for character matching. Console output confirms each transformed value, such as `" hello world! "` for lower-casing and `"Universe!"` for the set difference.
+`StringDecoratorExtensions` provides extension methods on `Decorator.Enclose` for string manipulation including casing conversion, encoding, URI conversion, set operations, and content inspection. This example wraps `" Hello World! "` and applies `ToCasing` with `LowerCase`, `UpperCase`, and `TitleCase` modes, converts the string to a byte array and stream with configurable encoding, and extracts the character-set difference between `"Hello World!"` and `"Hello Universe!"` using `Difference`. Key steps also include `StartsWith` checks with multiple candidate strings and `ContainsAny` for character matching. Console output confirms each transformed value, such as `" hello world! "` for lower-casing and `"Univs"` for the set difference.
 
 ```csharp
 // Program.cs
@@ -43,13 +43,13 @@ string encoded = decorator.ToEncodedString(o =>
 });
 
 // StartsWith checks
-bool starts = decorator.StartsWith(" Hello");                     // true
-bool startsIgnore = decorator.StartsWith(StringComparison.OrdinalIgnoreCase, "hello"); // true
-bool startsAny = decorator.StartsWith("Hi", "Hello");             // true
+bool starts = decorator.StartsWith(" Hello");                     // True
+bool startsIgnore = decorator.StartsWith(StringComparison.OrdinalIgnoreCase, "hello"); // False (leading space)
+bool startsAny = decorator.StartsWith("Hi", "Hello");             // False (leading space)
 
 // Set difference
 var helloDecorator = Decorator.Enclose("Hello World!");
-string diff = helloDecorator.Difference("Hello Universe!"); // "Universe!"
+string diff = helloDecorator.Difference("Hello Universe!"); // "Univs"
 
 // ContainsAny for characters
 bool hasChar = decorator.ContainsAny('o', StringComparison.Ordinal);                          // true
@@ -68,5 +68,5 @@ Console.WriteLine(hasChars);
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="d652111fd38378d9c6130996"><a href="~/run-actions/d652111fd38378d9c6130996/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/d652111fd38378d9c6130996/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="e3ae5b35547d3ae5d8af85df"><a href="~/run-actions/e3ae5b35547d3ae5d8af85df/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/e3ae5b35547d3ae5d8af85df/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

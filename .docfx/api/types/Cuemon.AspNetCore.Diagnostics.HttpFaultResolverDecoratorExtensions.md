@@ -4,18 +4,36 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register fault resolvers using the decorator pattern over a list of `HttpFaultResolver`.
+The following example demonstrates how to register fault resolvers using the decorator pattern over a list of `HttpFaultResolver` and evaluate exceptions against the registered resolvers.
 
 ```csharp
 // Program.cs
 using System;
 using System.Collections.Generic;
+using Cuemon;
 using Cuemon.AspNetCore.Diagnostics;
 using Cuemon.AspNetCore.Http;
-using Cuemon;
 using Examples;
 
-Console.WriteLine(new FaultResolverRegistrationExample().RegisterResolvers());
+var resolvers = new FaultResolverRegistrationExample().RegisterResolvers();
+Console.WriteLine($"Registered resolvers: {resolvers.Count}");
+
+Exception[] exceptions =
+[
+    new NotFoundException("Item 42 does not exist."),
+    new UnauthorizedException("Token expired.")
+];
+
+foreach (var ex in exceptions)
+{
+    foreach (var resolver in resolvers)
+    {
+        if (resolver.TryResolveFault(ex, out var descriptor))
+        {
+            Console.WriteLine($"{ex.GetType().Name} -> {descriptor.StatusCode} {descriptor.Code}: {descriptor.Message}");
+        }
+    }
+}
 
 namespace Examples
 {
@@ -37,12 +55,11 @@ namespace Examples
                 message: "Authentication is required.");
 
             return resolvers;
-
-    }
+        }
     }
 }
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="33419500b12b973d4ae0a372"><a href="~/run-actions/33419500b12b973d4ae0a372/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/33419500b12b973d4ae0a372/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="c538da1818bafa5627106e44"><a href="~/run-actions/c538da1818bafa5627106e44/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/c538da1818bafa5627106e44/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

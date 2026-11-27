@@ -37,13 +37,12 @@ using Cuemon.IO;
             using (var deflateStream = new DeflateStream(compressed, fastOptions.Level, leaveOpen: true))
             {
                 source.CopyTo(deflateStream);
+            }
 
             Console.WriteLine($"Original size: {originalData.Length} bytes");
             Console.WriteLine($"Compressed size: {compressed.Length} bytes");
-
-}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="8f5a4231d2e45de3ff45e017"><a href="~/run-actions/8f5a4231d2e45de3ff45e017/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/8f5a4231d2e45de3ff45e017/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="97626f02354204c104d1cdf6"><a href="~/run-actions/97626f02354204c104d1cdf6/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/97626f02354204c104d1cdf6/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

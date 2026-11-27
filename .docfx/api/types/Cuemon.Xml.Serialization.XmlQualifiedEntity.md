@@ -15,8 +15,8 @@ using Cuemon.Xml.Serialization;
 // Create an entity from local name only
 var entity1 = new XmlQualifiedEntity("Order");
 Console.WriteLine($"LocalName: {entity1.LocalName}"); // Order
-Console.WriteLine($"Namespace: {entity1.Namespace}"); // (null)
-Console.WriteLine($"Prefix: {entity1.Prefix}"); // (null)
+Console.WriteLine($"Namespace: {entity1.Namespace}"); // (empty string)
+Console.WriteLine($"Prefix: {entity1.Prefix}"); // (empty string)
 
 // Create an entity with local name and namespace
 var entity2 = new XmlQualifiedEntity("Order", "http://example.com/orders");
@@ -53,5 +53,5 @@ Console.WriteLine($"Options root name: {options.RootName.LocalName}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="7e3ace94e70bcafa5eaa891d"><a href="~/run-actions/7e3ace94e70bcafa5eaa891d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/7e3ace94e70bcafa5eaa891d/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="1f4e8bd4e97480ceabc792c7"><a href="~/run-actions/1f4e8bd4e97480ceabc792c7/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/1f4e8bd4e97480ceabc792c7/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

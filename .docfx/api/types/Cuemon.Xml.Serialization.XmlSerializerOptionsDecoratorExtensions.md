@@ -24,17 +24,18 @@ public class XmlSerializerOptionsDecoratorExtensionsExample
             RootName = new XmlQualifiedEntity("CustomRoot")
         };
 
-        // Apply the options as the default XmlWriterSettings globally.
+        // Apply the options as the default XmlSerializerOptions globally.
         Decorator.Enclose(options).ApplyToDefaultSettings();
 
-        // When running XmlConvert.EncodeName or similar, the default settings apply.
-        Console.WriteLine("Default settings applied successfully.");
-
-}
+        // Read back the global default settings to observe the applied options.
+        var defaultSettings = Cuemon.Xml.Serialization.XmlConvert.DefaultSettings();
+        Console.WriteLine($"Default RootName: {defaultSettings.RootName.LocalName}");
+        Console.WriteLine($"Default Indent: {defaultSettings.Writer.Indent}");
+    }
 }
 
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="7842d58b92f3cbdc3abfd2a0"><a href="~/run-actions/7842d58b92f3cbdc3abfd2a0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/7842d58b92f3cbdc3abfd2a0/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="801d6b47452104a9e048044f"><a href="~/run-actions/801d6b47452104a9e048044f/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/801d6b47452104a9e048044f/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

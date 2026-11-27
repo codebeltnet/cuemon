@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to use `SqlDataManager` to execute commands against Microsoft SQL Server.
+The following example demonstrates how to configure `SqlDataManager` with a Microsoft SQL Server connection string, inspect its transient fault handling callback, and clone the manager instance.
 
 ```csharp
 // Program.cs
@@ -16,9 +16,13 @@ var manager = new SqlDataManager(o =>
     o.ConnectionString = "Server=.;Database=AdventureWorks;Trusted_Connection=True;TrustServerCertificate=True;";
 });
 
-Console.WriteLine("SqlDataManager configured for the AdventureWorks database.");
+var cloned = (SqlDataManager)manager.Clone();
+
+Console.WriteLine($"Connection string: {manager.Options.ConnectionString}");
+Console.WriteLine($"Transient fault callback configured: {manager.TransientFaultHandlingOptionsCallback is not null}");
+Console.WriteLine($"Cloned connection string matches: {cloned.Options.ConnectionString == manager.Options.ConnectionString}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="10f0fcc57e29c9d0b098b708"><a href="~/run-actions/10f0fcc57e29c9d0b098b708/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/10f0fcc57e29c9d0b098b708/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="a25d8ef50be5b6e478d9908f"><a href="~/run-actions/a25d8ef50be5b6e478d9908f/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/a25d8ef50be5b6e478d9908f/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

@@ -14,7 +14,11 @@ using Cuemon.AspNetCore.Http.Throttling;
 using Microsoft.AspNetCore.Http;
 using MyApp.Http.Throttling;
 
-Console.WriteLine(new ThrottlingSentinelOptionsExample().CreateDefault());
+var example = new ThrottlingSentinelOptionsExample();
+var defaults = example.CreateDefault();
+Console.WriteLine($"Default Quota configured: {defaults.Quota is not null}");
+Console.WriteLine($"Default RateLimitHeader: {defaults.RateLimitHeaderName}");
+example.CreateCustom();
 
 namespace MyApp.Http.Throttling
 {
@@ -62,5 +66,5 @@ namespace MyApp.Http.Throttling
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="57b87d3a247429bade8c6308"><a href="~/run-actions/57b87d3a247429bade8c6308/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/57b87d3a247429bade8c6308/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="6b1e4d5f47acc6c89b830da5"><a href="~/run-actions/6b1e4d5f47acc6c89b830da5/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/6b1e4d5f47acc6c89b830da5/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

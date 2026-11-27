@@ -24,7 +24,7 @@ child1.Add("employee2");
 Console.WriteLine(root.GetPath());
 Console.WriteLine(child1.GetPath(n => n.Instance.ToString().ToUpper()));
 
-var matches = Hierarchy.Find(root, n => n.Instance.ToString().StartsWith("employee"));
+var matches = Hierarchy.Find(child1, n => n.Instance.ToString().StartsWith("employee"));
 Console.WriteLine($"Found {matches.Count()} node(s)");
 
 var obj = new { Name = "Root", Items = new[] { new { Id = 1 }, new { Id = 2 } } };
@@ -33,5 +33,5 @@ Console.WriteLine(tree.GetPath(n => n.InstanceType.Name));
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="0935da97633b9761817c0697"><a href="~/run-actions/0935da97633b9761817c0697/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0935da97633b9761817c0697/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="b078a1da3dcd2c05f2e88023"><a href="~/run-actions/b078a1da3dcd2c05f2e88023/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b078a1da3dcd2c05f2e88023/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

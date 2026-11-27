@@ -21,7 +21,8 @@ var sibling = root.Add("Sibling");
 Console.WriteLine($"Root depth: {root.Depth}, index: {root.Index}");       // 0, 0
 Console.WriteLine($"Child depth: {child.Depth}, index: {child.Index}");    // 1, 1
 Console.WriteLine($"Grandchild depth: {grandchild.Depth}");                 // 2
-Console.WriteLine($"Path: {grandchild.GetPath()}");                         // Root.Child.Grandchild
+Console.WriteLine($"Path: {grandchild.GetPath()}");                         // String.String.String
+Console.WriteLine($"Instance path: {grandchild.GetPath(n => n.Instance)}"); // Root.Child.Grandchild
 Console.WriteLine($"HasChildren: {root.HasChildren}");                      // True
 Console.WriteLine($"HasParent: {child.HasParent}");                         // True
 
@@ -32,12 +33,10 @@ Console.WriteLine(root[2].Instance); // Grandchild
 // Enumerate children
 foreach (var node in root.GetChildren())
 {
-    Console.WriteLine(node.Instance);
-// Output: Child, Sibling
-
+    Console.WriteLine(node.Instance); // Child, Sibling
 }
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="afb42fa010ef466f00ec2665"><a href="~/run-actions/afb42fa010ef466f00ec2665/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/afb42fa010ef466f00ec2665/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="696599d22ba7cb0d5064c0e8"><a href="~/run-actions/696599d22ba7cb0d5064c0e8/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/696599d22ba7cb0d5064c0e8/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

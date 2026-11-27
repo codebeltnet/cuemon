@@ -28,6 +28,7 @@ using Cuemon.Reflection;
             foreach (var param in descriptor.Parameters)
             {
                 Console.WriteLine("  {0} {1}", param.ParameterType.Name, param.ParameterName);
+            }
 
             // Append runtime arguments for debugging or logging.
             descriptor.AppendRuntimeArguments("Hello", StringComparison.OrdinalIgnoreCase);
@@ -35,6 +36,7 @@ using Cuemon.Reflection;
             foreach (var kvp in descriptor.RuntimeArguments)
             {
                 Console.WriteLine("  {0} = {1}", kvp.Key, kvp.Value);
+            }
 
             // Static factory method.
             var fromFactory = MethodDescriptor.Create(
@@ -49,10 +51,8 @@ using Cuemon.Reflection;
                 },
                 "test", 3);
             Console.WriteLine("Merged: input={0}, count={1}", merged["input"], merged["count"]);
-
-}}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="dcebc1c971522db2f8fdf030"><a href="~/run-actions/dcebc1c971522db2f8fdf030/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/dcebc1c971522db2f8fdf030/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="cef0fc8cef85037f50280653"><a href="~/run-actions/cef0fc8cef85037f50280653/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/cef0fc8cef85037f50280653/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`StreamCopyOptions` configures buffer size and whether the source stream remains open after synchronous copy operations. This example creates custom options with `BufferSize = 4096` and `LeaveOpen = true`, converts a `MemoryStream` to a byte array via the decorator pattern with these options, then confirms the source stream is still readable (`CanRead = True`). It also demonstrates the default behavior where `LeaveOpen = false` disposes the source stream after copying, showing `CanRead = False`. Console output displays the byte count (`26`), the decoded string (`"Hello, StreamCopyOptions!"`), and the stream's open/disposed state.
+`StreamCopyOptions` configures buffer size and whether the source stream remains open after synchronous copy operations. This example creates custom options with `BufferSize = 4096` and `LeaveOpen = true`, converts a `MemoryStream` to a byte array via the decorator pattern with these options, then confirms the source stream is still readable (`CanRead = True`). It also demonstrates the default behavior where `LeaveOpen = false` disposes the source stream after copying, showing `CanRead = False`. Console output displays the byte count (`25`), the decoded string (`"Hello, StreamCopyOptions!"`), and the stream's open/disposed state.
 
 ```csharp
 // Program.cs
@@ -28,7 +28,7 @@ byte[] bytes = Decorator.Enclose(source).ToByteArray(setup =>
     setup.LeaveOpen = true;
 });
 
-Console.WriteLine($"Read {bytes.Length} bytes"); // 26
+Console.WriteLine($"Read {bytes.Length} bytes"); // 25
 Console.WriteLine(Encoding.UTF8.GetString(bytes)); // Hello, StreamCopyOptions!
 Console.WriteLine($"Source stream is still open: {source.CanRead}"); // True
 
@@ -45,5 +45,5 @@ Console.WriteLine(Encoding.UTF8.GetString(result)); // Default options.
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="8014b51040d741e7f05caa9d"><a href="~/run-actions/8014b51040d741e7f05caa9d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/8014b51040d741e7f05caa9d/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="f634fbe03d02d0d4c89b0814"><a href="~/run-actions/f634fbe03d02d0d4c89b0814/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/f634fbe03d02d0d4c89b0814/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

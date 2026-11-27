@@ -33,7 +33,7 @@ namespace MyApp.Examples
 
             string json = JsonSerializer.Serialize(payload, options);
             Console.WriteLine(json);
-            // { "day": "Friday", "status": "Relative" }
+            // {"day":"friday","status":"relative"}
 
             var restored = JsonSerializer.Deserialize<Payload>(json, options);
             Console.WriteLine(restored.Day); // Friday
@@ -49,5 +49,5 @@ namespace MyApp.Examples
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="283726b85cb19e69a554cb19"><a href="~/run-actions/283726b85cb19e69a554cb19/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/283726b85cb19e69a554cb19/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="a619eed7bf7afa8a0671fcf2"><a href="~/run-actions/a619eed7bf7afa8a0671fcf2/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/a619eed7bf7afa8a0671fcf2/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

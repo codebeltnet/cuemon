@@ -37,6 +37,12 @@ context.Items[HttpRequestEvidence.HttpContextItemsKeyForCapturedRequestBody] =
     new MemoryStream(bodyBytes);
 
 var evidence = new HttpRequestEvidence(context.Request);
+context.Items[HttpRequestEvidence.HttpContextItemsKeyForCapturedRequestBody] = new MemoryStream(bodyBytes);
+var redactedEvidence = new HttpRequestEvidence(context.Request, body =>
+{
+    using var reader = new StreamReader(body, Encoding.UTF8, leaveOpen: true);
+    return reader.ReadToEnd().Replace("42", "***", StringComparison.Ordinal);
+});
 
 Console.WriteLine($"Location: {evidence.Location}");
 Console.WriteLine($"Method: {evidence.Method}");
@@ -44,8 +50,9 @@ Console.WriteLine($"Auth Header: {evidence.Headers["Authorization"]}");
 Console.WriteLine($"Query: status={evidence.Query["status"]}");
 Console.WriteLine($"Form: customerId={evidence.Form["customerId"]}");
 Console.WriteLine($"Body: {evidence.Body}");
+Console.WriteLine($"Redacted Body: {redactedEvidence.Body}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="705b005f353c871e56681e44"><a href="~/run-actions/705b005f353c871e56681e44/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/705b005f353c871e56681e44/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="ef30a3153e47e3dc7c2def98"><a href="~/run-actions/ef30a3153e47e3dc7c2def98/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/ef30a3153e47e3dc7c2def98/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

@@ -31,10 +31,11 @@ message.Headers.Add("X-Server-Id", "server-01");
 
 Decorator.Enclose(exception).AddResponseHeaders(message.Headers);
 
-Console.WriteLine($"Correlation header: {headers["X-Correlation-Id"]}");
-Console.WriteLine($"Server header: {message.Headers.GetValues("X-Server-Id").First()}");
+Console.WriteLine($"Correlation header: {exception.Headers["X-Correlation-Id"]}");
+Console.WriteLine($"Request header: {exception.Headers["X-Request-Id"]}");
+Console.WriteLine($"Server header: {exception.Headers["X-Server-Id"]}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="8f3115f05ecc6f1191b7ac85"><a href="~/run-actions/8f3115f05ecc6f1191b7ac85/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/8f3115f05ecc6f1191b7ac85/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="fa4cd9c6c02dbc53693bd26d"><a href="~/run-actions/fa4cd9c6c02dbc53693bd26d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/fa4cd9c6c02dbc53693bd26d/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

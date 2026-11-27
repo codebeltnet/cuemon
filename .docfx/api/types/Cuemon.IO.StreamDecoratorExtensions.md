@@ -9,7 +9,6 @@ example:
 ```csharp
 // Program.cs
 using System;
-using Cuemon;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +27,7 @@ Console.WriteLine($"Byte array length: {bytes.Length}"); // 13
 // ---- ToByteArrayAsync: async version ----
 var source2 = new MemoryStream(Encoding.UTF8.GetBytes("Async bytes."));
 byte[] asyncBytes = await Decorator.Enclose(source2).ToByteArrayAsync();
-Console.WriteLine($"Async bytes length: {asyncBytes.Length}"); // 11
+Console.WriteLine($"Async bytes length: {asyncBytes.Length}"); // 12
 
 // ---- ToEncodedString: stream to string ----
 var source3 = new MemoryStream(Encoding.UTF8.GetBytes("Read me as text."));
@@ -56,7 +55,7 @@ Console.WriteLine($"Destination length: {destination.Length}"); // 8
 var source4b = new MemoryStream(Encoding.UTF8.GetBytes("Sync copy."));
 using var dest4b = new MemoryStream();
 Decorator.Enclose(source4b).CopyStream(dest4b);
-Console.WriteLine($"Sync copy length: {dest4b.Length}"); // 9
+Console.WriteLine($"Sync copy length: {dest4b.Length}"); // 10
 
 // ---- CompressGZip / DecompressGZip ----
 var source5 = new MemoryStream(Encoding.UTF8.GetBytes("GZip compress this."));
@@ -117,9 +116,9 @@ Console.WriteLine(brotliAsyncText); // Async Brotli.
 var target = new MemoryStream();
 byte[] data = Encoding.UTF8.GetBytes("Write this.");
 await Decorator.Enclose(target).WriteAllAsync(data);
-Console.WriteLine($"Written bytes: {target.Length}"); // 10
+Console.WriteLine($"Written bytes: {target.Length}"); // 11
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="e0adcbaa31b1dd7e8b402da4"><a href="~/run-actions/e0adcbaa31b1dd7e8b402da4/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/e0adcbaa31b1dd7e8b402da4/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="e9eb913657bde7529fbba3db"><a href="~/run-actions/e9eb913657bde7529fbba3db/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/e9eb913657bde7529fbba3db/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

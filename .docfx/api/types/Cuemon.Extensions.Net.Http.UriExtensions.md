@@ -118,12 +118,13 @@ namespace MyApp.Http
                 Console.WriteLine($"Custom GET: {response.StatusCode}"); // 200
             }
 
-            // Use cancellation token
+            // Use cancellation token with a timeout against a delayed endpoint
+            var slowLocation = new Uri("https://example.com/api/slow");
             using var cts = new CancellationTokenSource();
-            cts.CancelAfter(TimeSpan.FromSeconds(5));
+            cts.CancelAfter(TimeSpan.FromMilliseconds(50));
             try
             {
-                using var response = await location.HttpGetAsync(cts.Token);
+                using var response = await slowLocation.HttpGetAsync(cts.Token);
                 Console.WriteLine($"Cancellable GET: {response.StatusCode}");
             }
             catch (TaskCanceledException)
@@ -167,20 +168,25 @@ namespace MyApp.Http
             _statusCode = statusCode;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(
+        protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken ct)
         {
+            if (request.RequestUri?.AbsolutePath.EndsWith("/slow", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5), ct);
+            }
+
             var response = new HttpResponseMessage(_statusCode)
             {
                 Content = new StringContent("OK"),
                 RequestMessage = request
             };
-            return Task.FromResult(response);
+            return response;
         }
     }
 }
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="31f27abdd71359ad7af83a56"><a href="~/run-actions/31f27abdd71359ad7af83a56/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/31f27abdd71359ad7af83a56/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="a96a01fbdfb87cfa130ed27a"><a href="~/run-actions/a96a01fbdfb87cfa130ed27a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/a96a01fbdfb87cfa130ed27a/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

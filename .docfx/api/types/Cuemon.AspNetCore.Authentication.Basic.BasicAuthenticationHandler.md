@@ -4,25 +4,28 @@ example:
 - *content
 ---
 
-The following example demonstrates how to register `BasicAuthenticationHandler` with ASP.NET Core authentication services. It sets up a `ServiceCollection`, registers the handler with a custom authenticator callback that validates credentials against hardcoded values, and builds the service provider. The handler is then resolved from DI and its configured realm is written to the console, confirming the authentication pipeline wires up correctly.
+The following example demonstrates how to register and exercise `BasicAuthenticationHandler` with ASP.NET Core authentication services. It configures a `ServiceCollection` with a custom authenticator callback, invokes `ChallengeAsync` to observe the `WWW-Authenticate` response header, and invokes `AuthenticateAsync` against a `DefaultHttpContext` carrying a Basic `Authorization` header to verify the authenticated principal.
 
 ```csharp
 // Program.cs
 using System;
 using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 using Cuemon.AspNetCore.Authentication.Basic;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using MyApp.Examples;
 
-BasicAuthenticationHandlerExample.Demonstrate();
+await BasicAuthenticationHandlerExample.DemonstrateAsync();
 
 namespace MyApp.Examples
 {
     public static class BasicAuthenticationHandlerExample
     {
-        public static void Demonstrate()
+        public static async Task DemonstrateAsync()
         {
             var services = new ServiceCollection();
 
@@ -44,14 +47,31 @@ namespace MyApp.Examples
                 });
 
             using var provider = services.BuildServiceProvider();
-            var options = provider.GetRequiredService<IOptionsMonitor<BasicAuthenticationOptions>>().Get(BasicAuthorizationHeader.Scheme);
 
-            Console.WriteLine($"Authentication realm: {options.Realm}");
+            var challengeContext = new DefaultHttpContext { RequestServices = provider };
+            using (var challengeScope = provider.CreateScope())
+            {
+                var challengeAuth = challengeScope.ServiceProvider.GetRequiredService<IAuthenticationService>();
+                await challengeAuth.ChallengeAsync(challengeContext, BasicAuthorizationHeader.Scheme, null);
+            }
+            Console.WriteLine($"WWW-Authenticate: {challengeContext.Response.Headers.WWWAuthenticate}");
+
+            var authContext = new DefaultHttpContext { RequestServices = provider };
+            var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes("Agent:Test"));
+            authContext.Request.Headers[HeaderNames.Authorization] = $"{BasicAuthorizationHeader.Scheme} {credentials}";
+
+            using (var authScope = provider.CreateScope())
+            {
+                var authService = authScope.ServiceProvider.GetRequiredService<IAuthenticationService>();
+                var result = await authService.AuthenticateAsync(authContext, BasicAuthorizationHeader.Scheme);
+                Console.WriteLine($"Authenticated: {result.Succeeded}");
+                Console.WriteLine($"User: {result.Principal?.Identity?.Name}");
+            }
         }
     }
 }
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="5acec4474b4e95e2fbcef7c9"><a href="~/run-actions/5acec4474b4e95e2fbcef7c9/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/5acec4474b4e95e2fbcef7c9/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="4ad54e348e2d0fb5d6e025be"><a href="~/run-actions/4ad54e348e2d0fb5d6e025be/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/4ad54e348e2d0fb5d6e025be/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

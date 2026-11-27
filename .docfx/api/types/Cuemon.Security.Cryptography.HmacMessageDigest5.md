@@ -16,6 +16,7 @@ using Cuemon;
 using MyApp.Security;
 
 HmacMessageDigest5Examples.Demonstrate();
+HmacMessageDigest5Examples.DemonstrateWithOptions();
 
 namespace MyApp.Security
 {
@@ -40,13 +41,13 @@ namespace MyApp.Security
             // Verify the HMAC by recomputing with the same secret.
             var verifier = new HmacMessageDigest5(secret, null);
             HashResult expected = verifier.ComputeHash(message);
-            bool isValid = hash.Equals(expected);
-            Console.WriteLine("HMAC valid: {0}", isValid); // true
+            bool isValid = hash.ToHexadecimalString() == expected.ToHexadecimalString();
+            Console.WriteLine("HMAC valid: {0}", isValid); // True
 
             // Tampered message produces a different HMAC.
             byte[] tampered = Encoding.UTF8.GetBytes("Important: Transfer $100 to account 99999");
             HashResult tamperedHash = hmacMd5.ComputeHash(tampered);
-            Console.WriteLine("Tampered HMAC matches: {0}", hash.Equals(tamperedHash)); // false
+            Console.WriteLine("Tampered HMAC matches: {0}", hash.ToHexadecimalString() == tamperedHash.ToHexadecimalString()); // False
 
             // Compute HMAC from string directly (UTF-8 encoding by default).
             HashResult fromString = hmacMd5.ComputeHash("Hello, HMAC!");
@@ -68,5 +69,5 @@ namespace MyApp.Security
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="4a207fae86885e2e8c2a151a"><a href="~/run-actions/4a207fae86885e2e8c2a151a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/4a207fae86885e2e8c2a151a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="1860051219f434162896a728"><a href="~/run-actions/1860051219f434162896a728/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/1860051219f434162896a728/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

@@ -29,6 +29,10 @@ bool isCountry = denmark.IsCountryOrTerritory();      // true
 bool isArea = europe.IsArea();                        // true (not a country)
 bool isCountryArea = denmark.IsArea();                // false (is a country)
 
+Console.WriteLine($"World: {isWorld}, Region: {isRegion}, Subregion: {isSubregion}");
+Console.WriteLine($"Denmark IsCountryOrTerritory: {isCountry}, IsArea: {isCountryArea}");
+Console.WriteLine($"Europe IsArea: {isArea}");
+
 // Check intermediate regions (sub-Saharan Africa, Latin America)
 var subSaharanAfrica = World.GetStatisticalRegion("202");
 bool isIntermediate = subSaharanAfrica.IsIntermediateRegion(); // true
@@ -64,5 +68,5 @@ foreach (var ancestor in denmark.GetAncestors())
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="43e15cf103357bbad8066400"><a href="~/run-actions/43e15cf103357bbad8066400/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/43e15cf103357bbad8066400/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="e2bcae1d416c03c1e54c35f6"><a href="~/run-actions/e2bcae1d416c03c1e54c35f6/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/e2bcae1d416c03c1e54c35f6/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

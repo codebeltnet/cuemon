@@ -106,9 +106,12 @@ string jsUnesc = quoted.JsUnescape(); // "hello's"
 string suffixed = counted.SuffixWith(" world"); // "hello world"
 Guid asGuid = guidSource.ToGuid();
 Uri asUri = uriSource.ToUri();
+Console.WriteLine(trimmed);
+Console.WriteLine(suffixed);
+Console.WriteLine($"{day.GetType().Name}.{day}");
 Console.WriteLine(isIntegerSequence);
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="b1fc5dd131a8daacb5db8ba8"><a href="~/run-actions/b1fc5dd131a8daacb5db8ba8/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b1fc5dd131a8daacb5db8ba8/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="07ff7426b5f18260ee9847ab"><a href="~/run-actions/07ff7426b5f18260ee9847ab/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/07ff7426b5f18260ee9847ab/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

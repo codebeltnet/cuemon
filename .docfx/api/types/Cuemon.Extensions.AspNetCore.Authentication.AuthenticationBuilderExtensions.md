@@ -62,14 +62,18 @@ namespace MyApp.Examples
             var digestOptions = provider.GetRequiredService<IOptionsMonitor<DigestAuthenticationOptions>>().Get(DigestAuthorizationHeader.Scheme);
             var hmacOptions = provider.GetRequiredService<IOptionsMonitor<HmacAuthenticationOptions>>().Get("hmac-docs");
 
-            Console.WriteLine($"Basic authentication requires HTTPS: {basicOptions.RequireSecureConnection}");
-            Console.WriteLine($"Digest authentication requires HTTPS: {digestOptions.RequireSecureConnection}");
-            Console.WriteLine($"HMAC authentication scheme: {hmacOptions.AuthenticationScheme}");
+            var basicHandler = provider.GetRequiredService<BasicAuthenticationHandler>();
+            var digestHandler = provider.GetRequiredService<DigestAuthenticationHandler>();
+            var hmacHandler = provider.GetRequiredService<HmacAuthenticationHandler>();
+
+            Console.WriteLine($"Basic handler: {basicHandler.GetType().Name}, requires HTTPS: {basicOptions.RequireSecureConnection}");
+            Console.WriteLine($"Digest handler: {digestHandler.GetType().Name}, requires HTTPS: {digestOptions.RequireSecureConnection}");
+            Console.WriteLine($"HMAC handler: {hmacHandler.GetType().Name}, scheme: {hmacOptions.AuthenticationScheme}");
         }
     }
 }
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="6faa4e81d231e4605cdd95e8"><a href="~/run-actions/6faa4e81d231e4605cdd95e8/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/6faa4e81d231e4605cdd95e8/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="9dc776983832a642ac7ce5ca"><a href="~/run-actions/9dc776983832a642ac7ce5ca/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/9dc776983832a642ac7ce5ca/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

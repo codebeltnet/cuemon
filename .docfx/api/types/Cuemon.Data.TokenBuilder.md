@@ -18,7 +18,7 @@ builder.Append("Alice");
 builder.Append(",30,");
 builder.Append("New York");
 
-Console.WriteLine($"Is valid: {builder.IsValid}");  // false - only 3 of 4 tokens
+Console.WriteLine($"Is valid: {builder.IsValid}");  // True
 Console.WriteLine($"Current:  '{builder}'");
 
 // Append the last field to complete the token row
@@ -38,5 +38,5 @@ Console.WriteLine($"Tokens:   {csvBuilder.Tokens}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="37f40b9fa3c262d6ee82d474"><a href="~/run-actions/37f40b9fa3c262d6ee82d474/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/37f40b9fa3c262d6ee82d474/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="23dc9383f219bc514b0d15d0"><a href="~/run-actions/23dc9383f219bc514b0d15d0/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/23dc9383f219bc514b0d15d0/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

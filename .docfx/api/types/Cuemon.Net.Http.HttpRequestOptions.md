@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-The following example demonstrates how to configure and send an HTTP request using `HttpRequestOptions` with the `HttpManager`.
+The following example demonstrates how to configure an HTTP request using `HttpRequestOptions`.
 
 ```csharp
 // Program.cs

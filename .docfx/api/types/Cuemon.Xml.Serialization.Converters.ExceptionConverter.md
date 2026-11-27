@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`ExceptionConverter` in the `Xml.Serialization` namespace serializes `Exception` instances to XML and deserializes them back, with optional stack trace and `Data` dictionary inclusion. This example creates an outer `InvalidOperationException` with an inner `ArgumentNullException` and a `"Server"` data entry, configures an `XmlFormatter` with the converter including stack trace and data, and serializes to XML output showing `<Source>`, `<Message>`, `<Stack>`, `<Data>`, and nested `<Inner>` elements. It also demonstrates deserializing from an XML string back to an exception instance with `converter.ReadXml`, and serialization without stack trace or data for simpler output. Console output displays the XML content and restored message.
+`ExceptionConverter` in the `Xml.Serialization` namespace serializes `Exception` instances to XML and deserializes them back, with optional stack trace and `Data` dictionary inclusion. This example creates and throws an outer `InvalidOperationException` with an inner `ArgumentNullException` and a `"Server"` data entry, configures an `XmlFormatter` with the converter including stack trace and data, and serializes to XML output showing `<Source>`, `<Message>`, `<Stack>`, `<Data>`, and nested `<ArgumentNullException namespace="System">` elements. It also demonstrates deserializing from an XML string back to an exception instance with `converter.ReadXml`, and serialization without stack trace or data for simpler output. Console output displays the XML content and restored message.
 
 ```csharp
 // Program.cs
@@ -17,7 +17,10 @@ using Cuemon.Xml.Serialization.Converters;
 using Cuemon.Xml.Serialization.Formatters;
 using MyApp.Examples;
 
-new ExceptionConverterExample().SerializeExceptionWithStackTrace();
+var example = new ExceptionConverterExample();
+example.SerializeExceptionWithStackTrace();
+example.DeserializeExceptionFromXml();
+example.SerializeWithoutStackTraceAndData();
 
 namespace MyApp.Examples
 {
@@ -25,10 +28,18 @@ namespace MyApp.Examples
     {
         public void SerializeExceptionWithStackTrace()
         {
-            // Create an exception with inner exception and custom data
+            // Create and throw an exception with inner exception and custom data so StackTrace and Source are populated
             var inner = new ArgumentNullException("connectionString", "Value cannot be null.");
-            var outer = new InvalidOperationException("Failed to connect to the database.", inner);
-            outer.Data["Server"] = "db01.prod.example.com";
+            InvalidOperationException outer;
+            try
+            {
+                throw new InvalidOperationException("Failed to connect to the database.", inner);
+            }
+            catch (InvalidOperationException ex)
+            {
+                outer = ex;
+                outer.Data["Server"] = "db01.prod.example.com";
+            }
 
             // Configure the XML formatter with ExceptionConverter including stack trace and data
             var options = new XmlFormatterOptions();
@@ -52,7 +63,7 @@ namespace MyApp.Examples
                 //   <Data>
                 //     <Server>db01.prod.example.com</Server>
                 //   </Data>
-                //   ...
+                //   <ArgumentNullException namespace="System">...</ArgumentNullException>
                 // </InvalidOperationException>
             }
         }
@@ -60,7 +71,7 @@ namespace MyApp.Examples
         public void DeserializeExceptionFromXml()
         {
             string xml = @"<?xml version=""1.0"" encoding=""utf-8""?>
-    <InvalidOperationException>
+    <InvalidOperationException namespace=""System"">
       <Source>MyApp</Source>
       <Message>Something went wrong.</Message>
     </InvalidOperationException>";
@@ -93,5 +104,5 @@ namespace MyApp.Examples
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="d8433388fb926817aa3d077b"><a href="~/run-actions/d8433388fb926817aa3d077b/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/d8433388fb926817aa3d077b/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="99bd2ca8b6b0de3a88932624"><a href="~/run-actions/99bd2ca8b6b0de3a88932624/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/99bd2ca8b6b0de3a88932624/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

@@ -25,11 +25,11 @@ try
     Console.WriteLine($"Method:         {validator.Method}");
     Console.WriteLine($"Checksum:       {validator.Checksum.ToHexadecimalString()}");
 
-    // Create validator using a custom hash algorithm
-    CacheValidator shaValidator = CacheValidatorFactory.CreateValidator(
+    // Create validator using a custom hash algorithm (FNV-128)
+    CacheValidator fnvValidator = CacheValidatorFactory.CreateValidator(
         file,
         () => HashFactory.CreateFnv128());
-    Console.WriteLine($"SHA-256: {shaValidator.Checksum.ToHexadecimalString()}");
+    Console.WriteLine($"FNV-128:        {fnvValidator.Checksum.ToHexadecimalString()}");
 }
 finally
 {
@@ -38,5 +38,5 @@ finally
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="b69cffc3764e21a4fcae313a"><a href="~/run-actions/b69cffc3764e21a4fcae313a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b69cffc3764e21a4fcae313a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="0b0937ae33565de7147c2dcd"><a href="~/run-actions/0b0937ae33565de7147c2dcd/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0b0937ae33565de7147c2dcd/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

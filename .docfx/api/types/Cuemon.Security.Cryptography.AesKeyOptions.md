@@ -13,6 +13,8 @@ using Cuemon.Security.Cryptography;
 using MyApp.Security.Cryptography;
 
 AesKeyOptionsExamples.ConfigureKeySize();
+AesKeyOptionsExamples.CustomRandomStringProvider();
+AesKeyOptionsExamples.InspectDefaultProperties();
 
 namespace MyApp.Security.Cryptography
 {
@@ -70,5 +72,5 @@ namespace MyApp.Security.Cryptography
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="6d563c7b526d50ef118efa66"><a href="~/run-actions/6d563c7b526d50ef118efa66/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/6d563c7b526d50ef118efa66/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="ad08a57f6c88597aabfdec8e"><a href="~/run-actions/ad08a57f6c88597aabfdec8e/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/ad08a57f6c88597aabfdec8e/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

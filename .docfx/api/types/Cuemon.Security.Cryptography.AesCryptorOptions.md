@@ -64,9 +64,9 @@ byte[] decrypted3 = cryptor.Decrypt(encrypted3, o =>
     o.Mode = defaultOptions.Mode;
     o.Padding = defaultOptions.Padding;
 });
-Console.WriteLine($"Decrypted: {Encoding.UTF8.GetString(decrypted3)}"); // Alternative mode.
+Console.WriteLine($"Decrypted: {Encoding.UTF8.GetString(decrypted3).TrimEnd('\0')}"); // Alternative mode.
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="5fccb59e120c32b707d3e338"><a href="~/run-actions/5fccb59e120c32b707d3e338/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/5fccb59e120c32b707d3e338/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="c5fed10c0775bfcb17bb49f5"><a href="~/run-actions/c5fed10c0775bfcb17bb49f5/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/c5fed10c0775bfcb17bb49f5/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

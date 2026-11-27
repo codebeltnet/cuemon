@@ -24,11 +24,12 @@ var options = new XmlSerializerOptions
 // Apply to default XmlConvert settings
 options.ApplyToDefaultSettings();
 
-// After this call, XmlConvert.DefaultSettings will reflect the options
-Console.WriteLine(options.Writer.Indent);
-Console.WriteLine(options.Reader.IgnoreWhitespace);
+// After this call, Cuemon.Xml.Serialization.XmlConvert.DefaultSettings reflects the applied options
+var defaultSettings = Cuemon.Xml.Serialization.XmlConvert.DefaultSettings?.Invoke();
+Console.WriteLine(defaultSettings?.Writer.Indent);
+Console.WriteLine(defaultSettings?.Reader.IgnoreWhitespace);
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="6ad5e1d298f529d0ac598bc7"><a href="~/run-actions/6ad5e1d298f529d0ac598bc7/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/6ad5e1d298f529d0ac598bc7/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="900daa8227b8bac3bd9c640c"><a href="~/run-actions/900daa8227b8bac3bd9c640c/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/900daa8227b8bac3bd9c640c/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

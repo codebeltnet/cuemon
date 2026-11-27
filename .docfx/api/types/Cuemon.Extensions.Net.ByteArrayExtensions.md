@@ -4,7 +4,7 @@ example:
 - *content
 ---
 
-`ByteArrayExtensions` in the `Net` namespace URL-encodes byte arrays for safe HTTP transmission with support for partial encoding and custom character encodings. This example converts `"hello world"` to a UTF-8 byte array and calls `UrlEncode` to produce `hello%20world`, then demonstrates partial encoding of only the first five bytes (producing `hello`) and encoding with UTF-32 where each character is encoded as 4 bytes. Console output displays each encoded result, confirming that full encoding, partial ranges, and non-default encodings all produce correct percent-encoded output.
+`ByteArrayExtensions` in the `Net` namespace URL-encodes byte arrays for safe HTTP transmission with support for partial encoding and custom character encodings. This example converts `"hello world"` to a UTF-8 byte array and calls `UrlEncode` to produce `hello+world`, then demonstrates partial encoding of only the first five bytes (producing `hello`) and encoding with UTF-32 where each character is encoded as 4 bytes. Console output displays each encoded result, confirming that full encoding, partial ranges, and non-default encodings all produce URL-encoded output.
 
 ```csharp
 // Program.cs
@@ -19,7 +19,7 @@ byte[] data = Encoding.UTF8.GetBytes("hello world");
 // URL-encode the entire byte array
 byte[] encoded = data.UrlEncode(0, data.Length);
 Console.WriteLine(Encoding.UTF8.GetString(encoded));
-// Output: hello%20world
+// Output: hello+world
 
 // Encode only a portion starting at position 0 for 5 bytes
 byte[] partial = data.UrlEncode(position: 0, bytesToRead: 5);
@@ -34,5 +34,5 @@ Console.WriteLine(result);
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="b442de0156c2c1bb64cd7f5d"><a href="~/run-actions/b442de0156c2c1bb64cd7f5d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b442de0156c2c1bb64cd7f5d/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="e1310a4bc7533d43927f901c"><a href="~/run-actions/e1310a4bc7533d43927f901c/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/e1310a4bc7533d43927f901c/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

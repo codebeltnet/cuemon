@@ -13,6 +13,9 @@ using Cuemon.Runtime;
 using MyApp.Runtime;
 
 DependencyEventArgsExamples.CreateEventArgs();
+DependencyEventArgsExamples.CreateEventArgsWithPastTimestamp();
+DependencyEventArgsExamples.UseEmptySentinel();
+DependencyEventArgsExamples.RaiseDependencyEvent();
 
 namespace MyApp.Runtime
 {
@@ -65,5 +68,5 @@ namespace MyApp.Runtime
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="af1f226a232e1c7816b2412a"><a href="~/run-actions/af1f226a232e1c7816b2412a/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/af1f226a232e1c7816b2412a/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="cfd4afd01dac5f455ea4e982"><a href="~/run-actions/cfd4afd01dac5f455ea4e982/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/cfd4afd01dac5f455ea4e982/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

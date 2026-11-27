@@ -32,15 +32,15 @@ using Cuemon.Collections.Generic;
                 foreach (var item in partitioner)
                 {
                     Console.Write($"{item} ");
+                }
                 Console.WriteLine();
 
-            Console.WriteLine();
-            Console.WriteLine($"Iterated count: {partitioner.IteratedCount}");
-            Console.WriteLine($"Has remaining partitions: {partitioner.HasPartitions}");
-
-}}
+                Console.WriteLine();
+                Console.WriteLine($"Iterated count: {partitioner.IteratedCount}");
+                Console.WriteLine($"Has remaining partitions: {partitioner.HasPartitions}");
+            }
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="3ca6246bd7b92fef1399e250"><a href="~/run-actions/3ca6246bd7b92fef1399e250/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/3ca6246bd7b92fef1399e250/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="096a45ec49b673b20921646d"><a href="~/run-actions/096a45ec49b673b20921646d/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/096a45ec49b673b20921646d/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

@@ -19,7 +19,9 @@ using Cuemon.Reflection;
 using Cuemon.Resilience;
 using MyApp.Examples;
 
-new TransientFaultExceptionConverterExample().SerializeTransientFaultException();
+var example = new TransientFaultExceptionConverterExample();
+example.SerializeTransientFaultException();
+example.DeserializeTransientFaultException();
 
 namespace MyApp.Examples
 {
@@ -83,6 +85,8 @@ namespace MyApp.Examples
           ""methodName"": ""ConnectAsync"",
           ""parameters"": [""connectionString""],
           ""arguments"": [""server=db;timeout=30""]
+        }
+      }
     }";
 
             var options = new JsonFormatterOptions();
@@ -103,5 +107,5 @@ namespace MyApp.Examples
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="28f9172c8596f162b1edf979"><a href="~/run-actions/28f9172c8596f162b1edf979/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/28f9172c8596f162b1edf979/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="e28ac0f61905b41b6be6ebae"><a href="~/run-actions/e28ac0f61905b41b6be6ebae/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/e28ac0f61905b41b6be6ebae/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

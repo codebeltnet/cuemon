@@ -18,10 +18,16 @@ using var host = Host.CreateDefaultBuilder()
     .Build();
 
 var environment = host.Services.GetRequiredService<IHostEnvironment>();
-Console.WriteLine(environment.IsLocalDevelopment());
-Console.WriteLine(environment.IsNonProduction());
+if (environment.IsLocalDevelopment())
+{
+    Console.WriteLine("Running on a developer machine.");
+}
+if (environment.IsNonProduction())
+{
+    Console.WriteLine("Environment is not Production.");
+}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="41e66d37f58ed90ef34eeeef"><a href="~/run-actions/41e66d37f58ed90ef34eeeef/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/41e66d37f58ed90ef34eeeef/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="4fecaba32bc54a3b651f9273"><a href="~/run-actions/4fecaba32bc54a3b651f9273/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/4fecaba32bc54a3b651f9273/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

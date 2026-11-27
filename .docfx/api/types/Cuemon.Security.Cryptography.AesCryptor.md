@@ -15,6 +15,8 @@ using Cuemon.Security.Cryptography;
 using MyApp.Security;
 
 AesCryptorExamples.Demonstrate();
+AesCryptorExamples.GenerateKeysWithCustomSize();
+AesCryptorExamples.UseDefaultConstructor();
 
 namespace MyApp.Security
 {
@@ -94,5 +96,5 @@ namespace MyApp.Security
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="0c5947f274a0c2de45246900"><a href="~/run-actions/0c5947f274a0c2de45246900/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0c5947f274a0c2de45246900/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="7dd0a56f388e1f4bcc05b682"><a href="~/run-actions/7dd0a56f388e1f4bcc05b682/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/7dd0a56f388e1f4bcc05b682/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

@@ -28,9 +28,9 @@ string json = JsonSerializer.Serialize(original, options);
 Console.WriteLine(json); // "16/06/2026"
 
 var restored = JsonSerializer.Deserialize<DateTime>(json, options);
-Console.WriteLine(restored.ToString("dd/MM/yyyy")); // 16/06/2026
+Console.WriteLine(restored.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)); // 16/06/2026
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="b05ce02bb71bac4f15c66f5b"><a href="~/run-actions/b05ce02bb71bac4f15c66f5b/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/b05ce02bb71bac4f15c66f5b/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="23f5f166aca856278ab12087"><a href="~/run-actions/23f5f166aca856278ab12087/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/23f5f166aca856278ab12087/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

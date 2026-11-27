@@ -22,16 +22,16 @@ var factory = new SlimHttpClientFactory(
     () => new HttpClientHandler(),
     o =>
     {
-        o.HandlerLifetime = TimeSpan.FromSeconds(30);
+        o.HandlerLifetime = factoryOptions.HandlerLifetime;
     });
 
 // Create a named client
 using var client = factory.CreateClient("MyApi");
 client.BaseAddress = new Uri("https://api.example.com");
 
-Console.WriteLine($"Client ready: {client.BaseAddress}");
+Console.WriteLine($"HandlerLifetime: {factoryOptions.HandlerLifetime.TotalSeconds}s, Client ready: {client.BaseAddress}");
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="36aa9c4dcf443d4b791a19b7"><a href="~/run-actions/36aa9c4dcf443d4b791a19b7/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/36aa9c4dcf443d4b791a19b7/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="1dd14cdefec836e9307570e7"><a href="~/run-actions/1dd14cdefec836e9307570e7/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/1dd14cdefec836e9307570e7/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

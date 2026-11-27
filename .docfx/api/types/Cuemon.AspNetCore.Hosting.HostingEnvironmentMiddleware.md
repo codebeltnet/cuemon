@@ -12,6 +12,7 @@ using System;
 using System.Threading.Tasks;
 using Cuemon.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -24,7 +25,10 @@ namespace Cuemon.AspNetCore.Hosting
     {
         public static async Task DemonstrateAsync()
         {
+            var responseFeature = new CapturingHttpResponseFeature();
             var context = new DefaultHttpContext();
+            context.Features.Set<IHttpResponseFeature>(responseFeature);
+
             var environment = new SampleHostEnvironment();
             var options = Options.Create(new HostingEnvironmentOptions
             {
@@ -33,13 +37,33 @@ namespace Cuemon.AspNetCore.Hosting
             });
 
             var middleware = new HostingEnvironmentMiddleware(
-                httpContext => httpContext.Response.WriteAsync("Hello"),
+                async httpContext =>
+                {
+                    await responseFeature.FireOnStartingAsync();
+                    await httpContext.Response.WriteAsync("Hello");
+                },
                 options);
 
             await middleware.InvokeAsync(context, environment);
 
-            // The middleware writes this header when the response starts.
-            Console.WriteLine($"{options.Value.HeaderName}: {environment.EnvironmentName}");
+            Console.WriteLine($"{options.Value.HeaderName}: {context.Response.Headers[options.Value.HeaderName]}");
+        }
+
+        private sealed class CapturingHttpResponseFeature : HttpResponseFeature
+        {
+            private Func<Task>? _onStarting;
+
+            public override void OnStarting(Func<object, Task> callback, object state)
+            {
+                var prior = _onStarting;
+                _onStarting = async () =>
+                {
+                    await callback(state);
+                    if (prior != null) { await prior(); }
+                };
+            }
+
+            public Task FireOnStartingAsync() => _onStarting?.Invoke() ?? Task.CompletedTask;
         }
 
         private sealed class SampleHostEnvironment : IHostEnvironment
@@ -54,5 +78,5 @@ namespace Cuemon.AspNetCore.Hosting
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="af4d35fd754a2665db716636"><a href="~/run-actions/af4d35fd754a2665db716636/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/af4d35fd754a2665db716636/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="34d97dfc5c86f9f0cc712f72"><a href="~/run-actions/34d97dfc5c86f9f0cc712f72/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/34d97dfc5c86f9f0cc712f72/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->

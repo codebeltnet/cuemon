@@ -17,11 +17,11 @@ using Cuemon.Net;
             qsc.Add("search", "dotnet");
             qsc.Add("page", "2");
             qsc.Add("sort", "name");
-            Console.WriteLine("Query string: {0}", qsc); // search=dotnet&page=2&sort=name
+            Console.WriteLine("Query string: {0}", qsc); // ?search=dotnet&page=2&sort=name
 
             // Create from an existing URI query string.
             var fromUrl = new QueryStringCollection("?category=books&author=tolkien");
-            Console.WriteLine("Parsed query: {0}", fromUrl); // category=books&author=tolkien
+            Console.WriteLine("Parsed query: {0}", fromUrl); // ?category=books&author=tolkien
 
             // Create with URL decoding enabled.
             var encoded = new QueryStringCollection("q=hello%20world&lang=en", urlDecode: true);
@@ -32,6 +32,7 @@ using Cuemon.Net;
             foreach (var pair in fromUrl)
             {
                 Console.WriteLine("  {0} = {1}", pair.Key, pair.Value);
+            }
 
             // Use AllKeys from the base NameValueCollection.
             Console.WriteLine("Keys: {0}", string.Join(", ", qsc.AllKeys));
@@ -44,10 +45,8 @@ using Cuemon.Net;
 
             // Count entries.
             Console.WriteLine("Count: {0}", qsc.Count);
-
-}
 ```
 
 <!-- docfx-run-actions:start -->
-<div class="docfx-run-actions" data-example-id="6636f10992cec8203b8df199"><a href="~/run-actions/6636f10992cec8203b8df199/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/6636f10992cec8203b8df199/docker.ps1" data-transport="docker">View Docker Script</a></div>
+<div class="docfx-run-actions" data-example-id="0a3af96a351dd4358fa542cb"><a href="~/run-actions/0a3af96a351dd4358fa542cb/native.ps1" data-transport="native">View Native Script</a> · <a href="~/run-actions/0a3af96a351dd4358fa542cb/docker.ps1" data-transport="docker">View Docker Script</a></div>
 <!-- docfx-run-actions:end -->
